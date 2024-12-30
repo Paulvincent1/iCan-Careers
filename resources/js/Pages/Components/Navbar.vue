@@ -8,7 +8,7 @@ let isActive = ref(false);
         <header
             class="container mx-auto flex h-[4.625rem] items-center justify-between px-[0.5rem] xl:max-w-7xl"
         >
-            <p>iCan Careers</p>
+            <p class=""><Link :href="route('home')">iCan Careers</Link></p>
             <nav
                 :class="[
                     'fixed inset-0 top-[4.626rem] z-[1000] flex h-[calc(100vh-4.625rem)] w-full flex-col items-center backdrop-blur-lg transition-all md:static md:inset-0 md:h-[100%] md:w-auto md:translate-x-0 md:flex-row',
@@ -20,10 +20,15 @@ let isActive = ref(false);
                 <ul
                     class="flex h-[100%] flex-col items-center justify-start gap-16 py-3 md:static md:flex-row md:gap-4"
                 >
-                    <li class="mt-6 md:my-auto md:pr-5">Learning</li>
-                    <li class="md:my-auto md:pr-5">Pricing</li>
+                    <li class="mt-6 md:my-auto md:pr-5">
+                        <Link href="/">Learning</Link>
+                    </li>
+                    <li class="md:my-auto md:pr-5">
+                        <Link href="/">Pricing</Link>
+                    </li>
                     <li class="md:my-auto">
                         <Link
+                            href="/"
                             class="rounded-3xl bg-[#024570] px-7 py-2 font-medium text-white"
                         >
                             POST A JOB
@@ -31,14 +36,23 @@ let isActive = ref(false);
                     </li>
                     <li class="flex items-center md:pr-3 lg:border-r-[1px]">
                         <Link
+                            href=""
                             class="rounded-3xl bg-[#73b743] px-7 py-2 font-medium text-white"
                         >
                             FIND JOBS
                         </Link>
                     </li>
                     <div class="flex items-center gap-3 font-semibold">
-                        <li>Login</li>
-                        <li>Signup</li>
+                        <li>
+                            <Link :href="route('login.index')" class=""
+                                >Login</Link
+                            >
+                        </li>
+                        <li>
+                            <Link :href="route('register.create')" class=""
+                                >Signup</Link
+                            >
+                        </li>
                     </div>
                 </ul>
             </nav>
