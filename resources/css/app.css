@@ -4,7 +4,8 @@
 @tailwind utilities;
 
 @layer base {
-    body {
-        box-sizing: border-box;
+    body,
+    html {
+        overflow-x: hidden;
     }
 }

@@ -5,14 +5,15 @@ let search = ref("");
 
 defineProps({
     endpoint: null,
+    name: String,
 });
 </script>
 <template>
     <div class="relative">
         <input
             type="text"
-            class="w-full rounded-3xl border p-4 px-10"
-            placeholder="Search Talent"
+            class="w-full rounded-3xl border p-4 px-12 outline-blue-400"
+            :placeholder="`Search ${name}`"
             v-model="search"
         />
         <i

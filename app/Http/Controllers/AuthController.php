@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
+
+use function Illuminate\Log\log;
 
 class AuthController extends Controller
 {
     public function registerCreate(Request $request){
-        return inertia('Register');
+        return inertia('Authentication/Register');
     }
 
     public function register(Request $request){
@@ -17,17 +25,22 @@ class AuthController extends Controller
             [
                 'name' => 'required',
                 'email' => 'required|email|unique:users,email',
-                'password' => 'required|confirmed'
+                'password' => 'required|confirmed',
+                'role' => 'required'
             ]
             );
 
             $user = User::create($fields);
+            $role = Role::where('name', $fields['role'])->first();
+            
 
-            return inertia('Login');
+            $user->roles()->attach($role->id);
+
+            return redirect()->route('login')->with('status', 'Successfuly registered!');
     }
 
     public function loginIndex(){
-        return inertia('Login');
+        return inertia('Authentication/Login', ['status' => session('status')]);
     }
 
     public function login(Request $request){
@@ -39,11 +52,61 @@ class AuthController extends Controller
         if(Auth::attempt($fields)){
             $request->session()->regenerate();
 
-            return redirect()->intended('home');
+            return redirect()->intended();
         }
 
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
     }
+
+    public function forgotPasswordIndex(Request $request){
+        return inertia('Authentication/ForgotPassword', [
+            'status' => $request->session()->get('status')
+        ]);
+    }
+
+    public function forgotPasswordSendVerification(Request $request){
+        $request->validate(['email' => 'required|email']);
+ 
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+     
+        return $status === Password::RESET_LINK_SENT
+                    ? back()->with(['status' => __($status)])
+                    : back()->withErrors(['email' => __($status)]);
+    }
+
+    public function resetPasswordIndex(Request $request){
+
+        return inertia('Authentication/ResetPassword', ['token' => $request->route('token'), 'email' => $request->email, 'status' => $request->session()->get('status')]);
+    }   
+
+    public function resetPassword(Request $request) {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+     
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+     
+                $user->save();
+     
+                event(new PasswordReset($user));
+            }
+        );
+     
+        return $status === Password::PASSWORD_RESET
+                    ? redirect()->route('login')->with('status', __($status))
+                    : back()->withErrors(['email' => [__($status)]]);
+    }
+
+
 }
