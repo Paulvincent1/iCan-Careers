@@ -1,12 +1,14 @@
 <script setup>
+import { Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 
 let isActive = ref(false);
+let profileDropdown = ref(false);
 </script>
 <template>
     <div class="fixed top-0 z-50 w-full border-b bg-white shadow">
         <header
-            class="container mx-auto flex h-[4.625rem] items-center justify-between px-[0.5rem] xl:max-w-7xl"
+            class="xs container mx-auto flex h-[4.625rem] items-center justify-between px-[0.5rem] xl:max-w-7xl"
         >
             <p class=""><Link :href="route('home')">iCan Careers</Link></p>
             <nav
@@ -44,7 +46,10 @@ let isActive = ref(false);
                             FIND JOBS
                         </Link>
                     </li>
-                    <div class="flex items-center gap-5">
+                    <div
+                        v-if="!$page.props.auth.user"
+                        class="flex items-center gap-5"
+                    >
                         <li>
                             <Link
                                 :href="route('login')"
@@ -62,6 +67,36 @@ let isActive = ref(false);
                             >
                         </li>
                     </div>
+
+                    <li
+                        v-if="$page.props.auth.user"
+                        class="relative flex items-center justify-center gap-1 hover:cursor-pointer"
+                        @click="profileDropdown = !profileDropdown"
+                    >
+                        <img
+                            class="w-7 rounded-[400px] object-cover"
+                            src="storage/assets/profile_placeholder.jpg"
+                            alt=""
+                        />
+                        <div class="flex gap-1">
+                            <p class="text-[12px]">Me</p>
+                            <i class="bi bi-chevron-down text-[12px]"></i>
+                        </div>
+
+                        <div
+                            v-show="profileDropdown"
+                            class="absolute right-0 top-14 w-40 rounded bg-white px-3 py-2 text-sm shadow"
+                        >
+                            <Link class="flex gap-2 p-2">
+                                <i class="bi bi-person"></i>
+                                <p>My Profile</p>
+                            </Link>
+                            <Link class="flex gap-2 p-2">
+                                <i class="bi bi-box-arrow-left"></i>
+                                <p>Log out</p>
+                            </Link>
+                        </div>
+                    </li>
                 </ul>
             </nav>
             <button class="md:hidden" @click="isActive = !isActive">
