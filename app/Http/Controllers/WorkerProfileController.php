@@ -4,15 +4,52 @@ namespace App\Http\Controllers;
 
 use App\Models\WorkerProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+
+use function Illuminate\Log\log;
 
 class WorkerProfileController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function createProfile()
     {
+        $user = Auth::user();
+        if($user->workerProfile){
+     
+            return redirect()->back();
+        }
+        
         return inertia('WorkerAccountSetup/CreateProfile');
+    }
+
+    public function storeProfile(Request $request){
+        // dd($request);
+        $fields = $request->validate([
+            'job_title' =>'required|max:255',
+            'profile_description' =>'required',
+            'highest_educational_attainment' =>'required',
+            'job_type' =>'required',
+            'work_hour_per_day' =>'required|numeric|min:1',
+            'hour_pay' =>'required|numeric|min:1',
+            'month_pay' =>'required|numeric|min:1',
+            'birth_year' =>'required|numeric|min:1900',
+            'gender' =>'required',
+          
+        ]);
+
+        $request->user()->workerProfile()->create($fields);
+      
+        Inertia::clearHistory();
+
+        return redirect()->route('add.skills');
+    }
+
+    public function addSkills(){
+       
+        return inertia('WorkerAccountSetup/AddSkills');
     }
 
     /**

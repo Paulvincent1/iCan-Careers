@@ -64,7 +64,7 @@ let id = prop.name + Math.random();
                 @blur="focusChecker"
                 :type="type"
                 :class="[
-                    'rounded bg-gray-100 px-4 pt-7 text-lg outline-blue-500',
+                    'rounded bg-gray-100 px-4 pt-7 text-lg outline-blue-400',
                     {
                         'border border-red-600': message,
                     },

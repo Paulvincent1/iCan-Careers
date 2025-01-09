@@ -24,6 +24,9 @@ Route::middleware(['guest'])->group(function (){
 });
 
 
-Route::prefix('jobseekers')->middleware(['guest'])->group(function (){
-    Route::get('/create-profile',[WorkerProfileController::class, 'index']);
+Route::prefix('jobseekers')->middleware(['auth'])->group(function (){
+    Route::get('/create-profile',[WorkerProfileController::class, 'createProfile'])->name('create.profile');
+    Route::post('/create-profile',[WorkerProfileController::class, 'storeProfile'])->name('create.profile.post');
+
+    Route::get('/add-skills',[WorkerProfileController::class, 'addSkills'])->name('add.skills');
 });

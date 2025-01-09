@@ -1,14 +1,179 @@
-<script setup></script>
+<script setup>
+import { ref } from "vue";
+import Breadcrumbs from "../Components/Breadcrumbs.vue";
+import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
+import Layout from "../Layouts/Layout.vue";
+import { useForm } from "@inertiajs/vue3";
+
+let props = defineProps({
+    breadcrumbs: Array,
+});
+defineOptions({
+    layout: [Layout, SetupProfileLayout],
+});
+
+let form = useForm({
+    job_title: null,
+    profile_description: null,
+    highest_educational_attainment: null,
+    job_type: null,
+    work_hour_per_day: null,
+    hour_pay: null,
+    month_pay: null,
+    birth_year: null,
+    gender: null,
+});
+
+const submit = () => {
+    form.post(route("create.profile.post"));
+};
+</script>
 <template>
-    <div
-        class="container mx-auto grid grid-cols-[300px,1fr] gap-1 bg-red-500 px-[0.5rem] xl:max-w-7xl"
-    >
-        <div class="bg-blue-500">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum
-            magnam libero quos odit iste animi unde enim iure, beatae
-            consequatur neque perferendis laudantium sapiente sint error
-            perspiciatis nulla voluptas corporis?
-        </div>
-        <div class="bg-yellow-500">dasda</div>
+    <div class="mt-9 border p-7">
+        <h2 class="my-3 text-2xl font-semibold">Tell us about you</h2>
+        <p class="text-sm">
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Reiciendis
+            corporis itaque eum eius unde aperiam aliquid vel ratione
+            doloremque! Ullam illo pariatur officiis tempore iste totam soluta
+            dignissimos libero. Hic?
+        </p>
+
+        <form
+            @submit.prevent="submit"
+            action="
+        "
+        >
+            <div class="flex flex-col">
+                <label class="mb-2 mt-4 font-semibold">JOB TITLE</label>
+                <input
+                    v-model="form.job_title"
+                    type="text"
+                    class="border px-3 py-2 outline-blue-400"
+                    placeholder="ex. Social Media Manager"
+                />
+            </div>
+            <div class="flex flex-col">
+                <label class="mb-2 mt-4 font-semibold"
+                    >PROFILE DESCRIPTION</label
+                >
+                <textarea
+                    v-model="form.profile_description"
+                    type="text"
+                    class="border px-3 pb-9 pt-2 outline-blue-400"
+                    placeholder="Tell us summary about your skills and how you want to be known as worker."
+                ></textarea>
+            </div>
+            <div class="flex flex-col">
+                <label class="mb-2 mt-4 font-semibold"
+                    >HIGHEST EDUCATIONAL ATTAINMENT</label
+                >
+                <div class="relative">
+                    <select
+                        v-model="form.highest_educational_attainment"
+                        name=""
+                        id=""
+                        class="w-full appearance-none border px-3 py-2 outline-blue-400"
+                    >
+                        <option value="Primary School Completed">
+                            Primary School Completed
+                        </option>
+                        <option value="Secondary School (High School) Diploma">
+                            Secondary School (High School) Diploma
+                        </option>
+                        <option value="Associate's Degree">
+                            Associate's Degree
+                        </option>
+                        <option value="Bachelor's Degree">
+                            Bachelor's Degree
+                        </option>
+                        <option value="Master's Degree">Master's Degree</option>
+                        <option value="Doctoral or PhD Degree">
+                            Doctoral or PhD Degree
+                        </option>
+                    </select>
+                    <i
+                        class="bi bi-chevron-down absolute right-2 top-[50%] translate-y-[-50%] text-[16px] font-bold text-purple-500"
+                    ></i>
+                </div>
+            </div>
+            <div class="mt-8">
+                <div>
+                    <p>
+                        Looking for
+
+                        <select
+                            v-model="form.job_type"
+                            name=""
+                            id=""
+                            class="border p-3 outline-blue-400"
+                        >
+                            <option value="Part Time">Part Time</option>
+                            <option value="Full Time">Full Time</option>
+                        </select>
+                        work (
+                        <input
+                            v-model="form.work_hour_per_day"
+                            type="number"
+                            min="1"
+                            class="w-20 border p-3 text-center"
+                        />
+                        hours / day) at ₱
+                        <input
+                            v-model="form.hour_pay"
+                            type="number"
+                            min="1"
+                            class="w-28 border p-3 text-center"
+                        />
+                        / hour, ₱
+                        <input
+                            v-model="form.month_pay"
+                            type="number"
+                            min="1"
+                            class="w-28 border p-3 text-center"
+                        />
+                        / month
+                    </p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <label class="mb-2 mr-3 mt-4 font-semibold">BIRTH YEAR</label>
+                <input
+                    v-model="form.birth_year"
+                    type="number"
+                    min="1900"
+                    class="w-20 border p-3 text-center outline-blue-500"
+                    placeholder="YYYY"
+                />
+            </div>
+            <div class="mt-4">
+                <p class="mb-2 mt-4 font-semibold">GENDER</p>
+                <div>
+                    <label class="mr-2" for="male">MALE</label>
+                    <input
+                        v-model="form.gender"
+                        type="radio"
+                        class="text-center"
+                        id="male"
+                        value="male"
+                    />
+                </div>
+                <div>
+                    <label class="mr-2" for="female">FEMALE</label>
+                    <input
+                        v-model="form.gender"
+                        type="radio"
+                        class="text-center"
+                        id="female"
+                        value="female"
+                    />
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button class="rounded border bg-blue-500 px-4 py-2 text-white">
+                    Save
+                </button>
+            </div>
+        </form>
     </div>
 </template>

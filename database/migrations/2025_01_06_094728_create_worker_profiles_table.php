@@ -20,7 +20,9 @@ return new class extends Migration
             $table->string('work_hour_per_day');
             $table->string('hour_pay');
             $table->string('month_pay');
+            $table->string('birth_year');
             $table->string('gender');
+            $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }

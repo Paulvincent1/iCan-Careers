@@ -14,6 +14,11 @@ class WorkerProfile extends Model
         'work_hour_per_day',
         'hour_pay',
         'month_pay',
+        'birth_year',
         'gender',
     ];
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
