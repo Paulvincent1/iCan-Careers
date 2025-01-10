@@ -25,6 +25,8 @@ Route::middleware(['guest'])->group(function (){
 
 
 Route::prefix('jobseekers')->middleware(['auth'])->group(function (){
+    Route::post('/logout',[AuthController::class, 'logout'])->name('logout');
+
     Route::get('/create-profile',[WorkerProfileController::class, 'createProfile'])->name('create.profile');
     Route::post('/create-profile',[WorkerProfileController::class, 'storeProfile'])->name('create.profile.post');
 

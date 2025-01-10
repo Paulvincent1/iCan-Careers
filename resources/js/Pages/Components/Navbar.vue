@@ -1,9 +1,18 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { onMounted, ref, useTemplateRef } from "vue";
 
 let isActive = ref(false);
 let profileDropdown = ref(false);
+
+const dropdownButton = useTemplateRef("drop");
+onMounted(() => {
+    document.addEventListener("click", (event) => {
+        if (!dropdownButton.value.contains(event.target)) {
+            profileDropdown.value = false;
+        }
+    });
+});
 </script>
 <template>
     <div class="fixed top-0 z-50 w-full border-b bg-white shadow">
@@ -69,13 +78,14 @@ let profileDropdown = ref(false);
                     </div>
 
                     <li
+                        ref="drop"
                         v-if="$page.props.auth.user"
                         class="relative flex items-center justify-center gap-1 hover:cursor-pointer"
                         @click="profileDropdown = !profileDropdown"
                     >
                         <img
                             class="w-7 rounded-[400px] object-cover"
-                            src="storage/assets/profile_placeholder.jpg"
+                            src="/storage/assets/profile_placeholder.jpg"
                             alt=""
                         />
                         <div class="flex gap-1">
@@ -87,13 +97,18 @@ let profileDropdown = ref(false);
                             v-show="profileDropdown"
                             class="absolute right-0 top-14 w-40 rounded bg-white px-3 py-2 text-sm shadow"
                         >
-                            <Link class="flex gap-2 p-2">
+                            <Link class="flex gap-2 p-2" href="/">
                                 <i class="bi bi-person"></i>
                                 <p>My Profile</p>
                             </Link>
-                            <Link class="flex gap-2 p-2">
+                            <Link
+                                :href="route('logout')"
+                                method="post"
+                                as="button"
+                                class="flex gap-2 p-2"
+                            >
                                 <i class="bi bi-box-arrow-left"></i>
-                                <p>Log out</p>
+                                <p>Logout</p>
                             </Link>
                         </div>
                     </li>

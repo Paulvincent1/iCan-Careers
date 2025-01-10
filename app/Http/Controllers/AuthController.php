@@ -52,6 +52,12 @@ class AuthController extends Controller
         if(Auth::attempt($fields)){
             $request->session()->regenerate();
 
+            $user = Auth::user();
+
+            if(!$user->workerProfile){  
+                return redirect()->route('create.profile');
+            }
+            
             return redirect()->intended();
         }
 
@@ -106,6 +112,18 @@ class AuthController extends Controller
         return $status === Password::PASSWORD_RESET
                     ? redirect()->route('login')->with('status', __($status))
                     : back()->withErrors(['email' => [__($status)]]);
+    }
+
+
+    public function logout(Request $request){
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        Inertia::clearHistory();
+
+        return redirect()->route('login');
     }
 
 

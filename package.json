@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^2.0.0",
-        "bootstrap-icons": "^1.11.3"
+        "bootstrap-icons": "^1.11.3",
+        "lodash": "^4.17.21"
     }
 }
