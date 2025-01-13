@@ -53,4 +53,8 @@ class User extends Authenticatable
     public function workerProfile(){
         return $this->hasOne(WorkerProfile::class, 'user_id');
     }
+
+    public function workerSkills() {
+        return $this->hasMany(WorkerSkills::class, 'user_id');
+    }
 }

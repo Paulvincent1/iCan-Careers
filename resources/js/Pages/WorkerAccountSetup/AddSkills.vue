@@ -4,6 +4,9 @@ import Breadcrumbs from "../Components/Breadcrumbs.vue";
 import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
 import Layout from "../Layouts/Layout.vue";
 import { debounce } from "lodash";
+import { useForm } from "@inertiajs/vue3";
+import InputFlashMessage from "../Components/InputFlashMessage.vue";
+import Skill from "../Components/Skill.vue";
 
 defineOptions({
     layout: [Layout, SetupProfileLayout],
@@ -26,32 +29,105 @@ var requestOptions = {
 };
 
 let isOpen = ref(false);
-watch(
-    query,
-    debounce(async (e) => {
-        isOpen.value = false;
-        try {
-            console.log(data.length);
-            let response = await fetch(
-                `https://api.apilayer.com/skills?q=${e}`,
-                requestOptions,
-            );
-            data = await response.json();
+// watch(
+//     query,
+//     debounce(async (e) => {
+//         isOpen.value = false;
+//         if (query.value.length) {
+//             try {
+//                 console.log(data.length);
+//                 let response = await fetch(
+//                     `https://api.apilayer.com/skills?q=${e}`,
+//                     requestOptions,
+//                 );
+//                 data = await response.json();
 
-            isOpen.value = true;
+//                 isOpen.value = true;
 
-            console.log(data);
-        } catch (error) {
-            console.error(error);
-        }
-    }, 500),
-);
+//                 console.log(data);
+//             } catch (error) {
+//                 console.error(error);
+//             }
+//         }
+//     }, 500),
+// );
 
-let skills = ref([]);
+const randomId = function (length = 6) {
+    return Math.random()
+        .toString(36)
+        .substring(2, length + 2);
+};
+
+// let skills = ref([]);
 
 function addSkill(name) {
-    skills.value.push(name);
+    if (name.length) {
+        form.skills.push({
+            id: randomId(),
+            name,
+            experience: "",
+            star: "",
+        });
+        query.value = "";
+    }
 }
+
+function updateSkillName(skillName, skillId) {
+    if (skillName.length) {
+        form.skills.forEach((object) => {
+            if (object.id === skillId) {
+                object.name = skillName;
+            }
+        });
+    }
+}
+
+function addExperience(exp, skillId) {
+    form.skills.forEach((object) => {
+        if (object.id === skillId) {
+            object.experience = exp;
+        }
+    });
+}
+
+function addStar(star, skillId) {
+    form.skills.forEach((object) => {
+        if (object.id === skillId) {
+            object.star = star;
+        }
+    });
+    console.log(form.skills);
+}
+
+function removeSkill(id) {
+    form.skills.forEach((element, index) => {
+        if (element.id === id) {
+            form.skills.splice(index, 1);
+        }
+    });
+}
+
+let form = useForm({
+    skills: [],
+});
+
+let errorMessage = ref("");
+const submit = () => {
+    if (form.skills.length) {
+        for (let i = 0; i < form.skills.length; i++) {
+            if (form.skills[i].star === "") {
+                errorMessage.value = "Please rate all your skills";
+                return;
+            }
+        }
+    } else {
+        errorMessage.value = "Please add a skill";
+
+        return;
+    }
+
+    form.post(route("add.skills.post"));
+};
 </script>
 <template>
     <div class="mt-9 border p-7">
@@ -66,6 +142,7 @@ function addSkill(name) {
                 <input
                     v-model="query"
                     type="text"
+                    placeholder="ex. Social Media Manager"
                     class="mt-3 w-full rounded border p-3 outline-blue-400"
                 />
                 <i
@@ -79,7 +156,7 @@ function addSkill(name) {
                 :class="[
                     'absolute left-0 h-20 w-full overflow-auto rounded bg-slate-500 p-3 text-white',
                     {
-                        'h-fit': !data.length,
+                        'h-fit': !data.length || data.length <= 5,
                     },
                 ]"
             >
@@ -88,7 +165,6 @@ function addSkill(name) {
                     v-for="(res, index) in data"
                     :key="index"
                     class="cursor-pointer p-1"
-                    ref="skill"
                     @click="addSkill(res)"
                 >
                     {{ res }}
@@ -96,17 +172,35 @@ function addSkill(name) {
             </div>
         </div>
 
-        <div>
+        <div class="mb-7">
             <p class="mb-2">Your Skills:</p>
             <div>
-                <div
-                    v-for="(skill, index) in skills"
-                    :key="index"
-                    class="border p-3"
-                >
-                    {{ skill }}
+                <div>
+                    <Skill
+                        v-for="skill in form.skills"
+                        :key="skill.id"
+                        :modelValue="skill"
+                        @addstar="addStar"
+                        @removeskill="removeSkill"
+                        @update:modelValue="addExperience"
+                        @updateSkillName="updateSkillName"
+                    />
                 </div>
+                <InputFlashMessage
+                    class="mt-2"
+                    :message="errorMessage"
+                    type="error"
+                />
             </div>
+        </div>
+        <hr class="mb-7" />
+        <div>
+            <button
+                @click="submit"
+                class="rounded bg-blue-500 px-4 py-2 text-white"
+            >
+                Save
+            </button>
         </div>
     </div>
 </template>

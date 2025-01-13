@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WorkerProfileController;
+use App\Http\Controllers\WorkerSkillsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,5 +31,6 @@ Route::prefix('jobseekers')->middleware(['auth'])->group(function (){
     Route::get('/create-profile',[WorkerProfileController::class, 'createProfile'])->name('create.profile');
     Route::post('/create-profile',[WorkerProfileController::class, 'storeProfile'])->name('create.profile.post');
 
-    Route::get('/add-skills',[WorkerProfileController::class, 'addSkills'])->name('add.skills');
+    Route::get('/add-skills',[WorkerSkillsController::class, 'create'])->name('add.skills');
+    Route::post('/add-skills',[WorkerSkillsController::class, 'store'])->name('add.skills.post');
 });

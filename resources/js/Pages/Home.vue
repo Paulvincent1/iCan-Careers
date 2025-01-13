@@ -1,4 +1,5 @@
 <script setup>
+import Rating from "./Components/Rating.vue";
 import Searchbar from "./Components/Searchbar.vue";
 </script>
 
@@ -25,6 +26,14 @@ import Searchbar from "./Components/Searchbar.vue";
                                 >Join Now</Link
                             >
                         </p>
+
+                        <form
+                            action="
+                        "
+                        >
+                            <Rating id="2"></Rating>
+                            <Rating id="1"></Rating>
+                        </form>
                     </div>
                 </div>
 

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('worker_skills', function (Blueprint $table) {
             $table->id();
             $table->string('skill_name');
-            $table->string('experience');
+            $table->string('experience')->nullable();
             $table->string('rating');
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();

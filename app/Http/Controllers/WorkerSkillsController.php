@@ -20,15 +20,20 @@ class WorkerSkillsController extends Controller
      */
     public function create()
     {
-        //
+        return inertia('WorkerAccountSetup/AddSkills');
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        //
+    { dd($request);
+        $skills = $request->validate([
+            'skills'=> 'required|array',
+            'skills.*' =>  'required|array'
+        ]);
+
+       
     }
 
     /**

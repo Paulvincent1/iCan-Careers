@@ -47,11 +47,6 @@ class WorkerProfileController extends Controller
         return redirect()->route('add.skills');
     }
 
-    public function addSkills(){
-       
-        return inertia('WorkerAccountSetup/AddSkills');
-    }
-
     /**
      * Show the form for creating a new resource.
      */
