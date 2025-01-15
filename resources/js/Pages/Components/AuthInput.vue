@@ -29,13 +29,17 @@ function focusChecker(event = {}) {
     if (event.type === "focus") {
         isFocus.value = true;
     } else if (event.type === "blur") {
-        if (input.value.value.length <= 0) {
-            isFocus.value = false;
+        if (input.value) {
+            if (input.value.value.length <= 0) {
+                isFocus.value = false;
+            }
         }
     }
 
-    if (input.value.value.length) {
-        isFocus.value = true;
+    if (input.value) {
+        if (input.value.value.length) {
+            isFocus.value = true;
+        }
     }
 }
 onMounted(() => {

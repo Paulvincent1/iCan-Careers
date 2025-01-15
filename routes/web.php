@@ -1,16 +1,19 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
+use App\Http\Middleware\isWorker;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return inertia('Home');
-})->name('home');
+
 
 Route::middleware(['guest'])->group(function (){
-
+    Route::get('/', function () {
+        return inertia('Home');
+    })->name('home');
+    
     Route::get('/register',[AuthController::class, 'registerCreate'])->name('register.create');
     Route::post('/register',[AuthController::class, 'register'])->name('register.post');
 
@@ -25,12 +28,16 @@ Route::middleware(['guest'])->group(function (){
 });
 
 
-Route::prefix('jobseekers')->middleware(['auth'])->group(function (){
-    Route::post('/logout',[AuthController::class, 'logout'])->name('logout');
+Route::post('/logout',[AuthController::class, 'logout'])->middleware(['auth'])->name('logout');
+
+
+Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(function (){
 
     Route::get('/create-profile',[WorkerProfileController::class, 'createProfile'])->name('create.profile');
     Route::post('/create-profile',[WorkerProfileController::class, 'storeProfile'])->name('create.profile.post');
 
     Route::get('/add-skills',[WorkerSkillsController::class, 'create'])->name('add.skills');
     Route::post('/add-skills',[WorkerSkillsController::class, 'store'])->name('add.skills.post');
+
+    Route::get('/',[WorkerDashboard::class, 'index'])->name('worker.dashboard');
 });

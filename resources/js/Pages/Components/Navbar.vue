@@ -1,6 +1,6 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
-import { onMounted, ref, useTemplateRef } from "vue";
+import { onMounted, ref, useTemplateRef, watch } from "vue";
 
 let isActive = ref(false);
 let profileDropdown = ref(false);
@@ -13,6 +13,12 @@ onMounted(() => {
         }
     });
 });
+
+watch(isActive, () => {
+    isActive.value
+        ? (document.body.style.position = "fixed")
+        : (document.body.style.position = "static");
+});
 </script>
 <template>
     <div class="fixed top-0 z-50 w-full border-b bg-white shadow">
@@ -22,7 +28,7 @@ onMounted(() => {
             <p class=""><Link :href="route('home')">iCan Careers</Link></p>
             <nav
                 :class="[
-                    'fixed inset-0 top-[4.626rem] z-[1000] flex h-[calc(100vh-4.625rem)] w-full flex-col items-center bg-white transition-all md:static md:inset-0 md:h-[100%] md:w-auto md:translate-x-0 md:flex-row',
+                    'fixed inset-0 top-[4.626rem] z-[1000] flex h-[calc(100vh-4.625rem)] w-full flex-col items-center overflow-auto bg-white transition-all md:static md:inset-0 md:h-[100%] md:w-auto md:translate-x-0 md:flex-row md:overflow-visible',
                     {
                         'translate-x-[100%]': !isActive,
                     },
@@ -37,7 +43,7 @@ onMounted(() => {
                     <li class="md:my-auto md:pr-5">
                         <Link href="/" @click="isActive = false">Pricing</Link>
                     </li>
-                    <li class="md:my-auto">
+                    <!-- <li class="md:my-auto">
                         <Link
                             href="/"
                             class="rounded-3xl bg-[#024570] px-7 py-2 font-medium text-white"
@@ -45,7 +51,7 @@ onMounted(() => {
                         >
                             POST A JOB
                         </Link>
-                    </li>
+                    </li> -->
                     <li class="flex items-center md:pr-3 lg:border-r-[1px]">
                         <Link
                             href=""
@@ -79,7 +85,7 @@ onMounted(() => {
 
                     <li
                         ref="drop"
-                        v-if="$page.props.auth.user"
+                        v-show="$page.props.auth.user"
                         class="relative flex items-center justify-center gap-1 hover:cursor-pointer"
                         @click="profileDropdown = !profileDropdown"
                     >
@@ -95,7 +101,7 @@ onMounted(() => {
 
                         <div
                             v-show="profileDropdown"
-                            class="absolute right-0 top-14 w-40 rounded bg-white px-3 py-2 text-sm shadow"
+                            class="absolute top-10 w-40 rounded bg-white px-3 py-2 text-sm shadow md:right-0 md:top-14"
                         >
                             <Link class="flex gap-2 p-2" href="/">
                                 <i class="bi bi-person"></i>
