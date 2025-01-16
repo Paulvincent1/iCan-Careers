@@ -1,6 +1,12 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link } from "@inertiajs/vue3";
 
+const props = defineProps({
+    user: {
+        type: Object,
+        required: true,
+    },
+});
 </script>
 <template>
     <div class="container mx-auto px-[0.5rem] xl:max-w-7xl">
@@ -18,27 +24,43 @@ import { Link } from '@inertiajs/vue3';
                             class="w-full rounded-[500px]"
                         />
                     </div>
-                    <p class="font-bol mb-3">Paul S.</p>
+                    <p class="font-bol mb-3">{{ user.name }}</p>
                     <button
-                        class="mb-3 w-full rounded-lg border px-4 py-2 font-bold"
+                        class="mb-3 w-full max-w-[500px] rounded-lg border px-4 py-2 font-bold"
                     >
                         View Profile
                     </button>
-                    <p class="text-red-500">Please Verify your account!</p>
+                    <div
+                        v-if="!$page.props.auth.worker_verified"
+                        class="flex flex-col items-center"
+                    >
+                        <p class="mb-3 text-center text-red-500">
+                            Please verify your account to apply for jobs!
+                        </p>
+                        <Link
+                            :href="route('account.verify')"
+                            as="button"
+                            class="w-full rounded-lg border bg-red-500 py-2 text-white"
+                        >
+                            Click here to verify!
+                        </Link>
+                    </div>
                 </div>
 
                 <div class="border p-4">Inbox</div>
             </div>
             <div
-                class="grid grid-cols-1 gap-2 rounded xl:grid-cols-[600px,1fr]"
+                class="grid grid-cols-1 gap-2 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
             >
-                <div class="h-[318px] rounded border p-3">
+                <div
+                    class="col-span-2 h-[318px] rounded border p-3 lg:col-span-1"
+                >
                     <div class="flex justify-between">
                         <p class="p-1 font-bold">Invoice status</p>
-                        <Link class="p-1">Create invoice</Link>
+                        <Link href="/" class="p-1">Create invoice</Link>
                     </div>
                 </div>
-                <div class="rounded border p-3">
+                <div class="col-span-2 rounded border p-3 lg:col-span-1">
                     <p class="font-bold">Notification</p>
                 </div>
                 <div class="col-span-2 h-[300px] rounded border p-3">

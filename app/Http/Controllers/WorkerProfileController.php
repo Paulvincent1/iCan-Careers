@@ -19,7 +19,7 @@ class WorkerProfileController extends Controller
         $user = Auth::user();
         if($user->workerProfile){
      
-            return redirect()->back();
+            return redirect()->route('add.skills');
         }
         
         return inertia('WorkerAccountSetup/CreateProfile');

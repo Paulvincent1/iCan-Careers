@@ -57,4 +57,8 @@ class User extends Authenticatable
     public function workerSkills() {
         return $this->hasMany(WorkerSkills::class, 'user_id');
     }
+
+    public function workerVerification(){
+        return $this->hasOne(WorkerVerification::class, 'user_id');
+    }
 }

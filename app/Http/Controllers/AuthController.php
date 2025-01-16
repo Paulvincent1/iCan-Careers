@@ -58,7 +58,15 @@ class AuthController extends Controller
                 return redirect()->route('create.profile');
             }
             
-            return redirect()->intended();
+            $userRole = '';
+            foreach($user->roles as $role){
+                $userRole = $role->name;
+            }
+
+            if($userRole === 'Senior' || $userRole === 'PWD'){
+                return redirect()->route('worker.dashboard');
+            }
+
         }
 
         return back()->withErrors([

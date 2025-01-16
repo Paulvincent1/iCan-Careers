@@ -49,6 +49,9 @@ class HandleInertiaRequests extends Middleware
                     }
                 }
                 return null;
+            },
+            'auth.worker_verified' => function () use($request){
+                $request->user() ? ($request->user()->workerVerification ? $request->user()->workerVerification : null) : null ;
             }
         ]);
     }

@@ -4,15 +4,34 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
+use App\Http\Controllers\WorkerVerificationController;
 use App\Http\Middleware\isWorker;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+    
+Route::get('/', function () {
+    $userRole = '';
+    if($auth = Auth::user()){
+        foreach($auth->roles as $role){
+            $userRole = $role->name;
+        }
 
+        if($userRole === 'Senior' || $userRole ==='PWD'){
+            return redirect()->route('worker.dashboard');
+        }
+    }
+    return inertia('Home');
+})->name('home');
+
+// functionality for the vue.
+
+Route::get('/goback', function(){
+    return redirect()->back();
+});
 
 Route::middleware(['guest'])->group(function (){
-    Route::get('/', function () {
-        return inertia('Home');
-    })->name('home');
+
     
     Route::get('/register',[AuthController::class, 'registerCreate'])->name('register.create');
     Route::post('/register',[AuthController::class, 'register'])->name('register.post');
@@ -40,4 +59,12 @@ Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(functio
     Route::post('/add-skills',[WorkerSkillsController::class, 'store'])->name('add.skills.post');
 
     Route::get('/',[WorkerDashboard::class, 'index'])->name('worker.dashboard');
+
+    Route::prefix('verification')->group(function () {
+
+        Route::get('/',[WorkerVerificationController::class, 'index'])->name('account.verify');
+        
+        Route::get('/id',[WorkerVerificationController::class, 'verificationId'])->name('account.verifiy.id');
+        Route::post('/id', [WorkerVerificationController::class, 'store'])->name('account.verifiy.id.post');
+    });
 });

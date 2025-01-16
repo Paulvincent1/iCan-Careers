@@ -12,7 +12,11 @@ class WorkerVerificationController extends Controller
      */
     public function index()
     {
-        //
+        return inertia('WorkerAccountSetup/Verification/Verification');
+    }
+
+    public function verificationId(){
+        return inertia('WorkerAccountSetup/Verification/IdVerfication');
     }
 
     /**
@@ -28,7 +32,16 @@ class WorkerVerificationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+       
+        $fields = $request->validate([
+            'first_name' => 'required|max:255',
+            'middle_name' => 'required|max:255',
+            'last_name' => 'required|max:255',
+            'suffix' => 'required|max:255',
+            'id_image' => 'required|image',
+            'selfie_image' => 'required|image',
+        ]);
+        dd($fields);
     }
 
     /**

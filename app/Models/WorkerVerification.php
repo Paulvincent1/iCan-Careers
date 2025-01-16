@@ -14,4 +14,8 @@ class WorkerVerification extends Model
         'id_image',
         'selfie_image',
     ];
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
