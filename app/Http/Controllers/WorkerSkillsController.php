@@ -28,7 +28,7 @@ class WorkerSkillsController extends Controller
             return redirect()->route('create.profile');
         }
 
-        if($user->workerSkills){
+        if(count($user->workerSkills)){
             return redirect()->route('worker.dashboard');
         }
 

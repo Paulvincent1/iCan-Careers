@@ -181,6 +181,7 @@ const submit = () => {
                         :key="skill.id"
                         :modelValue="skill"
                         @addstar="addStar"
+                        v-model="something"
                         @removeskill="removeSkill"
                         @update:modelValue="addExperience"
                         @updateSkillName="updateSkillName"
