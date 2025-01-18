@@ -4,6 +4,14 @@ import Rating from "./Rating.vue";
 
 let props = defineProps({
     modelValue: Object,
+    owner: {
+        type: Boolean,
+        default: true,
+    },
+    starValue: {
+        type: null,
+        required: false,
+    },
 });
 let emit = defineEmits([
     "addstar",
@@ -31,17 +39,20 @@ let isEditSkill = ref(false);
 let onHover = ref(false);
 </script>
 <template>
-    <div class="border p-3">
+    <div class="rounded border p-3">
         <div class="flex justify-between">
             <div
                 @click="isEditSkill = true"
                 v-show="!isEditSkill"
-                class="flex cursor-pointer gap-2"
+                :class="[
+                    'flex cursor-pointer gap-2',
+                    { 'pointer-events-none': !owner },
+                ]"
             >
                 <p class="text-lg">
                     {{ modelValue.name }}
                 </p>
-                <i class="bi bi-pencil-fill text-blue-500"></i>
+                <i v-if="owner" class="bi bi-pencil-fill text-blue-500"></i>
             </div>
             <div v-show="isEditSkill" class="flex gap-2">
                 <input
@@ -62,6 +73,7 @@ let onHover = ref(false);
             </div>
             <div class="flex gap-3">
                 <button
+                    v-if="owner"
                     @click="removeSkill(modelValue.id)"
                     @mouseover="onHover = true"
                     @mouseout="onHover = false"
@@ -75,12 +87,17 @@ let onHover = ref(false);
                         ]"
                     ></i>
                 </button>
-                <Rating :id="modelValue.id" @addstar="addStar" />
+                <Rating
+                    starValue="starValue"
+                    :id="modelValue.id"
+                    @addstar="addStar"
+                />
             </div>
         </div>
         <div class="mt-3 flex items-end gap-2">
             <p class="text-[14px]">Experience:</p>
             <input
+                v-if="owner"
                 @input="
                     emit(
                         'update:modelValue',
@@ -92,6 +109,9 @@ let onHover = ref(false);
                 class="border px-2 outline-blue-500"
                 placeholder="Less than 6 months"
             />
+            <p v-if="!owner" class="text-[14px]">
+                {{ modelValue.experience ? modelValue.experience : "N/A" }}
+            </p>
         </div>
     </div>
 </template>

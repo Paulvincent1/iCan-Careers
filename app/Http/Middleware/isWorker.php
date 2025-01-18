@@ -32,7 +32,7 @@ class isWorker
         if($isWorker){
             return $next($request);
         }else{
-            // todo returns worker dashboard.
+           return redirect()->route('worker.dashboard');
         }
     }
 }

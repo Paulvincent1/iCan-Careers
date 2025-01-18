@@ -181,11 +181,12 @@ const submit = () => {
                         :key="skill.id"
                         :modelValue="skill"
                         @addstar="addStar"
-                        v-model="something"
                         @removeskill="removeSkill"
                         @update:modelValue="addExperience"
                         @updateSkillName="updateSkillName"
                     />
+                    <!-- owner="true" -->
+                    <!-- starValue="1" -->
                 </div>
                 <InputFlashMessage
                     class="mt-2"
