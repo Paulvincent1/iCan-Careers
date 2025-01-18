@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\WorkerProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,12 @@ class WorkerProfileController extends Controller
         Inertia::clearHistory();
 
         return redirect()->route('add.skills');
+    }
+
+
+    public function myProfile(User $user){
+        
+        return inertia('Worker/Profile');
     }
 
     /**

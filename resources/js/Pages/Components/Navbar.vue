@@ -91,7 +91,7 @@ watch(isActive, () => {
                     >
                         <img
                             class="w-7 rounded-[400px] object-cover"
-                            src="/storage/assets/profile_placeholder.jpg"
+                            src="/assets/profile_placeholder.jpg"
                             alt=""
                         />
                         <div class="flex gap-1">

@@ -34,7 +34,7 @@ import Searchbar from "./Components/Searchbar.vue";
                 >
                     <img
                         class="absolute left-0 top-0 h-[600px] w-[1000px] max-w-none"
-                        src="storage/assets/hero.jpg"
+                        src="/assets/hero.jpg"
                         alt="hero-section"
                     />
                 </div>

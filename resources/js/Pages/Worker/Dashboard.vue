@@ -1,11 +1,19 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
+import { onMounted } from "vue";
 
 const props = defineProps({
     user: {
         type: Object,
         required: true,
     },
+    isPending: {
+        type: null,
+    },
+});
+
+onMounted(() => {
+    console.log(props.isVerified);
 });
 </script>
 <template>
@@ -19,17 +27,19 @@ const props = defineProps({
                 >
                     <div class="mb-3 w-[84px]">
                         <img
-                            src="/storage/assets/profile_placeholder.jpg"
+                            src="assets/profile_placeholder.jpg"
                             alt=""
                             class="w-full rounded-[500px]"
                         />
                     </div>
                     <p class="font-bol mb-3">{{ user.name }}</p>
-                    <button
+                    <Link
+                        :href="route('worker.profile')"
+                        as="button"
                         class="mb-3 w-full max-w-[500px] rounded-lg border px-4 py-2 font-bold"
                     >
                         View Profile
-                    </button>
+                    </Link>
                     <div
                         v-if="!$page.props.auth.worker_verified"
                         class="flex flex-col items-center"
@@ -44,6 +54,10 @@ const props = defineProps({
                         >
                             Click here to verify!
                         </Link>
+                    </div>
+
+                    <div v-if="isPending">
+                        <p class="text-yellow-400">{{ isPending }}</p>
                     </div>
                 </div>
 

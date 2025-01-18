@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\WorkerVerification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class WorkerVerificationController extends Controller
 {
@@ -16,6 +19,10 @@ class WorkerVerificationController extends Controller
     }
 
     public function verificationId(){
+        $user = Auth::user();
+        if($user->workerVerification){
+            return redirect()->route('worker.dashboard');
+        }
         return inertia('WorkerAccountSetup/Verification/IdVerfication');
     }
 
@@ -32,6 +39,7 @@ class WorkerVerificationController extends Controller
      */
     public function store(Request $request)
     {
+
        
         $fields = $request->validate([
             'first_name' => 'required|max:255',
@@ -41,7 +49,24 @@ class WorkerVerificationController extends Controller
             'id_image' => 'required|image',
             'selfie_image' => 'required|image',
         ]);
-        dd($fields);
+        // dd($fields);
+
+        $idImage = Storage::disk('public')->put('images',$fields['id_image']);
+        $selfieImage = Storage::disk('public')->put('images',$fields['selfie_image']);
+
+        // dd('/storage/'.$idImage);
+        $user = Auth::user();
+        $user->workerVerification()->create([
+            'first_name' => $fields['first_name'],
+            'middle_name' => $fields['middle_name'],
+            'last_name' => $fields['last_name'],
+            'suffix' =>  $fields['suffix'],
+            'id_image' =>  '/storage/'.$idImage,
+            'selfie_image' => '/storage/'.$selfieImage,
+        ]);
+
+        Inertia::clearHistory();
+        return redirect()->route('worker.dashboard');
     }
 
     /**

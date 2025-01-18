@@ -17,11 +17,11 @@ function goBack() {
                 <div class="relative">
                     <img
                         class="w-48 object-cover"
-                        src="/storage/assets/government_id_verification2.png"
+                        src="/assets/government_id_verification2.png"
                         alt="government_id"
                     />
                     <img
-                        src="/storage/assets/check_image.png"
+                        src="/assets/check_image.png"
                         alt=""
                         class="absolute right-3 top-[50%] w-20"
                     />
