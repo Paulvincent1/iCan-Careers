@@ -90,6 +90,14 @@ function addExperience(exp, skillId) {
     });
 }
 
+function updateExperience(exp, skillId) {
+    form.skills.forEach((object) => {
+        if (object.id === skillId) {
+            object.experience = exp;
+        }
+    });
+}
+
 function addStar(star, skillId) {
     form.skills.forEach((object) => {
         if (object.id === skillId) {
@@ -182,8 +190,8 @@ const submit = () => {
                         :modelValue="skill"
                         @addstar="addStar"
                         @removeskill="removeSkill"
-                        @update:modelValue="addExperience"
                         @updateSkillName="updateSkillName"
+                        @updateExperience="updateExperience"
                     />
                     <!-- owner="true" -->
                     <!-- starValue="1" -->

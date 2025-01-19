@@ -6,12 +6,16 @@ const emit = defineEmits(["addstar"]);
 
 let props = defineProps({
     id: {
-        type: String,
+        type: null,
         required: true,
     },
     starValue: {
         type: null,
         required: false,
+    },
+    owner: {
+        type: Boolean,
+        default: true,
     },
 });
 
@@ -29,14 +33,11 @@ function addStar(star) {
             :name="`star_${id}`"
             :id="`star5_${id}`"
             value="5"
-            :disabled="starValue ? starValue != 5 : false"
+            :disabled="owner ? false : true"
             :checked="starValue ? (starValue === 5 ? true : false) : false"
         />
 
-        <label
-            :for="`star5_${id}`"
-            :class="{ 'pointer-events-none': starValue }"
-        >
+        <label :for="`star5_${id}`" :class="{ 'pointer-events-none': !owner }">
             <i class="bi bi-star-fill"></i>
         </label>
 
@@ -46,14 +47,11 @@ function addStar(star) {
             :name="`star_${id}`"
             :id="`star4_${id}`"
             value="4"
-            :disabled="starValue ? starValue != 4 : false"
+            :disabled="owner ? false : true"
             :checked="starValue ? (starValue === 4 ? true : false) : false"
         />
 
-        <label
-            :for="`star4_${id}`"
-            :class="{ 'pointer-events-none': starValue }"
-        >
+        <label :for="`star4_${id}`" :class="{ 'pointer-events-none': !owner }">
             <i class="bi bi-star-fill"></i>
         </label>
 
@@ -63,14 +61,11 @@ function addStar(star) {
             :name="`star_${id}`"
             :id="`star3_${id}`"
             value="3"
-            :disabled="starValue ? starValue != 3 : false"
+            :disabled="owner ? false : true"
             :checked="starValue ? (starValue === 3 ? true : false) : false"
         />
 
-        <label
-            :for="`star3_${id}`"
-            :class="{ 'pointer-events-none': starValue }"
-        >
+        <label :for="`star3_${id}`" :class="{ 'pointer-events-none': !owner }">
             <i class="bi bi-star-fill"></i>
         </label>
 
@@ -80,14 +75,11 @@ function addStar(star) {
             :name="`star_${id}`"
             :id="`star2_${id}`"
             value="2"
-            :disabled="starValue ? starValue != 2 : false"
+            :disabled="owner ? false : true"
             :checked="starValue ? (starValue === 2 ? true : false) : false"
         />
 
-        <label
-            :for="`star2_${id}`"
-            :class="{ 'pointer-events-none': starValue }"
-        >
+        <label :for="`star2_${id}`" :class="{ 'pointer-events-none': !owner }">
             <i class="bi bi-star-fill"></i>
         </label>
 
@@ -97,14 +89,11 @@ function addStar(star) {
             :name="`star_${id}`"
             :id="`star1_${id}`"
             value="1"
-            :disabled="starValue ? starValue != 1 : false"
-            :checked="starValue ? (starValue === 1 ? true : true) : false"
+            :disabled="owner ? false : true"
+            :checked="starValue ? (starValue === 1 ? true : false) : false"
         />
 
-        <label
-            :for="`star1_${id}`"
-            :class="{ 'pointer-events-none': starValue }"
-        >
+        <label :for="`star1_${id}`" :class="{ 'pointer-events-none': !owner }">
             <i class="bi bi-star-fill"></i>
         </label>
     </div>

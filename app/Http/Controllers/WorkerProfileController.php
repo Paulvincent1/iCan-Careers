@@ -49,9 +49,12 @@ class WorkerProfileController extends Controller
     }
 
 
-    public function myProfile(User $user){
-        
-        return inertia('Worker/Profile');
+    public function myProfile(){
+        $user = Auth::user();
+        $workerSkills = $user->workerSkills;
+        $workerProfile = $user->workerProfile;
+        // dd($workerProfile);
+        return inertia('Worker/Profile',['userProp' => $user, 'workerSkillsProp' => $workerSkills, 'workerProfileProp' => $workerProfile]);
     }
 
     /**

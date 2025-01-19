@@ -4,6 +4,9 @@ import Breadcrumbs from "../Components/Breadcrumbs.vue";
 import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
 import Layout from "../Layouts/Layout.vue";
 import { useForm } from "@inertiajs/vue3";
+import WorkDetailsForm from "../Components/WorkDetailsForm.vue";
+import InputFlashMessage from "../Components/InputFlashMessage.vue";
+import dayjs from "dayjs";
 
 let props = defineProps({
     breadcrumbs: Array,
@@ -51,6 +54,10 @@ const submit = () => {
                     class="border px-3 py-2 outline-blue-400"
                     placeholder="ex. Social Media Manager"
                 />
+                <InputFlashMessage
+                    type="error"
+                    :message="form.errors.job_title"
+                />
             </div>
             <div class="flex flex-col">
                 <label class="mb-2 mt-4 font-semibold"
@@ -62,6 +69,10 @@ const submit = () => {
                     class="border px-3 pb-9 pt-2 outline-blue-400"
                     placeholder="Tell us summary about your skills and how you want to be known as worker."
                 ></textarea>
+                <InputFlashMessage
+                    type="error"
+                    :message="form.errors.profile_description"
+                />
             </div>
             <div class="flex flex-col">
                 <label class="mb-2 mt-4 font-semibold"
@@ -94,45 +105,20 @@ const submit = () => {
                     <i
                         class="bi bi-chevron-down absolute right-2 top-[50%] translate-y-[-50%] text-[16px] font-bold text-purple-500"
                     ></i>
+                    <InputFlashMessage
+                        type="error"
+                        :message="form.errors.highest_educational_attainment"
+                    />
                 </div>
             </div>
             <div class="mt-8">
                 <div>
-                    <p>
-                        Looking for
-
-                        <select
-                            v-model="form.job_type"
-                            name=""
-                            id=""
-                            class="border p-3 outline-blue-400"
-                        >
-                            <option value="Part Time">Part Time</option>
-                            <option value="Full Time">Full Time</option>
-                        </select>
-                        work (
-                        <input
-                            v-model="form.work_hour_per_day"
-                            type="number"
-                            min="1"
-                            class="w-20 border p-3 text-center"
-                        />
-                        hours / day) at ₱
-                        <input
-                            v-model="form.hour_pay"
-                            type="number"
-                            min="1"
-                            class="w-28 border p-3 text-center"
-                        />
-                        / hour, ₱
-                        <input
-                            v-model="form.month_pay"
-                            type="number"
-                            min="1"
-                            class="w-28 border p-3 text-center"
-                        />
-                        / month
-                    </p>
+                    <WorkDetailsForm
+                        v-model:jobType="form.job_type"
+                        v-model:workHourPerDay="form.work_hour_per_day"
+                        v-model:hourPay="form.hour_pay"
+                        v-model:monthPay="form.month_pay"
+                    />
                 </div>
             </div>
             <div class="mt-4">
@@ -141,8 +127,10 @@ const submit = () => {
                     v-model="form.birth_year"
                     type="number"
                     min="1900"
+                    :max="dayjs().format('YYYY') - 18"
                     class="w-20 border p-3 text-center outline-blue-500"
                     placeholder="YYYY"
+                    required
                 />
             </div>
             <div class="mt-4">
@@ -154,7 +142,7 @@ const submit = () => {
                         type="radio"
                         class="text-center"
                         id="male"
-                        value="male"
+                        value="Male"
                     />
                 </div>
                 <div>
@@ -164,9 +152,10 @@ const submit = () => {
                         type="radio"
                         class="text-center"
                         id="female"
-                        value="female"
+                        value="Female"
                     />
                 </div>
+                <InputFlashMessage type="error" :message="form.errors.gender" />
             </div>
 
             <div class="flex justify-end">

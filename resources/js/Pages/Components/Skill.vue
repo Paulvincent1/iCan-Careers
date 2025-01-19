@@ -1,6 +1,7 @@
 <script setup>
 import { ref, useTemplateRef } from "vue";
 import Rating from "./Rating.vue";
+import { constant } from "lodash";
 
 let props = defineProps({
     modelValue: Object,
@@ -8,22 +9,27 @@ let props = defineProps({
         type: Boolean,
         default: true,
     },
-    starValue: {
-        type: null,
-        required: false,
-    },
 });
+
+console.log(props.modelValue.star);
 let emit = defineEmits([
     "addstar",
     "removeskill",
     "updateSkillName",
-    "update:modelValue",
+    "updateExperience",
 ]);
 
+let experienceActive = ref(false);
+
 let input = useTemplateRef("input");
+let experienceInput = useTemplateRef("experienceInput");
 
 function updateSkillName() {
     emit("updateSkillName", input.value.value, props.modelValue.id);
+}
+
+function updateExperience() {
+    emit("updateExperience", experienceInput.value.value, props.modelValue.id);
 }
 
 function addStar(star) {
@@ -88,27 +94,36 @@ let onHover = ref(false);
                     ></i>
                 </button>
                 <Rating
-                    starValue="starValue"
+                    :owner="owner"
+                    :starValue="modelValue.star"
                     :id="modelValue.id"
                     @addstar="addStar"
                 />
             </div>
         </div>
         <div class="mt-3 flex items-end gap-2">
-            <p class="text-[14px]">Experience:</p>
-            <input
-                v-if="owner"
-                @input="
-                    emit(
-                        'update:modelValue',
-                        $event.target.value,
-                        modelValue.id,
-                    )
-                "
-                type="text"
-                class="border px-2 outline-blue-500"
-                placeholder="Less than 6 months"
-            />
+            <div>
+                <p class="text-[14px]">Experience:</p>
+                <input
+                    ref="experienceInput"
+                    v-if="owner"
+                    @input="experienceActive = true"
+                    type="text"
+                    class="mr-2 rounded border p-1 outline-blue-500"
+                    placeholder="Less than 6 months"
+                    :value="modelValue.experience"
+                />
+                <button
+                    v-if="experienceActive"
+                    @click="
+                        updateExperience();
+                        experienceActive = false;
+                    "
+                    class="rounded bg-green-300 p-1 text-white"
+                >
+                    Save Experience
+                </button>
+            </div>
             <p v-if="!owner" class="text-[14px]">
                 {{ modelValue.experience ? modelValue.experience : "N/A" }}
             </p>

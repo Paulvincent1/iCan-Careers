@@ -1,5 +1,38 @@
 <script setup>
+import { ref } from "vue";
 import Skill from "../Components/Skill.vue";
+import dayjs from "dayjs";
+import WorkDetailsForm from "../Components/WorkDetailsForm.vue";
+
+let props = defineProps({
+    userProp: Object,
+    workerSkillsProp: Object,
+    workerProfileProp: Object,
+});
+
+let workerSkills = ref(props.workerSkillsProp);
+console.log(workerSkills.value[0].rating);
+
+let workerProfile = ref(props.workerProfileProp);
+let isEditProfileActive = ref(false);
+
+const memberSince = dayjs(props.userProp.created_at).format("MMMM DD, YYYY");
+
+const age = dayjs().format("YYYY") - workerProfile.value.birth_year;
+
+let hourPay = ref(formatCurrency(workerProfile.value.hour_pay));
+let monthPay = ref(formatCurrency(workerProfile.value.month_pay));
+
+function formatCurrency(value) {
+    return new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+    }).format(value);
+}
+
+function updateExperience(exp, skillId) {
+    console.log("update experience" + exp + skillId);
+}
 </script>
 <template>
     <div class="min-h-[calc(100vh-4.625rem)] bg-[#f3f7fa]">
@@ -20,8 +53,8 @@ import Skill from "../Components/Skill.vue";
             <div
                 class="xs container mx-auto flex flex-col items-center justify-center pt-16 xl:max-w-7xl"
             >
-                <p class="mb-2">Name</p>
-                <p class="text-[24px]">Job Title</p>
+                <p class="mb-2">{{ userProp.name }}</p>
+                <p class="text-[24px]">{{ workerProfile.job_title }}</p>
                 <div class="flex items-center gap-1">
                     <p class="text-sm font-bold text-gray-600">Verified</p>
                     <i class="bi bi-patch-check-fill text-green-400"></i>
@@ -43,10 +76,35 @@ import Skill from "../Components/Skill.vue";
                             >
                                 <i class="bi bi-bag font-bold"></i>
                             </div>
-                            <p>
-                                Looking for full-time work (8 hours/day) at
-                                P900/hour (P50,000.00/month)
+                            <p
+                                v-if="!isEditProfileActive"
+                                @click="isEditProfileActive = true"
+                                class="max-w-[400px] cursor-pointer hover:border-b-2"
+                            >
+                                Looking for {{ workerProfile.job_type }} work
+                                ({{
+                                    workerProfile.work_hour_per_day
+                                }}
+                                hours/day) at {{ hourPay }}/hour ({{
+                                    monthPay
+                                }}/month)
                             </p>
+                            <WorkDetailsForm
+                                v-if="isEditProfileActive"
+                                v-model:jobType="workerProfile.job_type"
+                                v-model:workHourPerDay="
+                                    workerProfile.work_hour_per_day
+                                "
+                                v-model:hourPay="workerProfile.hour_pay"
+                                v-model:monthPay="workerProfile.month_pay"
+                            />
+                            <button
+                                v-if="isEditProfileActive"
+                                @click="isEditProfileActive = false"
+                                class="rounded bg-green-500 p-1 text-white"
+                            >
+                                Save
+                            </button>
                         </div>
                         <div class="mb-4 flex items-center gap-4">
                             <div
@@ -54,7 +112,11 @@ import Skill from "../Components/Skill.vue";
                             >
                                 <i class="bi bi-mortarboard"></i>
                             </div>
-                            <p>High school diploma</p>
+                            <p>
+                                {{
+                                    workerProfile.highest_educational_attainment
+                                }}
+                            </p>
                         </div>
                         <div class="mb-4 flex items-center gap-4">
                             <div
@@ -64,23 +126,29 @@ import Skill from "../Components/Skill.vue";
                             </div>
                             <div>
                                 <p>Member Since</p>
-                                <p>October 30th, 2023</p>
+                                <p>{{ memberSince }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="rounded-lg bg-white p-8 text-gray-600 shadow">
                         <p class="mb-3 text-[20px]">Profile Description</p>
                         <p class="text-[14px]">
-                            Lorem ipsum dolor sit amet consectetur adipisicing
-                            elit. Cumque sit ullam pariatur sint, odio, itaque
-                            ipsum maiores, eveniet veritatis voluptatibus
-                            deleniti! Fugiat, saepe cupiditate? Recusandae
-                            delectus nihil animi cupiditate tempora.
+                            {{ workerProfile.profile_description }}
                         </p>
                     </div>
                     <div class="rounded-lg bg-white p-8 text-gray-600 shadow">
                         <p class="mb-3 text-[20px]">Top Skills</p>
-                        <!-- <Skill /> -->
+                        <Skill
+                            v-for="(skill, index) in workerSkills"
+                            :key="skill.id"
+                            :modelValue="{
+                                id: skill.id,
+                                name: skill.skill_name,
+                                experience: skill.experience,
+                                star: Number(skill.rating),
+                            }"
+                            @updateExperience="updateExperience"
+                        />
                     </div>
                 </div>
                 <div
@@ -89,7 +157,7 @@ import Skill from "../Components/Skill.vue";
                     <p class="mb-3 text-[20px]">Basic Information</p>
                     <div class="mb-2">
                         <label class="text-sm" for="">Age</label>
-                        <p>19</p>
+                        <p>{{ age }}</p>
                         <!-- <input
                             type="number"
                             value="2025"
@@ -98,7 +166,7 @@ import Skill from "../Components/Skill.vue";
                     </div>
                     <div class="mb-2">
                         <label class="text-sm" for="">Gender</label>
-                        <p>Male</p>
+                        <p>{{ workerProfile.gender }}</p>
                         <!-- <input
                             type="number"
                             value="2025"
