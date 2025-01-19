@@ -54,7 +54,20 @@ class WorkerProfileController extends Controller
         $workerSkills = $user->workerSkills;
         $workerProfile = $user->workerProfile;
         // dd($workerProfile);
-        return inertia('Worker/Profile',['userProp' => $user, 'workerSkillsProp' => $workerSkills, 'workerProfileProp' => $workerProfile]);
+        return inertia('Worker/Profile',['userProp' => $user, 'workerSkillsProp' => $workerSkills, 'workerProfileProp' => $workerProfile, 'messageProp' => session('message')]);
+    }
+
+    public function updateProfile(Request $request){
+        $user = Auth::user();
+        if($request->job_title){
+            $user->workerProfile->update([
+                'job_title' => $request->job_title
+            ]);
+        }
+
+        // dd($request);
+
+        return redirect()->back()->with(['message' => 'Successfuly updated!']);
     }
 
     /**

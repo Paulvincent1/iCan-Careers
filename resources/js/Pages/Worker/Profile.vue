@@ -1,22 +1,29 @@
 <script setup>
-import { ref } from "vue";
+import { computed, onMounted, onUpdated, ref, watch } from "vue";
 import Skill from "../Components/Skill.vue";
 import dayjs from "dayjs";
 import WorkDetailsForm from "../Components/WorkDetailsForm.vue";
+import { router, useForm } from "@inertiajs/vue3";
 
 let props = defineProps({
     userProp: Object,
     workerSkillsProp: Object,
     workerProfileProp: Object,
+    messageProp: String,
 });
+
+let messageShow = ref(false);
+
+let isEditProfileActive = ref(false);
+let isEditJobTitleActive = ref(false);
 
 let workerSkills = ref(props.workerSkillsProp);
 console.log(workerSkills.value[0].rating);
 
 let workerProfile = ref(props.workerProfileProp);
-let isEditProfileActive = ref(false);
-
-const memberSince = dayjs(props.userProp.created_at).format("MMMM DD, YYYY");
+const memberSince = computed(() => {
+    dayjs(props.userProp.created_at).format("MMMM DD, YYYY");
+});
 
 const age = dayjs().format("YYYY") - workerProfile.value.birth_year;
 
@@ -32,6 +39,49 @@ function formatCurrency(value) {
 
 function updateExperience(exp, skillId) {
     console.log("update experience" + exp + skillId);
+}
+
+function updateJobTitle() {
+    router.put(
+        "/jobseekers/myprofile/updateprofile",
+        {
+            job_title: workerProfile.value.job_title,
+        },
+        {
+            onSuccess: () => {
+                if (props.messageProp) {
+                    messageShow.value = true;
+                    setTimeout(() => {
+                        messageShow.value = false;
+                    }, 2000);
+                }
+            },
+            preserveScroll: true,
+        },
+    );
+}
+
+function updateWorkDetails() {
+    router.put(
+        "/jobseekers/myprofile/updateprofile",
+        {
+            job_type: workerProfile.value.jobType,
+            work_hour_per_day: workerProfile.value.work_hour_per_day,
+            hour_pay: workerProfile.value.hour_pay,
+            month_pay: workerProfile.value.month_pay,
+        },
+        {
+            onSuccess: () => {
+                if (props.messageProp) {
+                    messageShow.value = true;
+                    setTimeout(() => {
+                        messageShow.value = false;
+                    }, 2000);
+                }
+            },
+            preserveScroll: true,
+        },
+    );
 }
 </script>
 <template>
@@ -53,8 +103,33 @@ function updateExperience(exp, skillId) {
             <div
                 class="xs container mx-auto flex flex-col items-center justify-center pt-16 xl:max-w-7xl"
             >
-                <p class="mb-2">{{ userProp.name }}</p>
-                <p class="text-[24px]">{{ workerProfile.job_title }}</p>
+                <p class="mb-2 text-lg">{{ userProp.name }}</p>
+
+                <div class="mb-3">
+                    <p
+                        @click="isEditJobTitleActive = true"
+                        v-if="!isEditJobTitleActive"
+                        class="max-w-[600px] cursor-pointer break-words text-center text-[24px] font-bold hover:underline"
+                    >
+                        {{ workerProfile.job_title }}
+                    </p>
+                    <div v-if="isEditJobTitleActive">
+                        <input
+                            type="text"
+                            v-model="workerProfile.job_title"
+                            class="mr-2 rounded border-none p-1 outline-none ring-green-300 transition-all hover:ring-1 focus:ring-1"
+                        />
+                        <button
+                            @click="
+                                isEditJobTitleActive = false;
+                                updateJobTitle();
+                            "
+                            class="rounded bg-green-500 p-1 text-white"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </div>
                 <div class="flex items-center gap-1">
                     <p class="text-sm font-bold text-gray-600">Verified</p>
                     <i class="bi bi-patch-check-fill text-green-400"></i>
@@ -100,7 +175,10 @@ function updateExperience(exp, skillId) {
                             />
                             <button
                                 v-if="isEditProfileActive"
-                                @click="isEditProfileActive = false"
+                                @click="
+                                    isEditProfileActive = false;
+                                    updateWorkDetails();
+                                "
                                 class="rounded bg-green-500 p-1 text-white"
                             >
                                 Save
@@ -196,5 +274,30 @@ function updateExperience(exp, skillId) {
                 </div>
             </div>
         </div>
+
+        <Teleport to="body" defer>
+            <Transition>
+                <div v-if="messageShow" class="">
+                    <div
+                        class="fixed left-[50%] top-20 flex translate-x-[-50%] items-center gap-2 rounded bg-green-200 p-4 text-green-600"
+                    >
+                        <i class="bi bi-check-circle-fill"></i>
+                        <p class="text-center">{{ props.messageProp }}</p>
+                    </div>
+                </div>
+            </Transition>
+        </Teleport>
     </div>
 </template>
+
+<style scoped>
+.v-enter-active,
+.v-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+    opacity: 0;
+}
+</style>

@@ -60,7 +60,9 @@ Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(functio
     Route::post('/addskills',[WorkerSkillsController::class, 'store'])->name('add.skills.post');
 
     Route::get('/',[WorkerDashboard::class, 'index'])->name('worker.dashboard');
+    
     Route::get('/myprofile',[WorkerProfileController::class, 'myProfile'])->name('worker.profile');
+    Route::put('/myprofile/updateprofile',[WorkerProfileController::class, 'updateProfile'])->name('update.profile.put');
 
     Route::prefix('verification')->group(function () {
 
