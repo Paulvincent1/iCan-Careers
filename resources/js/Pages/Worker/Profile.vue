@@ -1,9 +1,9 @@
 <script setup>
-import { computed, onMounted, onUpdated, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import Skill from "../Components/Skill.vue";
 import dayjs from "dayjs";
 import WorkDetailsForm from "../Components/WorkDetailsForm.vue";
-import { router, useForm } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 
 let props = defineProps({
     userProp: Object,
@@ -16,13 +16,13 @@ let messageShow = ref(false);
 
 let isEditProfileActive = ref(false);
 let isEditJobTitleActive = ref(false);
+let isEditDescription = ref(false);
 
 let workerSkills = ref(props.workerSkillsProp);
-console.log(workerSkills.value[0].rating);
-
 let workerProfile = ref(props.workerProfileProp);
+
 const memberSince = computed(() => {
-    dayjs(props.userProp.created_at).format("MMMM DD, YYYY");
+    return dayjs(props.userProp.created_at).format("MMMM DD, YYYY");
 });
 
 const age = dayjs().format("YYYY") - workerProfile.value.birth_year;
@@ -65,7 +65,7 @@ function updateWorkDetails() {
     router.put(
         "/jobseekers/myprofile/updateprofile",
         {
-            job_type: workerProfile.value.jobType,
+            job_type: workerProfile.value.job_type,
             work_hour_per_day: workerProfile.value.work_hour_per_day,
             hour_pay: workerProfile.value.hour_pay,
             month_pay: workerProfile.value.month_pay,
@@ -83,21 +83,77 @@ function updateWorkDetails() {
         },
     );
 }
+
+function updateDescription() {
+    router.put(
+        "/jobseekers/myprofile/updateprofile",
+        {
+            profile_description: workerProfile.value.profile_description,
+        },
+        {
+            onSuccess: () => {
+                if (props.messageProp) {
+                    messageShow.value = true;
+                    setTimeout(() => {
+                        messageShow.value = false;
+                    }, 2000);
+                }
+            },
+            preserveScroll: true,
+        },
+    );
+}
+
+let profilePreview = ref(props.userProp.profile_img);
+function uploadProfileImage(e) {
+    profilePreview = URL.createObjectURL(e.target.files[0]);
+
+    router.post(
+        "/jobseekers/myprofile/updateprofile",
+        {
+            _method: "put",
+            profile_img: e.target.files[0],
+        },
+        {
+            onSuccess: () => {
+                if (props.messageProp) {
+                    messageShow.value = true;
+                    setTimeout(() => {
+                        messageShow.value = false;
+                    }, 2000);
+                }
+            },
+            preserveScroll: true,
+        },
+    );
+}
 </script>
 <template>
     <div class="min-h-[calc(100vh-4.625rem)] bg-[#f3f7fa]">
-        <div class="relative h-32 bg-[#FAFAFA]">
-            <div
-                class="absolute left-[50%] top-[32px] flex translate-x-[-50%] flex-col items-center"
+        <div class="bg- relative h-32 bg-[#FAFAFA]">
+            <label
+                for="profileimg"
+                class="absolute left-[50%] top-[40px] flex h-36 w-36 translate-x-[-50%] cursor-pointer flex-col items-center"
             >
-                <div class="mb-3 w-36">
+                <div class="mb-3 h-full w-full">
                     <img
-                        src="/assets/profile_placeholder.jpg"
+                        draggable="false"
+                        :src="
+                            profilePreview
+                                ? profilePreview
+                                : '/assets/profile_placeholder.jpg'
+                        "
                         alt=""
-                        class="w-full rounded-full"
+                        class="h-full w-full rounded-full object-cover"
                     />
                 </div>
-            </div>
+                <input
+                    @change="uploadProfileImage"
+                    id="profileimg"
+                    type="file"
+                    class="hidden"
+                />
+            </label>
         </div>
         <div class="bg-white pb-2">
             <div
@@ -113,22 +169,26 @@ function updateWorkDetails() {
                     >
                         {{ workerProfile.job_title }}
                     </p>
-                    <div v-if="isEditJobTitleActive">
+                    <form
+                        @submit.prevent="
+                            isEditJobTitleActive = false;
+                            updateJobTitle();
+                        "
+                        v-if="isEditJobTitleActive"
+                    >
                         <input
                             type="text"
                             v-model="workerProfile.job_title"
-                            class="mr-2 rounded border-none p-1 outline-none ring-green-300 transition-all hover:ring-1 focus:ring-1"
+                            class="mr-2 rounded border p-1 outline-none ring-green-300 transition-all hover:ring-1 focus:ring-1"
+                            required
                         />
                         <button
-                            @click="
-                                isEditJobTitleActive = false;
-                                updateJobTitle();
-                            "
+                            @click=""
                             class="rounded bg-green-500 p-1 text-white"
                         >
                             Save
                         </button>
-                    </div>
+                    </form>
                 </div>
                 <div class="flex items-center gap-1">
                     <p class="text-sm font-bold text-gray-600">Verified</p>
@@ -164,25 +224,27 @@ function updateWorkDetails() {
                                     monthPay
                                 }}/month)
                             </p>
-                            <WorkDetailsForm
+                            <form
                                 v-if="isEditProfileActive"
-                                v-model:jobType="workerProfile.job_type"
-                                v-model:workHourPerDay="
-                                    workerProfile.work_hour_per_day
-                                "
-                                v-model:hourPay="workerProfile.hour_pay"
-                                v-model:monthPay="workerProfile.month_pay"
-                            />
-                            <button
-                                v-if="isEditProfileActive"
-                                @click="
-                                    isEditProfileActive = false;
+                                @submit.prevent="
                                     updateWorkDetails();
+                                    isEditProfileActive = false;
                                 "
-                                class="rounded bg-green-500 p-1 text-white"
                             >
-                                Save
-                            </button>
+                                <WorkDetailsForm
+                                    v-model:jobType="workerProfile.job_type"
+                                    v-model:workHourPerDay="
+                                        workerProfile.work_hour_per_day
+                                    "
+                                    v-model:hourPay="workerProfile.hour_pay"
+                                    v-model:monthPay="workerProfile.month_pay"
+                                />
+                                <button
+                                    class="rounded bg-green-500 p-1 text-white"
+                                >
+                                    Save
+                                </button>
+                            </form>
                         </div>
                         <div class="mb-4 flex items-center gap-4">
                             <div
@@ -208,11 +270,33 @@ function updateWorkDetails() {
                             </div>
                         </div>
                     </div>
-                    <div class="rounded-lg bg-white p-8 text-gray-600 shadow">
+                    <div
+                        class="max-w-2xl rounded-lg bg-white p-8 text-gray-600 shadow"
+                    >
                         <p class="mb-3 text-[20px]">Profile Description</p>
-                        <p class="text-[14px]">
+                        <p
+                            @click="isEditDescription = true"
+                            v-if="!isEditDescription"
+                            class="cursor-pointer whitespace-pre-line break-words text-[14px] hover:underline"
+                        >
                             {{ workerProfile.profile_description }}
                         </p>
+                        <form
+                            v-if="isEditDescription"
+                            @submit.prevent="
+                                updateDescription();
+                                isEditDescription = false;
+                            "
+                        >
+                            <textarea
+                                class="w-full border p-2 pb-28 outline-green-500"
+                                v-model="workerProfile.profile_description"
+                                required
+                            ></textarea>
+                            <button class="rounded bg-green-500 p-1 text-white">
+                                Save
+                            </button>
+                        </form>
                     </div>
                     <div class="rounded-lg bg-white p-8 text-gray-600 shadow">
                         <p class="mb-3 text-[20px]">Top Skills</p>
@@ -275,7 +359,7 @@ function updateWorkDetails() {
             </div>
         </div>
 
-        <Teleport to="body" defer>
+        <Teleport defer to="body">
             <Transition>
                 <div v-if="messageShow" class="">
                     <div

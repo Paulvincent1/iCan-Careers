@@ -49,7 +49,7 @@ class WorkerVerificationController extends Controller
             'id_image' => 'required|image',
             'selfie_image' => 'required|image',
         ]);
-        // dd($fields);
+        // dd($fields['id_image']);
 
         $idImage = Storage::disk('public')->put('images',$fields['id_image']);
         $selfieImage = Storage::disk('public')->put('images',$fields['selfie_image']);

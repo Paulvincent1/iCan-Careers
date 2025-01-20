@@ -41,11 +41,7 @@ const submit = () => {
             dignissimos libero. Hic?
         </p>
 
-        <form
-            @submit.prevent="submit"
-            action="
-        "
-        >
+        <form @submit.prevent="submit">
             <div class="flex flex-col">
                 <label class="mb-2 mt-4 font-semibold">JOB TITLE</label>
                 <input

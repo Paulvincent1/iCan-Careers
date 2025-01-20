@@ -1,10 +1,8 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
-import { onMounted, ref, useTemplateRef } from "vue";
+import { ref  } from "vue";
 import InputFlashMessage from "../../Components/InputFlashMessage.vue";
 
-let govIdInput = useTemplateRef("govID");
-let selfieIdInput = useTemplateRef("selfieID");
 
 let form = useForm({
     first_name: null,

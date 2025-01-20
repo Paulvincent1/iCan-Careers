@@ -11,7 +11,7 @@ let page = usePage();
     <main class="mt-[4.625rem]">
         <slot></slot>
     </main>
-    <Teleport to="body">
+    <Teleport defer to="body">
         <div
             v-if="
                 $page.props.auth.worker_profile &&

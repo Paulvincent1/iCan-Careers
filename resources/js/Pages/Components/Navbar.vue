@@ -19,6 +19,19 @@ watch(isActive, () => {
         ? (document.body.style.position = "fixed")
         : (document.body.style.position = "static");
 });
+
+window.addEventListener("resize", () => {
+    if (window.innerWidth >= 768) {
+        if (isActive.value === true) {
+            document.body.style.position = "static";
+        }
+    }
+    if (window.innerWidth <= 768) {
+        if (isActive.value === true) {
+            document.body.style.position = "fixed";
+        }
+    }
+});
 </script>
 <template>
     <div class="fixed top-0 z-50 w-full border-b bg-white shadow">
@@ -55,7 +68,7 @@ watch(isActive, () => {
                     <li class="flex items-center md:pr-3 lg:border-r-[1px]">
                         <Link
                             href=""
-                            class="rounded-3xl bg-[#73b743] px-7 py-2 font-medium text-white"
+                            class="rounded-3xl bg-green-500 px-7 py-2 font-medium text-white"
                             @click="isActive = false"
                         >
                             FIND JOBS
