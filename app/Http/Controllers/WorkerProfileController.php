@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\WorkerProfile;
+use App\Models\WorkerSkills;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -53,10 +54,17 @@ class WorkerProfileController extends Controller
 
     public function myProfile(){
         $user = Auth::user();
+        if(!$user->workerProfile){
+            return redirect()->back();
+        }
         $workerSkills = $user->workerSkills;
         $workerProfile = $user->workerProfile;
-        // dd($user);
-        return inertia('Worker/Profile',['userProp' => $user, 'workerSkillsProp' => $workerSkills, 'workerProfileProp' => $workerProfile, 'messageProp' => session('message')]);
+        
+        return inertia('Worker/Profile',['userProp' => $user, 
+         'workerSkillsProp' => $workerSkills,
+         'workerProfileProp' => $workerProfile, 
+         'messageProp' => session('message'),
+        ]);
     }
 
     public function updateProfile(Request $request){
@@ -119,6 +127,61 @@ class WorkerProfileController extends Controller
                 'profile_img' => '/storage/'.$path
             ]);
         }
+
+
+        return redirect()->back()->with(['message' => 'Successfuly updated!']);
+    }
+
+    public function updateSkill(Request $request, WorkerSkills $skillid){
+       $user = Auth::user();
+       
+        if($request->skill_name){
+
+            $request->validate(
+                [
+                    'skill_name' => 'max:255'
+                    ]
+                );
+
+
+            $user->workerSkills()->find($skillid->id)->update([
+                'skill_name' => $request->skill_name
+            ]);
+        }
+    
+       
+
+        if($request->experience){
+            $request->validate([
+                'experience' => 'max:255'
+            ]);
+         
+
+            $user->workerSkills()->find($skillid->id)->update(
+                [
+                    'experience' => $request->experience
+                ]
+            );
+        }
+
+        if($request->rating){
+            $request->validate([
+                'rating' => 'numeric|min:1|max:5'
+            ]);
+
+            $user->workerSkills()->find($skillid->id)->update(
+                [
+                    'rating' => $request->rating
+                ]
+            );
+        }
+
+        return redirect()->back()->with(['message' => 'Successfuly updated!']);
+    }
+
+    public function deleteSkill(WorkerSkills $skillid){
+
+        $skillid->delete();
 
 
         return redirect()->back()->with(['message' => 'Successfuly updated!']);

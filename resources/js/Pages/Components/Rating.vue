@@ -17,12 +17,24 @@ let props = defineProps({
         type: Boolean,
         default: true,
     },
+    disabled: null,
 });
 
-console.log(props.starValue + "dasda");
-
 function addStar(star) {
+  
     emit("addstar", star);
+}
+
+function disabeldBtn() {
+    if (props.owner) {
+        if (props.disabled) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return true;
+    }
 }
 </script>
 <template>
@@ -33,11 +45,14 @@ function addStar(star) {
             :name="`star_${id}`"
             :id="`star5_${id}`"
             value="5"
-            :disabled="owner ? false : true"
+            :disabled="disabeldBtn()"
             :checked="starValue ? (starValue === 5 ? true : false) : false"
         />
 
-        <label :for="`star5_${id}`" :class="{ 'pointer-events-none': !owner }">
+        <label
+            :for="`star5_${id}`"
+            :class="{ 'pointer-events-none': disabeldBtn() }"
+        >
             <i class="bi bi-star-fill"></i>
         </label>
 
@@ -47,11 +62,14 @@ function addStar(star) {
             :name="`star_${id}`"
             :id="`star4_${id}`"
             value="4"
-            :disabled="owner ? false : true"
+            :disabled="disabeldBtn()"
             :checked="starValue ? (starValue === 4 ? true : false) : false"
         />
 
-        <label :for="`star4_${id}`" :class="{ 'pointer-events-none': !owner }">
+        <label
+            :for="`star4_${id}`"
+            :class="{ 'pointer-events-none': disabeldBtn() }"
+        >
             <i class="bi bi-star-fill"></i>
         </label>
 
@@ -61,11 +79,14 @@ function addStar(star) {
             :name="`star_${id}`"
             :id="`star3_${id}`"
             value="3"
-            :disabled="owner ? false : true"
+            :disabled="disabeldBtn()"
             :checked="starValue ? (starValue === 3 ? true : false) : false"
         />
 
-        <label :for="`star3_${id}`" :class="{ 'pointer-events-none': !owner }">
+        <label
+            :for="`star3_${id}`"
+            :class="{ 'pointer-events-none': disabeldBtn() }"
+        >
             <i class="bi bi-star-fill"></i>
         </label>
 
@@ -75,11 +96,14 @@ function addStar(star) {
             :name="`star_${id}`"
             :id="`star2_${id}`"
             value="2"
-            :disabled="owner ? false : true"
+            :disabled="disabeldBtn()"
             :checked="starValue ? (starValue === 2 ? true : false) : false"
         />
 
-        <label :for="`star2_${id}`" :class="{ 'pointer-events-none': !owner }">
+        <label
+            :for="`star2_${id}`"
+            :class="{ 'pointer-events-none': disabeldBtn() }"
+        >
             <i class="bi bi-star-fill"></i>
         </label>
 
@@ -89,11 +113,14 @@ function addStar(star) {
             :name="`star_${id}`"
             :id="`star1_${id}`"
             value="1"
-            :disabled="owner ? false : true"
+            :disabled="disabeldBtn()"
             :checked="starValue ? (starValue === 1 ? true : false) : false"
         />
 
-        <label :for="`star1_${id}`" :class="{ 'pointer-events-none': !owner }">
+        <label
+            :for="`star1_${id}`"
+            :class="{ 'pointer-events-none': disabeldBtn() }"
+        >
             <i class="bi bi-star-fill"></i>
         </label>
     </div>

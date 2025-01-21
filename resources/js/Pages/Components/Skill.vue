@@ -9,12 +9,12 @@ let props = defineProps({
         type: Boolean,
         default: true,
     },
+    disabled: null,
 });
 
-console.log(props.modelValue.star);
 let emit = defineEmits([
     "addstar",
-    "removeskill",
+    "removeSkill",
     "updateSkillName",
     "updateExperience",
 ]);
@@ -33,19 +33,18 @@ function updateExperience() {
 }
 
 function addStar(star) {
-    console.log(star);
     emit("addstar", star, props.modelValue.id);
 }
 
 function removeSkill(id) {
-    emit("removeskill", id);
+    emit("removeSkill", id);
 }
 
 let isEditSkill = ref(false);
 let onHover = ref(false);
 </script>
 <template>
-    <div class="rounded border p-3">
+    <div class="rounded-lg border p-3">
         <div class="flex justify-between">
             <div
                 @click="isEditSkill = true"
@@ -60,25 +59,31 @@ let onHover = ref(false);
                 </p>
                 <i v-if="owner" class="bi bi-pencil-fill text-blue-500"></i>
             </div>
-            <div v-show="isEditSkill" class="flex gap-2">
+            <form
+                @submit.prevent="
+                    updateSkillName();
+                    isEditSkill = false;
+                "
+                v-show="isEditSkill"
+                class="flex gap-2"
+            >
                 <input
                     type="text"
                     ref="input"
                     :value="modelValue.name"
                     class="w-28 border p-1 outline-blue-500"
+                    required
                 />
                 <button
-                    @click="
-                        updateSkillName();
-                        isEditSkill = false;
-                    "
+                    :disabled="disabled"
                     class="rounded bg-green-300 p-1 text-white"
                 >
                     Save
                 </button>
-            </div>
+            </form>
             <div class="flex gap-3">
                 <button
+                    :disabled="disabled"
                     v-if="owner"
                     @click="removeSkill(modelValue.id)"
                     @mouseover="onHover = true"
@@ -97,6 +102,7 @@ let onHover = ref(false);
                     :owner="owner"
                     :starValue="modelValue.star"
                     :id="modelValue.id"
+                    :disabled="disabled"
                     @addstar="addStar"
                 />
             </div>
@@ -114,6 +120,7 @@ let onHover = ref(false);
                     :value="modelValue.experience"
                 />
                 <button
+                    :disabled="disabled"
                     v-if="experienceActive"
                     @click="
                         updateExperience();

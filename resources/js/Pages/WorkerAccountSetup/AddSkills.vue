@@ -4,53 +4,14 @@ import Breadcrumbs from "../Components/Breadcrumbs.vue";
 import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
 import Layout from "../Layouts/Layout.vue";
 import { debounce } from "lodash";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import Skill from "../Components/Skill.vue";
+import AddSkillInput from "../Components/AddSkillInput.vue";
 
 defineOptions({
     layout: [Layout, SetupProfileLayout],
 });
-
-document.addEventListener("click", (event) => {
-    isOpen.value = false;
-});
-
-let query = ref("");
-let data = ref("");
-
-var myHeaders = new Headers();
-myHeaders.append("apikey", "b2T1prX5rbN9RJaBSBBtZtevFlvCwFrs");
-
-var requestOptions = {
-    method: "GET",
-    redirect: "follow",
-    headers: myHeaders,
-};
-
-let isOpen = ref(false);
-// watch(
-//     query,
-//     debounce(async (e) => {
-//         isOpen.value = false;
-//         if (query.value.length) {
-//             try {
-//                 console.log(data.length);
-//                 let response = await fetch(
-//                     `https://api.apilayer.com/skills?q=${e}`,
-//                     requestOptions,
-//                 );
-//                 data = await response.json();
-
-//                 isOpen.value = true;
-
-//                 console.log(data);
-//             } catch (error) {
-//                 console.error(error);
-//             }
-//         }
-//     }, 500),
-// );
 
 const randomId = function (length = 6) {
     return Math.random()
@@ -68,7 +29,6 @@ function addSkill(name) {
             experience: "",
             star: "",
         });
-        query.value = "";
     }
 }
 
@@ -80,14 +40,6 @@ function updateSkillName(skillName, skillId) {
             }
         });
     }
-}
-
-function addExperience(exp, skillId) {
-    form.skills.forEach((object) => {
-        if (object.id === skillId) {
-            object.experience = exp;
-        }
-    });
 }
 
 function updateExperience(exp, skillId) {
@@ -114,9 +66,11 @@ function removeSkill(id) {
         }
     });
 }
+let page = usePage();
 
 let form = useForm({
     skills: [],
+    currentComponent: page.component,
 });
 
 let errorMessage = ref("");
@@ -145,7 +99,9 @@ const submit = () => {
             can only select up to a maximum of 15 skills.
         </p>
 
-        <div class="relative mb-4">
+        <AddSkillInput @addSkill="addSkill" />
+
+        <!-- <div class="relative mb-4">
             <div class="relative">
                 <input
                     v-model="query"
@@ -178,18 +134,19 @@ const submit = () => {
                     {{ res }}
                 </p>
             </div>
-        </div>
+        </div> -->
 
         <div class="mb-7">
             <p class="mb-2">Your Skills:</p>
             <div>
                 <div>
                     <Skill
+                        class="mb-2"
                         v-for="skill in form.skills"
                         :key="skill.id"
                         :modelValue="skill"
                         @addstar="addStar"
-                        @removeskill="removeSkill"
+                        @removeSkill="removeSkill"
                         @updateSkillName="updateSkillName"
                         @updateExperience="updateExperience"
                     />

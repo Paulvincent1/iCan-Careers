@@ -4,6 +4,7 @@ import AuthInput from "../Components/AuthInput.vue";
 import Quotes from "../Components/Quotes.vue";
 import AuthForm from "../Components/AuthForm.vue";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
+import { reactive } from "vue";
 
 defineProps({
     status: null,

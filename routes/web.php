@@ -63,6 +63,8 @@ Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(functio
     
     Route::get('/myprofile',[WorkerProfileController::class, 'myProfile'])->name('worker.profile');
     Route::put('/myprofile/updateprofile',[WorkerProfileController::class, 'updateProfile'])->name('update.profile.put');
+    Route::put('/myprofile/updateskill/{skillid}',[WorkerProfileController::class, 'updateSkill'])->name('update.profile.put');
+    Route::delete('/myprofile/deleteskill/{skillid}',[WorkerProfileController::class, 'deleteSkill'])->name('update.profile.delete');
 
     Route::prefix('verification')->group(function () {
 

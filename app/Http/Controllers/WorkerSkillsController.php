@@ -45,9 +45,9 @@ class WorkerSkillsController extends Controller
        
         $skills = $request->validate([
             'skills'=> 'required|array',
-            'skills.*.name' => 'required',
-            'skills.*.experience' => 'nullable',
-            'skills.*.star'=> 'required|numeric|min_digits:1|max_digits:5',
+            'skills.*.name' => 'required|max:255',
+            'skills.*.experience' => 'nullable|max:255',
+            'skills.*.star'=> 'required|numeric|min:1|max:5',
         ]);
         $user = Auth::user();
         foreach($skills['skills'] as $skill){
@@ -59,9 +59,12 @@ class WorkerSkillsController extends Controller
             ]);
         }
 
-        
+        if($request->currentComponent ==='WorkerAccountSetup/AddSkills'){
 
-        return redirect()->route('worker.dashboard');
+            return redirect()->route('worker.dashboard');
+        }
+
+        return redirect()->back()->with(['message' => 'Successfuly updated!']);
        
     }
 

@@ -1,9 +1,10 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import Skill from "../Components/Skill.vue";
 import dayjs from "dayjs";
 import WorkDetailsForm from "../Components/WorkDetailsForm.vue";
 import { router } from "@inertiajs/vue3";
+import AddSkillModal from "../Components/Modal/AddSkillModal.vue";
 
 let props = defineProps({
     userProp: Object,
@@ -17,9 +18,28 @@ let messageShow = ref(false);
 let isEditProfileActive = ref(false);
 let isEditJobTitleActive = ref(false);
 let isEditDescription = ref(false);
+let isOpen = ref(false);
+
+function isOpenUpdateValue(e) {
+    isOpen.value = e;
+}
 
 let workerSkills = ref(props.workerSkillsProp);
 let workerProfile = ref(props.workerProfileProp);
+
+watchEffect(() => {
+    workerSkills.value = props.workerSkillsProp;
+    showSuccessMessage();
+});
+
+function showSuccessMessage() {
+    if (props.messageProp) {
+        messageShow.value = true;
+        setTimeout(() => {
+            messageShow.value = false;
+        }, 2000);
+    }
+}
 
 const memberSince = computed(() => {
     return dayjs(props.userProp.created_at).format("MMMM DD, YYYY");
@@ -37,10 +57,6 @@ function formatCurrency(value) {
     }).format(value);
 }
 
-function updateExperience(exp, skillId) {
-    console.log("update experience" + exp + skillId);
-}
-
 function updateJobTitle() {
     router.put(
         "/jobseekers/myprofile/updateprofile",
@@ -49,12 +65,7 @@ function updateJobTitle() {
         },
         {
             onSuccess: () => {
-                if (props.messageProp) {
-                    messageShow.value = true;
-                    setTimeout(() => {
-                        messageShow.value = false;
-                    }, 2000);
-                }
+                showSuccessMessage();
             },
             preserveScroll: true,
         },
@@ -72,12 +83,7 @@ function updateWorkDetails() {
         },
         {
             onSuccess: () => {
-                if (props.messageProp) {
-                    messageShow.value = true;
-                    setTimeout(() => {
-                        messageShow.value = false;
-                    }, 2000);
-                }
+                showSuccessMessage();
             },
             preserveScroll: true,
         },
@@ -92,12 +98,7 @@ function updateDescription() {
         },
         {
             onSuccess: () => {
-                if (props.messageProp) {
-                    messageShow.value = true;
-                    setTimeout(() => {
-                        messageShow.value = false;
-                    }, 2000);
-                }
+                showSuccessMessage();
             },
             preserveScroll: true,
         },
@@ -116,12 +117,114 @@ function uploadProfileImage(e) {
         },
         {
             onSuccess: () => {
-                if (props.messageProp) {
-                    messageShow.value = true;
-                    setTimeout(() => {
-                        messageShow.value = false;
-                    }, 2000);
-                }
+                showSuccessMessage();
+            },
+            preserveScroll: true,
+        },
+    );
+}
+
+// for skills
+let disable = ref(false);
+
+function updateSkillName(skillName, skillId) {
+    router.put(
+        `/jobseekers/myprofile/updateskill/${skillId}`,
+        {
+            skill_name: skillName,
+        },
+        {
+            onStart: (start) => {
+                disable.value = true;
+            },
+            onSuccess: () => {
+                showSuccessMessage();
+                workerSkills.value.forEach((e) => {
+                    if (e.id === skillId) {
+                        e.skill_name = skillName;
+                    }
+                });
+            },
+            onFinish: (visit) => {
+                disable.value = false;
+            },
+            preserveScroll: true,
+        },
+    );
+}
+
+function updateExperience(exp, skillId) {
+    router.put(
+        `/jobseekers/myprofile/updateskill/${skillId}`,
+        {
+            experience: exp,
+        },
+        {
+            onStart: (start) => {
+                disable.value = true;
+            },
+            onSuccess: () => {
+                showSuccessMessage();
+                workerSkills.value.forEach((e) => {
+                    if (e.id === skillId) {
+                        e.experience = exp;
+                    }
+                });
+            },
+            onFinish: (visit) => {
+                disable.value = false;
+            },
+            preserveScroll: true,
+        },
+    );
+}
+
+function updateStar(star, skillId) {
+    router.put(
+        `/jobseekers/myprofile/updateskill/${skillId}`,
+        {
+            rating: star,
+        },
+        {
+            onStart: (start) => {
+                disable.value = true;
+            },
+            onSuccess: () => {
+                showSuccessMessage();
+                workerSkills.value.forEach((e) => {
+                    if (e.id === skillId) {
+                        e.rating = star;
+                    }
+                });
+            },
+            onFinish: (visit) => {
+                disable.value = false;
+            },
+            preserveScroll: true,
+        },
+    );
+}
+
+function removeSkill(skillId) {
+    router.delete(
+        `/jobseekers/myprofile/deleteskill/${skillId}`,
+
+        {
+            onBefore: () =>
+                confirm("Are you sure you want to delete this user?"),
+            onStart: (start) => {
+                disable.value = true;
+            },
+            onSuccess: () => {
+                showSuccessMessage();
+                workerSkills.value.forEach((e, i) => {
+                    if (e.id === skillId) {
+                        workerSkills.value.splice(i, 1);
+                    }
+                });
+            },
+            onFinish: (visit) => {
+                disable.value = false;
             },
             preserveScroll: true,
         },
@@ -203,8 +306,8 @@ function uploadProfileImage(e) {
                 class="mt-8 grid gap-6 md:grid-cols-[1fr,250px] lg:grid-cols-[1fr,300px]"
             >
                 <div class="flex flex-col gap-4 text-[16px] text-gray-600">
-                    <div class="rounded-lg bg-white p-8 shadow">
-                        <p class="mb-3 text-[20px]">Overview</p>
+                    <div class="rounded-lg bg-white p-8">
+                        <p class="mb-3 text-[20px] font-bold">Overview</p>
                         <div class="mb-4 flex items-center gap-4">
                             <div
                                 class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200"
@@ -273,7 +376,9 @@ function uploadProfileImage(e) {
                     <div
                         class="max-w-2xl rounded-lg bg-white p-8 text-gray-600 shadow"
                     >
-                        <p class="mb-3 text-[20px]">Profile Description</p>
+                        <p class="mb-3 text-[20px] font-bold">
+                            Profile Description
+                        </p>
                         <p
                             @click="isEditDescription = true"
                             v-if="!isEditDescription"
@@ -298,25 +403,40 @@ function uploadProfileImage(e) {
                             </button>
                         </form>
                     </div>
-                    <div class="rounded-lg bg-white p-8 text-gray-600 shadow">
-                        <p class="mb-3 text-[20px]">Top Skills</p>
+                    <div
+                        class="mb-8 rounded-lg bg-white p-8 text-gray-600 shadow"
+                    >
+                        <div class="mb-4 flex justify-between">
+                            <p class="text-[20px] font-bold">Top Skills</p>
+                            <button
+                                @click="isOpenUpdateValue(true)"
+                                class="rounded-xl bg-green-400 px-2 text-white"
+                            >
+                                Add Skill
+                            </button>
+                        </div>
                         <Skill
+                            class="mb-3"
                             v-for="(skill, index) in workerSkills"
                             :key="skill.id"
+                            :disabled="disable"
                             :modelValue="{
                                 id: skill.id,
                                 name: skill.skill_name,
                                 experience: skill.experience,
                                 star: Number(skill.rating),
                             }"
+                            @updateSkillName="updateSkillName"
                             @updateExperience="updateExperience"
+                            @removeSkill="removeSkill"
+                            @addstar="updateStar"
                         />
                     </div>
                 </div>
                 <div
                     class="self-start rounded-lg bg-white p-8 text-gray-600 shadow"
                 >
-                    <p class="mb-3 text-[20px]">Basic Information</p>
+                    <p class="mb-3 text-[20px] font-bold">Basic Information</p>
                     <div class="mb-2">
                         <label class="text-sm" for="">Age</label>
                         <p>{{ age }}</p>
@@ -369,6 +489,15 @@ function uploadProfileImage(e) {
                         <p class="text-center">{{ props.messageProp }}</p>
                     </div>
                 </div>
+            </Transition>
+        </Teleport>
+        <Teleport defer to="body">
+            <Transition>
+                <AddSkillModal
+                    v-if="isOpen"
+                    :isOpen="isOpen"
+                    @updateIsOpen="isOpenUpdateValue"
+                />
             </Transition>
         </Teleport>
     </div>
