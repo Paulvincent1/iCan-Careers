@@ -8,9 +8,6 @@ import WorkDetailsForm from "../Components/WorkDetailsForm.vue";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import dayjs from "dayjs";
 
-let props = defineProps({
-    breadcrumbs: Array,
-});
 defineOptions({
     layout: [Layout, SetupProfileLayout],
 });

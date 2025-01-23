@@ -41,12 +41,15 @@ class HandleInertiaRequests extends Middleware
             : null,
             'auth.worker_profile' => function () use($request) {
                 if($request->user()){
-                    if(!$request->user()->workerProfile){
-                        return ['message' => 'Complete your profile now to let freelancers discover and connect with you!', 'route' => 'create.profile'];
-                    }elseif(!$request->user()->workerSkills){
-
-                        return ['message' => 'Add your skills to showcase your expertise and attract the right opportunities!', 'route' => 'add.skills'];
+                    if($request->user()->roles()->whereIn('name', ['PWD', 'Senior'])->exists()){
+                        if(!$request->user()->workerProfile){
+                            return ['message' => 'Complete your profile now to let freelancers discover and connect with you!', 'route' => 'create.profile'];
+                        }elseif(!$request->user()->workerSkills){
+                            
+                            return ['message' => 'Add your skills to showcase your expertise and attract the right opportunities!', 'route' => 'add.skills'];
+                        }
                     }
+ 
                 }
                 return null;
             },

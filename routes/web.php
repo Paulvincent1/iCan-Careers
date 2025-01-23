@@ -1,12 +1,13 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmployerProfileController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
 use App\Http\Controllers\WorkerVerificationController;
+use App\Http\Middleware\isEmployer;
 use App\Http\Middleware\isWorker;
-use App\Models\WorkerProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,7 @@ Route::get('/', function () {
         if($userRole === 'Senior' || $userRole ==='PWD'){
             return redirect()->route('worker.dashboard');
         }
+        // todo if employer
     }
     return inertia('Home');
 })->name('home');
@@ -73,4 +75,13 @@ Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(functio
         Route::get('/id',[WorkerVerificationController::class, 'verificationId'])->name('account.verifiy.id');
         Route::post('/id', [WorkerVerificationController::class, 'store'])->name('account.verifiy.id.post');
     });
+});
+
+
+Route::prefix('employers')->middleware(['auth',isEmployer::class])->group(function (){
+
+    Route::get('/createprofile',[EmployerProfileController::class, 'createProfile'])->name('create.profile.employer');
+    Route::post('/createprofile',[EmployerProfileController::class, 'storeProfile'])->name('create.profile.employer.post');
+
+    Route::get('/companyinformation',[EmployerProfileController::class, 'createCompanyInformation'])->name('create.company.employer');
 });

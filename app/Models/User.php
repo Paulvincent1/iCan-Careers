@@ -63,4 +63,8 @@ class User extends Authenticatable
     public function workerVerification(){
         return $this->hasOne(WorkerVerification::class, 'user_id');
     }
+
+    public function employerProfile(){
+        return $this->hasOne(EmployerProfile::class, 'user_id');
+    }
 }

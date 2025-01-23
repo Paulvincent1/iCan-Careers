@@ -54,9 +54,7 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            if(!$user->workerProfile){  
-                return redirect()->route('create.profile');
-            }
+            
             
             $userRole = '';
             foreach($user->roles as $role){
@@ -64,7 +62,19 @@ class AuthController extends Controller
             }
 
             if($userRole === 'Senior' || $userRole === 'PWD'){
+                if(!$user->workerProfile){  
+                    return redirect()->route('create.profile');
+                }
                 return redirect()->route('worker.dashboard');
+            }
+
+            if($userRole === 'Employer'){
+                if(!$user->employerProfile){
+
+                    return redirect()->route('create.profile.employer');
+                }
+
+                //return redirect()->route('employer.dashboard');
             }
 
         }

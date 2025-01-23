@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class isWorker
+class isEmployer
 {
     /**
      * Handle an incoming request.
@@ -15,14 +15,13 @@ class isWorker
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $hasWorkerRole = $request->user()->roles()->whereIn('name', ['PWD', 'Senior'])->exists();
+        $hasEmployerRole = $request->user()->roles()->whereIn('name',['Employer'])->exists();
 
-        if($hasWorkerRole){
+        if($hasEmployerRole){
 
             return $next($request);
         }
-
         return redirect()->intended();
-       
+      
     }
 }
