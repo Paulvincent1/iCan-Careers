@@ -1,8 +1,8 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
-import { ref  } from "vue";
+import { ref } from "vue";
 import InputFlashMessage from "../../Components/InputFlashMessage.vue";
-
+import SubmitImage from "../../Components/SubmitImage.vue";
 
 let form = useForm({
     first_name: null,
@@ -17,12 +17,12 @@ let avatarGovID = ref(null);
 let avatarSelfieID = ref(null);
 
 const govIdChange = (e) => {
-    form.id_image = e.target.files[0];
-    avatarGovID.value = URL.createObjectURL(e.target.files[0]);
+    form.id_image = e;
+    avatarGovID.value = URL.createObjectURL(e);
 };
 const selfieIdChange = (e) => {
-    form.selfie_image = e.target.files[0];
-    avatarSelfieID.value = URL.createObjectURL(e.target.files[0]);
+    form.selfie_image = e;
+    avatarSelfieID.value = URL.createObjectURL(e);
 };
 
 const submit = () => {
@@ -154,102 +154,19 @@ const submit = () => {
                     <div
                         class="flex flex-col justify-center gap-11 sm:flex-row"
                     >
-                        <div class="w-full max-w-[400px]">
-                            <label
-                                for="govID"
-                                class="relative mb-3 flex h-[200px] w-full max-w-[400px] flex-1 cursor-pointer justify-center rounded border-2 border-dashed p-4"
-                            >
-                                <img
-                                    v-if="avatarGovID"
-                                    :src="avatarGovID"
-                                    alt=""
-                                    class="absolute inset-0 h-[100%] w-[100%] object-cover"
-                                />
-                                <div class="mt-9 flex flex-col items-center">
-                                    <svg
-                                        class="mb-3"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="48"
-                                        height="48"
-                                        viewBox="0 0 48 48"
-                                    >
-                                        <g
-                                            fill="#000"
-                                            fill-rule="nonzero"
-                                            opacity=".203"
-                                        >
-                                            <path
-                                                d="M39.429 4.286H7.714V2.143C7.714.959 8.602 0 9.696 0h27.75c1.095 0 1.983.96 1.983 2.143v2.143zM46 7.714H2c-1.105 0-2 .902-2 2.015v36.257C0 47.098.895 48 2 48h44c1.105 0 2-.902 2-2.014V9.729a2.007 2.007 0 0 0-2-2.015zm-32 8.057c2.21 0 4 1.804 4 4.029 0 2.225-1.79 4.029-4 4.029s-4-1.804-4-4.029c0-2.225 1.79-4.029 4-4.029zM10 37.93L30 19.8l10 18.129H10z"
-                                            />
-                                        </g>
-                                    </svg>
-                                    <p class="text-center text-slate-500">
-                                        Upload your government ID photo here
-                                    </p>
-                                </div>
-                                <input
-                                    @change="govIdChange"
-                                    accept="image/*"
-                                    ref="govID"
-                                    type="file"
-                                    class="hidden"
-                                    id="govID"
-                                />
-                            </label>
-                            <InputFlashMessage
-                                class="text-center"
-                                type="error"
-                                :message="form.errors.id_image"
-                            />
-                        </div>
-                        <div class="w-full max-w-[400px]">
-                            <label
-                                for="selfieID"
-                                class="relative mb-3 flex h-[200px] w-full flex-1 cursor-pointer justify-center rounded border-2 border-dashed p-4"
-                            >
-                                <img
-                                    v-if="avatarSelfieID"
-                                    :src="avatarSelfieID"
-                                    alt=""
-                                    class="absolute inset-0 h-[100%] w-[100%] object-cover"
-                                />
-                                <div class="mt-9 flex flex-col items-center">
-                                    <svg
-                                        class="mb-3"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="48"
-                                        height="48"
-                                        viewBox="0 0 48 48"
-                                    >
-                                        <g
-                                            fill="#000"
-                                            fill-rule="nonzero"
-                                            opacity=".203"
-                                        >
-                                            <path
-                                                d="M39.429 4.286H7.714V2.143C7.714.959 8.602 0 9.696 0h27.75c1.095 0 1.983.96 1.983 2.143v2.143zM46 7.714H2c-1.105 0-2 .902-2 2.015v36.257C0 47.098.895 48 2 48h44c1.105 0 2-.902 2-2.014V9.729a2.007 2.007 0 0 0-2-2.015zm-32 8.057c2.21 0 4 1.804 4 4.029 0 2.225-1.79 4.029-4 4.029s-4-1.804-4-4.029c0-2.225 1.79-4.029 4-4.029zM10 37.93L30 19.8l10 18.129H10z"
-                                            />
-                                        </g>
-                                    </svg>
-                                    <p class="text-center text-slate-500">
-                                        Upload your selfie photo with ID here
-                                    </p>
-                                </div>
-                                <input
-                                    @change="selfieIdChange"
-                                    ref="selfieID"
-                                    accept="image/*"
-                                    type="file"
-                                    class="hidden"
-                                    id="selfieID"
-                                />
-                            </label>
-                            <InputFlashMessage
-                                class="text-center"
-                                type="error"
-                                :message="form.errors.selfie_image"
-                            />
-                        </div>
+                        <SubmitImage
+                            id="govId"
+                            @imageAdded="govIdChange"
+                            description="Upload your government ID photo here"
+                            :error="form.errors.id_image"
+                        ></SubmitImage>
+
+                        <SubmitImage
+                            id="selfieId"
+                            @imageAdded="selfieIdChange"
+                            description="Upload your selfie ID photo here"
+                            :error="form.errors.selfie_image"
+                        ></SubmitImage>
                     </div>
                 </div>
                 <div class="flex flex-col items-center justify-center">

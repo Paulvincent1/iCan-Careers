@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('business_information', function (Blueprint $table) {
             $table->id();
+            $table->string('business_name');
+            $table->string('business_logo');
+            $table->string('industry');
+            $table->string('business_description');
+            $table->json('business_location');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }

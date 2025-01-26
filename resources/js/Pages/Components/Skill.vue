@@ -57,7 +57,7 @@ let onHover = ref(false);
                 <p class="text-lg">
                     {{ modelValue.name }}
                 </p>
-                <i v-if="owner" class="bi bi-pencil-fill text-blue-500"></i>
+                <i v-show="owner" class="bi bi-pencil-fill text-blue-500"></i>
             </div>
             <form
                 @submit.prevent="
@@ -84,7 +84,7 @@ let onHover = ref(false);
             <div class="flex gap-3">
                 <button
                     :disabled="disabled"
-                    v-if="owner"
+                    v-show="owner"
                     @click="removeSkill(modelValue.id)"
                     @mouseover="onHover = true"
                     @mouseout="onHover = false"
@@ -112,7 +112,7 @@ let onHover = ref(false);
                 <p class="text-[14px]">Experience:</p>
                 <input
                     ref="experienceInput"
-                    v-if="owner"
+                    v-show="owner"
                     @input="experienceActive = true"
                     type="text"
                     class="mr-2 rounded border p-1 outline-blue-500"
@@ -121,7 +121,7 @@ let onHover = ref(false);
                 />
                 <button
                     :disabled="disabled"
-                    v-if="experienceActive"
+                    v-show="experienceActive"
                     @click="
                         updateExperience();
                         experienceActive = false;
@@ -131,7 +131,7 @@ let onHover = ref(false);
                     Save Experience
                 </button>
             </div>
-            <p v-if="!owner" class="text-[14px]">
+            <p v-show="!owner" class="text-[14px]">
                 {{ modelValue.experience ? modelValue.experience : "N/A" }}
             </p>
         </div>

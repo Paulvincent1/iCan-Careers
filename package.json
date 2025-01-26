@@ -18,9 +18,12 @@
         "vite": "^6.0"
     },
     "dependencies": {
+        "@indoorequal/vue-maplibre-gl": "^8.2.2",
         "@inertiajs/vue3": "^2.0.0",
+        "@stadiamaps/maplibre-search-box": "^2.0.0",
         "bootstrap-icons": "^1.11.3",
         "dayjs": "^1.11.13",
-        "lodash": "^4.17.21"
+        "lodash": "^4.17.21",
+        "maplibre-gl": "^5.0.1"
     }
 }

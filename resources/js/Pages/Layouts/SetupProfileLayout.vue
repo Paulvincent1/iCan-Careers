@@ -41,14 +41,9 @@ if (
             active: false,
         },
         {
-            name: "Create profile",
+            name: "Create Employer Profile",
             done: false,
-            active: false,
-        },
-        {
-            name: " Company / Business Information",
-            done: false,
-            active: false,
+            active: true,
         },
     ];
 }
@@ -75,17 +70,17 @@ function updateBreadcrumbs() {
         breadcrumbs.value[2].active = true;
     }
 
-    if (page.component === "EmployerAccountSetup/CreateProfile") {
-        breadcrumbs.value[1].active = true;
+    // if (page.component === "EmployerAccountSetup/CreateProfile") {
+    //     breadcrumbs.value[1].active = true;
 
-        breadcrumbs.value[2].active = false;
-    }
-    if (page.component === "WorkerAccountSetup/CompanyInformation") {
-        breadcrumbs.value[1].active = false;
-        breadcrumbs.value[1].done = true;
+    //     breadcrumbs.value[2].active = false;
+    // }
+    // if (page.component === "WorkerAccountSetup/CompanyInformation") {
+    //     breadcrumbs.value[1].active = false;
+    //     breadcrumbs.value[1].done = true;
 
-        breadcrumbs.value[2].active = true;
-    }
+    //     breadcrumbs.value[2].active = true;
+    // }
 }
 </script>
 

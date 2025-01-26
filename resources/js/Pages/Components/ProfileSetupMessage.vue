@@ -8,6 +8,7 @@ let isActive = ref(null);
 defineProps({
     info: null,
 });
+let emit = defineEmits(["close"]);
 </script>
 <template>
     <div class="font-semibold text-[#42423c]">
@@ -21,7 +22,9 @@ defineProps({
                     >Click here!</Link
                 >
             </p>
-            <i class="bi bi-x-lg"></i>
+            <button @click="emit('close', true)">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
     </div>
 </template>

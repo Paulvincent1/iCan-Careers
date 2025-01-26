@@ -4,6 +4,7 @@ import { createApp, h } from "vue";
 import { createInertiaApp, Head, Link } from "@inertiajs/vue3";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import Layout from "./Pages/Layouts/Layout.vue";
+import VueMaplibreGl from "@indoorequal/vue-maplibre-gl";
 
 createInertiaApp({
     resolve: (name) => {
@@ -16,6 +17,7 @@ createInertiaApp({
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
+            .use(VueMaplibreGl)
             .component("Head", Head)
             .component("Link", Link)
             .mount(el);

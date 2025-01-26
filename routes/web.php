@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmployerDashboardController;
 use App\Http\Controllers\EmployerProfileController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
@@ -83,5 +84,6 @@ Route::prefix('employers')->middleware(['auth',isEmployer::class])->group(functi
     Route::get('/createprofile',[EmployerProfileController::class, 'createProfile'])->name('create.profile.employer');
     Route::post('/createprofile',[EmployerProfileController::class, 'storeProfile'])->name('create.profile.employer.post');
 
-    Route::get('/companyinformation',[EmployerProfileController::class, 'createCompanyInformation'])->name('create.company.employer');
+    Route::get('/',[EmployerDashboardController::class, 'index'])->name('employer.dashboard');
+
 });

@@ -57,12 +57,14 @@ function addStar(star, skillId) {
     console.log(form.skills);
 }
 
+let deleteBtnClicked = ref(false);
 function removeSkill(id) {
     form.skills.forEach((element, index) => {
         if (element.id === id) {
             form.skills.splice(index, 1);
         }
     });
+    deleteBtnClicked.value = true;
 }
 
 let form = useForm({
@@ -96,16 +98,18 @@ const card = useTemplateRef("card");
 const backdrop = useTemplateRef("backdrop");
 const closeBtn = useTemplateRef("closeBtn");
 const saveBtn = useTemplateRef("saveBtn");
+const skill = useTemplateRef("skill");
 onMounted(() => {
     backdrop.value.addEventListener("click", (e) => {
-        console.log(closeBtn.value.contains(e.target));
-        if (saveBtn.value.contains(e.target)) {
+        if (saveBtn.value.contains(e.target) || deleteBtnClicked.value) {
+            deleteBtnClicked.value = false;
             return;
         }
         if (
             !card.value.contains(e.target) ||
             closeBtn.value.contains(e.target)
         ) {
+            console.log(!card.value.contains(e.target));
             updateIsOpenFalse();
         }
     });
@@ -132,6 +136,7 @@ onMounted(() => {
 
             <div class="mb-3 max-h-[300px] overflow-y-auto">
                 <Skill
+                    ref="skill"
                     class="mb-2"
                     v-for="skill in form.skills"
                     :key="skill.id"

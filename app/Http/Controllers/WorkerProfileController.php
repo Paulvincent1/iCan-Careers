@@ -55,7 +55,7 @@ class WorkerProfileController extends Controller
     public function myProfile(){
         $user = Auth::user();
         if(!$user->workerProfile){
-            return redirect()->back();
+            return redirect()->route('create.profile');
         }
         $workerSkills = $user->workerSkills;
         $workerProfile = $user->workerProfile;

@@ -10,7 +10,15 @@ class BusinessInformation extends Model
         'business_name',
         'business_logo',
         'industry',
-        'company_description',
-        'company_location',
+        'business_description',
+        'business_location',
     ];
+
+    protected $casts = [
+        'business_location' => 'array'
+    ];
+
+    public function user(){
+        return $this->belongsTo(User::class,'user_id');
+    }
 }

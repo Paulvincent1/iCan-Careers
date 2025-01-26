@@ -5,6 +5,13 @@ import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import dayjs from "dayjs";
+import { ref, Transition, watch } from "vue";
+import { MglMap, MglMarker } from "@indoorequal/vue-maplibre-gl";
+import { useMap } from "@indoorequal/vue-maplibre-gl";
+import { MapLibreSearchControl } from "@stadiamaps/maplibre-search-box";
+import { MglNavigationControl } from "@indoorequal/vue-maplibre-gl";
+import "@stadiamaps/maplibre-search-box/dist/style.css";
+import SubmitImage from "../Components/SubmitImage.vue";
 
 defineOptions({
     layout: [Layout, SetupProfileLayout],
@@ -15,12 +22,76 @@ let form = useForm({
     phone_number: null,
     birth_year: null,
     gender: null,
+    employer_type: null,
+    business_name: null,
+    business_logo: null,
+    industry: null,
+    business_description: null,
+    business_location: [120.9842, 14.5995],
 });
 
+let otherIndustry = ref("");
+let showInput = ref(false);
+watch(
+    () => form.industry,
+    (e) => {
+        if (e === "Other") {
+            showInput.value = true;
+            // console.log(e);
+        } else {
+            showInput.value = false;
+        }
+    },
+);
+
+let showCompanyForm = ref(false);
+watch(
+    () => form.employer_type,
+    () => {
+        if (form.employer_type === "business") {
+            showCompanyForm.value = true;
+        }
+        if (form.employer_type === "individual") {
+            showCompanyForm.value = false;
+        }
+    },
+);
+
+const style = "https://tiles.openfreemap.org/styles/liberty";
+const center = [120.9842, 14.5995];
+const zoom = 6;
+
+function setPointerCursor(event) {
+    event.event.target.getCanvas().style.cursor = "default";
+}
+
+function setMarker(event) {
+    let { lng, lat } = event.event.lngLat;
+    form.business_location = [lng, lat];
+}
+
+let map = useMap();
+const control = new MapLibreSearchControl();
+
+watch(
+    () => map.isLoaded,
+    () => {
+        map.map.addControl(control, "top-left");
+    },
+);
+
+function imageAdded(image) {
+    form.business_logo = image;
+}
+
 const submit = () => {
-    form.post(route("create.profile.employer.post"));   
+    if (form.industry === "Other") {
+        form.industry = otherIndustry.value;
+    }
+    form.post(route("create.profile.employer.post"));
 };
 </script>
+
 <template>
     <div class="mt-9 border p-7">
         <h2 class="my-3 text-2xl font-semibold">Tell us about you</h2>
@@ -38,7 +109,8 @@ const submit = () => {
                     v-model="form.full_name"
                     type="text"
                     class="border px-3 py-2 outline-blue-400"
-                    placeholder="ex. Social Media Manager"
+                    placeholder="John Doe"
+                    required
                 />
                 <InputFlashMessage
                     type="error"
@@ -49,9 +121,10 @@ const submit = () => {
                 <label class="mb-2 mt-4 font-semibold">Phone number</label>
                 <input
                     v-model="form.phone_number"
-                    type="text"
+                    type="number"
                     class="border px-3 py-2 outline-blue-400"
-                    placeholder="ex. Social Media Manager"
+                    placeholder="951...."
+                    required
                 />
                 <InputFlashMessage
                     type="error"
@@ -74,7 +147,7 @@ const submit = () => {
             <div class="mt-4">
                 <p class="mb-2 mt-4 font-semibold">GENDER</p>
                 <div>
-                    <label class="mr-2" for="male">MALE</label>
+                    <label class="mr-2" for="male">Male</label>
                     <input
                         v-model="form.gender"
                         type="radio"
@@ -84,9 +157,8 @@ const submit = () => {
                     />
                 </div>
                 <div>
-                    <label class="mr-2" for="female">FEMALE</label>
+                    <label class="mr-2" for="female">Female</label>
                     <input
-                        v-model="form.gender"
                         type="radio"
                         class="text-center"
                         id="female"
@@ -96,7 +168,149 @@ const submit = () => {
                 <InputFlashMessage type="error" :message="form.errors.gender" />
             </div>
 
-            <div class="flex justify-end">
+            <div class="mt-5 flex flex-col">
+                <label class="mb-2 mr-3 mt-4 font-semibold"
+                    >What kind of employer are you?</label
+                >
+                <select
+                    name=""
+                    id=""
+                    class="border p-3"
+                    v-model="form.employer_type"
+                    required
+                >
+                    <option value="business">
+                        Business / Company Employer
+                    </option>
+                    <option value="individual" class="">
+                        Individual (Freelance)
+                    </option>
+                </select>
+            </div>
+
+            <Transition
+                enter-active-class="animate__animated animate__fadeIn"
+                leave-active-class="animate__animated animate__fadeOut"
+            >
+                <div v-if="showCompanyForm" class="mb-3">
+                    <h2 class="my-3 text-2xl font-semibold">
+                        Company Information
+                    </h2>
+                    <p class="text-sm">
+                        Lorem, ipsum dolor sit amet consectetur adipisicing
+                        elit. Reiciendis corporis itaque eum eius unde aperiam
+                        aliquid vel ratione doloremque! Ullam illo pariatur
+                        officiis tempore iste totam soluta dignissimos libero.
+                        Hic?
+                    </p>
+
+                    <div class="flex flex-col">
+                        <label class="mb-2 mt-4 font-semibold"
+                            >Business / Company name</label
+                        >
+                        <input
+                            v-model="form.business_name"
+                            type="text"
+                            class="border px-3 py-2 outline-blue-400"
+                            placeholder="ex. iCan Careers"
+                        />
+                        <InputFlashMessage
+                            type="error"
+                            :message="form.errors.business_name"
+                        />
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="mb-2 mt-4 font-semibold"
+                            >Business logo</label
+                        >
+                        <SubmitImage
+                            @imageAdded="imageAdded"
+                            description="Upload the business logo here"
+                            :error="form.errors.business_logo"
+                        ></SubmitImage>
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="mb-2 mt-4 font-semibold">Industry</label>
+                        <select
+                            name=""
+                            id=""
+                            class="border p-3"
+                            v-model="form.industry"
+                        >
+                            <option value="Technology and IT">
+                                Technology and IT
+                            </option>
+                            <option value="Remote Customer Support" class="">
+                                Remote Customer Support
+                            </option>
+                            <option value="Creative and Design" class="">
+                                Creative and Design
+                            </option>
+                            <option
+                                value="Accounting and Financial Services"
+                                class=""
+                            >
+                                Accounting and Financial Services
+                            </option>
+                            <option value="Social Media Management" class="">
+                                Social Media Management
+                            </option>
+                            <option value="Other" class="">Other</option>
+                        </select>
+                        <input
+                            v-if="showInput"
+                            v-model="otherIndustry"
+                            type="text"
+                            class="mt-3 border px-3 py-2 outline-blue-400"
+                            placeholder="Please Specify"
+                        />
+                        <InputFlashMessage
+                            type="error"
+                            :message="form.errors.industry"
+                        />
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="mb-2 mt-4 font-semibold"
+                            >Company description</label
+                        >
+                        <textarea
+                            v-model="form.business_description"
+                            type="text"
+                            class="border px-3 pb-9 pt-2 outline-blue-400"
+                            placeholder="Tell us summary about your skills and how you want to be known as worker."
+                        ></textarea>
+                        <InputFlashMessage
+                            type="error"
+                            :message="form.errors.business_description"
+                        />
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label class="mb-2 mt-4 font-semibold"
+                            >Please select your company location</label
+                        >
+                    </div>
+                    <mgl-map
+                        @map:mouseover="setPointerCursor"
+                        @map:click="setMarker"
+                        :map-style="style"
+                        :center="center"
+                        :zoom="zoom"
+                        height="500px"
+                    >
+                        <mgl-marker
+                            :coordinates="form.business_location"
+                            color="#cc0000"
+                        >
+                        </mgl-marker>
+                        <mgl-navigation-control
+                            position="bottom-left"
+                        ></mgl-navigation-control>
+                    </mgl-map>
+                </div>
+            </Transition>
+
+            <div class="mt-3 flex justify-end">
                 <button class="rounded border bg-blue-500 px-4 py-2 text-white">
                     Save
                 </button>
@@ -104,3 +318,16 @@ const submit = () => {
         </form>
     </div>
 </template>
+<style>
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+.input-container .cancel {
+    top: 3px !important;
+}
+
+.maplibregl-marker:hover,
+.maplibregl-marker svg:hover,
+.maplibregl-marker svg g g:hover {
+    cursor: default;
+}
+</style>

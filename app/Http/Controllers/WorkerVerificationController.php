@@ -45,7 +45,7 @@ class WorkerVerificationController extends Controller
             'first_name' => 'required|max:255',
             'middle_name' => 'required|max:255',
             'last_name' => 'required|max:255',
-            'suffix' => 'required|max:255',
+            'suffix' => 'max:255',
             'id_image' => 'required|image',
             'selfie_image' => 'required|image',
         ]);
@@ -60,7 +60,7 @@ class WorkerVerificationController extends Controller
             'first_name' => $fields['first_name'],
             'middle_name' => $fields['middle_name'],
             'last_name' => $fields['last_name'],
-            'suffix' =>  $fields['suffix'],
+            'suffix' =>  $fields['suffix'] ?? null,
             'id_image' =>  '/storage/'.$idImage,
             'selfie_image' => '/storage/'.$selfieImage,
         ]);
