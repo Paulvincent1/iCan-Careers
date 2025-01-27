@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class JobSearch extends Controller
+class JobSearchController extends Controller
 {
     /**
      * Display a listing of the resource.

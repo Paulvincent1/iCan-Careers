@@ -5,6 +5,9 @@ import { createInertiaApp, Head, Link } from "@inertiajs/vue3";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import Layout from "./Pages/Layouts/Layout.vue";
 import VueMaplibreGl from "@indoorequal/vue-maplibre-gl";
+import { register } from "swiper/element/bundle";
+// register Swiper custom elements
+register();
 
 createInertiaApp({
     resolve: (name) => {

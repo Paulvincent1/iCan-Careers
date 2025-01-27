@@ -51,7 +51,7 @@ const submit = () => {
                 <select name="" id="" v-model="form.job_type">
                     <option value="Full time">Full time</option>
                     <option value="Part time">Part time</option>
-                    <option value="Project based">Project based</option>
+                    <option value="Contract">Contract</option>
                 </select>
                 <InputFlashMessage
                     type="error"

@@ -4,7 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployerDashboardController;
 use App\Http\Controllers\EmployerProfileController;
 use App\Http\Controllers\JobPostController;
-use App\Http\Controllers\JobSearch;
+use App\Http\Controllers\JobSearchController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
@@ -75,7 +75,7 @@ Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(functio
     Route::put('/myprofile/updateskill/{skillid}',[WorkerProfileController::class, 'updateSkill'])->name('update.profile.put');
     Route::delete('/myprofile/deleteskill/{skillid}',[WorkerProfileController::class, 'deleteSkill'])->name('update.profile.delete');
 
-    Route::get('/jobsearch',[JobSearch::class,'index'])->name('jobsearch');
+    Route::get('/jobsearch',[JobSearchController::class,'index'])->name('jobsearch');
 });
 
 
