@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployerDashboardController;
 use App\Http\Controllers\EmployerProfileController;
+use App\Http\Controllers\JobPostController;
+use App\Http\Controllers\JobSearch;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
@@ -23,16 +25,12 @@ Route::get('/', function () {
         if($userRole === 'Senior' || $userRole ==='PWD'){
             return redirect()->route('worker.dashboard');
         }
-        // todo if employer
+       
+        return redirect()->route('employer.dashboard');
     }
     return inertia('Home');
 })->name('home');
 
-// functionality for the vue.
-
-Route::get('/goback', function(){
-    return redirect()->back();
-});
 
 Route::middleware(['guest'])->group(function (){
 
@@ -56,6 +54,14 @@ Route::post('/logout',[AuthController::class, 'logout'])->middleware(['auth'])->
 
 Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(function (){
 
+    Route::prefix('verification')->group(function () {
+
+        Route::get('/',[WorkerVerificationController::class, 'index'])->name('account.verify');
+        
+        Route::get('/id',[WorkerVerificationController::class, 'verificationId'])->name('account.verifiy.id');
+        Route::post('/id', [WorkerVerificationController::class, 'store'])->name('account.verifiy.id.post');
+    });
+    
     Route::get('/createprofile',[WorkerProfileController::class, 'createProfile'])->name('create.profile');
     Route::post('/createprofile',[WorkerProfileController::class, 'storeProfile'])->name('create.profile.post');
 
@@ -69,13 +75,7 @@ Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(functio
     Route::put('/myprofile/updateskill/{skillid}',[WorkerProfileController::class, 'updateSkill'])->name('update.profile.put');
     Route::delete('/myprofile/deleteskill/{skillid}',[WorkerProfileController::class, 'deleteSkill'])->name('update.profile.delete');
 
-    Route::prefix('verification')->group(function () {
-
-        Route::get('/',[WorkerVerificationController::class, 'index'])->name('account.verify');
-        
-        Route::get('/id',[WorkerVerificationController::class, 'verificationId'])->name('account.verifiy.id');
-        Route::post('/id', [WorkerVerificationController::class, 'store'])->name('account.verifiy.id.post');
-    });
+    Route::get('/jobsearch',[JobSearch::class,'index'])->name('jobsearch');
 });
 
 
@@ -85,5 +85,9 @@ Route::prefix('employers')->middleware(['auth',isEmployer::class])->group(functi
     Route::post('/createprofile',[EmployerProfileController::class, 'storeProfile'])->name('create.profile.employer.post');
 
     Route::get('/',[EmployerDashboardController::class, 'index'])->name('employer.dashboard');
+    Route::get('/createjob',[JobPostController::class, 'create'])->name('create.job');
+    Route::post('/createjob',[JobPostController::class, 'store'])->name('create.job.post');
+
+
 
 });

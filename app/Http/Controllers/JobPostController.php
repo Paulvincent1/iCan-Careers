@@ -1,0 +1,84 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\JobPost;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class JobPostController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return inertia('Employer/CreateJob');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+
+        
+        $user = Auth::user();
+        $fields = $request->validate([
+            'job_title' => 'required|max:255',
+            'job_type' => 'required|max:255',
+            'work_arrangement' => 'required|max:255',
+            'hour_per_day' => 'required|max:255',
+            'hourly_rate' => 'required|max:255',
+            'salary' => 'required|max:255',
+            'description' => 'required|max:255',
+            'preferred_educational_attainment' => 'required|max:255',
+            'preferred_worker_type' => 'required|max:255',
+        ]);
+
+
+        $user->employerJobPosts()->create($fields);
+
+        return redirect()->route('employer.dashboard');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(JobPost $jobPost)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(JobPost $jobPost)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, JobPost $jobPost)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(JobPost $jobPost)
+    {
+        //
+    }
+}

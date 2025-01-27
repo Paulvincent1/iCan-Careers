@@ -7,6 +7,7 @@ import { useForm } from "@inertiajs/vue3";
 import WorkDetailsForm from "../Components/WorkDetailsForm.vue";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import dayjs from "dayjs";
+import EducationalAttainment from "../Components/EducationalAttainment.vue";
 
 defineOptions({
     layout: [Layout, SetupProfileLayout],
@@ -71,38 +72,10 @@ const submit = () => {
                 <label class="mb-2 mt-4 font-semibold"
                     >HIGHEST EDUCATIONAL ATTAINMENT</label
                 >
-                <div class="relative">
-                    <select
-                        v-model="form.highest_educational_attainment"
-                        name=""
-                        id=""
-                        class="w-full appearance-none border px-3 py-2 outline-blue-400"
-                    >
-                        <option value="Primary School Completed">
-                            Primary School Completed
-                        </option>
-                        <option value="Secondary School (High School) Diploma">
-                            Secondary School (High School) Diploma
-                        </option>
-                        <option value="Associate's Degree">
-                            Associate's Degree
-                        </option>
-                        <option value="Bachelor's Degree">
-                            Bachelor's Degree
-                        </option>
-                        <option value="Master's Degree">Master's Degree</option>
-                        <option value="Doctoral or PhD Degree">
-                            Doctoral or PhD Degree
-                        </option>
-                    </select>
-                    <i
-                        class="bi bi-chevron-down absolute right-2 top-[50%] translate-y-[-50%] text-[16px] font-bold text-purple-500"
-                    ></i>
-                    <InputFlashMessage
-                        type="error"
-                        :message="form.errors.highest_educational_attainment"
-                    />
-                </div>
+                <EducationalAttainment
+                    v-model="form.highest_educational_attainment"
+                    :message="form.errors.highest_educational_attainment"
+                ></EducationalAttainment>
             </div>
             <div class="mt-8">
                 <div>

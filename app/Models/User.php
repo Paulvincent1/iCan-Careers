@@ -71,4 +71,12 @@ class User extends Authenticatable
     public function businessInformation(){
         return $this->hasOne(BusinessInformation::class, 'user_id');
     }
+
+    public function employerJobPosts(){
+        return $this->hasMany(JobPost::class,'employer_id');
+    }
+
+    public function workerJobStatuses(){
+        return $this->hasMany(JobStatus::class, 'worker_id');
+    }
 }

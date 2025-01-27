@@ -1,9 +1,9 @@
-<script setup></script>
+<script setup>
+import { route } from "../../../../vendor/tightenco/ziggy/src/js";
+</script>
 <template>
     <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
-        <div
-            class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-24 xl:gap-32"
-        >
+        <div class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-20">
             <div>
                 <div
                     class="mb-4 flex flex-col items-center justify-center rounded border p-4"
@@ -25,19 +25,16 @@
                     </Link>
                     <div class="flex flex-col items-center">
                         <p class="mb-3 text-center text-red-500">
-                            Please verify your account to apply for jobs!
+                            Your account is currently on free tier, Please
+                            upgrade to pro tier to hire workers.
                         </p>
-                        <Link
+                        <!-- <Link
                             :href="route('account.verify')"
                             as="button"
                             class="w-full rounded-lg border bg-red-500 py-2 text-white"
                         >
-                            Click here to verify!
-                        </Link>
-                    </div>
-
-                    <div>
-                        <p class="text-yellow-400">Pending</p>
+                            See Pricing
+                        </Link> -->
                     </div>
                 </div>
 
@@ -51,7 +48,9 @@
                 >
                     <div class="flex justify-between">
                         <p class="p-1 font-bold">Job status</p>
-                        <Link href="/" class="p-1">Create job</Link>
+                        <Link :href="route('create.job')" class="p-1"
+                            >Post job</Link
+                        >
                     </div>
                 </div>
                 <div class="col-span-2 rounded border p-3 lg:col-span-1">

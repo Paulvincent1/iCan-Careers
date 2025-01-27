@@ -1,6 +1,7 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
 import { onMounted, ref, useTemplateRef, watch } from "vue";
+import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 
 let isActive = ref(false);
 let profileDropdown = ref(false);
@@ -67,7 +68,7 @@ window.addEventListener("resize", () => {
                     </li> -->
                     <li class="flex items-center md:pr-3 lg:border-r-[1px]">
                         <Link
-                            href=""
+                            :href="route('jobsearch')"
                             class="rounded-3xl bg-green-500 px-7 py-2 font-medium text-white"
                             @click="isActive = false"
                         >

@@ -20,7 +20,7 @@ class EmployerProfileController extends Controller
     public function createProfile(){
         $user = Auth::user();
         if($user->employerProfile){
-            // return redirect()->
+            return redirect()->route('employer.dashboard');
         }
         return inertia('EmployerAccountSetup/CreateProfile');
     }

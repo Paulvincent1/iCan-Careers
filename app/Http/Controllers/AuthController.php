@@ -74,7 +74,7 @@ class AuthController extends Controller
                     return redirect()->route('create.profile.employer');
                 }
 
-                //return redirect()->route('employer.dashboard');
+                return redirect()->route('employer.dashboard');
             }
 
         }

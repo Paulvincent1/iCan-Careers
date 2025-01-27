@@ -18,9 +18,7 @@ onMounted(() => {
 </script>
 <template>
     <div class="container mx-auto px-[0.5rem] xl:max-w-7xl">
-        <div
-            class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-24 xl:gap-32"
-        >
+        <div class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-20">
             <div>
                 <div
                     class="mb-4 flex flex-col items-center justify-center rounded border p-4"
