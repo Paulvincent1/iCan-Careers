@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('salary');
             $table->string('description');
             $table->string('preferred_educational_attainment');
-            $table->string('preferred_worker_type');
+            $table->json('preferred_worker_types');
             $table->foreignId('employer_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });

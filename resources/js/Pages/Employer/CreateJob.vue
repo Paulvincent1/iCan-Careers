@@ -3,6 +3,7 @@ import { useForm } from "@inertiajs/vue3";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import EducationalAttainment from "../Components/EducationalAttainment.vue";
+import { onMounted, ref, useTemplateRef } from "vue";
 
 let form = useForm({
     job_title: null,
@@ -13,10 +14,95 @@ let form = useForm({
     salary: null,
     description: null,
     preferred_educational_attainment: null,
-    preferred_worker_type: null,
+    preferred_worker_types: null,
 });
 
+let isCheck = ref(false);
+function check() {
+    isCheck.value = !isCheck.value;
+}
+
+let isOpenToAllDisability = ref(false);
+function openToAll() {
+    isOpenToAllDisability.value = !isOpenToAllDisability.value;
+}
+
+let isOtherCheck = ref(false);
+function otherCheck() {
+    isOtherCheck.value = !isOtherCheck.value;
+}
+
+let candidateType = ref([]);
+function addCandidateType(e) {
+    if (!e.target.checked) {
+        candidateType.value.forEach((candidate, index) => {
+            if (candidate === e.target.value) {
+                candidateType.value.splice(index, 1);
+            }
+        });
+
+        if (e.target.value === "PWD") {
+            isOpenToAllDisability.value = false;
+            const index = candidateType.value.indexOf(
+                "Open to All Disabalities",
+            );
+            candidateType.value.splice(index, 1);
+        }
+
+        if (e.target.value === "Other") {
+            otherInput.value.value = "";
+            isOtherCheck.value = false;
+
+            if (candidateType.value.indexOf(otherValue.value) != -1) {
+                candidateType.value.splice(
+                    candidateType.value.indexOf(otherValue.value),
+                    1,
+                );
+            }
+        }
+    }
+
+    if (e.target.checked) {
+        candidateType.value.push(e.target.value);
+
+        if (e.target.value === "Open to All Disabalities") {
+            for (let i = candidateType.value.length - 1; i >= 0; i--) {
+                const candidate = candidateType.value[i];
+                if (
+                    candidate != "PWD" &&
+                    candidate != "Seniors Citizens" &&
+                    candidate != "Open to All Disabalities"
+                ) {
+                    candidateType.value.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    console.log(candidateType.value);
+}
+
+let otherInput = useTemplateRef("otherInput");
+onMounted(() => {});
+
+let otherValue = ref("");
 const submit = () => {
+    if (candidateType.value.indexOf("Other") != -1) {
+        candidateType.value[candidateType.value.indexOf("Other")] =
+            otherInput.value.value;
+        otherValue.value = otherInput.value.value;
+    }
+    if (otherInput.value) {
+        if (otherInput.value.value != otherValue.value) {
+            candidateType.value[candidateType.value.indexOf(otherValue.value)] =
+                otherInput.value.value;
+
+            otherValue.value = otherInput.value.value;
+        }
+    }
+
+    form.preferred_worker_types = candidateType.value;
+    console.log(candidateType.value);
     form.post(route("create.job.post"));
 };
 </script>
@@ -138,18 +224,110 @@ const submit = () => {
             </div>
             <div class="flex flex-col">
                 <label class="mb-2 mt-4 font-semibold"
-                    >Preferred worker type</label
+                    >Candidate type options:</label
                 >
-                <input
-                    v-model="form.preferred_worker_type"
-                    type="text"
-                    class="border px-3 py-2 outline-blue-400"
-                    placeholder="John Doe"
-                    required
-                />
+
+                <div>
+                    <label for="">Seniors</label>
+                    <input
+                        @change="addCandidateType"
+                        value="Seniors Citizens"
+                        type="checkbox"
+                    />
+                </div>
+                <div>
+                    <label for="">PWD</label>
+                    <input
+                        @change="
+                            check();
+                            addCandidateType($event);
+                        "
+                        value="PWD"
+                        type="checkbox"
+                    />
+                </div>
+                <div v-if="isCheck">
+                    <div v-if="!isOpenToAllDisability">
+                        <div>
+                            <label for="">Physical Disabalities</label>
+                            <input
+                                @change="addCandidateType"
+                                type="checkbox"
+                                value="Physical Disabalities"
+                            />
+                        </div>
+                        <div>
+                            <label for="">Visual Impairments</label>
+                            <input
+                                @change="addCandidateType"
+                                type="checkbox"
+                                value="Visual Impairments"
+                            />
+                        </div>
+                        <div>
+                            <label for="">Hearing Impairments</label>
+                            <input
+                                @change="addCandidateType"
+                                type="checkbox"
+                                value="Hearing Impairments"
+                            />
+                        </div>
+                        <div>
+                            <label for=""
+                                >Cognitive/Developmental Disabilities</label
+                            >
+                            <input
+                                @change="addCandidateType"
+                                type="checkbox"
+                                value="Cognitive/Developmental Disabilities"
+                            />
+                        </div>
+                        <div>
+                            <label for="">Mental Health Disabalities</label>
+                            <input
+                                @change="addCandidateType"
+                                type="checkbox"
+                                value="Mental Health Disabalities"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="">Other</label>
+                            <input
+                                @change="
+                                    otherCheck();
+                                    addCandidateType($event);
+                                "
+                                type="checkbox"
+                                value="Other"
+                            />
+                            <br />
+                            <input
+                                v-if="isOtherCheck"
+                                ref="otherInput"
+                                type="text"
+                                placeholder="Please Specify"
+                                class="border-b outline-none"
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label for="">Open to All Disabalities</label>
+                        <input
+                            @change="
+                                openToAll();
+                                addCandidateType($event);
+                            "
+                            type="checkbox"
+                            value="Open to All Disabalities"
+                        />
+                    </div>
+                </div>
+
                 <InputFlashMessage
                     type="error"
-                    :message="form.errors.preferred_worker_type"
+                    :message="form.errors.preferred_worker_types"
                 />
             </div>
 

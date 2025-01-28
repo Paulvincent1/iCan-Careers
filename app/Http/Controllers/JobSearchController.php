@@ -9,8 +9,9 @@ class JobSearchController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        dd($request);
         return inertia('Worker/FindJobs');
     }
 

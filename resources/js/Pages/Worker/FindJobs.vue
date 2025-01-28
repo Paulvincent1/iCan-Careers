@@ -14,23 +14,28 @@ let swiperContainer = useTemplateRef("swiper-container");
 //         swiperContainer.value.swiper.slideNext();
 //     });
 // });
-let checkboxs;
+let workingSchedCheckbox;
+let workingModesCheckbox;
+let experienceCheckbox;
 onMounted(() => {
     swiperContainer.value.swiper.update();
-    checkboxs = document.querySelectorAll("input[type='checkbox']");
+    workingSchedCheckbox = document.querySelectorAll(".workingsched");
+    workingModesCheckbox = document.querySelectorAll(".workingmodes");
+    experienceCheckbox = document.querySelectorAll(".experience");
 });
 
 let workingSched = ref([]);
 function updateWorkingSched() {
-    checkboxs.forEach((e) => {
-        if (e.classList.contains("workingsched")) {
-            if (!e.checked) {
-                const index = workingSched.value.indexOf(e.value);
-                if (index !== -1) {
-                    workingSched.value.splice(index, 1);
-                }
+    workingSchedCheckbox.forEach((e) => {
+        if (!e.checked) {
+            const index = workingSched.value.indexOf(e.value);
+            if (index !== -1) {
+                workingSched.value.splice(index, 1);
             }
+        }
+        // console.log(workingSched.value.indexOf(e.value) != -1);
 
+        if (workingSched.value.indexOf(e.value) === -1) {
             if (e.checked) {
                 workingSched.value.push(e.value);
             }
@@ -40,11 +45,55 @@ function updateWorkingSched() {
     submit();
 }
 
+let workingModes = ref([]);
+function updateWorkingModes() {
+    workingModesCheckbox.forEach((e) => {
+        if (!e.checked) {
+            const index = workingModes.value.indexOf(e.value);
+            if (index !== -1) {
+                workingModes.value.splice(index, 1);
+            }
+        }
+        // console.log(workingSched.value.indexOf(e.value) != -1);
+
+        if (workingModes.value.indexOf(e.value) === -1) {
+            if (e.checked) {
+                workingModes.value.push(e.value);
+            }
+        }
+    });
+    console.log(workingModes.value);
+    submit();
+}
+
+let experiences = ref([]);
+function updateExperiences() {
+    experienceCheckbox.forEach((e) => {
+        if (!e.checked) {
+            const index = experiences.value.indexOf(e.value);
+            if (index !== -1) {
+                experiences.value.splice(index, 1);
+            }
+        }
+        // console.log(workingSched.value.indexOf(e.value) != -1);
+
+        if (experiences.value.indexOf(e.value) === -1) {
+            if (e.checked) {
+                experiences.value.push(e.value);
+            }
+        }
+    });
+    console.log(experiences.value);
+    submit();
+}
+
 const submit = () => {
     router.get(
         route("jobsearch"),
         {
             job_type: workingSched.value,
+            work_arrangement: workingModes.value,
+            experience: experiences.value,
         },
         {
             preserveState: true,
@@ -74,6 +123,7 @@ const submit = () => {
                     <div>
                         <label for="part">Part time</label>
                         <input
+                            @change="updateWorkingSched"
                             id="part"
                             type="checkbox"
                             class="workingsched"
@@ -83,6 +133,7 @@ const submit = () => {
                     <div>
                         <label for="contract">Contract</label>
                         <input
+                            @change="updateWorkingSched"
                             id="contract"
                             type="checkbox"
                             class="workingsched"
@@ -95,15 +146,33 @@ const submit = () => {
 
                     <div>
                         <label for="remote">Remote</label>
-                        <input id="remote" type="checkbox" />
+                        <input
+                            @change="updateWorkingModes"
+                            id="remote"
+                            type="checkbox"
+                            class="workingmodes"
+                            value="Remote"
+                        />
                     </div>
                     <div>
                         <label for="hybrid">Hybrid</label>
-                        <input id="hybrid" type="checkbox" />
+                        <input
+                            @change="updateWorkingModes"
+                            id="hybrid"
+                            type="checkbox"
+                            class="workingmodes"
+                            value="Hybrid"
+                        />
                     </div>
                     <div>
                         <label for="office">Office</label>
-                        <input id="office" type="checkbox" />
+                        <input
+                            @change="updateWorkingModes"
+                            id="office"
+                            type="checkbox"
+                            class="workingmodes"
+                            value="Office"
+                        />
                     </div>
                 </div>
                 <div>
@@ -111,19 +180,43 @@ const submit = () => {
 
                     <div>
                         <label for="fresher">Fresher</label>
-                        <input id="fresher" type="checkbox" />
+                        <input
+                            @change="updateExperiences"
+                            id="fresher"
+                            type="checkbox"
+                            class="experience"
+                            value="Fresher"
+                        />
                     </div>
                     <div>
                         <label for="year0-2">0-2 years</label>
-                        <input id="year0-2" type="checkbox" />
+                        <input
+                            @change="updateExperiences"
+                            id="year0-2"
+                            type="checkbox"
+                            class="experience"
+                            value="0-2 years"
+                        />
                     </div>
                     <div>
                         <label for="year2-4">2-4 years</label>
-                        <input id="year2-4" type="checkbox" />
+                        <input
+                            @change="updateExperiences"
+                            id="year2-4"
+                            type="checkbox"
+                            class="experience"
+                            value="2-4 years"
+                        />
                     </div>
                     <div>
                         <label for="year5">5+ years</label>
-                        <input id="year5" type="checkbox" />
+                        <input
+                            @change="updateExperiences"
+                            id="year5"
+                            type="checkbox"
+                            class="experience"
+                            value="5+ years"
+                        />
                     </div>
                 </div>
             </div>

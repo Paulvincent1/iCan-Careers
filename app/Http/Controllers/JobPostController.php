@@ -41,7 +41,7 @@ class JobPostController extends Controller
             'salary' => 'required|max:255',
             'description' => 'required|max:255',
             'preferred_educational_attainment' => 'required|max:255',
-            'preferred_worker_type' => 'required|max:255',
+            'preferred_worker_types' => 'required',
         ]);
 
 

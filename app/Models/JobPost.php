@@ -15,7 +15,11 @@ class JobPost extends Model
         'salary',
         'description',
         'preferred_educational_attainment', // can add No Preference
-        'preferred_worker_type',
+        'preferred_worker_types',
+    ];
+
+    protected $casts = [
+        'preferred_worker_types' => 'array'
     ];
 
     public function employer(){
