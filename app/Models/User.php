@@ -79,4 +79,8 @@ class User extends Authenticatable
     public function workerJobStatuses(){
         return $this->hasMany(JobStatus::class, 'worker_id');
     }
+
+    public function savedJobs(){
+        return $this->belongsToMany(User::class, 'job_post_user','user_id','job_post_id');
+    }
 }

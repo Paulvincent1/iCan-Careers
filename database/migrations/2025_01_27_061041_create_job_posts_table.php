@@ -16,11 +16,13 @@ return new class extends Migration
             $table->string('job_title');
             $table->string('job_type');
             $table->string('work_arrangement');
+            $table->string('experience');
             $table->string('hour_per_day');
             $table->string('hourly_rate');
             $table->string('salary');
             $table->string('description');
             $table->string('preferred_educational_attainment');
+            $table->json('skills');
             $table->json('preferred_worker_types');
             $table->foreignId('employer_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();

@@ -4,6 +4,12 @@ import { forEach } from "lodash";
 import { FreeMode } from "swiper/modules";
 import { onMounted, ref, useTemplateRef } from "vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
+import JobCard from "../Components/JobCard.vue";
+
+let props = defineProps({
+    jobs: null,
+});
+console.log(props.jobs);
 
 let swiperContainer = useTemplateRef("swiper-container");
 // let next = useTemplateRef("next");
@@ -104,7 +110,9 @@ const submit = () => {
 </script>
 <template>
     <div class="container mx-auto px-[0.5rem] xl:max-w-7xl">
-        <div class="grid grid-cols-[300px,1fr] pt-4">
+        <div
+            class="grid pt-4 md:grid-cols-[200px,1fr] xl:grid-cols-[300px,1fr]"
+        >
             <div class="border p-3">
                 <p>Filters</p>
                 <div>
@@ -240,6 +248,19 @@ const submit = () => {
                         :navigation="true"
                     >
                         <swiper-slide
+                            v-for="(job, index) in jobs"
+                            :key="job.id"
+                            class="flex w-auto items-center justify-center"
+                        >
+                            <p
+                                href="/"
+                                method="get"
+                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
+                            >
+                                {{ job.job_title }}
+                            </p>
+                        </swiper-slide>
+                        <swiper-slide
                             class="flex w-auto items-center justify-center"
                         >
                             <p
@@ -256,7 +277,7 @@ const submit = () => {
                             <p
                                 href="/"
                                 method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
+                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
                             >
                                 Social Media Manager
                             </p>
@@ -267,7 +288,7 @@ const submit = () => {
                             <p
                                 href="/"
                                 method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
+                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
                             >
                                 Social Media Manager
                             </p>
@@ -278,7 +299,7 @@ const submit = () => {
                             <p
                                 href="/"
                                 method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
+                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
                             >
                                 Social Media Manager
                             </p>
@@ -289,7 +310,7 @@ const submit = () => {
                             <p
                                 href="/"
                                 method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
+                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
                             >
                                 Social Media Manager
                             </p>
@@ -300,7 +321,7 @@ const submit = () => {
                             <p
                                 href="/"
                                 method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
+                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
                             >
                                 Social Media Manager
                             </p>
@@ -311,67 +332,27 @@ const submit = () => {
                             <p
                                 href="/"
                                 method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-300 p-3 text-blue-300"
+                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
                             >
                                 Social Media Manager
                             </p>
                         </swiper-slide>
                     </swiper-container>
+                </div>
+
+                <div class="grid gap-2 lg:grid-cols-2">
+                    <JobCard
+                        v-for="job in jobs"
+                        :key="job.id"
+                        :job="job"
+                    ></JobCard>
+                    <!-- <JobCard></JobCard> -->
+
+                    <div class="bg-yellow-300">dasdas</div>
+                    <div class="bg-red-300">dasdas</div>
+                    <div class="bg-yellow-300">dasdas</div>
+                    <div class="bg-red-300">dasdas</div>
+                    <div class="bg-yellow-300">dasdas</div>
                 </div>
             </div>
         </div>

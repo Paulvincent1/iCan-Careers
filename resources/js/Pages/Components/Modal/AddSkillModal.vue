@@ -4,6 +4,7 @@ import AddSkillInput from "../AddSkillInput.vue";
 import Skill from "../Skill.vue";
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 import InputFlashMessage from "../InputFlashMessage.vue";
+import { uniqueId } from "lodash";
 
 let emit = defineEmits(["updateIsOpen"]);
 
@@ -11,18 +12,18 @@ function updateIsOpenFalse() {
     emit("updateIsOpen", false);
 }
 
-const randomId = function (length = 6) {
-    return Math.random()
-        .toString(36)
-        .substring(2, length + 2);
-};
+// const randomId = function (length = 6) {
+//     return Math.random()
+//         .toString(36)
+//         .substring(2, length + 2);
+// };
 
 // let skills = ref([]);
 
 function addSkill(name) {
     if (name.length) {
         form.skills.push({
-            id: randomId(),
+            id: uniqueId(),
             name,
             experience: "",
             star: "",

@@ -30,17 +30,20 @@ class JobPostController extends Controller
     public function store(Request $request)
     {
 
+        // dd($request);
         
         $user = Auth::user();
         $fields = $request->validate([
             'job_title' => 'required|max:255',
             'job_type' => 'required|max:255',
             'work_arrangement' => 'required|max:255',
+            'experience' => 'required',
             'hour_per_day' => 'required|max:255',
             'hourly_rate' => 'required|max:255',
             'salary' => 'required|max:255',
             'description' => 'required|max:255',
             'preferred_educational_attainment' => 'required|max:255',
+            'skills' => 'required',
             'preferred_worker_types' => 'required',
         ]);
 

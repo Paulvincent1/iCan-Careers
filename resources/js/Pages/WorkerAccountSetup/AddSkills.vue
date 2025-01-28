@@ -8,23 +8,24 @@ import { useForm, usePage } from "@inertiajs/vue3";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import Skill from "../Components/Skill.vue";
 import AddSkillInput from "../Components/AddSkillInput.vue";
+import { uniqueId } from "lodash";
 
 defineOptions({
     layout: [Layout, SetupProfileLayout],
 });
 
-const randomId = function (length = 6) {
-    return Math.random()
-        .toString(36)
-        .substring(2, length + 2);
-};
+// const randomId = function (length = 6) {
+//     return Math.random()
+//         .toString(36)
+//         .substring(2, length + 2);
+// };
 
 // let skills = ref([]);
 
 function addSkill(name) {
     if (name.length) {
         form.skills.push({
-            id: randomId(),
+            id: uniqueId(),
             name,
             experience: "",
             star: "",

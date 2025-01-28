@@ -1,4 +1,6 @@
 <script setup>
+import InputFlashMessage from "./InputFlashMessage.vue";
+
 let model = defineModel({
     type: null,
     required: true,

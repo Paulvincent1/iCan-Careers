@@ -382,7 +382,7 @@ function removeSkill(skillId) {
                         <p
                             @click="isEditDescription = true"
                             v-if="!isEditDescription"
-                            class="cursor-pointer whitespace-pre-line break-words text-[14px] hover:underline"
+                            class="cursor-pointer whitespace-pre-wrap break-words text-[14px] hover:underline"
                         >
                             {{ workerProfile.profile_description }}
                         </p>

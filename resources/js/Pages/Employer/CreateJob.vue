@@ -4,16 +4,19 @@ import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import EducationalAttainment from "../Components/EducationalAttainment.vue";
 import { onMounted, ref, useTemplateRef } from "vue";
+import { uniqueId } from "lodash";
 
 let form = useForm({
     job_title: null,
     job_type: null,
     work_arrangement: null,
+    experience: null,
     hour_per_day: null,
     hourly_rate: null,
     salary: null,
     description: null,
     preferred_educational_attainment: null,
+    skills: null,
     preferred_worker_types: null,
 });
 
@@ -46,7 +49,10 @@ function addCandidateType(e) {
             const index = candidateType.value.indexOf(
                 "Open to All Disabalities",
             );
-            candidateType.value.splice(index, 1);
+
+            if (index != -1) {
+                candidateType.value.splice(index, 1);
+            }
         }
 
         if (e.target.value === "Other") {
@@ -58,6 +64,7 @@ function addCandidateType(e) {
                     candidateType.value.indexOf(otherValue.value),
                     1,
                 );
+                console.log(3);
             }
         }
     }
@@ -83,9 +90,32 @@ function addCandidateType(e) {
 }
 
 let otherInput = useTemplateRef("otherInput");
+let otherValue = ref("");
+
+let skillInput = useTemplateRef("skillInput");
+let skills = ref([]);
+function addSkill() {
+    if (skillInput.value.value != "") {
+        skills.value.push({
+            id: uniqueId(),
+            name: skillInput.value.value,
+        });
+        skillInput.value.value = "";
+    }
+
+    console.log(skillInput.value.value);
+}
+
+function removeSkill(skill) {
+    skills.value.forEach((e, index) => {
+        if (e.id === skill.id) {
+            skills.value.splice(index, 1);
+        }
+    });
+}
+
 onMounted(() => {});
 
-let otherValue = ref("");
 const submit = () => {
     if (candidateType.value.indexOf("Other") != -1) {
         candidateType.value[candidateType.value.indexOf("Other")] =
@@ -101,6 +131,7 @@ const submit = () => {
         }
     }
 
+    form.skills = skills.value;
     form.preferred_worker_types = candidateType.value;
     console.log(candidateType.value);
     form.post(route("create.job.post"));
@@ -155,6 +186,19 @@ const submit = () => {
                 <InputFlashMessage
                     type="error"
                     :message="form.errors.work_arrangement"
+                />
+            </div>
+            <div class="flex flex-col">
+                <p class="mb-2 mt-4 font-semibold">Preferred Experience</p>
+                <select name="" id="" v-model="form.experience">
+                    <option value="Fresher">Fresher</option>
+                    <option value="0-2 years">0-2 years</option>
+                    <option value="2-4 years">2-4 years</option>
+                    <option value="5+ years">5+ years</option>
+                </select>
+                <InputFlashMessage
+                    type="error"
+                    :message="form.errors.experience"
                 />
             </div>
 
@@ -218,9 +262,44 @@ const submit = () => {
 
                 <EducationalAttainment
                     v-model="form.preferred_educational_attainment"
-                    :error="form.preferred_educational_attainment"
+                    :error="form.errors.preferred_educational_attainment"
                     :openToAll="true"
                 ></EducationalAttainment>
+            </div>
+            <div class="flex flex-col">
+                <div class="flex flex-col">
+                    <label class="mb-2 mt-4 font-semibold">Skills needed</label>
+                    <div class="mb-3">
+                        <input
+                            ref="skillInput"
+                            type="text"
+                            class="mr-3 border px-3 py-2 outline-blue-400"
+                            placeholder="John Doe"
+                        />
+                        <input
+                            @click="addSkill"
+                            class="rounded bg-green-500 p-2 text-white"
+                            type="button"
+                            value="Add"
+                        />
+                    </div>
+                    <div
+                        class="flex min-h-20 flex-wrap items-start justify-start gap-1 border p-2"
+                    >
+                        <div
+                            v-for="(skill, index) in skills"
+                            :key="skill.id"
+                            class="flex w-fit rounded bg-gray-300 p-1"
+                        >
+                            <p class="">{{ skill.name }}</p>
+                            <i
+                                @click="removeSkill(skill)"
+                                class="bi bi-x cursor-pointer"
+                            ></i>
+                        </div>
+                    </div>
+                </div>
+                <InputFlashMessage type="error" :message="form.errors.skills" />
             </div>
             <div class="flex flex-col">
                 <label class="mb-2 mt-4 font-semibold"

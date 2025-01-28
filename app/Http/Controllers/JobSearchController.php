@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\JobPost;
 use Illuminate\Http\Request;
 
 class JobSearchController extends Controller
@@ -11,8 +12,26 @@ class JobSearchController extends Controller
      */
     public function index(Request $request)
     {
-        dd($request);
-        return inertia('Worker/FindJobs');
+        // $jobType = $request->input('job_type') ?? [];
+        // $workArrangement = $request->input('work_arrangement') ?? [];
+        // $experience = $request->input('experience') ?? [];
+        
+        $jobs = JobPost::with(['employer.businessInformation','employer.employerProfile'])->filter(request(['job_type','work_arrangement','experience']))->get();
+      
+
+        // dd($jobs);
+        // $jobs = JobPost::whereIn('job_type',$jobType)->orWhereIn('work_arrangement', $workArrangement)
+        // ->orWhereIn('experience', $experience)->get();
+
+        // JobPost::whereIn('job_title',$jobType)->orWhere(function ($query) use ($workArrangement) {
+        //     $query->whereIn('work_arrangement', $workArrangement);
+        // })->orWhere(function ($query) use ($experience) {
+        //     $query->whereIn('experience', $experience);
+        // })->get();
+
+        // dd($jobs);
+       
+        return inertia('Worker/FindJobs',['jobs' => $jobs]);
     }
 
     /**
