@@ -47,8 +47,25 @@ class JobPostController extends Controller
             'preferred_worker_types' => 'required',
         ]);
 
+        $skills = [];
+        foreach($fields['skills'] as $skill){
+            $skills[] = $skill['name'];
+        }
 
-        $user->employerJobPosts()->create($fields);
+
+        $user->employerJobPosts()->create([
+            'job_title' =>  $fields['job_title'],
+            'job_type' =>  $fields['job_type'],
+            'work_arrangement' =>  $fields['work_arrangement'],
+            'experience' =>  $fields['experience'],
+            'hour_per_day' =>  $fields['hour_per_day'],
+            'hourly_rate' =>  $fields['hourly_rate'],
+            'salary' =>  $fields['salary'],
+            'description' =>  $fields['description'],
+            'preferred_educational_attainment' =>  $fields['preferred_educational_attainment'],
+            'skills' =>  $skills,
+            'preferred_worker_types' =>  $fields['preferred_worker_types'],
+        ]);
 
         return redirect()->route('employer.dashboard');
     }

@@ -15,8 +15,8 @@ class JobSearchController extends Controller
         // $jobType = $request->input('job_type') ?? [];
         // $workArrangement = $request->input('work_arrangement') ?? [];
         // $experience = $request->input('experience') ?? [];
-        
-        $jobs = JobPost::with(['employer.businessInformation','employer.employerProfile'])->filter(request(['job_type','work_arrangement','experience']))->get();
+
+        $jobs = JobPost::with(['employer.businessInformation','employer.employerProfile'])->filter(request(['job_type','work_arrangement','experience','job_title']))->latest()->get();
       
 
         // dd($jobs);
@@ -31,7 +31,7 @@ class JobSearchController extends Controller
 
         // dd($jobs);
        
-        return inertia('Worker/FindJobs',['jobs' => $jobs]);
+        return inertia('Worker/FindJobs',['jobsProps' => $jobs]);
     }
 
     /**

@@ -41,6 +41,10 @@ class JobPost extends Model
         if($filters['experience'] ?? false){
             $query->whereIn('experience', request('experience'));
         }
+
+        if($filters['job_title'] ?? false){
+            $query->where('job_title','like', '%' . request('job_title') . '%');
+        }
     }
 
 

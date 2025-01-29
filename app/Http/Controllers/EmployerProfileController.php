@@ -6,6 +6,7 @@ use App\Models\BusinessInformation;
 use App\Models\EmployerProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class EmployerProfileController extends Controller
 {
@@ -47,7 +48,16 @@ class EmployerProfileController extends Controller
                 'business_location' =>'required' ,
             ]);
 
-            $user->businessInformation()->create($business);
+            // dd($business);
+            $logo = Storage::disk('public')->put('images', $request->business_logo);
+            $user->businessInformation()->create([
+                'business_name' => $business['business_name'],
+                'business_logo' => '/storage/' . $logo,
+                'industry' =>  $business['industry'],
+                'business_description' =>  $business['business_description'],
+                'business_location' =>  $business   ['business_location'],
+                
+            ]);
         }
 
         

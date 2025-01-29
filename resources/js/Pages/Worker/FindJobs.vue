@@ -2,14 +2,16 @@
 import { Link, router } from "@inertiajs/vue3";
 import { forEach } from "lodash";
 import { FreeMode } from "swiper/modules";
-import { onMounted, ref, useTemplateRef } from "vue";
+import { onMounted, onUpdated, ref, useTemplateRef, watch } from "vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import JobCard from "../Components/JobCard.vue";
+import { debounce } from "lodash";
 
 let props = defineProps({
-    jobs: null,
+    jobsProps: null,
 });
-console.log(props.jobs);
+
+let jobs = ref(props.jobsProps);
 
 let swiperContainer = useTemplateRef("swiper-container");
 // let next = useTemplateRef("next");
@@ -23,12 +25,42 @@ let swiperContainer = useTemplateRef("swiper-container");
 let workingSchedCheckbox;
 let workingModesCheckbox;
 let experienceCheckbox;
+let jobTitlesRawArray = ref([]);
+let jobTitles = ref([]);
+const params = ref({});
+let tagActive = ref(false);
 onMounted(() => {
+    tagActive.value = false;
     swiperContainer.value.swiper.update();
     workingSchedCheckbox = document.querySelectorAll(".workingsched");
     workingModesCheckbox = document.querySelectorAll(".workingmodes");
     experienceCheckbox = document.querySelectorAll(".experience");
+
+    console.log(jobs.value);
+
+    jobs.value.forEach((e) => {
+        jobTitlesRawArray.value.push(e.job_title);
+    });
+
+    jobTitles.value = [...new Set(jobTitlesRawArray.value)];
+    params.value = route().params;
+
+    search.value = params.value.job_title;
 });
+
+watch(
+    () => props.jobsProps,
+    () => {
+        jobTitlesRawArray.value = [];
+        props.jobsProps.forEach((e) => {
+            jobTitlesRawArray.value.push(e.job_title);
+        });
+
+        jobTitles.value = [...new Set(jobTitlesRawArray.value)];
+
+        jobs.value = props.jobsProps;
+    },
+);
 
 let workingSched = ref([]);
 function updateWorkingSched() {
@@ -39,7 +71,6 @@ function updateWorkingSched() {
                 workingSched.value.splice(index, 1);
             }
         }
-        // console.log(workingSched.value.indexOf(e.value) != -1);
 
         if (workingSched.value.indexOf(e.value) === -1) {
             if (e.checked) {
@@ -47,8 +78,9 @@ function updateWorkingSched() {
             }
         }
     });
-    console.log(workingSched.value);
+
     submit();
+    resetFilter();
 }
 
 let workingModes = ref([]);
@@ -70,6 +102,7 @@ function updateWorkingModes() {
     });
     console.log(workingModes.value);
     submit();
+    resetFilter();
 }
 
 let experiences = ref([]);
@@ -91,6 +124,54 @@ function updateExperiences() {
     });
     console.log(experiences.value);
     submit();
+    resetFilter();
+}
+
+let lastTagValueClicked = ref(null);
+function filterTag(tag, event) {
+    const tagbutton = event.target;
+    let tagbuttons = document.querySelectorAll(".tag-buttons");
+
+    tagbuttons.forEach((e) => {
+        console.log(e);
+        e.classList.remove("bg-blue-300", "text-white");
+    });
+
+    if (lastTagValueClicked.value != tag) {
+        if (tagActive.value) {
+            jobs.value = props.jobsProps;
+            jobs.value = jobs.value.filter((value, index) => {
+                return value.job_title === tag;
+            });
+            tagbutton.classList.add("bg-blue-300", "text-white");
+            lastTagValueClicked.value = tag;
+            console.log("if-if");
+            return;
+        }
+
+        jobs.value = jobs.value.filter((value, index) => {
+            return value.job_title === tag;
+        });
+        tagbutton.classList.add("bg-blue-300", "text-white");
+        tagActive.value = true;
+        lastTagValueClicked.value = tag;
+        console.log("if");
+    } else {
+        jobs.value = props.jobsProps;
+        tagActive.value = false;
+        lastTagValueClicked.value = null;
+        console.log("else");
+    }
+}
+function resetFilter() {
+    let tagbuttons = document.querySelectorAll(".tag-buttons");
+
+    tagbuttons.forEach((e) => {
+        console.log(e);
+        e.classList.remove("bg-blue-300", "text-white");
+    });
+    lastTagValueClicked.value = null;
+    tagActive.value = false;
 }
 
 const submit = () => {
@@ -100,6 +181,7 @@ const submit = () => {
             job_type: workingSched.value,
             work_arrangement: workingModes.value,
             experience: experiences.value,
+            job_title: search.value,
         },
         {
             preserveState: true,
@@ -107,130 +189,200 @@ const submit = () => {
         },
     );
 };
+let search = ref("");
+
+watch(search, debounce(submit, 500));
 </script>
 <template>
     <div class="container mx-auto px-[0.5rem] xl:max-w-7xl">
         <div
-            class="grid pt-4 md:grid-cols-[200px,1fr] xl:grid-cols-[300px,1fr]"
+            class="grid items-start gap-8 pt-4 md:grid-cols-[200px,1fr] xl:grid-cols-[300px,1fr]"
         >
-            <div class="border p-3">
-                <p>Filters</p>
-                <div>
-                    <p>Working Schedule</p>
+            <div class="top-20 p-3 md:sticky">
+                <p class="mb-3 text-xl">Filters</p>
+                <div
+                    class="flex flex-col sm:flex-row sm:justify-around md:flex-col"
+                >
+                    <div class="mb-3">
+                        <p>Working Schedule</p>
 
-                    <div>
-                        <label for="full">Full time</label>
-                        <input
-                            @change="updateWorkingSched"
-                            id="full"
-                            type="checkbox"
-                            value="full time"
-                            class="workingsched"
-                        />
+                        <div>
+                            <input
+                                @change="updateWorkingSched"
+                                id="full"
+                                type="checkbox"
+                                value="full time"
+                                class="workingsched mr-2"
+                                :checked="
+                                    params.job_type
+                                        ? params.job_type.includes('full time')
+                                        : false
+                                "
+                            />
+                            <label for="full">Full time</label>
+                        </div>
+                        <div>
+                            <input
+                                @change="updateWorkingSched"
+                                id="part"
+                                type="checkbox"
+                                class="workingsched mr-2"
+                                value="part time"
+                                :checked="
+                                    params.job_type
+                                        ? params.job_type.includes('part time')
+                                        : false
+                                "
+                            />
+                            <label for="part">Part time</label>
+                        </div>
+                        <div>
+                            <input
+                                @change="updateWorkingSched"
+                                id="contract"
+                                type="checkbox"
+                                class="workingsched mr-2"
+                                value="contract"
+                                :checked="
+                                    params.job_type
+                                        ? params.job_type.includes('contract')
+                                        : false
+                                "
+                            />
+                            <label for="contract">Contract</label>
+                        </div>
                     </div>
-                    <div>
-                        <label for="part">Part time</label>
-                        <input
-                            @change="updateWorkingSched"
-                            id="part"
-                            type="checkbox"
-                            class="workingsched"
-                            value="part time"
-                        />
-                    </div>
-                    <div>
-                        <label for="contract">Contract</label>
-                        <input
-                            @change="updateWorkingSched"
-                            id="contract"
-                            type="checkbox"
-                            class="workingsched"
-                            value="contract"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <p>Working Modes</p>
+                    <div class="mb-3">
+                        <p>Working Modes</p>
 
-                    <div>
-                        <label for="remote">Remote</label>
-                        <input
-                            @change="updateWorkingModes"
-                            id="remote"
-                            type="checkbox"
-                            class="workingmodes"
-                            value="Remote"
-                        />
+                        <div>
+                            <input
+                                @change="updateWorkingModes"
+                                id="remote"
+                                type="checkbox"
+                                class="workingmodes mr-2"
+                                value="Remote"
+                                :checked="
+                                    params.work_arrangement
+                                        ? params.work_arrangement.includes(
+                                              'Remote',
+                                          )
+                                        : false
+                                "
+                            />
+                            <label for="remote">Remote</label>
+                        </div>
+                        <div>
+                            <input
+                                @change="updateWorkingModes"
+                                id="hybrid"
+                                type="checkbox"
+                                class="workingmodes mr-2"
+                                value="Hybrid"
+                                :checked="
+                                    params.work_arrangement
+                                        ? params.work_arrangement.includes(
+                                              'Hybrid',
+                                          )
+                                        : false
+                                "
+                            />
+                            <label for="hybrid">Hybrid</label>
+                        </div>
+                        <div>
+                            <input
+                                @change="updateWorkingModes"
+                                id="office"
+                                type="checkbox"
+                                class="workingmodes mr-2"
+                                value="Office"
+                                :checked="
+                                    params.work_arrangement
+                                        ? params.work_arrangement.includes(
+                                              'Office',
+                                          )
+                                        : false
+                                "
+                            />
+                            <label for="office">Office</label>
+                        </div>
                     </div>
                     <div>
-                        <label for="hybrid">Hybrid</label>
-                        <input
-                            @change="updateWorkingModes"
-                            id="hybrid"
-                            type="checkbox"
-                            class="workingmodes"
-                            value="Hybrid"
-                        />
-                    </div>
-                    <div>
-                        <label for="office">Office</label>
-                        <input
-                            @change="updateWorkingModes"
-                            id="office"
-                            type="checkbox"
-                            class="workingmodes"
-                            value="Office"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <p>Experience</p>
+                        <p>Experience</p>
 
-                    <div>
-                        <label for="fresher">Fresher</label>
-                        <input
-                            @change="updateExperiences"
-                            id="fresher"
-                            type="checkbox"
-                            class="experience"
-                            value="Fresher"
-                        />
-                    </div>
-                    <div>
-                        <label for="year0-2">0-2 years</label>
-                        <input
-                            @change="updateExperiences"
-                            id="year0-2"
-                            type="checkbox"
-                            class="experience"
-                            value="0-2 years"
-                        />
-                    </div>
-                    <div>
-                        <label for="year2-4">2-4 years</label>
-                        <input
-                            @change="updateExperiences"
-                            id="year2-4"
-                            type="checkbox"
-                            class="experience"
-                            value="2-4 years"
-                        />
-                    </div>
-                    <div>
-                        <label for="year5">5+ years</label>
-                        <input
-                            @change="updateExperiences"
-                            id="year5"
-                            type="checkbox"
-                            class="experience"
-                            value="5+ years"
-                        />
+                        <div>
+                            <input
+                                @change="updateExperiences"
+                                id="fresher"
+                                type="checkbox"
+                                class="experience mr-2"
+                                value="Fresher"
+                                :checked="
+                                    params.work_arrangement
+                                        ? params.work_arrangement.includes(
+                                              'Office',
+                                          )
+                                        : false
+                                "
+                            />
+                            <label for="fresher">Fresher</label>
+                        </div>
+                        <div>
+                            <input
+                                @change="updateExperiences"
+                                id="year0-2"
+                                type="checkbox"
+                                class="experience mr-2"
+                                value="0-2 years"
+                                :checked="
+                                    params.experience
+                                        ? params.experience.includes(
+                                              '0-2 years',
+                                          )
+                                        : false
+                                "
+                            />
+                            <label for="year0-2">0-2 years</label>
+                        </div>
+                        <div>
+                            <input
+                                @change="updateExperiences"
+                                id="year2-4"
+                                type="checkbox"
+                                class="experience mr-2"
+                                value="2-4 years"
+                                :checked="
+                                    params.experience
+                                        ? params.experience.includes(
+                                              '2-4 years',
+                                          )
+                                        : false
+                                "
+                            />
+                            <label for="year2-4">2-4 years</label>
+                        </div>
+                        <div>
+                            <input
+                                @change="updateExperiences"
+                                id="year5"
+                                type="checkbox"
+                                class="experience mr-2"
+                                value="5+ years"
+                                :checked="
+                                    params.experience
+                                        ? params.experience.includes('5+ years')
+                                        : false
+                                "
+                            />
+                            <label for="year5">5+ years</label>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="h-[1000px] overflow-hidden border p-3">
+            <div class="overflow-hidden p-3">
                 <header class="mb-4 flex justify-end">
                     <input
+                        v-model="search"
                         type="text"
                         class="w-96 rounded-full border p-2 px-5"
                         placeholder="Search job title"
@@ -247,115 +399,67 @@ const submit = () => {
                         :free-mode-sticky="false"
                         :navigation="true"
                     >
-                        <swiper-slide
-                            v-for="(job, index) in jobs"
-                            :key="job.id"
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
+                        <TransitionGroup name="list">
+                            <swiper-slide
+                                v-for="(jobTitle, index) in jobTitles"
+                                :key="index"
+                                class="flex w-auto items-center justify-center"
                             >
-                                {{ job.job_title }}
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
-                        <swiper-slide
-                            class="flex w-auto items-center justify-center"
-                        >
-                            <p
-                                href="/"
-                                method="get"
-                                class="rounded-full border border-blue-500 p-3 text-[12px] text-blue-500"
-                            >
-                                Social Media Manager
-                            </p>
-                        </swiper-slide>
+                                <li
+                                    @click="filterTag(jobTitle, $event)"
+                                    href="/"
+                                    :class="[
+                                        'tag-buttons rounded-full border border-blue-500 px-5 py-2 text-[12px] text-blue-500 hover:cursor-pointer',
+                                    ]"
+                                >
+                                    {{ jobTitle }}
+                                </li>
+                            </swiper-slide>
+                        </TransitionGroup>
                     </swiper-container>
                 </div>
 
-                <div class="grid gap-2 lg:grid-cols-2">
+                <TransitionGroup
+                    tag="div"
+                    name="jobcard"
+                    class="grid gap-2 lg:grid-cols-2"
+                >
                     <JobCard
                         v-for="job in jobs"
                         :key="job.id"
                         :job="job"
                     ></JobCard>
                     <!-- <JobCard></JobCard> -->
-
-                    <div class="bg-yellow-300">dasdas</div>
-                    <div class="bg-red-300">dasdas</div>
-                    <div class="bg-yellow-300">dasdas</div>
-                    <div class="bg-red-300">dasdas</div>
-                    <div class="bg-yellow-300">dasdas</div>
-                </div>
+                </TransitionGroup>
             </div>
         </div>
     </div>
 </template>
-<style scoped></style>
+<style scoped>
+.jobcard-move, /* added class to all moving elements */
+.jobcard-leave-active,
+.jobcard-enter-active {
+    transition: all 0.5s ease-in;
+}
+
+.jobcard-enter-from,
+.jobcard-leave-to {
+    opacity: 0;
+}
+
+.jobcard-leave-active {
+    min-width: 465px;
+    position: absolute;
+}
+
+.list-move,
+.list-leave-active,
+.list-enter-active {
+    transition: all 0.5s ease-in;
+}
+
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
+}
+</style>

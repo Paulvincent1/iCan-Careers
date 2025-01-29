@@ -268,7 +268,9 @@ const submit = () => {
             </div>
             <div class="flex flex-col">
                 <div class="flex flex-col">
-                    <label class="mb-2 mt-4 font-semibold">Skills needed</label>
+                    <label class="mb-2 mt-4 font-semibold"
+                        >Required Skills</label
+                    >
                     <div class="mb-3">
                         <input
                             ref="skillInput"

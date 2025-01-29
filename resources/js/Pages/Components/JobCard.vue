@@ -14,7 +14,7 @@ let datePosted = computed(() => {
 });
 </script>
 <template>
-    <div class="rounded-lg border p-3">
+    <div class="rounded-lg border bg-white p-3">
         <div class="mb-3 flex justify-between">
             <p class="text-gray-500">{{ datePosted }}</p>
             <i class="bi bi-bookmark-dash text-green-500"></i>
@@ -22,15 +22,23 @@ let datePosted = computed(() => {
         <div class="mb-4 flex gap-3">
             <div class="h-14 w-14">
                 <img
-                    src="/storage/images/images.png"
+                    :src="
+                        job.employer.business_information
+                            ? job.employer.business_information.business_logo
+                            : '/storage/images/images.png'
+                    "
                     alt=""
-                    class="h-full w-full object-cover"
+                    class="h-full w-full rounded object-cover"
                 />
             </div>
             <div>
                 <p class="text-lg font-bold">{{ job.job_title }}</p>
                 <p>
-                    {{ job.employer.business_information ?? job.employer.name }}
+                    {{
+                        job.employer.business_information
+                            ? job.employer.business_information.business_name
+                            : job.employer.name
+                    }}
                 </p>
             </div>
         </div>
@@ -49,20 +57,11 @@ let datePosted = computed(() => {
         <div
             class="mb-3 flex max-h-[64px] flex-wrap gap-2 overflow-hidden text-sm"
         >
-            <p class="w-fit rounded bg-gray-300 p-1 text-center font-bold">
-                Ads
-            </p>
-
-            <p class="w-fit rounded bg-gray-300 p-1 text-center font-bold">
-                Video Editing
-            </p>
-
-            <p class="w-fit rounded bg-gray-300 p-1 text-center font-bold">
-                Graphic design
-            </p>
-
-            <p class="w-fit rounded bg-gray-300 p-1 text-center font-bold">
-                Graphic design
+            <p
+                v-for="skill in job.skills"
+                class="w-fit rounded bg-gray-300 p-1 text-center font-bold"
+            >
+                {{ skill }}
             </p>
         </div>
         <div class="flex justify-center gap-3">

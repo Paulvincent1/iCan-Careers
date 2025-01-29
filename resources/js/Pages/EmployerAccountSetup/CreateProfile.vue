@@ -159,6 +159,7 @@ const submit = () => {
                 <div>
                     <label class="mr-2" for="female">Female</label>
                     <input
+                    v-model="form.gender"
                         type="radio"
                         class="text-center"
                         id="female"
