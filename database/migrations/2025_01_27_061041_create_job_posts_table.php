@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('job_title');
             $table->string('job_type');
             $table->string('work_arrangement');
+            $table->json('location')->nullable();
             $table->string('experience');
             $table->string('hour_per_day');
             $table->string('hourly_rate');

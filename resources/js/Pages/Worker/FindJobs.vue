@@ -1,5 +1,5 @@
 <script setup>
-import { Link, router } from "@inertiajs/vue3";
+import { Link, router, usePage } from "@inertiajs/vue3";
 import { forEach } from "lodash";
 import { FreeMode } from "swiper/modules";
 import { onMounted, onUpdated, ref, useTemplateRef, watch } from "vue";
@@ -295,16 +295,16 @@ watch(search, debounce(submit, 500));
                                 id="office"
                                 type="checkbox"
                                 class="workingmodes mr-2"
-                                value="Office"
+                                value="Onsite"
                                 :checked="
                                     params.work_arrangement
                                         ? params.work_arrangement.includes(
-                                              'Office',
+                                              'Onsite',
                                           )
                                         : false
                                 "
                             />
-                            <label for="office">Office</label>
+                            <label for="office">On site</label>
                         </div>
                     </div>
                     <div>
@@ -320,7 +320,7 @@ watch(search, debounce(submit, 500));
                                 :checked="
                                     params.work_arrangement
                                         ? params.work_arrangement.includes(
-                                              'Office',
+                                              'Fresher',
                                           )
                                         : false
                                 "

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JobPost;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JobSearchController extends Controller
 {
@@ -16,7 +17,10 @@ class JobSearchController extends Controller
         // $workArrangement = $request->input('work_arrangement') ?? [];
         // $experience = $request->input('experience') ?? [];
 
-        $jobs = JobPost::with(['employer.businessInformation','employer.employerProfile'])->filter(request(['job_type','work_arrangement','experience','job_title']))->latest()->get();
+        $user = Auth::user();
+        $jobs = JobPost::with(['employer.businessInformation','employer.employerProfile','usersWhoSaved' => function ($query) use ($user) {
+            $query->where('user_id',  $user->id)->first();
+        }])->filter(request(['job_type','work_arrangement','experience','job_title']))->latest()->get();
       
 
         // dd($jobs);
@@ -30,8 +34,27 @@ class JobSearchController extends Controller
         // })->get();
 
         // dd($jobs);
+
+      
        
         return inertia('Worker/FindJobs',['jobsProps' => $jobs]);
+    }
+
+    public function saveJob(JobPost $id){
+
+        $user = Auth::user();
+        $job = $user->savedJobs()->where('job_post_id',$id->id)->first();
+       
+      
+        if($job){
+            $user->savedJobs()->detach($id);
+            return redirect()->back();
+        }
+
+        $user->savedJobs()->attach($id);
+
+        return redirect()->back();
+
     }
 
     /**
@@ -53,9 +76,10 @@ class JobSearchController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(JobPost $id)
     {
-        //
+        // dd($id);
+        return inertia('Worker/ShowJob',['jobPostProps' => $id]);
     }
 
     /**

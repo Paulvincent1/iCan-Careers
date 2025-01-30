@@ -8,7 +8,7 @@ import { useForm, usePage } from "@inertiajs/vue3";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import Skill from "../Components/Skill.vue";
 import AddSkillInput from "../Components/AddSkillInput.vue";
-import { uniqueId } from "lodash";
+import { nanoid } from "nanoid/non-secure";
 
 defineOptions({
     layout: [Layout, SetupProfileLayout],
@@ -25,7 +25,7 @@ defineOptions({
 function addSkill(name) {
     if (name.length) {
         form.skills.push({
-            id: uniqueId(),
+            id: nanoid(),
             name,
             experience: "",
             star: "",

@@ -4,7 +4,7 @@ import AddSkillInput from "../AddSkillInput.vue";
 import Skill from "../Skill.vue";
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 import InputFlashMessage from "../InputFlashMessage.vue";
-import { uniqueId } from "lodash";
+import { nanoid } from 'nanoid/non-secure'
 
 let emit = defineEmits(["updateIsOpen"]);
 
@@ -23,7 +23,7 @@ function updateIsOpenFalse() {
 function addSkill(name) {
     if (name.length) {
         form.skills.push({
-            id: uniqueId(),
+            id: nanoid(),
             name,
             experience: "",
             star: "",
@@ -121,7 +121,7 @@ onMounted(() => {
         ref="backdrop"
         class="fixed inset-0 z-50 flex items-center justify-center backdrop-brightness-75"
     >
-        <div ref="card" class="w-[400px] rounded bg-white p-4">
+        <div ref="card" class="w-[350px] rounded bg-white p-4 sm:w-[400px]">
             <div class="flex justify-between">
                 <p>Add Skill</p>
                 <button ref="closeBtn">

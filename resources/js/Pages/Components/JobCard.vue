@@ -1,12 +1,24 @@
 <script setup>
+import { Link, usePage } from "@inertiajs/vue3";
 import dayjs from "dayjs";
-import { computed } from "vue";
+import { computed, onUpdated, ref, watch } from "vue";
 
 let props = defineProps({
     job: {
         type: null,
         required: true,
     },
+});
+
+// watch(
+//     () => props.job,
+//     () => {
+//         console.log("hi");
+//     },
+// );
+
+onUpdated(() => {
+    console.log("his");
 });
 
 let datePosted = computed(() => {
@@ -25,7 +37,7 @@ let datePosted = computed(() => {
                     :src="
                         job.employer.business_information
                             ? job.employer.business_information.business_logo
-                            : '/storage/images/images.png'
+                            : '/assets/images.png'
                     "
                     alt=""
                     class="h-full w-full rounded object-cover"
@@ -65,16 +77,22 @@ let datePosted = computed(() => {
             </p>
         </div>
         <div class="flex justify-center gap-3">
-            <button
+            <Link
+                :href="route('jobsearch.show', job.id)"
+                as="button"
                 class="flex-1 rounded-lg border border-green-500 p-3 text-green-500"
             >
                 Details
-            </button>
-            <button
+            </Link>
+            <Link
+                as="button"
+                method="post"
+                preserve-scroll
+                :href="route('jobsearch.save.job', job.id)"
                 class="flex-1 rounded-lg border bg-green-500 p-3 text-white"
             >
-                Save for later
-            </button>
+                {{ job.users_who_saved.length ? "Saved" : "Save for later" }}
+            </Link>
         </div>
     </div>
 </template>

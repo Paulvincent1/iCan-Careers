@@ -81,6 +81,6 @@ class User extends Authenticatable
     }
 
     public function savedJobs(){
-        return $this->belongsToMany(User::class, 'job_post_user','user_id','job_post_id');
+        return $this->belongsToMany(JobPost::class, 'job_post_user','user_id','job_post_id');
     }
 }

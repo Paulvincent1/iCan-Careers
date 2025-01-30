@@ -11,6 +11,7 @@ class JobPost extends Model
         'job_title',
         'job_type', // part-time or full-time, project based
         'work_arrangement', // wfh, onsite, hybrid
+        'location',
         'experience', // fresher, 0-2 years, etc
         'hour_per_day',
         'hourly_rate',
@@ -23,7 +24,8 @@ class JobPost extends Model
 
     protected $casts = [
         'preferred_worker_types' => 'array',
-        'skills' => 'array'
+        'skills' => 'array',
+        'location' => 'array'
     ];
 
 

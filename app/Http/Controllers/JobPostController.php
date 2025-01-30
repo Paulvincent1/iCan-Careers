@@ -21,7 +21,13 @@ class JobPostController extends Controller
      */
     public function create()
     {
-        return inertia('Employer/CreateJob');
+        $user = Auth::user();
+        $location = null;
+        if($user->employerProfile->employer_type === 'business'){
+            $location = $user->businessInformation->business_location;
+
+        }
+        return inertia('Employer/CreateJob',['locationProps' => $location]);
     }
 
     /**
@@ -37,6 +43,7 @@ class JobPostController extends Controller
             'job_title' => 'required|max:255',
             'job_type' => 'required|max:255',
             'work_arrangement' => 'required|max:255',
+            'location' => 'nullable',
             'experience' => 'required',
             'hour_per_day' => 'required|max:255',
             'hourly_rate' => 'required|max:255',
@@ -46,6 +53,14 @@ class JobPostController extends Controller
             'skills' => 'required',
             'preferred_worker_types' => 'required',
         ]);
+
+
+
+        if($fields['work_arrangement'] === 'On site' ||$fields['work_arrangement'] === 'Hybrid'){
+            $request->validate([
+                'location' => 'required'
+            ]);
+        }
 
         $skills = [];
         foreach($fields['skills'] as $skill){
@@ -57,6 +72,7 @@ class JobPostController extends Controller
             'job_title' =>  $fields['job_title'],
             'job_type' =>  $fields['job_type'],
             'work_arrangement' =>  $fields['work_arrangement'],
+            'location' =>  $fields['location'],
             'experience' =>  $fields['experience'],
             'hour_per_day' =>  $fields['hour_per_day'],
             'hourly_rate' =>  $fields['hourly_rate'],

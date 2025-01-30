@@ -69,13 +69,22 @@ Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(functio
     Route::post('/addskills',[WorkerSkillsController::class, 'store'])->name('add.skills.post');
 
     Route::get('/',[WorkerDashboard::class, 'index'])->name('worker.dashboard');
+
     
     Route::get('/myprofile',[WorkerProfileController::class, 'myProfile'])->name('worker.profile');
     Route::put('/myprofile/updateprofile',[WorkerProfileController::class, 'updateProfile'])->name('update.profile.put');
     Route::put('/myprofile/updateskill/{skillid}',[WorkerProfileController::class, 'updateSkill'])->name('update.profile.put');
     Route::delete('/myprofile/deleteskill/{skillid}',[WorkerProfileController::class, 'deleteSkill'])->name('update.profile.delete');
 
-    Route::get('/jobsearch',[JobSearchController::class,'index'])->name('jobsearch');
+
+    // for job search
+    Route::prefix('jobsearch')->group(function () {
+
+        Route::get('/',[JobSearchController::class,'index'])->name('jobsearch');
+        Route::post('/save/{id}',[JobSearchController::class,'saveJob'])->name('jobsearch.save.job');
+        Route::get('/showjob/{id}',[JobSearchController::class,'show'])->name('jobsearch.show');
+    });
+
 });
 
 
@@ -89,5 +98,12 @@ Route::prefix('employers')->middleware(['auth',isEmployer::class])->group(functi
     Route::post('/createjob',[JobPostController::class, 'store'])->name('create.job.post');
 
 
+
+});
+
+
+
+//shared route for authenticated users
+Route::middleware(['auth'])->group(function() {
 
 });

@@ -3,13 +3,21 @@ import { useForm } from "@inertiajs/vue3";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import EducationalAttainment from "../Components/EducationalAttainment.vue";
-import { onMounted, ref, useTemplateRef } from "vue";
-import { uniqueId } from "lodash";
+import { onMounted, ref, useTemplateRef, watch } from "vue";
+import { nanoid } from "nanoid/non-secure";
+import Maps from "../Components/Maps.vue";
+
+let props = defineProps({
+    locationProps: null,
+});
+
+console.log(props.locationProps);
 
 let form = useForm({
     job_title: null,
     job_type: null,
     work_arrangement: null,
+    location: props.locationProps,
     experience: null,
     hour_per_day: null,
     hourly_rate: null,
@@ -19,6 +27,36 @@ let form = useForm({
     skills: null,
     preferred_worker_types: null,
 });
+
+onMounted(() => {
+    form.location = props.locationProps ? [...props.locationProps] : null;
+    console.log(form.location);
+});
+
+let isMapShow = ref(false);
+function showMap() {
+    if (form.work_arrangement === "Onsite") {
+        isMapShow.value = true;
+        return;
+    }
+
+    if (form.work_arrangement === "Hybrid") {
+        isMapShow.value = true;
+        return;
+    }
+
+    isMapShow.value = false;
+}
+
+function setCoordinates(coordinates) {
+    form.location = [...coordinates];
+}
+watch(
+    () => form.work_arrangement,
+    (value) => {
+        showMap();
+    },
+);
 
 let isCheck = ref(false);
 function check() {
@@ -97,7 +135,7 @@ let skills = ref([]);
 function addSkill() {
     if (skillInput.value.value != "") {
         skills.value.push({
-            id: uniqueId(),
+            id: nanoid(),
             name: skillInput.value.value,
         });
         skillInput.value.value = "";
@@ -179,14 +217,21 @@ const submit = () => {
             <div class="flex flex-col">
                 <p class="mb-2 mt-4 font-semibold">Work arrangement</p>
                 <select name="" id="" v-model="form.work_arrangement">
-                    <option value="Work from home">Work from home (WFH)</option>
-                    <option value="On site">On site</option>
+                    <option value="Onsite">Onsite</option>
                     <option value="Hybrid">Hybrid</option>
+                    <option value="Remote">Remote</option>
                 </select>
                 <InputFlashMessage
                     type="error"
                     :message="form.errors.work_arrangement"
                 />
+
+                <Maps
+                    v-if="isMapShow"
+                    :markedCoordinatesProps="form.location"
+                    :centerProps="form.location"
+                    @update:coordinates="setCoordinates"
+                ></Maps>
             </div>
             <div class="flex flex-col">
                 <p class="mb-2 mt-4 font-semibold">Preferred Experience</p>

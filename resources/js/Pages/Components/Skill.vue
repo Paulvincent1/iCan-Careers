@@ -1,7 +1,6 @@
 <script setup>
 import { ref, useTemplateRef } from "vue";
 import Rating from "./Rating.vue";
-import { constant } from "lodash";
 
 let props = defineProps({
     modelValue: Object,
