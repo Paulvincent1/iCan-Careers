@@ -21,7 +21,7 @@ let isActive = ref(false);
                     class="flex h-[100%] flex-col items-center justify-start gap-16 py-3 md:static md:flex-row md:gap-4"
                 >
                     <li class="mt-6 md:my-auto md:pr-5">Learning</li>
-                    <li class="md:my-auto md:pr-5">Pricing</li>
+                    <li class="md:my-auto md:pr-5"><Link :href="route('pricing')">Pricing</Link></li>
                     <li class="md:my-auto">
                         <Link
                             class="rounded-3xl bg-[#024570] px-7 py-2 font-medium text-white"
