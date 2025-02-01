@@ -17,6 +17,19 @@ let props = defineProps({
 //     },
 // );
 
+let isSaved = ref(props.job.users_who_saved.length);
+
+function saveJob() {
+    if (isSaved.value === 0) {
+        isSaved.value = 1;
+        console.log("hui");
+    } else {
+        console.log("hello");
+
+        isSaved.value = 0;
+    }
+}
+
 onUpdated(() => {
     console.log("his");
 });
@@ -35,8 +48,9 @@ let datePosted = computed(() => {
             <div class="h-14 w-14">
                 <img
                     :src="
-                        job.employer.business_information
-                            ? job.employer.business_information.business_logo
+                        job.employer.employer_profile.business_information
+                            ? job.employer.employer_profile.business_information
+                                  .business_logo
                             : '/assets/images.png'
                     "
                     alt=""
@@ -47,8 +61,9 @@ let datePosted = computed(() => {
                 <p class="text-lg font-bold">{{ job.job_title }}</p>
                 <p>
                     {{
-                        job.employer.business_information
-                            ? job.employer.business_information.business_name
+                        job.employer.employer_profile.business_information
+                            ? job.employer.employer_profile.business_information
+                                  .business_name
                             : job.employer.name
                     }}
                 </p>
@@ -85,13 +100,14 @@ let datePosted = computed(() => {
                 Details
             </Link>
             <Link
+                @click="saveJob"
                 as="button"
                 method="post"
                 preserve-scroll
                 :href="route('jobsearch.save.job', job.id)"
                 class="flex-1 rounded-lg border bg-green-500 p-3 text-white"
             >
-                {{ job.users_who_saved.length ? "Saved" : "Save for later" }}
+                {{ isSaved === 1 ? "Saved" : "Save for later" }}
             </Link>
         </div>
     </div>

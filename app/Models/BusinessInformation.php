@@ -18,7 +18,12 @@ class BusinessInformation extends Model
         'business_location' => 'array'
     ];
 
-    public function user(){
-        return $this->belongsTo(User::class,'user_id');
+    // public function user(){
+    //     return $this->belongsTo(User::class,'user_id');
+    // }
+
+    public function employerProfile(){
+        return $this->hasMany(EmployerProfile::class, 'business_id');
     }
+
 }

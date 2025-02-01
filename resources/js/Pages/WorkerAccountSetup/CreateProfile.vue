@@ -23,10 +23,25 @@ let form = useForm({
     month_pay: null,
     birth_year: null,
     gender: null,
+    resume: null,
 });
 
+function addResume(e) {
+    if (e.target.files[0]) {
+        form.resume = e.target.files[0];
+    }
+}
+
+let isDisabled = ref(false);
 const submit = () => {
-    form.post(route("create.profile.post"));
+    form.post(route("create.profile.post"), {
+        onStart: () => {
+            isDisabled.value = true;
+        },
+        onFinish: () => {
+            isDisabled.value = false;
+        },
+    });
 };
 </script>
 <template>
@@ -123,9 +138,27 @@ const submit = () => {
                 </div>
                 <InputFlashMessage type="error" :message="form.errors.gender" />
             </div>
+            <div class="mt-4">
+                <p class="mb-2 mt-4 font-semibold">
+                    Add your resume (Optional)
+                </p>
+
+                <div>
+                    <!-- <label class="mr-2" for="male">MALE</label> -->
+                    <input
+                        @change="addResume"
+                        type="file"
+                        class="appearance-none text-center"
+                    />
+                </div>
+                <InputFlashMessage type="error" :message="form.errors.resume" />
+            </div>
 
             <div class="flex justify-end">
-                <button class="rounded border bg-blue-500 px-4 py-2 text-white">
+                <button
+                    class="rounded border bg-blue-500 px-4 py-2 text-white"
+                    :disabled="isDisabled"
+                >
                     Save
                 </button>
             </div>

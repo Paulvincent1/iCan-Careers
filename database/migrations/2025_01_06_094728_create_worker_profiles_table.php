@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('month_pay');
             $table->string('birth_year');
             $table->string('gender');
+            $table->string('resume')->nullable();
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });

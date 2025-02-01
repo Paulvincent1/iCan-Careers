@@ -11,8 +11,6 @@ let props = defineProps({
     jobsProps: null,
 });
 
-let jobs = ref(props.jobsProps);
-
 let swiperContainer = useTemplateRef("swiper-container");
 // let next = useTemplateRef("next");
 // let prev = useTemplateRef("prev");
@@ -22,6 +20,7 @@ let swiperContainer = useTemplateRef("swiper-container");
 //         swiperContainer.value.swiper.slideNext();
 //     });
 // });
+
 let workingSchedCheckbox;
 let workingModesCheckbox;
 let experienceCheckbox;
@@ -29,6 +28,10 @@ let jobTitlesRawArray = ref([]);
 let jobTitles = ref([]);
 const params = ref({});
 let tagActive = ref(false);
+
+let intialJobArray = ref([]);
+let jobs = ref(props.jobsProps);
+
 onMounted(() => {
     tagActive.value = false;
     swiperContainer.value.swiper.update();
@@ -45,7 +48,11 @@ onMounted(() => {
     jobTitles.value = [...new Set(jobTitlesRawArray.value)];
     params.value = route().params;
 
-    search.value = params.value.job_title;
+    if (params.value.job_title) {
+        search.value = params.value.job_title;
+    }
+
+    intialJobArray.value = props.jobsProps;
 });
 
 watch(
@@ -57,8 +64,6 @@ watch(
         });
 
         jobTitles.value = [...new Set(jobTitlesRawArray.value)];
-
-        jobs.value = props.jobsProps;
     },
 );
 
@@ -186,6 +191,9 @@ const submit = () => {
         {
             preserveState: true,
             preserveScroll: true,
+            onSuccess: () => {
+                jobs.value = props.jobsProps;
+            },
         },
     );
 };

@@ -52,7 +52,6 @@ class JobPost extends Model
 
 
 
-
     public function employer(){
         return $this->belongsTo(User::class, 'employer_id');
     }

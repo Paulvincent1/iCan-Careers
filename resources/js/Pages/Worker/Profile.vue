@@ -475,6 +475,15 @@ function removeSkill(skillId) {
                             class="appearance-none outline-none hover:underline"
                         /> -->
                     </div>
+                    <div class="mb-2">
+                        <label class="text-sm" s for="">Resume</label>
+                        <p>link</p>
+                        <!-- <input
+                            type="number"
+                            value="2025"
+                            class="appearance-none outline-none hover:underline"
+                        /> -->
+                    </div>
                 </div>
             </div>
         </div>

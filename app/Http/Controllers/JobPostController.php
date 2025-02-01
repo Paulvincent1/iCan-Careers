@@ -24,7 +24,7 @@ class JobPostController extends Controller
         $user = Auth::user();
         $location = null;
         if($user->employerProfile->employer_type === 'business'){
-            $location = $user->businessInformation->business_location;
+            $location = $user->employerProfile->buisnessInformation->business_location;
 
         }
         return inertia('Employer/CreateJob',['locationProps' => $location]);
@@ -56,7 +56,7 @@ class JobPostController extends Controller
 
 
 
-        if($fields['work_arrangement'] === 'On site' ||$fields['work_arrangement'] === 'Hybrid'){
+        if($fields['work_arrangement'] === 'On site' || $fields['work_arrangement'] === 'Hybrid'){
             $request->validate([
                 'location' => 'required'
             ]);

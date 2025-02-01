@@ -18,7 +18,7 @@ class JobSearchController extends Controller
         // $experience = $request->input('experience') ?? [];
 
         $user = Auth::user();
-        $jobs = JobPost::with(['employer.businessInformation','employer.employerProfile','usersWhoSaved' => function ($query) use ($user) {
+        $jobs = JobPost::with(['employer.employerProfile','employer.employerProfile.businessInformation','usersWhoSaved' => function ($query) use ($user) {
             $query->where('user_id',  $user->id)->first();
         }])->filter(request(['job_type','work_arrangement','experience','job_title']))->latest()->get();
       

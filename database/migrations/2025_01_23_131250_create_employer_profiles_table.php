@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('birth_year');
             $table->string('gender');
             $table->string('employer_type');
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
+            $table->foreignId('business_id')->unique()->nullable()->constrained('business_information')->cascadeOnDelete();
             $table->timestamps();
         });
     }

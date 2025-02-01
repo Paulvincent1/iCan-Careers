@@ -23,7 +23,7 @@ let form = useForm({
     business_logo: null,
     industry: null,
     business_description: null,
-    business_location: null,
+    business_location: [120.9842, 14.5995],
 });
 
 function setMarkLocation(coordinates, newvalue) {
@@ -173,6 +173,13 @@ const submit = () => {
                 leave-active-class="animate__animated animate__fadeOut"
             >
                 <div v-if="showCompanyForm" class="mb-3">
+                    <div>
+                        <h2 class="my-3 text-2xl font-semibold">
+                            Search exisiting company
+                        </h2>
+
+                        <input type="text" class="border p-2" />
+                    </div>
                     <h2 class="my-3 text-2xl font-semibold">
                         Company Information
                     </h2>

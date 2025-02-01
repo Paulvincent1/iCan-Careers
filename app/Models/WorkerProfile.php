@@ -16,6 +16,7 @@ class WorkerProfile extends Model
         'month_pay',
         'birth_year',
         'gender',
+        'resume',
     ];
 
     public function user(){

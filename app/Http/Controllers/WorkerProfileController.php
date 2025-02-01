@@ -41,10 +41,26 @@ class WorkerProfileController extends Controller
             'month_pay' =>'required|numeric|min:1',
             'birth_year' =>'required|numeric|min:1900',
             'gender' =>'required',
+            'resume' =>'nullable|file|extensions:pdf,docx,doc',
           
         ]);
 
-        $request->user()->workerProfile()->create($fields);
+        if($fields['resume']){
+            $resumepath = Storage::disk('public')->put('resume', $request->resume);
+        }
+
+        $request->user()->workerProfile()->create([
+            'job_title' => $fields['job_title'],
+            'profile_description' => $fields['profile_description'],
+            'highest_educational_attainment' => $fields['highest_educational_attainment'],
+            'job_type' => $fields['job_type'],
+            'work_hour_per_day' => $fields['work_hour_per_day'],
+            'hour_pay' => $fields['hour_pay'],
+            'month_pay' => $fields['month_pay'],
+            'birth_year' => $fields['birth_year'],
+            'gender' => $fields['gender'],
+            'resume' => '/storage/'. $resumepath,
+        ]);
       
         Inertia::clearHistory();
 

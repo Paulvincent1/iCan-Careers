@@ -37,29 +37,46 @@ class EmployerProfileController extends Controller
             'employer_type' => 'required'
         ]);
         
-        $user->employerProfile()->create($fields);
-
+        
         if($fields['employer_type'] === 'business'){
+           
             $business = $request->validate([
                 'business_name' => 'required|max:255',
                 'business_logo' => 'required|image',
                 'industry' => 'required',
                 'business_description' => 'required',
-                'business_location' =>'required' ,
+                'business_location' =>'required',
             ]);
-
-            // dd($business);
+            // dd($request);    
+  
             $logo = Storage::disk('public')->put('images', $request->business_logo);
-            $user->businessInformation()->create([
+
+
+           $businessInformation =  BusinessInformation::create([
                 'business_name' => $business['business_name'],
                 'business_logo' => '/storage/' . $logo,
                 'industry' =>  $business['industry'],
                 'business_description' =>  $business['business_description'],
-                'business_location' =>  $business   ['business_location'],
+                'business_location' =>  $business['business_location'],
                 
             ]);
+
+
+           $user->employerProfile()->create([
+            'full_name' => $fields['full_name'],
+            'phone_number' => $fields['phone_number'],
+            'birth_year' => $fields['birth_year'],
+            'gender' => $fields['gender'],
+            'employer_type' => $fields['employer_type'],
+            'business_id' => $businessInformation->id,
+           ]);
+
+
+            return redirect()->route('employer.dashboard');
         }
 
+       
+        $user->employerProfile()->create($fields);
         
         return redirect()->route('employer.dashboard');
     }
