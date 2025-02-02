@@ -1,5 +1,5 @@
 <script setup>
-import { useForm } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 import Layout from "../Layouts/Layout.vue";
 import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
@@ -8,10 +8,38 @@ import dayjs from "dayjs";
 import { ref, Transition, watch } from "vue";
 import SubmitImage from "../Components/SubmitImage.vue";
 import Maps from "../Components/Maps.vue";
+import { debounce } from "lodash";
 
 defineOptions({
     layout: [Layout, SetupProfileLayout],
 });
+
+let props = defineProps({
+    bussinessProps: null,
+});
+
+let searchBusiness = ref("");
+let isBusinessSelected = ref(false);
+let businessSelected = ref(null);
+
+watch(
+    searchBusiness,
+    debounce(() => {
+        search();
+    }, 1000),
+);
+
+function selectBusiness(business) {
+    isBusinessSelected.value = true;
+    form.business_id = business.id;
+    businessSelected.value = business;
+}
+
+function removeSelectedBusiness() {
+    isBusinessSelected.value = false;
+    form.business_id = null;
+    businessSelected.value = null;
+}
 
 let form = useForm({
     full_name: null,
@@ -19,6 +47,7 @@ let form = useForm({
     birth_year: null,
     gender: null,
     employer_type: null,
+    business_id: null,
     business_name: null,
     business_logo: null,
     industry: null,
@@ -61,6 +90,19 @@ watch(
 
 function imageAdded(image) {
     form.business_logo = image;
+}
+
+function search() {
+    router.get(
+        "/employers/createprofile",
+        {
+            business_name: searchBusiness.value,
+        },
+        {
+            preserveScroll: true,
+            preserveState: true,
+        },
+    );
 }
 
 const submit = () => {
@@ -178,106 +220,163 @@ const submit = () => {
                             Search exisiting company
                         </h2>
 
-                        <input type="text" class="border p-2" />
-                    </div>
-                    <h2 class="my-3 text-2xl font-semibold">
-                        Company Information
-                    </h2>
-                    <p class="text-sm">
-                        Lorem, ipsum dolor sit amet consectetur adipisicing
-                        elit. Reiciendis corporis itaque eum eius unde aperiam
-                        aliquid vel ratione doloremque! Ullam illo pariatur
-                        officiis tempore iste totam soluta dignissimos libero.
-                        Hic?
-                    </p>
-
-                    <div class="flex flex-col">
-                        <label class="mb-2 mt-4 font-semibold"
-                            >Business / Company name</label
-                        >
                         <input
-                            v-model="form.business_name"
+                            v-model="searchBusiness"
                             type="text"
-                            class="border px-3 py-2 outline-blue-400"
-                            placeholder="ex. iCan Careers"
+                            class="mb-2 border p-2"
+                            placeholder="Search exisitng company"
                         />
-                        <InputFlashMessage
-                            type="error"
-                            :message="form.errors.business_name"
-                        />
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="mb-2 mt-4 font-semibold"
-                            >Business logo</label
-                        >
-                        <SubmitImage
-                            @imageAdded="imageAdded"
-                            description="Upload the business logo here"
-                            :error="form.errors.business_logo"
-                        ></SubmitImage>
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="mb-2 mt-4 font-semibold">Industry</label>
-                        <select
-                            name=""
-                            id=""
-                            class="border p-3"
-                            v-model="form.industry"
-                        >
-                            <option value="Technology and IT">
-                                Technology and IT
-                            </option>
-                            <option value="Remote Customer Support" class="">
-                                Remote Customer Support
-                            </option>
-                            <option value="Creative and Design" class="">
-                                Creative and Design
-                            </option>
-                            <option
-                                value="Accounting and Financial Services"
-                                class=""
+
+                        <div class="mb-2 h-52 w-72 overflow-y-auto border p-2">
+                            <div
+                                v-for="(business, index) in bussinessProps"
+                                :key="business.id"
+                                @click="selectBusiness(business)"
+                                class="flex cursor-pointer items-center gap-3 p-2 shadow"
                             >
-                                Accounting and Financial Services
-                            </option>
-                            <option value="Social Media Management" class="">
-                                Social Media Management
-                            </option>
-                            <option value="Other" class="">Other</option>
-                        </select>
-                        <input
-                            v-if="showInput"
-                            v-model="otherIndustry"
-                            type="text"
-                            class="mt-3 border px-3 py-2 outline-blue-400"
-                            placeholder="Please Specify"
-                        />
-                        <InputFlashMessage
-                            type="error"
-                            :message="form.errors.industry"
-                        />
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="mb-2 mt-4 font-semibold"
-                            >Company description</label
-                        >
-                        <textarea
-                            v-model="form.business_description"
-                            type="text"
-                            class="border px-3 pb-9 pt-2 outline-blue-400"
-                            placeholder="Tell us summary about your skills and how you want to be known as worker."
-                        ></textarea>
-                        <InputFlashMessage
-                            type="error"
-                            :message="form.errors.business_description"
-                        />
+                                <img
+                                    src="/assets/images.png"
+                                    class="w-12 rounded object-cover"
+                                    alt=""
+                                />
+                                <p class="text-lg">
+                                    {{ business.business_name }}
+                                </p>
+                            </div>
+                        </div>
+                        <div v-if="businessSelected">
+                            <p>Selected Company</p>
+                            <div
+                                class="flex w-72 cursor-pointer items-center justify-between p-2 shadow"
+                            >
+                                <div class="flex items-center gap-3">
+                                    <div>
+                                        <img
+                                            src="/assets/images.png"
+                                            class="w-12 rounded object-cover"
+                                            alt=""
+                                        />
+                                    </div>
+                                    <p class="text-lg">
+                                        {{ businessSelected.business_name }}
+                                    </p>
+                                </div>
+                                <i
+                                    @click="removeSelectedBusiness"
+                                    class="bi bi-x text-lg"
+                                ></i>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex flex-col">
-                        <label class="mb-2 mt-4 font-semibold"
-                            >Please select your company location</label
-                        >
+                    <div v-if="!isBusinessSelected">
+                        <h2 class="my-3 text-2xl font-semibold">
+                            Company Information
+                        </h2>
+                        <p class="text-sm">
+                            Lorem, ipsum dolor sit amet consectetur adipisicing
+                            elit. Reiciendis corporis itaque eum eius unde
+                            aperiam aliquid vel ratione doloremque! Ullam illo
+                            pariatur officiis tempore iste totam soluta
+                            dignissimos libero. Hic?
+                        </p>
+
+                        <div class="flex flex-col">
+                            <label class="mb-2 mt-4 font-semibold"
+                                >Business / Company name</label
+                            >
+                            <input
+                                v-model="form.business_name"
+                                type="text"
+                                class="border px-3 py-2 outline-blue-400"
+                                placeholder="ex. iCan Careers"
+                            />
+                            <InputFlashMessage
+                                type="error"
+                                :message="form.errors.business_name"
+                            />
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="mb-2 mt-4 font-semibold"
+                                >Business logo</label
+                            >
+                            <SubmitImage
+                                @imageAdded="imageAdded"
+                                description="Upload the business logo here"
+                                :error="form.errors.business_logo"
+                            ></SubmitImage>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="mb-2 mt-4 font-semibold"
+                                >Industry</label
+                            >
+                            <select
+                                name=""
+                                id=""
+                                class="border p-3"
+                                v-model="form.industry"
+                            >
+                                <option value="Technology and IT">
+                                    Technology and IT
+                                </option>
+                                <option
+                                    value="Remote Customer Support"
+                                    class=""
+                                >
+                                    Remote Customer Support
+                                </option>
+                                <option value="Creative and Design" class="">
+                                    Creative and Design
+                                </option>
+                                <option
+                                    value="Accounting and Financial Services"
+                                    class=""
+                                >
+                                    Accounting and Financial Services
+                                </option>
+                                <option
+                                    value="Social Media Management"
+                                    class=""
+                                >
+                                    Social Media Management
+                                </option>
+                                <option value="Other" class="">Other</option>
+                            </select>
+                            <input
+                                v-if="showInput"
+                                v-model="otherIndustry"
+                                type="text"
+                                class="mt-3 border px-3 py-2 outline-blue-400"
+                                placeholder="Please Specify"
+                            />
+                            <InputFlashMessage
+                                type="error"
+                                :message="form.errors.industry"
+                            />
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="mb-2 mt-4 font-semibold"
+                                >Company description</label
+                            >
+                            <textarea
+                                v-model="form.business_description"
+                                type="text"
+                                class="border px-3 pb-9 pt-2 outline-blue-400"
+                                placeholder="Tell us summary about your skills and how you want to be known as worker."
+                            ></textarea>
+                            <InputFlashMessage
+                                type="error"
+                                :message="form.errors.business_description"
+                            />
+                        </div>
+
+                        <div class="flex flex-col">
+                            <label class="mb-2 mt-4 font-semibold"
+                                >Please select your company location</label
+                            >
+                        </div>
+                        <Maps @update:coordinates="setMarkLocation"></Maps>
                     </div>
-                    <Maps @update:coordinates="setMarkLocation"></Maps>
                 </div>
             </Transition>
 

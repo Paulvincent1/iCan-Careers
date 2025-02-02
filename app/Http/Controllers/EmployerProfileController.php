@@ -23,7 +23,10 @@ class EmployerProfileController extends Controller
         if($user->employerProfile){
             return redirect()->route('employer.dashboard');
         }
-        return inertia('EmployerAccountSetup/CreateProfile');
+
+        $businesses =  BusinessInformation::filter(request(['business_name']))->get();
+        // dd($businesses);
+        return inertia('EmployerAccountSetup/CreateProfile', ['bussinessProps' => $businesses]);
     }
 
     public function storeProfile(Request $request){
@@ -39,6 +42,26 @@ class EmployerProfileController extends Controller
         
         
         if($fields['employer_type'] === 'business'){
+
+            if($request->business_id){
+                $business =  BusinessInformation::where('id', $request->business_id)->first();
+                
+                if($business){
+
+                    $user->employerProfile()->create([
+                        'full_name' => $fields['full_name'],
+                        'phone_number' => $fields['phone_number'],
+                        'birth_year' => $fields['birth_year'],
+                        'gender' => $fields['gender'],
+                        'employer_type' => $fields['employer_type'],
+                        'business_id' => $business->id,                       
+                    ]);
+
+                    return redirect()->route('employer.dashboard');
+                }
+
+                return redirect()->back()->withErrors(['business' => 'business found']);
+            }
            
             $business = $request->validate([
                 'business_name' => 'required|max:255',

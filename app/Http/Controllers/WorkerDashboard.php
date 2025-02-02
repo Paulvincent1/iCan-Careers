@@ -17,6 +17,11 @@ class WorkerDashboard extends Controller
                 $isPending = null;
             }
         }
-        return inertia('Worker/Dashboard', ['user' => $user, 'isPending' => $isPending]);
+
+        $savedJobs = $user->savedJobs()->with(['employer.employerProfile.businessInformation'])->get();
+
+        // dd($savedJobs);
+   
+        return inertia('Worker/Dashboard', ['user' => $user, 'isPending' => $isPending, 'savedJobsProps' => $savedJobs]);
     }
 }

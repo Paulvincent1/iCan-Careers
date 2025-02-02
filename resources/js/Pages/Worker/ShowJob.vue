@@ -2,24 +2,38 @@
 import { uniqueId } from "lodash";
 import Maps from "../Components/Maps.vue";
 
-let props = defineProps(() => {
-    jobPostProps: null;
+let props = defineProps({
+    jobPostProps: null,
 });
 
 console.log(props.jobPostProps);
 </script>
 <template>
     <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
-        <div class="flex flex-col gap-3 p-4 pt-7 sm:flex-row">
+        <div class="flex flex-col gap-5 p-4 pt-7 sm:flex-row">
             <div class="w-20 sm:w-32 md:w-48">
                 <img class="rounded" src="/assets/images.png" alt="" />
             </div>
             <div class="flex flex-col items-start justify-around">
                 <div class="mb-2">
                     <p class="text-[26px] sm:text-[32px]">
-                        Social Media manager
+                        {{ jobPostProps.job_title }}
                     </p>
-                    <p>Spotify</p>
+                    <p>
+                        {{
+                            jobPostProps.employer.employer_profile
+                                .business_information
+                                ? jobPostProps.employer.employer_profile
+                                      .business_information.business_name
+                                : jobPostProps.employer.name
+                        }}
+                    </p>
+                </div>
+                <div class="flex gap-4">
+                    <div>Full Time</div>
+                    <div>Onsite</div>
+                    <div>$8/hr</div>
+                    <div>0-2 years</div>
                 </div>
 
                 <div class="mb-2 flex w-full gap-4">
@@ -51,34 +65,40 @@ console.log(props.jobPostProps);
                 </div> -->
             </div>
         </div>
+
         <div class="p-4">
             <div class="mb-3">
+                <p class="text-lg font-bold">Hour per day</p>
+                <p class="whitespace-pre-wrap">
+                    {{ jobPostProps.hour_per_day }}
+                </p>
+            </div>
+            <div class="mb-3">
                 <p class="text-lg font-bold">Description</p>
-                <p>
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                    Quas nesciunt ipsam placeat. Incidunt maxime eum
-                    reprehenderit libero explicabo tempora, deleniti obcaecati
-                    neque distinctio dolorum quaerat harum fugit eaque
-                    perferendis quas.
+                <p class="whitespace-pre-wrap">
+                    {{ jobPostProps.description }}
                 </p>
             </div>
 
             <div class="mb-3">
                 <p class="text-lg font-bold">Preferred worker</p>
-                <p>Senior Citizens</p>
+                <p>{{ jobPostProps.preferred_worker_types }}</p>
             </div>
             <div class="mb-3">
                 <p class="text-lg font-bold">
                     Preferred educational attainment
                 </p>
-                <p>Bachelor's Degree</p>
+                <p>{{ jobPostProps.preferred_educational_attainment }}</p>
             </div>
             <div class="mb-3">
                 <p class="text-lg font-bold">Required Skills</p>
-                <p>Video Editor</p>
+                <p>{{ jobPostProps.skills }}</p>
             </div>
             <div>
-                <Maps></Maps>
+                <Maps
+                    v-if="jobPostProps.location"
+                    :markedCoordinatesProps="jobPostProps.location"
+                ></Maps>
             </div>
         </div>
     </div>

@@ -78,8 +78,9 @@ class JobSearchController extends Controller
      */
     public function show(JobPost $id)
     {
-        // dd($id);
-        return inertia('Worker/ShowJob',['jobPostProps' => $id]);
+        $job = JobPost::with('employer.employerProfile.businessInformation')->where('id', $id->id)->first();
+ 
+        return inertia('Worker/ShowJob',['jobPostProps' =>   $job ]);
     }
 
     /**

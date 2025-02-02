@@ -70,10 +70,10 @@ let datePosted = computed(() => {
             </div>
         </div>
         <div class="mb-4 flex justify-around text-gray-600">
-            <p>{{ job.job_type }}</p>
-            <p>{{ job.work_arrangement }}</p>
-            <p>{{ job.hour_per_day }}</p>
-            <p>{{ job.experience }}</p>
+            <p><i class="bi bi-briefcase"></i> {{ job.job_type }}</p>
+            <p><i class="bi bi-layers"></i> {{ job.work_arrangement }}</p>
+            <p><i class="bi bi-cash"></i> {{ job.hourly_rate }}</p>
+            <p><i class="bi bi-person"></i> {{ job.experience }}</p>
         </div>
         <div class="mb-5">
             <p class="mb-2">Job Description</p>

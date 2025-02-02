@@ -24,8 +24,7 @@ class JobPostController extends Controller
         $user = Auth::user();
         $location = null;
         if($user->employerProfile->employer_type === 'business'){
-            $location = $user->employerProfile->buisnessInformation->business_location;
-
+            $location = $user->employerProfile->businessInformation->business_location;
         }
         return inertia('Employer/CreateJob',['locationProps' => $location]);
     }

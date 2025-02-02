@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('hour_per_day');
             $table->string('hourly_rate');
             $table->string('salary');
-            $table->string('description');
+            $table->text('description');
             $table->string('preferred_educational_attainment');
             $table->json('skills');
             $table->json('preferred_worker_types');

@@ -29,7 +29,9 @@ let form = useForm({
 });
 
 onMounted(() => {
-    form.location = props.locationProps ? [...props.locationProps] : null;
+    form.location = props.locationProps
+        ? [...props.locationProps]
+        : [120.9842, 14.5995];
     console.log(form.location);
 });
 
