@@ -253,7 +253,8 @@ const submit = () => {
                 <label class="mb-2 mt-4 font-semibold">Hour per day</label>
                 <input
                     v-model="form.hour_per_day"
-                    type="text"
+                    type="number"
+                    min="1"
                     class="border px-3 py-2 outline-blue-400"
                     placeholder="John Doe"
                     required
@@ -264,10 +265,11 @@ const submit = () => {
                 />
             </div>
             <div class="flex flex-col">
-                <label class="mb-2 mt-4 font-semibold">Hourly rate</label>
+                <label class="mb-2 mt-4 font-semibold">Hourly rate ₱</label>
                 <input
                     v-model="form.hourly_rate"
-                    type="text"
+                    type="number"
+                    min="1"
                     class="border px-3 py-2 outline-blue-400"
                     placeholder="John Doe"
                     required
@@ -278,10 +280,13 @@ const submit = () => {
                 />
             </div>
             <div class="flex flex-col">
-                <label class="mb-2 mt-4 font-semibold">Salary</label>
+                <label class="mb-2 mt-4 font-semibold"
+                    >Salary per month ₱</label
+                >
                 <input
                     v-model="form.salary"
-                    type="text"
+                    type="number"
+                    min="1"
                     class="border px-3 py-2 outline-blue-400"
                     placeholder="John Doe"
                     required
@@ -290,7 +295,7 @@ const submit = () => {
             </div>
             <div class="flex flex-col">
                 <label class="mb-2 mt-4 font-semibold">Description</label>
-                <input
+                <textarea
                     v-model="form.description"
                     type="text"
                     class="border px-3 py-2 outline-blue-400"

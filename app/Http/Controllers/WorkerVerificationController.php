@@ -43,7 +43,7 @@ class WorkerVerificationController extends Controller
        
         $fields = $request->validate([
             'first_name' => 'required|max:255',
-            'middle_name' => 'required|max:255',
+            'middle_name' => 'max:255',
             'last_name' => 'required|max:255',
             'suffix' => 'max:255',
             'id_image' => 'required|image',

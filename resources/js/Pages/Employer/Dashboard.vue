@@ -3,7 +3,7 @@ import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 </script>
 <template>
     <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
-        <div class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-20">
+        <div class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-10">
             <div>
                 <div
                     class="mb-4 flex flex-col items-center justify-center rounded border p-4"

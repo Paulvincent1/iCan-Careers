@@ -59,7 +59,7 @@ class WorkerProfileController extends Controller
             'month_pay' => $fields['month_pay'],
             'birth_year' => $fields['birth_year'],
             'gender' => $fields['gender'],
-            'resume' => '/storage/'. $resumepath,
+            'resume' => $resumepath  ? '/storage/'. $resumepath : null,
         ]);
       
         Inertia::clearHistory();

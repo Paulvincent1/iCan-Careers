@@ -10,6 +10,8 @@ let props = defineProps({
     },
 });
 
+let emit = defineEmits(["saveJob"]);
+
 // watch(
 //     () => props.job,
 //     () => {
@@ -20,6 +22,7 @@ let props = defineProps({
 let isSaved = ref(props.job.users_who_saved.length);
 
 function saveJob() {
+    emit("saveJob");
     if (isSaved.value === 0) {
         isSaved.value = 1;
         console.log("hui");
@@ -39,10 +42,27 @@ let datePosted = computed(() => {
 });
 </script>
 <template>
-    <div class="rounded-lg border bg-white p-3">
+    <div class="rounded-lg bg-white p-3 shadow-lg ring-1 ring-gray-50">
         <div class="mb-3 flex justify-between">
             <p class="text-gray-500">{{ datePosted }}</p>
-            <i class="bi bi-bookmark-dash text-green-500"></i>
+            <Link
+                @click="saveJob"
+                as="button"
+                method="post"
+                preserve-scroll
+                :href="route('jobsearch.save.job', job.id)"
+            >
+                <i
+                    @click=""
+                    :class="[
+                        'bi bi-bookmark-dash-fill text-green-500 hover:cursor-pointer',
+                        {
+                            'bi-bookmark-dash-fill': isSaved,
+                            'bi-bookmark-dash': !isSaved,
+                        },
+                    ]"
+                ></i>
+            </Link>
         </div>
         <div class="mb-4 flex gap-3">
             <div class="h-14 w-14">

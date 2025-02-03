@@ -2,13 +2,21 @@
 import { Link, router, usePage } from "@inertiajs/vue3";
 import { forEach } from "lodash";
 import { FreeMode } from "swiper/modules";
-import { onMounted, onUpdated, ref, useTemplateRef, watch } from "vue";
+import {
+    onMounted,
+    onUpdated,
+    ref,
+    useTemplateRef,
+    watch,
+    watchEffect,
+} from "vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import JobCard from "../Components/JobCard.vue";
 import { debounce } from "lodash";
 
 let props = defineProps({
     jobsProps: null,
+    messageProp: null,
 });
 
 let swiperContainer = useTemplateRef("swiper-container");
@@ -53,6 +61,24 @@ onMounted(() => {
     }
 
     intialJobArray.value = props.jobsProps;
+});
+
+let messageShow = ref(false);
+function showMessage() {
+    console.log(props.messageProp);
+
+    if (props.messageProp) {
+        messageShow.value = true;
+        setTimeout(() => {
+            messageShow.value = false;
+        }, 2000);
+    }
+}
+
+watchEffect(() => {
+    if (props.messageProp) {
+        showMessage();
+    }
 });
 
 watch(
@@ -436,11 +462,24 @@ watch(search, debounce(submit, 500));
                         v-for="job in jobs"
                         :key="job.id"
                         :job="job"
+                        @saveJob="showMessage"
                     ></JobCard>
                     <!-- <JobCard></JobCard> -->
                 </TransitionGroup>
             </div>
         </div>
+        <Teleport defer to="body">
+            <Transition name="message">
+                <div v-if="messageShow" class="">
+                    <div
+                        class="fixed left-[50%] top-20 flex translate-x-[-50%] items-center gap-2 rounded bg-green-200 p-4 text-green-600"
+                    >
+                        <i class="bi bi-check-circle-fill"></i>
+                        <p class="text-center">{{ props.messageProp }}</p>
+                    </div>
+                </div>
+            </Transition>
+        </Teleport>
     </div>
 </template>
 <style scoped>
@@ -469,5 +508,15 @@ watch(search, debounce(submit, 500));
 .list-enter-from,
 .list-leave-to {
     opacity: 0;
+}
+
+.message-enter-from,
+.message-leave-to {
+    opacity: 0;
+}
+
+.message-enter-active,
+.message-leave-active {
+    transition: all 0.5s ease-in;
 }
 </style>

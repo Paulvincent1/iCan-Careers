@@ -9,6 +9,7 @@ use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
 use App\Http\Controllers\WorkerVerificationController;
+use App\Http\Middleware\ForceGetRedirect;
 use App\Http\Middleware\isEmployer;
 use App\Http\Middleware\isWorker;
 use Illuminate\Support\Facades\Auth;
@@ -52,7 +53,7 @@ Route::middleware(['guest'])->group(function (){
 Route::post('/logout',[AuthController::class, 'logout'])->middleware(['auth'])->name('logout');
 
 
-Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(function (){
+Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class])->group(function (){
 
     Route::prefix('verification')->group(function () {
 
@@ -88,7 +89,7 @@ Route::prefix('jobseekers')->middleware(['auth',isWorker::class])->group(functio
 });
 
 
-Route::prefix('employers')->middleware(['auth',isEmployer::class])->group(function (){
+Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::class])->group(function (){
 
     Route::get('/createprofile',[EmployerProfileController::class, 'createProfile'])->name('create.profile.employer');
     Route::post('/createprofile',[EmployerProfileController::class, 'storeProfile'])->name('create.profile.employer.post');
@@ -104,6 +105,6 @@ Route::prefix('employers')->middleware(['auth',isEmployer::class])->group(functi
 
 
 //shared route for authenticated users
-Route::middleware(['auth'])->group(function() {
+Route::middleware([ForceGetRedirect::class])->group(function() {
 
 });

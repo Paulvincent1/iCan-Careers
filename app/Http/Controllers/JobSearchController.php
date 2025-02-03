@@ -35,9 +35,10 @@ class JobSearchController extends Controller
 
         // dd($jobs);
 
+        // dd(session()->get('messageProp'));
       
        
-        return inertia('Worker/FindJobs',['jobsProps' => $jobs]);
+        return inertia('Worker/FindJobs',['jobsProps' => $jobs, 'messageProp' => session()->get('messageProp')]);
     }
 
     public function saveJob(JobPost $id){
@@ -48,12 +49,12 @@ class JobSearchController extends Controller
       
         if($job){
             $user->savedJobs()->detach($id);
-            return redirect()->back();
+            return redirect()->back()->with(['messageProp' => 'Successfuly saved!']);
         }
 
         $user->savedJobs()->attach($id);
 
-        return redirect()->back();
+        return redirect()->back()->with(['messageProp' => 'Successfuly saved!']);
 
     }
 
@@ -78,7 +79,10 @@ class JobSearchController extends Controller
      */
     public function show(JobPost $id)
     {
-        $job = JobPost::with('employer.employerProfile.businessInformation')->where('id', $id->id)->first();
+        $user = Auth::user();
+        $job = JobPost::with(['employer.employerProfile.businessInformation','usersWhoSaved' => function ($query) use($user) {
+            $query->where('user_id',  $user->id)->first();
+        }])->where('id', $id->id)->first();
  
         return inertia('Worker/ShowJob',['jobPostProps' =>   $job ]);
     }

@@ -1,105 +1,195 @@
 <script setup>
 import { uniqueId } from "lodash";
 import Maps from "../Components/Maps.vue";
+import { ref } from "vue";
+import { Link } from "@inertiajs/vue3";
+import ReusableModal from "../Components/Modal/ReusableModal.vue";
 
 let props = defineProps({
     jobPostProps: null,
 });
 
-console.log(props.jobPostProps);
+let preferredWorkers = ref(props.jobPostProps.preferred_worker_types);
+swapArrayValues();
+function swapArrayValues() {
+    let senior = preferredWorkers.value.indexOf("Seniors Citizens");
+
+    if (senior !== -1 && senior !== 0) {
+        [preferredWorkers.value[0], preferredWorkers.value[senior]] = [
+            preferredWorkers.value[senior],
+            preferredWorkers.value[0],
+        ];
+    }
+}
+
+let isSaved = ref(props.jobPostProps.users_who_saved);
+
+function saveJob() {
+    if (isSaved.value === 0) {
+        isSaved.value = 1;
+        console.log("hui");
+    } else {
+        console.log("hello");
+
+        isSaved.value = 0;
+    }
+}
+
+console.log(isSaved.value);
 </script>
 <template>
-    <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
-        <div class="flex flex-col gap-5 p-4 pt-7 sm:flex-row">
-            <div class="w-20 sm:w-32 md:w-48">
-                <img class="rounded" src="/assets/images.png" alt="" />
-            </div>
-            <div class="flex flex-col items-start justify-around">
-                <div class="mb-2">
-                    <p class="text-[26px] sm:text-[32px]">
-                        {{ jobPostProps.job_title }}
-                    </p>
-                    <p>
-                        {{
-                            jobPostProps.employer.employer_profile
-                                .business_information
-                                ? jobPostProps.employer.employer_profile
-                                      .business_information.business_name
-                                : jobPostProps.employer.name
-                        }}
-                    </p>
+    <div class="">
+        <div class="relative h-32 bg-[#FAFAFA]">
+            <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
+                <div
+                    class="absolute left-[50%] top-[50px] flex h-32 w-full translate-x-[-50%] flex-col items-center"
+                >
+                    <img
+                        class="h-full rounded-lg"
+                        src="/assets/images.png"
+                        alt=""
+                    />
                 </div>
-                <div class="flex gap-4">
-                    <div>Full Time</div>
-                    <div>Onsite</div>
-                    <div>$8/hr</div>
-                    <div>0-2 years</div>
-                </div>
-
-                <div class="mb-2 flex w-full gap-4">
-                    <button
-                        class="w-28 flex-1 rounded bg-green-500 p-2 text-white md:w-36 md:p-3"
-                    >
-                        Saved
-                    </button>
-                    <!-- <button
-                        class="w-36 rounded border border-green-500 p-3 text-green-500"
-                    >
-                        Saved
-                    </button> -->
-                    <!-- <button class="w-36 rounded bg-green-500 p-3 text-white">
-                        Applied
-                    </button> -->
-                    <button
-                        class="w-28 flex-1 rounded border border-green-500 p-2 text-green-500 md:w-36 md:p-3"
-                    >
-                        Apply
-                    </button>
-                </div>
-                <!-- <div class="flex gap-5">
-                    <p>Full time</p>
-                    <p>Remote</p>
-                    <p>Fresher</p>
-                    <p>$20hr</p>
-                    <p>8+ hour per day</p>
-                </div> -->
             </div>
         </div>
-
-        <div class="p-4">
-            <div class="mb-3">
-                <p class="text-lg font-bold">Hour per day</p>
-                <p class="whitespace-pre-wrap">
-                    {{ jobPostProps.hour_per_day }}
-                </p>
-            </div>
-            <div class="mb-3">
-                <p class="text-lg font-bold">Description</p>
-                <p class="whitespace-pre-wrap">
-                    {{ jobPostProps.description }}
-                </p>
-            </div>
-
-            <div class="mb-3">
-                <p class="text-lg font-bold">Preferred worker</p>
-                <p>{{ jobPostProps.preferred_worker_types }}</p>
-            </div>
-            <div class="mb-3">
-                <p class="text-lg font-bold">
-                    Preferred educational attainment
-                </p>
-                <p>{{ jobPostProps.preferred_educational_attainment }}</p>
-            </div>
-            <div class="mb-3">
-                <p class="text-lg font-bold">Required Skills</p>
-                <p>{{ jobPostProps.skills }}</p>
-            </div>
-            <div>
-                <Maps
-                    v-if="jobPostProps.location"
-                    :markedCoordinatesProps="jobPostProps.location"
-                ></Maps>
+        <div class="xs container mx-auto mt-12 px-[0.5rem] xl:max-w-7xl">
+            <p class="break-words text-center text-[24px] md:text-[32px]">
+                {{ jobPostProps.job_title }}
+            </p>
+            <p class="text-center">
+                {{
+                    jobPostProps.employer.employer_profile.business_information
+                        ? jobPostProps.employer.employer_profile
+                              .business_information.business_name
+                        : jobPostProps.employer.name
+                }}
+            </p>
+            <div class="mb-3 mt-3 flex justify-center gap-5">
+                <Link
+                    @click="saveJob"
+                    as="button"
+                    method="post"
+                    preserve-scroll
+                    :href="route('jobsearch.save.job', jobPostProps.id)"
+                    class="rounded bg-green-400 p-2 px-8 text-white"
+                >
+                    {{ isSaved ? "Saved" : "Save for later" }}
+                </Link>
+                <button
+                    class="rounded border border-green-400 p-2 px-8 text-green-400"
+                >
+                    Apply
+                </button>
             </div>
         </div>
+        <div class="bg-[#f3f7fa]">
+            <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
+                <div
+                    class="grid items-start gap-5 pt-5 lg:grid-cols-[1fr,300px]"
+                >
+                    <div class="rounded bg-white p-8 shadow">
+                        <div class="mb-3">
+                            <p class="mb-3 text-[20px] font-bold">
+                                Description
+                            </p>
+                            <p class="whitespace-pre-wrap break-words">
+                                {{ jobPostProps.description }}
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="text-lg font-bold">Open to</p>
+                            <div
+                                v-for="(worker, index) in preferredWorkers"
+                                :key="index"
+                            >
+                                <p
+                                    :class="{
+                                        'ml-5 list-item list-inside':
+                                            worker !== 'PWD' &&
+                                            worker !== 'Seniors Citizens',
+                                    }"
+                                >
+                                    {{ worker }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-lg font-bold">
+                                Preferred educational attainment
+                            </p>
+                            <p>
+                                {{
+                                    jobPostProps.preferred_educational_attainment
+                                }}
+                            </p>
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-lg font-bold">Required Skills</p>
+                            <div>
+                                <p
+                                    class="w-fit rounded bg-slate-300 px-2 font-bold"
+                                    v-for="(
+                                        skill, index
+                                    ) in jobPostProps.skills"
+                                    :key="index"
+                                >
+                                    {{ skill }}
+                                </p>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-lg font-bold">Location</p>
+                            <Maps
+                                v-if="jobPostProps.location"
+                                :disableSearch="true"
+                                :disableSetMaker="true"
+                                :centerProps="jobPostProps.location"
+                                :markedCoordinatesProps="jobPostProps.location"
+                            ></Maps>
+                        </div>
+                    </div>
+                    <div
+                        class="row-start-1 rounded bg-white p-8 shadow lg:row-start-auto"
+                    >
+                        <p class="mb-3 text-[20px] font-bold">Overview</p>
+                        <div class="text-[16px]">
+                            <div class="mb-2">
+                                <p>Job type</p>
+                                <p>Full Time</p>
+                            </div>
+                            <div class="mb-2">
+                                <p>Working Mode</p>
+                                <p>Onsite</p>
+                            </div>
+                            <div class="mb-2">
+                                <p>Hour per day</p>
+                                <p>8</p>
+                            </div>
+                            <div class="mb-2">
+                                <p>Hourly rate</p>
+                                <p>₱8</p>
+                            </div>
+                            <div class="mb-2">
+                                <p>Salary</p>
+                                <p>₱8</p>
+                            </div>
+                            <div class="mb-2">
+                                <p>Experience required</p>
+                                <p>0-2 years</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <Teleport defer to="body">
+            <ReusableModal>
+                <div class="w-[500px] bg-white p-2">
+                    <p>Are you sure?</p>
+                    <p>This action cannot be undone!</p>
+                </div>
+            </ReusableModal>
+        </Teleport>
     </div>
 </template>

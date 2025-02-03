@@ -25,9 +25,9 @@ onMounted(() => {
         <div class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-10">
             <div>
                 <div
-                    class="mb-4 flex h-[350px] flex-col items-center justify-center rounded border p-4"
+                    class="mb-4 flex flex-col items-center justify-start rounded border p-4"
                 >
-                    <div class="mb-3 w-[84px]">
+                    <div class="mb-3 mt-4 w-[84px]">
                         <img
                             src="assets/profile_placeholder.jpg"
                             alt=""

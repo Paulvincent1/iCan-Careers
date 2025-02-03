@@ -6,10 +6,11 @@ import { MglNavigationControl } from "@indoorequal/vue-maplibre-gl";
 import "@stadiamaps/maplibre-search-box/dist/style.css";
 import { ref, watch } from "vue";
 
-
 let props = defineProps({
     centerProps: null,
     markedCoordinatesProps: null,
+    disableSearch: null,
+    disableSetMaker: null,
 });
 
 let emit = defineEmits(["update:coordinates"]);
@@ -24,6 +25,9 @@ function setPointerCursor(event) {
 }
 
 function setMarker(event) {
+    if (props.disableSetMaker) {
+        return;
+    }
     let { lng, lat } = event.event.lngLat;
     markCoordinates.value = [lng, lat];
     emit("update:coordinates", [lng, lat]);
@@ -35,6 +39,9 @@ const control = new MapLibreSearchControl();
 watch(
     () => map.isLoaded,
     () => {
+        if (props.disableSearch) {
+            return;
+        }
         map.map.addControl(control, "top-left");
     },
 );
