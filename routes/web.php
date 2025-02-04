@@ -84,6 +84,9 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class
         Route::get('/',[JobSearchController::class,'index'])->name('jobsearch');
         Route::post('/save/{id}',[JobSearchController::class,'saveJob'])->name('jobsearch.save.job');
         Route::get('/showjob/{id}',[JobSearchController::class,'show'])->name('jobsearch.show');
+
+        Route::post('/showjob/{id}',[JobSearchController::class,'apply'])->name('jobsearch.apply');
+
     });
 
 });
@@ -106,5 +109,5 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
 
 //shared route for authenticated users
 Route::middleware([ForceGetRedirect::class])->group(function() {
-
+    Route::get('/{path}',[WorkerProfileController::class,'showResume'])->where('path','.*')->name('show.resume');
 });

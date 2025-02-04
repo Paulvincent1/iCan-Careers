@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('job_statuses', function (Blueprint $table) {
+        Schema::create('application', function (Blueprint $table) {
             $table->id();
-            $table->string('job_status');
-            $table->foreignId('job_post_id')->constrained('job_posts')->cascadeOnDelete();
             $table->foreignId('worker_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('job_post_id')->constrained('job_posts')->cascadeOnDelete();
+            $table->enum('status',['Pending', 'Under Review','Interview Scheduled','Accepted', 'Rejected']);
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('job_statuses');
+        Schema::dropIfExists('application');
     }
 };

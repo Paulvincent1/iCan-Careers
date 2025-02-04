@@ -1,13 +1,36 @@
 <script setup>
 import { uniqueId } from "lodash";
 import Maps from "../Components/Maps.vue";
-import { ref } from "vue";
-import { Link } from "@inertiajs/vue3";
+import { ref, watchEffect } from "vue";
+import { Link, router } from "@inertiajs/vue3";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
+import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 
 let props = defineProps({
     jobPostProps: null,
+    workerProfileProps: null,
+    messageProp: null,
 });
+
+let messageShow = ref(false);
+function showMessage() {
+    console.log(props.messageProp);
+
+    if (props.messageProp) {
+        messageShow.value = true;
+        setTimeout(() => {
+            messageShow.value = false;
+        }, 2000);
+    }
+}
+
+watchEffect(() => {
+    if (props.messageProp) {
+        showMessage();
+    }
+});
+
+console.log(props.jobPostProps);
 
 let preferredWorkers = ref(props.jobPostProps.preferred_worker_types);
 swapArrayValues();
@@ -22,7 +45,7 @@ function swapArrayValues() {
     }
 }
 
-let isSaved = ref(props.jobPostProps.users_who_saved);
+let isSaved = ref(props.jobPostProps.users_who_saved.length);
 
 function saveJob() {
     if (isSaved.value === 0) {
@@ -35,18 +58,38 @@ function saveJob() {
     }
 }
 
-console.log(isSaved.value);
+let showModal = ref(false);
+function closeModal() {
+    showModal.value = false;
+}
+
+let isApplied = ref(props.jobPostProps.users_who_applied.length);
+function submitResume() {
+    router.post(
+        route("jobsearch.apply", props.jobPostProps.id),
+        {},
+        {
+            onSuccess: () => {},
+        },
+    );
+}
 </script>
 <template>
     <div class="">
         <div class="relative h-32 bg-[#FAFAFA]">
             <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
                 <div
-                    class="absolute left-[50%] top-[50px] flex h-32 w-full translate-x-[-50%] flex-col items-center"
+                    class="absolute left-[50%] top-[50px] flex h-32 w-32 translate-x-[-50%] flex-col items-center"
                 >
                     <img
-                        class="h-full rounded-lg"
-                        src="/assets/images.png"
+                        class="h-full w-full rounded-lg object-cover"
+                        :src="
+                            jobPostProps.employer.employer_profile
+                                .business_information
+                                ? jobPostProps.employer.employer_profile
+                                      .business_information.business_logo
+                                : '/assets/images.png'
+                        "
                         alt=""
                     />
                 </div>
@@ -64,7 +107,7 @@ console.log(isSaved.value);
                         : jobPostProps.employer.name
                 }}
             </p>
-            <div class="mb-3 mt-3 flex justify-center gap-5">
+            <div class="mb-3 mt-3 flex justify-center gap-2">
                 <Link
                     @click="saveJob"
                     as="button"
@@ -76,9 +119,16 @@ console.log(isSaved.value);
                     {{ isSaved ? "Saved" : "Save for later" }}
                 </Link>
                 <button
-                    class="rounded border border-green-400 p-2 px-8 text-green-400"
+                    @click="showModal = true"
+                    :class="[
+                        'rounded border border-green-400 p-2 px-8 text-green-400',
+                        {
+                            'pointer-events-none bg-green-400 text-white':
+                                isApplied,
+                        },
+                    ]"
                 >
-                    Apply
+                    {{ isApplied ? "Already Applied!" : "Apply" }}
                 </button>
             </div>
         </div>
@@ -89,9 +139,7 @@ console.log(isSaved.value);
                 >
                     <div class="rounded bg-white p-8 shadow">
                         <div class="mb-3">
-                            <p class="mb-3 text-[20px] font-bold">
-                                Description
-                            </p>
+                            <p class="text-[20px] font-bold">Description</p>
                             <p class="whitespace-pre-wrap break-words">
                                 {{ jobPostProps.description }}
                             </p>
@@ -184,12 +232,49 @@ console.log(isSaved.value);
             </div>
         </div>
         <Teleport defer to="body">
-            <ReusableModal>
-                <div class="w-[500px] bg-white p-2">
-                    <p>Are you sure?</p>
-                    <p>This action cannot be undone!</p>
+            <ReusableModal v-if="showModal" @closeModal="closeModal">
+                <div class="w-[500px] rounded bg-white p-4">
+                    <div class="flex justify-between">
+                        <p class="text-lg font-bold">Are you sure?</p>
+                        <button @click="closeModal">
+                            <i class="bi bi-x font-bold"></i>
+                        </button>
+                    </div>
+                    <p class="mb-3">This action cannot be undone!</p>
+                    <div class="mb-4 flex gap-2 border p-2">
+                        <p>Your active resume:</p>
+                        <a
+                            class="text-blue-500"
+                            :href="
+                                route(
+                                    'show.resume',
+                                    workerProfileProps.resume_path,
+                                )
+                            "
+                            target="_blank"
+                            >{{ workerProfileProps.resume }}</a
+                        >
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <button @click="closeModal" class="rounded border p-2">
+                            Cancel
+                        </button>
+                        <button
+                            @click="
+                                submitResume();
+                                closeModal();
+                            "
+                            class="rounded bg-green-500 p-2 text-white"
+                        >
+                            Submit
+                        </button>
+                    </div>
                 </div>
             </ReusableModal>
         </Teleport>
+        <SuccessfulMessage
+            :messageProp="messageProp"
+            :messageShow="messageShow"
+        ></SuccessfulMessage>
     </div>
 </template>

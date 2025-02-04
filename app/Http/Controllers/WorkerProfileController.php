@@ -46,7 +46,8 @@ class WorkerProfileController extends Controller
         ]);
 
         if($fields['resume']){
-            $resumepath = Storage::disk('public')->put('resume', $request->resume);
+            $resumepath = Storage::disk('local')->put('resume', $request->resume);
+
         }
 
         $request->user()->workerProfile()->create([
@@ -59,7 +60,8 @@ class WorkerProfileController extends Controller
             'month_pay' => $fields['month_pay'],
             'birth_year' => $fields['birth_year'],
             'gender' => $fields['gender'],
-            'resume' => $resumepath  ? '/storage/'. $resumepath : null,
+            'resume' => $resumepath ? $request->resume->getClientOriginalName() : null,
+            'resume_path' => $resumepath  ?? null ,
         ]);
       
         Inertia::clearHistory();
@@ -225,6 +227,18 @@ class WorkerProfileController extends Controller
     public function show(WorkerProfile $workerProfile)
     {
         //
+    }
+
+    public function showResume(string $path){
+       $user = Auth::user();
+
+    //    dd($user->workerProfile->resume_path === $path);
+
+       if($user->workerProfile->resume_path === $path || $user->employerJobPosts()->where('employer_id',$user->id)->first()) { 
+           return Storage::disk('local')->response($path);
+        }
+
+        abort(403,"You're not authorize to view this");
     }
 
     /**

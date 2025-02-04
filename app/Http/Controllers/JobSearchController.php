@@ -20,7 +20,9 @@ class JobSearchController extends Controller
         $user = Auth::user();
         $jobs = JobPost::with(['employer.employerProfile','employer.employerProfile.businessInformation','usersWhoSaved' => function ($query) use ($user) {
             $query->where('user_id',  $user->id)->first();
-        }])->filter(request(['job_type','work_arrangement','experience','job_title']))->latest()->get();
+        }])->filter(request(['job_type','work_arrangement','experience','job_title']))->whereDoesntHave('usersWhoApplied', function ($query){
+            $query->whereIn('status', ['Accepted']);
+        })->latest()->get();
       
 
         // dd($jobs);
@@ -80,11 +82,30 @@ class JobSearchController extends Controller
     public function show(JobPost $id)
     {
         $user = Auth::user();
-        $job = JobPost::with(['employer.employerProfile.businessInformation','usersWhoSaved' => function ($query) use($user) {
+        $job = JobPost::with(['employer.employerProfile.businessInformation', 'usersWhoApplied' => function ($query) use($user) {
+            $query->where('worker_id', $user->id)->first();
+        },'usersWhoSaved' => function ($query) use($user) {
             $query->where('user_id',  $user->id)->first();
         }])->where('id', $id->id)->first();
+
+        // dd($job);
  
-        return inertia('Worker/ShowJob',['jobPostProps' =>   $job ]);
+        return inertia('Worker/ShowJob',['jobPostProps' =>  $job, 'workerProfileProps' => $user->workerProfile, 'messageProp' => session()->get('messageProp')]);
+    }
+
+    public function apply(JobPost $id){
+        $user = Auth::user();
+
+        if(!$id->usersWhoApplied()->where('worker_id',$user->id)->first()){
+            $user->appliedJobs()->attach($id->id);
+            return redirect()->back()->with(['messageProp' => 'Successfuly applied!']);
+        }
+        // else{
+        //     $user->appliedJobs()->detach($id->id);
+        // }
+        
+        return redirect()->back();
+
     }
 
     /**

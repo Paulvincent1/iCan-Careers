@@ -13,6 +13,7 @@ import {
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import JobCard from "../Components/JobCard.vue";
 import { debounce } from "lodash";
+import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 
 let props = defineProps({
     jobsProps: null,
@@ -468,7 +469,11 @@ watch(search, debounce(submit, 500));
                 </TransitionGroup>
             </div>
         </div>
-        <Teleport defer to="body">
+        <SuccessfulMessage
+            :messageProp="messageProp"
+            :messageShow="messageShow"
+        ></SuccessfulMessage>
+        <!-- <Teleport defer to="body">
             <Transition name="message">
                 <div v-if="messageShow" class="">
                     <div
@@ -479,7 +484,7 @@ watch(search, debounce(submit, 500));
                     </div>
                 </div>
             </Transition>
-        </Teleport>
+        </Teleport> -->
     </div>
 </template>
 <style scoped>
@@ -508,15 +513,5 @@ watch(search, debounce(submit, 500));
 .list-enter-from,
 .list-leave-to {
     opacity: 0;
-}
-
-.message-enter-from,
-.message-leave-to {
-    opacity: 0;
-}
-
-.message-enter-active,
-.message-leave-active {
-    transition: all 0.5s ease-in;
 }
 </style>

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('birth_year');
             $table->string('gender');
             $table->string('resume')->nullable();
+            $table->string('resume_path')->nullable();
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
