@@ -1,5 +1,12 @@
 <script setup>
+import { Link } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
+
+let props = defineProps({
+    openJobsProps: null,
+});
+
+console.log(props.openJobsProps);
 </script>
 <template>
     <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
@@ -43,17 +50,124 @@ import { route } from "../../../../vendor/tightenco/ziggy/src/js";
             <div
                 class="grid grid-cols-1 gap-2 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
             >
-                <div
-                    class="col-span-2 h-[318px] rounded border p-3 lg:col-span-1"
-                >
-                    <div class="flex justify-between">
-                        <p class="p-1 font-bold">Job status</p>
-                        <Link :href="route('create.job')" class="p-1"
-                            >Post job</Link
+                <div class="col-span-2 rounded border p-3 lg:col-span-1">
+                    <div>
+                        <div class="flex justify-between">
+                            <p class="p-1 font-bold">Job status</p>
+                            <Link
+                                :href="route('create.job')"
+                                class="p-1 text-blue-500"
+                                >Post job</Link
+                            >
+                        </div>
+
+                        <swiper-container
+                            class="mb-3 text-[12px]"
+                            slides-per-view="auto"
+                            :space-between="10"
                         >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    class="rounded border border-green-400 bg-green-400 p-1 text-white"
+                                >
+                                    Open Jobs
+                                </li></swiper-slide
+                            >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    class="rounded border border-red-400 p-1 text-red-400"
+                                >
+                                    Close Jobs
+                                </li></swiper-slide
+                            >
+                            <!-- <swiper-slide class="w-fit">
+                                <li
+                                    class="rounded border border-yellow-400 bg-yellow-400 p-1 text-white"
+                                >
+                                    Pending
+                                </li></swiper-slide
+                            >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    class="rounded border border-slate-400 p-1 text-slate-400"
+                                >
+                                    Under Review
+                                </li></swiper-slide
+                            >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    class="rounded border border-green-400 p-1 text-green-400"
+                                >
+                                    Accepted
+                                </li></swiper-slide
+                            >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    class="rounded border border-red-400 p-1 text-red-400"
+                                >
+                                    Rejected
+                                </li></swiper-slide
+                            > -->
+                        </swiper-container>
+                    </div>
+
+                    <div class="h-[350px] overflow-y-auto">
+                        <table border="1" class="w-full border-collapse">
+                            <thead class="bg-slate-200 text-slate-500">
+                                <tr>
+                                    <th class="p-2 text-start font-normal">
+                                        Job Title
+                                    </th>
+                                    <th class="p-2 text-start font-normal">
+                                        Job Type
+                                    </th>
+                                    <th class="p-2 text-start font-normal">
+                                        Salary
+                                    </th>
+                                    <th class="p-2 text-start font-normal">
+                                        Applications
+                                    </th>
+                                    <th class="p-2 text-start font-normal">
+                                        Details
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="(job, index) in openJobsProps"
+                                    :key="job.id"
+                                >
+                                    <td class="p-2 text-start">
+                                        {{ job.job_title }}
+                                    </td>
+                                    <td class="p-2 text-start">
+                                        {{ job.job_type }}
+                                    </td>
+                                    <td class="p-2 text-start">
+                                        {{ job.salary }}
+                                    </td>
+                                    <td class="p-2 text-start">2</td>
+                                    <td class="p-2 text-start">
+                                        <Link
+                                            :href="
+                                                route('jobsearch.show', job.id)
+                                            "
+                                            as="button"
+                                            class="rounded bg-green-500 px-2 py-1 text-white"
+                                        >
+                                            <i
+                                                class="bi bi-box-arrow-up-right"
+                                            ></i>
+                                        </Link>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="col-span-2 rounded border p-3 lg:col-span-1">
+                <div
+                    class="col-span-2 h-[432px] rounded border p-3 lg:col-span-1"
+                >
                     <p class="font-bold">Notification</p>
                 </div>
                 <div class="col-span-2 h-[300px] rounded border p-3">

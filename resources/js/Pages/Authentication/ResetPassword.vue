@@ -21,7 +21,9 @@ const submit = () => {
 };
 </script>
 <template>
-    <div class="container mx-auto grid justify-center px-[0.5rem] xl:max-w-7xl">
+    <div
+        class="container mx-auto grid justify-items-center px-[0.5rem] xl:max-w-7xl"
+    >
         <AuthForm title="Reset Password">
             <p class="mb-5">Enter your new password</p>
             <InputFlashMessage :message="status" type="success" />

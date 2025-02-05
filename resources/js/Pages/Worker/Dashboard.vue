@@ -12,6 +12,7 @@ const props = defineProps({
         type: null,
     },
     savedJobsProps: null,
+    jobsAppliedProps: null,
 });
 
 console.log(props.savedJobsProps);
@@ -82,7 +83,7 @@ onMounted(() => {
                     </div>
                 </div>
                 <div
-                    class="grid h-[300px] grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2"
+                    class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2"
                 >
                     <div class="col-span-1 rounded border p-2">
                         <p
@@ -99,7 +100,7 @@ onMounted(() => {
                                             Logo
                                         </th>
                                         <th class="px-7 py-2 font-normal">
-                                            Name
+                                            Job Title
                                         </th>
                                         <th class="px-7 py-2 font-normal">
                                             Details
@@ -165,7 +166,102 @@ onMounted(() => {
                             </table>
                         </div>
                     </div>
-                    <div class="col-span-1 border p-2">Jobs applied</div>
+                    <div class="col-span-1 border p-2">
+                        <p
+                            class="mb-3 border-b-[1px] border-gray-100 p-2 text-[14px]"
+                        >
+                            Applied Jobs
+                        </p>
+
+                        <div class="h-[350px] overflow-y-auto">
+                            <table border="1" class="w-full border-collapse">
+                                <thead>
+                                    <tr class="text-gray-500">
+                                        <th class="px-7 py-2 font-normal">
+                                            Logo
+                                        </th>
+                                        <th class="px-7 py-2 font-normal">
+                                            Job Title
+                                        </th>
+                                        <th class="px-7 py-2 font-normal">
+                                            Status
+                                        </th>
+                                        <th class="px-7 py-2 font-normal">
+                                            Details
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="job in jobsAppliedProps"
+                                        class="text-center"
+                                    >
+                                        <td class="p-2">
+                                            <img
+                                                class="mx-auto w-12 object-cover"
+                                                :src="
+                                                    job.employer
+                                                        .employer_profile
+                                                        .business_information
+                                                        ? job.employer
+                                                              .employer_profile
+                                                              .business_information
+                                                              .business_logo
+                                                        : '/assets/images.png'
+                                                "
+                                                alt=""
+                                            />
+                                        </td>
+                                        <td class="p-2">
+                                            {{ job.job_title }}
+                                        </td>
+                                        <td
+                                            :class="[
+                                                'p-2',
+                                                {
+                                                    'text-yellow-500':
+                                                        job.pivot.status ===
+                                                        'Pending',
+                                                },
+                                            ]"
+                                        >
+                                            {{ job.pivot.status }}
+                                        </td>
+                                        <td class="p-2">
+                                            <Link
+                                                :href="
+                                                    route(
+                                                        'jobsearch.show',
+                                                        job.id,
+                                                    )
+                                                "
+                                                as="button"
+                                                class="rounded bg-green-500 px-2 py-1 text-white"
+                                            >
+                                                <i
+                                                    class="bi bi-box-arrow-up-right"
+                                                ></i>
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                    <!-- <tr class="text-center">
+                                    <td class="p-2">
+                                        <img
+                                            class="mx-auto w-12"
+                                            src="/assets/images.png"
+                                            alt=""
+                                            />
+                                        </td>
+                                        <td class="p-2">
+                                            Lorem ipsum dolor sit, amet consectetur
+                                            adipisicing elit. Distinctio quas
+                                        </td>
+                                        <td class="p-2">Details</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

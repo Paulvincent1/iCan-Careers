@@ -17,7 +17,7 @@ const submit = () => {
 </script>
 <template>
     <div
-        class="container mx-auto grid h-[100vh-64px] justify-center px-[05.rem] xl:max-w-7xl"
+        class="container mx-auto grid h-[100vh-64px] justify-items-center px-[05.rem] xl:max-w-7xl"
     >
         <AuthForm title="Forgot Password">
             <p class="mb-5">

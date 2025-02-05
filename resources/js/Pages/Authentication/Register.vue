@@ -39,7 +39,9 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="container mx-auto grid justify-center px-[0.5rem] md:max-w-7xl">
+    <div
+        class="container mx-auto grid justify-items-center px-[0.5rem] md:max-w-7xl"
+    >
         <AuthForm>
             <div class="mb-8">
                 <h1 class="mb-2 text-3xl font-semibold">Sign up</h1>

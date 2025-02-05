@@ -22,7 +22,7 @@ const submit = () => {
 
 <template>
     <div
-        class="container mx-auto grid h-[calc(100vh-4.625rem)] items-start justify-center px-[0.5rem] md:max-w-7xl"
+        class="container mx-auto grid h-[calc(100vh-4.625rem)] items-start justify-items-center px-[0.5rem] md:max-w-7xl"
     >
         <AuthForm title="Log In">
             <div class="mb-8">

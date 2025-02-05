@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\JobPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,9 +20,9 @@ class WorkerDashboard extends Controller
         }
 
         $savedJobs = $user->savedJobs()->with(['employer.employerProfile.businessInformation'])->get();
-
-        // dd($savedJobs);
-   
-        return inertia('Worker/Dashboard', ['user' => $user, 'isPending' => $isPending, 'savedJobsProps' => $savedJobs]);
+        
+        $appliedJobs = $user->appliedJobs()->with(['employer.employerProfile.businessInformation'])->get();
+      
+        return inertia('Worker/Dashboard', ['user' => $user, 'isPending' => $isPending, 'savedJobsProps' => $savedJobs ,'jobsAppliedProps' => $appliedJobs]);
     }
 }

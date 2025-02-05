@@ -17,8 +17,8 @@ onMounted(() => {
 
 watch(isActive, () => {
     isActive.value
-        ? (document.body.style.position = "fixed")
-        : (document.body.style.position = "static");
+        ? (document.body.style.overflow = "hidden")
+        : (document.body.style.overflow = "static");
 });
 
 window.addEventListener("resize", () => {
