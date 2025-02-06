@@ -229,12 +229,21 @@ class WorkerProfileController extends Controller
         //
     }
 
-    public function showResume(string $path){
+    public function showResume(string $path, User $workerId){
        $user = Auth::user();
 
-    //    dd($user->workerProfile->resume_path === $path);
+      
 
-       if($user->workerProfile->resume_path === $path || $user->employerJobPosts()->where('employer_id',$user->id)->first()) { 
+    //    dd($user->employerJobPosts()->whereHas('usersWhoApplied', function ($query) use ($workerId){
+    //     $query->where('worker_id',4);
+    //    })->first());
+
+    //    dd($user->workerProfile->resume_path === $path);
+    // dd($workerId);
+
+       if($user->workerProfile?->resume_path === $path || $user->employerJobPosts()->whereHas('usersWhoApplied', function ($query) use ($workerId){
+        $query->where('worker_id',$workerId->id);
+       })->first()) { 
            return Storage::disk('local')->response($path);
         }
 

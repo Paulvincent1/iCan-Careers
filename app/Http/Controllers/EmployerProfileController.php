@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\BusinessInformation;
 use App\Models\EmployerProfile;
+use App\Models\JobPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class EmployerProfileController extends Controller
@@ -29,6 +31,27 @@ class EmployerProfileController extends Controller
         return inertia('EmployerAccountSetup/CreateProfile', ['bussinessProps' => $businesses]);
     }
 
+ 
+
+    public function createCompanyInformation(){
+        return inertia('EmployerAccountSetup/CompanyInformation');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
     public function storeProfile(Request $request){
         // dd($request);
         $user = Auth::user();
@@ -104,32 +127,34 @@ class EmployerProfileController extends Controller
         return redirect()->route('employer.dashboard');
     }
 
-    public function createCompanyInformation(){
-        return inertia('EmployerAccountSetup/CompanyInformation');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
     public function show(EmployerProfile $employerProfile)
     {
         //
+    }
+
+    public function showJobApplicants(Request $request, JobPost $jobid){
+
+        Gate::authorize('view-applicants', [$jobid]);
+
+        $applicants = $jobid->usersWhoApplied()->with(['workerProfile'])->wherePivot('status', 'like' , '%' . $request->get('filter') . '%')
+        ->where('name' ,'like', '%' . $request->get('q') . '%')->get();
+
+     
+        // $applicantsCount = $jobid->usersWhoApplied()
+        // ->selectRaw('status, count(*) as count')
+        // ->where('application.job_post_id', $jobid->id)
+        // ->groupBy('status')
+        // ->get();
+    
+    
+        // dd($applicantsCount);
+    
+
+        
+        return inertia('Employer/Applicants', ['applicantsProps' => $applicants]);
     }
 
     /**

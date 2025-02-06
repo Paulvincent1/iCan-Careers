@@ -80,39 +80,11 @@ console.log(props.openJobsProps);
                                     Close Jobs
                                 </li></swiper-slide
                             >
-                            <!-- <swiper-slide class="w-fit">
-                                <li
-                                    class="rounded border border-yellow-400 bg-yellow-400 p-1 text-white"
-                                >
-                                    Pending
-                                </li></swiper-slide
-                            >
-                            <swiper-slide class="w-fit">
-                                <li
-                                    class="rounded border border-slate-400 p-1 text-slate-400"
-                                >
-                                    Under Review
-                                </li></swiper-slide
-                            >
-                            <swiper-slide class="w-fit">
-                                <li
-                                    class="rounded border border-green-400 p-1 text-green-400"
-                                >
-                                    Accepted
-                                </li></swiper-slide
-                            >
-                            <swiper-slide class="w-fit">
-                                <li
-                                    class="rounded border border-red-400 p-1 text-red-400"
-                                >
-                                    Rejected
-                                </li></swiper-slide
-                            > -->
                         </swiper-container>
                     </div>
 
                     <div class="h-[350px] overflow-y-auto">
-                        <table border="1" class="w-full border-collapse">
+                        <table class="w-full border-collapse">
                             <thead class="bg-slate-200 text-slate-500">
                                 <tr>
                                     <th class="p-2 text-start font-normal">
@@ -146,7 +118,16 @@ console.log(props.openJobsProps);
                                     <td class="p-2 text-start">
                                         {{ job.salary }}
                                     </td>
-                                    <td class="p-2 text-start">2</td>
+                                    <td class="p-2 text-start">
+                                        <Link
+                                            class="text-blue-500 underline"
+                                            :href="
+                                                route('job.applicants', job.id)
+                                            "
+                                        >
+                                            {{ job.users_who_applied.length }}
+                                        </Link>
+                                    </td>
                                     <td class="p-2 text-start">
                                         <Link
                                             :href="
