@@ -1,21 +1,49 @@
 <script setup>
-import { Link } from "@inertiajs/vue3";
-import { onMounted, ref } from "vue";
+import { Link, router, useForm } from "@inertiajs/vue3";
+import { onMounted, ref, watch } from "vue";
 
 let props = defineProps({
     applicantsProps: null,
+    statusCountProps: null,
 });
 
-let pendingCount = ref(null);
-let underReviewCount = ref(null);
-let acceptedCount = ref(null);
-let rejectedCount = ref(null);
+console.log(props.statusCountProps);
+console.log(props.applicantsProps);
+
+let applicants = ref(props.applicantsProps);
+
+let pendingCount = ref(props.statusCountProps.Pending);
+let underReviewCount = ref(props.statusCountProps["Under Review"]);
+let acceptedCount = ref(props.statusCountProps.Pending);
+let rejectedCount = ref(props.statusCountProps.Pending);
 
 onMounted(() => {
-    props.applicantsProps.forEach(job => {
-        job
-    });
+    // props.applicantsProps.forEach((job) => {
+    //     job;
+    // });
 });
+
+// let updateStatus = ref(null);
+
+// watch(updateStatus, (value) => {
+//     if (value === "under review" || value === "rejected") {
+//         console.log("hi");
+//     }
+// });
+
+function updateStatus(applicationId, e) {
+    if (confirm("Are you sure you want to update the status?")) {
+        console.log(e.target.value);
+
+        router.post(
+            route("job.applicants.update.status", { pivotId: applicationId }),
+            {
+                _method: "put",
+                status: e.target.value,
+            },
+        );
+    }
+}
 </script>
 <template>
     <div class="container mx-auto px-[0.5rem] pt-3 xl:max-w-7xl">
@@ -29,28 +57,28 @@ onMounted(() => {
                         <li
                             class="rounded border border-yellow-400 bg-yellow-400 p-1 text-white"
                         >
-                            Pending
+                            Pending ({{ pendingCount ?? 0 }})
                         </li></swiper-slide
                     >
                     <swiper-slide class="w-fit">
                         <li
                             class="rounded border border-slate-400 p-1 text-slate-400"
                         >
-                            Under Review
+                            Under Review ({{ underReviewCount ?? 0 }})
                         </li></swiper-slide
                     >
                     <swiper-slide class="w-fit">
                         <li
                             class="rounded border border-green-400 p-1 text-green-400"
                         >
-                            Accepted
+                            Accepted ({{ props.statusCountProps.Pending ?? 0 }})
                         </li></swiper-slide
                     >
                     <swiper-slide class="w-fit">
                         <li
                             class="rounded border border-red-400 p-1 text-red-400"
                         >
-                            Rejected
+                            Rejected ({{ props.statusCountProps.Pending ?? 0 }})
                         </li></swiper-slide
                     >
                 </swiper-container>
@@ -75,7 +103,7 @@ onMounted(() => {
                 <tbody>
                     <tr
                         class="border-b"
-                        v-for="(applicant, index) in applicantsProps"
+                        v-for="(applicant, index) in applicants"
                         :key="applicant.id"
                     >
                         <th class="p-3 text-start">
@@ -109,7 +137,21 @@ onMounted(() => {
                                 >View Profile</Link
                             >
                         </th>
-                        <th class="p-3 text-start font-normal">a</th>
+                        <th class="p-3 text-start font-normal">
+                            <select
+                                name=""
+                                id=""
+                                @change="
+                                    updateStatus(applicant.pivot.id, $event)
+                                "
+                            >
+                                <option value="">Update</option>
+                                <option value="under review">
+                                    Under Review
+                                </option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </th>
                     </tr>
                 </tbody>
             </table>

@@ -103,6 +103,7 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
 
 
     Route::get('/applicants/{jobid}',[EmployerProfileController::class, 'showJobApplicants'])->name('job.applicants');
+    Route::put('/applicants/{pivotId}',[EmployerProfileController::class, 'updateStatus'])->name('job.applicants.update.status');
 
 });
 

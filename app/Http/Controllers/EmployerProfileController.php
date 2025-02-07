@@ -7,6 +7,7 @@ use App\Models\EmployerProfile;
 use App\Models\JobPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
@@ -150,11 +151,15 @@ class EmployerProfileController extends Controller
         // ->get();
     
     
-        // dd($applicantsCount);
-    
-
+        $statusCounts = $jobid->usersWhoApplied()
+        ->selectRaw('status, count(*) as count')
+        ->wherePivot('job_post_id', $jobid->id)
+        ->groupBy('status')
+        ->pluck('count', 'status');
         
-        return inertia('Employer/Applicants', ['applicantsProps' => $applicants]);
+        // dd($statusCounts);
+        
+        return inertia('Employer/Applicants', ['applicantsProps' => $applicants, 'statusCountProps' => $statusCounts]);
     }
 
     /**
@@ -171,6 +176,12 @@ class EmployerProfileController extends Controller
     public function update(Request $request, EmployerProfile $employerProfile)
     {
         //
+    }
+
+    public function updateStatus(Request $request, int $pivotId){
+        dd($pivotId);
+
+        DB::table('application')->where('id', $pivotId)->update(['status' => $request->status]);
     }
 
     /**
