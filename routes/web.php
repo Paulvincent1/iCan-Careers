@@ -102,8 +102,12 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
     Route::post('/createjob',[JobPostController::class, 'store'])->name('create.job.post');
 
 
-    Route::get('/applicants/{jobid}',[EmployerProfileController::class, 'showJobApplicants'])->name('job.applicants');
-    Route::put('/applicants/{pivotId}',[EmployerProfileController::class, 'updateStatus'])->name('job.applicants.update.status');
+    Route::get('/jobpost/{jobid}',[JobPostController::class,'show'])->name('employer.jobpost.show');
+    Route::put('/jobpost/{jobid}',[JobPostController::class,'closeJob'])->name('employer.jobpost.close');
+
+
+    Route::get('/applicants/{jobid}',[EmployerDashboardController::class, 'showJobApplicants'])->name('job.applicants');
+    Route::put('/applicants/{pivotId}',[EmployerDashboardController::class, 'updateStatus'])->name('job.applicants.update.status');
 
 });
 
@@ -111,5 +115,12 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
 
 //shared route for authenticated users
 Route::middleware([ForceGetRedirect::class])->group(function() {
+
+
+    Route::get('/view/applicant-profile/{applicantId}', [WorkerProfileController::class,'show'])->name('worker.show.profile');
+
+
     Route::get('/{path}/{workerId?}',[WorkerProfileController::class,'showResume'])->where('path','^[^\/]+\/[^\/]+$')->where('workerId', '[0-9]+')->name('show.resume');
+
+   
 });

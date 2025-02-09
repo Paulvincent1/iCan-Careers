@@ -55,7 +55,8 @@ class HandleInertiaRequests extends Middleware
             },
             'auth.worker_verified' => function () use($request){
                 return $request->user() ? ($request->user()->workerVerification ? $request->user()->workerVerification : null) : null;
-            }
+            },
+            'auth.user.role' => fn () => $request->user()?->roles()->first(),
         ]);
     }
 }

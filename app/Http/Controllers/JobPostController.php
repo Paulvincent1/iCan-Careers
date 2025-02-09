@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\JobPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class JobPostController extends Controller
 {
@@ -88,9 +89,20 @@ class JobPostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(JobPost $jobPost)
+    public function show(JobPost $jobid)
     {
-        //
+        
+        $user = Auth::user();
+
+        $jobid->load('employer.employerProfile.businessInformation');
+
+        if($jobid->employer_id != $user->id){
+            abort(403,'Your not authorize to see this');
+        }
+        // dd($job);
+    
+        return inertia('ShowJob', ['jobPostProps' =>  $jobid,'messageProp' => session()->get('messageProp')]);
+      
     }
 
     /**
@@ -107,6 +119,21 @@ class JobPostController extends Controller
     public function update(Request $request, JobPost $jobPost)
     {
         //
+    }
+
+    public function closeJob(JobPost $jobid){
+        $user = Auth::user();
+
+        if($jobid->employer_id != $user->id){
+
+            abort(403, 'Your not authorize to see this.');
+        }
+        $jobid->update([
+            'job_status' => 'Closed'
+        ]);
+      
+        Inertia::clearHistory();
+        return redirect()->route('employer.dashboard');
     }
 
     /**

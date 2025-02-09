@@ -224,9 +224,17 @@ class WorkerProfileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(WorkerProfile $workerProfile)
+    public function show(User $applicantId)
     {
-        //
+       
+        $workerSkills = $applicantId->workerSkills;
+        $workerProfile = $applicantId->workerProfile;
+        
+        return inertia('Worker/Profile',['userProp' => $applicantId, 
+         'workerSkillsProp' => $workerSkills,
+         'workerProfileProp' => $workerProfile, 
+         'messageProp' => session('message'),
+        ]);
     }
 
     public function showResume(string $path, User $workerId){

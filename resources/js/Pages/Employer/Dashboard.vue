@@ -1,12 +1,30 @@
 <script setup>
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
+import { onMounted, ref } from "vue";
 
 let props = defineProps({
-    openJobsProps: null,
+    jobsProps: null,
+});
+let page = usePage();
+let jobs = ref(null);
+
+onMounted(() => {
+    jobs.value = props.jobsProps.filter((job) => {
+        return job.job_status === "Open";
+    });
 });
 
-console.log(props.openJobsProps);
+let jobTag = ref("Open");
+
+function switchJobTag(jobstatus) {
+    jobs.value = props.jobsProps.filter((job) => {
+        return job.job_status === jobstatus;
+    });
+    jobTag.value = jobstatus;
+}
+
+console.log(props.jobsProps);
 </script>
 <template>
     <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
@@ -15,14 +33,14 @@ console.log(props.openJobsProps);
                 <div
                     class="mb-4 flex flex-col items-center justify-center rounded border p-4"
                 >
-                    <div class="mb-3 w-[84px]">
+                    <div class="mb-3 mt-4 w-[84px]">
                         <img
                             src="assets/profile_placeholder.jpg"
                             alt=""
                             class="w-full rounded-[500px]"
                         />
                     </div>
-                    <p class="font-bol mb-3">dasdas</p>
+                    <p class="font-bol mb-3">{{ page.props.auth.user.name }}</p>
                     <Link
                         :href="route('worker.profile')"
                         as="button"
@@ -68,14 +86,28 @@ console.log(props.openJobsProps);
                         >
                             <swiper-slide class="w-fit">
                                 <li
-                                    class="rounded border border-green-400 bg-green-400 p-1 text-white"
+                                    @click="switchJobTag('Open')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-green-400 p-1 text-green-400',
+                                        {
+                                            'bg-green-400 text-white':
+                                                jobTag === 'Open',
+                                        },
+                                    ]"
                                 >
                                     Open Jobs
                                 </li></swiper-slide
                             >
                             <swiper-slide class="w-fit">
                                 <li
-                                    class="rounded border border-red-400 p-1 text-red-400"
+                                    @click="switchJobTag('Closed')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-red-400 p-1 text-red-400',
+                                        {
+                                            'bg-red-400 text-white':
+                                                jobTag === 'Closed',
+                                        },
+                                    ]"
                                 >
                                     Close Jobs
                                 </li></swiper-slide
@@ -105,10 +137,7 @@ console.log(props.openJobsProps);
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr
-                                    v-for="(job, index) in openJobsProps"
-                                    :key="job.id"
-                                >
+                                <tr v-for="(job, index) in jobs" :key="job.id">
                                     <td class="p-2 text-start">
                                         {{ job.job_title }}
                                     </td>
@@ -131,7 +160,10 @@ console.log(props.openJobsProps);
                                     <td class="p-2 text-start">
                                         <Link
                                             :href="
-                                                route('jobsearch.show', job.id)
+                                                route(
+                                                    'employer.jobpost.show',
+                                                    job.id,
+                                                )
                                             "
                                             as="button"
                                             class="rounded bg-green-500 px-2 py-1 text-white"

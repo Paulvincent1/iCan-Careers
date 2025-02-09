@@ -215,17 +215,31 @@ onMounted(() => {
                                         <td class="p-2">
                                             {{ job.job_title }}
                                         </td>
-                                        <td
-                                            :class="[
-                                                'p-2',
-                                                {
-                                                    'text-yellow-500':
-                                                        job.pivot.status ===
-                                                        'Pending',
-                                                },
-                                            ]"
-                                        >
-                                            {{ job.pivot.status }}
+                                        <td class="p-2">
+                                            <p
+                                                :class="[
+                                                    'p-1 text-sm font-bold',
+                                                    {
+                                                        'rounded-full bg-yellow-400 text-white':
+                                                            job.pivot.status ===
+                                                            'Pending',
+                                                        'rounded-full bg-slate-400 text-white':
+                                                            job.pivot.status ===
+                                                            'Under Review',
+                                                        'rounded-full bg-slate-400 text-white':
+                                                            job.pivot.status ===
+                                                            'Interview Scheduled',
+                                                        'rounded-full bg-green-400 text-white':
+                                                            job.pivot.status ===
+                                                            'Accepted',
+                                                        'rounded-full bg-red-400 text-white':
+                                                            job.pivot.status ===
+                                                            'Rejected',
+                                                    },
+                                                ]"
+                                            >
+                                                {{ job.pivot.status }}
+                                            </p>
                                         </td>
                                         <td class="p-2">
                                             <Link

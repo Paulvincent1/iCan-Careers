@@ -1,16 +1,19 @@
 <script setup>
 import { uniqueId } from "lodash";
-import Maps from "../Components/Maps.vue";
+import Maps from "./Components/Maps.vue";
 import { ref, watchEffect } from "vue";
-import { Link, router } from "@inertiajs/vue3";
-import ReusableModal from "../Components/Modal/ReusableModal.vue";
-import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
+import { Link, router, usePage } from "@inertiajs/vue3";
+import ReusableModal from "./Components/Modal/ReusableModal.vue";
+import SuccessfulMessage from "./Components/Popup/SuccessfulMessage.vue";
 
 let props = defineProps({
     jobPostProps: null,
     workerProfileProps: null,
     messageProp: null,
 });
+
+let page = usePage();
+console.log(page.props.auth.user.role.name);
 
 let messageShow = ref(false);
 function showMessage() {
@@ -45,7 +48,7 @@ function swapArrayValues() {
     }
 }
 
-let isSaved = ref(props.jobPostProps.users_who_saved.length);
+let isSaved = ref(props.jobPostProps.users_who_saved?.length ?? 0);
 
 function saveJob() {
     if (isSaved.value === 0) {
@@ -63,19 +66,25 @@ function closeModal() {
     showModal.value = false;
 }
 
-let isApplied = ref(props.jobPostProps.users_who_applied.length);
+let isApplied = ref(props.jobPostProps.users_who_applied?.length ?? 0);
 function submitResume() {
     router.post(
         route("jobsearch.apply", props.jobPostProps.id),
         {},
         {
-            onSuccess: () => {},
+            onSuccess: () => {
+                isApplied.value = 1;
+            },
         },
     );
 }
+
+// employer side
+let isClosed = ref(null);
+function closeJob() {}
 </script>
 <template>
-    <div class="">
+    <div class="flex min-h-[calc(100vh-4.625rem)] flex-col">
         <div class="relative h-32 bg-[#FAFAFA]">
             <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
                 <div
@@ -107,36 +116,60 @@ function submitResume() {
                         : jobPostProps.employer.name
                 }}
             </p>
-            <div class="mb-3 mt-3 flex justify-center gap-2">
+            <div
+                v-if="
+                    page.props.auth.user.role.name === 'Senior' ||
+                    page.props.auth.user.role.name === 'PWD'
+                "
+                class="mb-3 mt-3 flex justify-center gap-2"
+            >
                 <Link
                     @click="saveJob"
                     as="button"
                     method="post"
                     preserve-scroll
                     :href="route('jobsearch.save.job', jobPostProps.id)"
-                    class="rounded bg-green-400 p-2 px-8 text-white"
+                    class="w-44 rounded bg-green-400 p-2 px-8 text-white"
                 >
                     {{ isSaved ? "Saved" : "Save for later" }}
                 </Link>
                 <button
                     @click="showModal = true"
                     :class="[
-                        'rounded border border-green-400 p-2 px-8 text-green-400',
+                        'w-44 rounded border border-green-400 p-2 px-8 text-green-400',
                         {
                             'pointer-events-none bg-green-400 text-white':
                                 isApplied,
                         },
                     ]"
                 >
-                    {{ isApplied ? "Already Applied!" : "Apply" }}
+                    {{ isApplied ? "Applied!" : "Apply" }}
                 </button>
             </div>
-        </div>
-        <div class="bg-[#f3f7fa]">
-            <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
-                <div
-                    class="grid items-start gap-5 pt-5 lg:grid-cols-[1fr,300px]"
+            <div v-else class="mb-3 mt-3 flex justify-center gap-2">
+                <Link
+                    as="button"
+                    method="put"
+                    preserve-scroll
+                    :href="route('employer.jobpost.close', jobPostProps.id)"
+                    class="w-44 rounded border border-red-400 p-2 px-8 font-bold text-red-400"
                 >
+                    {{ isSaved ? "Closed" : "Close this job" }}
+                </Link>
+                <Link
+                    as="button"
+                    method="post"
+                    preserve-scroll
+                    :href="route('jobsearch.save.job', jobPostProps.id)"
+                    class="w-44 rounded border border-blue-400 p-2 px-8 font-bold text-blue-400"
+                >
+                    Edit
+                </Link>
+            </div>
+        </div>
+        <div class="flex-1 bg-[#f3f7fa]">
+            <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
+                <div class="grid gap-5 pt-5 lg:grid-cols-[1fr,300px]">
                     <div class="rounded bg-white p-8 shadow">
                         <div class="mb-3">
                             <p class="text-[20px] font-bold">Description</p>
@@ -186,7 +219,7 @@ function submitResume() {
                                 </p>
                             </div>
                         </div>
-                        <div>
+                        <div v-if="jobPostProps.work_arrangement != 'Remote'">
                             <p class="text-lg font-bold">Location</p>
                             <Maps
                                 v-if="jobPostProps.location"
@@ -198,33 +231,33 @@ function submitResume() {
                         </div>
                     </div>
                     <div
-                        class="row-start-1 rounded bg-white p-8 shadow lg:row-start-auto"
+                        class="row-start-1 self-start rounded bg-white p-8 shadow lg:row-start-auto"
                     >
                         <p class="mb-3 text-[20px] font-bold">Overview</p>
                         <div class="text-[16px]">
                             <div class="mb-2">
                                 <p>Job type</p>
-                                <p>Full Time</p>
+                                <p>{{ jobPostProps.job_type }}</p>
                             </div>
                             <div class="mb-2">
                                 <p>Working Mode</p>
-                                <p>Onsite</p>
+                                <p>{{ jobPostProps.work_arrangement }}</p>
                             </div>
                             <div class="mb-2">
                                 <p>Hour per day</p>
-                                <p>8</p>
+                                <p>{{ jobPostProps.hour_per_day }}</p>
                             </div>
                             <div class="mb-2">
                                 <p>Hourly rate</p>
-                                <p>₱8</p>
+                                <p>{{ jobPostProps.hourly_rate }}</p>
                             </div>
                             <div class="mb-2">
                                 <p>Salary</p>
-                                <p>₱8</p>
+                                <p>{{ jobPostProps.salary }}</p>
                             </div>
                             <div class="mb-2">
                                 <p>Experience required</p>
-                                <p>0-2 years</p>
+                                <p>{{ jobPostProps.experience }}</p>
                             </div>
                         </div>
                     </div>
@@ -232,7 +265,14 @@ function submitResume() {
             </div>
         </div>
         <Teleport defer to="body">
-            <ReusableModal v-if="showModal" @closeModal="closeModal">
+            <ReusableModal
+                v-if="
+                    showModal &&
+                    (page.props.auth.user.role.name === 'Senior' ||
+                        page.props.auth.user.role.name === 'PWD')
+                "
+                @closeModal="closeModal"
+            >
                 <div class="w-[500px] rounded bg-white p-4">
                     <div class="flex justify-between">
                         <p class="text-lg font-bold">Are you sure?</p>

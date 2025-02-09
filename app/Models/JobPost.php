@@ -20,6 +20,7 @@ class JobPost extends Model
         'preferred_educational_attainment', // can add No Preference
         'skills',
         'preferred_worker_types',
+        'job_status',
     ];
 
     protected $casts = [

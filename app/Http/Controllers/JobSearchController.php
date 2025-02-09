@@ -90,7 +90,7 @@ class JobSearchController extends Controller
 
         // dd($job);
  
-        return inertia('Worker/ShowJob',['jobPostProps' =>  $job, 'workerProfileProps' => $user->workerProfile, 'messageProp' => session()->get('messageProp')]);
+        return inertia('ShowJob',['jobPostProps' =>  $job, 'workerProfileProps' => $user->workerProfile, 'messageProp' => session()->get('messageProp')]);
     }
 
     public function apply(JobPost $id){

@@ -19,9 +19,9 @@ class WorkerDashboard extends Controller
             }
         }
 
-        $savedJobs = $user->savedJobs()->with(['employer.employerProfile.businessInformation'])->get();
+        $savedJobs = $user->savedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
         
-        $appliedJobs = $user->appliedJobs()->with(['employer.employerProfile.businessInformation'])->get();
+        $appliedJobs = $user->appliedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
       
         return inertia('Worker/Dashboard', ['user' => $user, 'isPending' => $isPending, 'savedJobsProps' => $savedJobs ,'jobsAppliedProps' => $appliedJobs]);
     }
