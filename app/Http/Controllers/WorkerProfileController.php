@@ -234,6 +234,7 @@ class WorkerProfileController extends Controller
          'workerSkillsProp' => $workerSkills,
          'workerProfileProp' => $workerProfile, 
          'messageProp' => session('message'),
+         'visitor' => true
         ]);
     }
 

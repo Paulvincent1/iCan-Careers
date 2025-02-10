@@ -18,17 +18,17 @@ const submit = () => {
     form.post(route("register.post"));
 };
 
-let userRole = ref("worker");
+let userRole = ref("Worker");
 let select = useTemplateRef("select");
 function selectRole() {
-    if (select.value.value === "worker") {
-        userRole.value = "worker";
-        if (form.role === "employer") {
+    if (select.value.value === "Worker") {
+        userRole.value = "Worker";
+        if (form.role === "Employer") {
             form.role = null;
         }
     } else {
-        userRole.value = "employer";
-        form.role = "employer";
+        userRole.value = "Employer";
+        form.role = "Employer";
     }
     console.log(form.role);
 }
@@ -82,12 +82,12 @@ onMounted(() => {
                 <div class="flex">
                     <p>I'm a</p>
                     <select name="role" id="" ref="select" @change="selectRole">
-                        <option value="worker">Worker</option>
-                        <option value="employer">Employer</option>
+                        <option value="Worker">Worker</option>
+                        <option value="Employer">Employer</option>
                     </select>
                 </div>
 
-                <div v-if="userRole === 'worker'" class="mb-4">
+                <div v-if="userRole === 'Worker'" class="mb-4">
                     <div class="flex gap-2">
                         <input
                             @change="selectRole"

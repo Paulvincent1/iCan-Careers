@@ -80,8 +80,10 @@ function submitResume() {
 }
 
 // employer side
-let isClosed = ref(null);
-function closeJob() {}
+let isClosed = ref(props.jobPostProps.job_status === "Closed");
+function closeJob() {
+    isClosed.value = true;
+}
 </script>
 <template>
     <div class="flex min-h-[calc(100vh-4.625rem)] flex-col">
@@ -121,42 +123,59 @@ function closeJob() {}
                     page.props.auth.user.role.name === 'Senior' ||
                     page.props.auth.user.role.name === 'PWD'
                 "
-                class="mb-3 mt-3 flex justify-center gap-2"
             >
-                <Link
-                    @click="saveJob"
-                    as="button"
-                    method="post"
-                    preserve-scroll
-                    :href="route('jobsearch.save.job', jobPostProps.id)"
-                    class="w-44 rounded bg-green-400 p-2 px-8 text-white"
+                <div
+                    class="mb-3 mt-3 flex justify-center gap-2"
+                    v-if="jobPostProps.job_status === 'Open'"
                 >
-                    {{ isSaved ? "Saved" : "Save for later" }}
-                </Link>
-                <button
-                    @click="showModal = true"
-                    :class="[
-                        'w-44 rounded border border-green-400 p-2 px-8 text-green-400',
-                        {
-                            'pointer-events-none bg-green-400 text-white':
-                                isApplied,
-                        },
-                    ]"
-                >
-                    {{ isApplied ? "Applied!" : "Apply" }}
-                </button>
+                    <Link
+                        @click="saveJob"
+                        as="button"
+                        method="post"
+                        preserve-scroll
+                        :href="route('jobsearch.save.job', jobPostProps.id)"
+                        class="w-44 rounded bg-green-400 p-2 px-8 text-white"
+                    >
+                        {{ isSaved ? "Saved" : "Save for later" }}
+                    </Link>
+                    <button
+                        @click="showModal = true"
+                        :class="[
+                            'w-44 rounded border border-green-400 p-2 px-8 text-green-400',
+                            {
+                                'pointer-events-none bg-green-400 text-white':
+                                    isApplied,
+                            },
+                        ]"
+                    >
+                        {{ isApplied ? "Applied!" : "Apply" }}
+                    </button>
+                </div>
+                <div v-else class="mb-3 mt-3">
+                    <p class="text-center text-lg font-bold text-red-500">
+                        This job listing is closed
+                    </p>
+                </div>
             </div>
             <div v-else class="mb-3 mt-3 flex justify-center gap-2">
                 <Link
+                    @click="closeJob"
                     as="button"
                     method="put"
                     preserve-scroll
                     :href="route('employer.jobpost.close', jobPostProps.id)"
-                    class="w-44 rounded border border-red-400 p-2 px-8 font-bold text-red-400"
+                    :class="[
+                        'w-44 rounded border border-red-400 p-2 px-8 font-bold text-red-400',
+                        {
+                            'pointer-events-none bg-red-400 text-white':
+                                isClosed,
+                        },
+                    ]"
                 >
-                    {{ isSaved ? "Closed" : "Close this job" }}
+                    {{ isClosed ? "Closed" : "Close this job" }}
                 </Link>
                 <Link
+                    v-if="!isClosed"
                     as="button"
                     method="post"
                     preserve-scroll

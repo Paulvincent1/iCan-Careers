@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,6 +36,14 @@ class AuthController extends Controller
             
 
             $user->roles()->attach($role->id);
+
+            if($fields['role'] === 'Employer'){
+                // creating a free tier subscription if the user is employer
+                $user->employerSubscription()->create([
+                    'subscription_type' => 'Free',
+                    'start_date' => Carbon::now(),
+                ]);
+            }
 
             return redirect()->route('login')->with('status', 'Successfuly registered!');
     }

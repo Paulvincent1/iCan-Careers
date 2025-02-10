@@ -20,9 +20,7 @@ class JobSearchController extends Controller
         $user = Auth::user();
         $jobs = JobPost::with(['employer.employerProfile','employer.employerProfile.businessInformation','usersWhoSaved' => function ($query) use ($user) {
             $query->where('user_id',  $user->id)->first();
-        }])->filter(request(['job_type','work_arrangement','experience','job_title']))->whereDoesntHave('usersWhoApplied', function ($query){
-            $query->whereIn('status', ['Accepted']);
-        })->latest()->get();
+        }])->filter(request(['job_type','work_arrangement','experience','job_title']))->where('job_status','Open')->latest()->get();
       
 
         // dd($jobs);
@@ -44,6 +42,9 @@ class JobSearchController extends Controller
     }
 
     public function saveJob(JobPost $id){
+        if($id->job_status === 'Pending'){
+            abort(403, "Your'e not allowed to do this action");
+        }
 
         $user = Auth::user();
         $job = $user->savedJobs()->where('job_post_id',$id->id)->first();
@@ -96,7 +97,7 @@ class JobSearchController extends Controller
     public function apply(JobPost $id){
         $user = Auth::user();
 
-        if(!$id->usersWhoApplied()->where('worker_id',$user->id)->first()){
+        if(!$id->usersWhoApplied()->where('worker_id',$user->id)->first() && $id->job_status != 'Closed'){
             $user->appliedJobs()->attach($id->id);
             return redirect()->back()->with(['messageProp' => 'Successfuly applied!']);
         }

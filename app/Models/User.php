@@ -82,7 +82,30 @@ class User extends Authenticatable
 
     public function appliedJobs(){
         return $this->belongsToMany(JobPost::class,'application','worker_id', 'job_post_id')
-        ->withPivot(['id','status'])
+        ->withPivot('id','status')
         ->withTimestamps();
+    }
+
+    public function myJobs(){
+        return $this->belongsToMany(JobPost::class, 'hired_workers','worker_id','job_post_id')
+        ->wherePivot('current','id')
+        ->withTimestamps();
+    }
+
+    public function workerInvoices(){
+        return $this->hasMany(Invoice::class,'worker_id');
+    }
+
+    public function employerInvoices(){
+        return $this->hasMany(Invoice::class,'employer_id');
+    }
+
+    public function employerSubscriptionInvoices(){
+        return $this->hasMany(EmployerSubscriptionInvoice::class,'employer_id');
+    }
+
+    // for tracking subscription
+    public function employerSubscription(){
+        return $this->hasOne(EmployerSubscription::class,'employer_id');
     }
 }

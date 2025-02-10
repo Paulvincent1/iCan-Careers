@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('preferred_educational_attainment');
             $table->json('skills');
             $table->json('preferred_worker_types');
-            $table->enum('job_status',['Open', 'Closed']);
+            $table->enum('job_status',['Pending','Open', 'Closed']);
             $table->foreignId('employer_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });

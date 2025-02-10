@@ -11,6 +11,7 @@ let props = defineProps({
     workerSkillsProp: Object,
     workerProfileProp: Object,
     messageProp: String,
+    visitor: null,
 });
 
 let messageShow = ref(false);
@@ -236,7 +237,12 @@ function removeSkill(skillId) {
         <div class="bg- relative h-32 bg-[#FAFAFA]">
             <label
                 for="profileimg"
-                class="absolute left-[50%] top-[40px] flex h-36 w-36 translate-x-[-50%] cursor-pointer flex-col items-center"
+                :class="[
+                    'absolute left-[50%] top-[40px] flex h-36 w-36 translate-x-[-50%] cursor-pointer flex-col items-center',
+                    {
+                        'pointer-events-none': visitor,
+                    },
+                ]"
             >
                 <div class="mb-3 h-full w-full">
                     <img
@@ -268,7 +274,12 @@ function removeSkill(skillId) {
                     <p
                         @click="isEditJobTitleActive = true"
                         v-if="!isEditJobTitleActive"
-                        class="max-w-[600px] cursor-pointer break-words text-center text-[24px] font-bold hover:underline"
+                        :class="[
+                            'max-w-[600px] cursor-pointer break-words text-center text-[24px] font-bold hover:underline',
+                            {
+                                'pointer-events-none': visitor,
+                            },
+                        ]"
                     >
                         {{ workerProfile.job_title }}
                     </p>
@@ -317,7 +328,12 @@ function removeSkill(skillId) {
                             <p
                                 v-if="!isEditProfileActive"
                                 @click="isEditProfileActive = true"
-                                class="max-w-[400px] cursor-pointer hover:border-b-2"
+                                :class="[
+                                    'max-w-[400px] cursor-pointer hover:border-b-2',
+                                    {
+                                        'pointer-events-none': visitor,
+                                    },
+                                ]"
                             >
                                 Looking for {{ workerProfile.job_type }} work
                                 ({{
@@ -382,7 +398,12 @@ function removeSkill(skillId) {
                         <p
                             @click="isEditDescription = true"
                             v-if="!isEditDescription"
-                            class="cursor-pointer whitespace-pre-wrap break-words text-[14px] hover:underline"
+                            :class="[
+                                'cursor-pointer whitespace-pre-wrap break-words text-[14px] hover:underline',
+                                {
+                                    'pointer-events-none': visitor,
+                                },
+                            ]"
                         >
                             {{ workerProfile.profile_description }}
                         </p>
@@ -409,6 +430,7 @@ function removeSkill(skillId) {
                         <div class="mb-4 flex justify-between">
                             <p class="text-[20px] font-bold">Top Skills</p>
                             <button
+                                v-if="!visitor"
                                 @click="isOpenUpdateValue(true)"
                                 class="rounded-xl bg-green-400 px-2 text-white"
                             >
@@ -426,6 +448,7 @@ function removeSkill(skillId) {
                                 experience: skill.experience,
                                 star: Number(skill.rating),
                             }"
+                            :owner="!visitor"
                             @updateSkillName="updateSkillName"
                             @updateExperience="updateExperience"
                             @removeSkill="removeSkill"

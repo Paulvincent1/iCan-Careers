@@ -17,9 +17,9 @@ let closeProfileSetupMessage = ref(false);
         <ProfileSetupMessage
             @close="closeProfileSetupMessage = true"
             v-if="
-                $page.props.auth.worker_profile &&
-                $page.component != 'WorkerAccountSetup/AddSkills' &&
-                $page.component != 'WorkerAccountSetup/CreateProfile' &&
+                (page.props.auth.worker_profile &&
+                page.component != 'WorkerAccountSetup/AddSkills' &&
+                page.component != 'WorkerAccountSetup/CreateProfile')   && 
                 !closeProfileSetupMessage
                     ? true
                     : false

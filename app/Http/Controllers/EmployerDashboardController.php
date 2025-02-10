@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobPost;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,10 @@ class EmployerDashboardController extends Controller
     public function showJobApplicants(Request $request, JobPost $jobid){
 
         Gate::authorize('view-applicants', [$jobid]);
+
+        if($jobid->job_status === 'Pending'){
+            abort(403, "You're not allowed to view this page");
+        }
 
         $applicants = $jobid->usersWhoApplied()->with(['workerProfile'])->where('name' ,'like', '%' . $request->get('q') . '%')->get();
 
@@ -53,9 +58,14 @@ class EmployerDashboardController extends Controller
     }
 
     public function updateStatus(Request $request, int $pivotId){
-        // dd($pivotId);
 
-        DB::table('application')->where('id', $pivotId)->update(['status' => $request->status]);
+        $update = DB::table('application')->where('id', $pivotId)->update(['status' => $request->status]);
+        if($request->status === 'Accepted' && $update){
+            $application = DB::table('application')->where('id', $pivotId)->first();
+            $worker = User::find($application->worker_id);
+
+            $worker->myJobs()->attach($application->job_post_id);
+        }
 
         return redirect()->back()->with('message','Successfully updated');
     }

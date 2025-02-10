@@ -15,7 +15,12 @@ onMounted(() => {
     });
 });
 
-let jobTag = ref("Open");
+let jobTag = ref(
+    page.props.auth.user.employer.subscription.subscription_type === "Free"
+        ? "Pending"
+        : "Open",
+);
+// let jobTag = ref(page.props.auth.user.employer.subscription);
 
 function switchJobTag(jobstatus) {
     jobs.value = props.jobsProps.filter((job) => {
@@ -84,6 +89,28 @@ console.log(props.jobsProps);
                             slides-per-view="auto"
                             :space-between="10"
                         >
+                            <swiper-slide
+                                v-if="
+                                    page.props.auth.user.employer.subscription
+                                        .subscription_type === 'Free'
+                                "
+                                class="w-fit"
+                            >
+                                <li
+                                    @click="switchJobTag('Pending')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-yellow-500 p-1',
+                                        {
+                                            'bg-yellow-500 text-white':
+                                                jobTag === 'Pending',
+                                            'text-yellow-500':
+                                                jobTag != 'Pending',
+                                        },
+                                    ]"
+                                >
+                                    Pending Jobs
+                                </li></swiper-slide
+                            >
                             <swiper-slide class="w-fit">
                                 <li
                                     @click="switchJobTag('Open')"
@@ -147,9 +174,17 @@ console.log(props.jobsProps);
                                     <td class="p-2 text-start">
                                         {{ job.salary }}
                                     </td>
-                                    <td class="p-2 text-start">
+                                    <td
+                                        :class="[
+                                            'p-2 text-start text-blue-500 underline',
+                                            {
+                                                'pointer-events-none text-black no-underline':
+                                                    jobTag === 'Pending',
+                                            },
+                                        ]"
+                                    >
                                         <Link
-                                            class="text-blue-500 underline"
+                                            class=""
                                             :href="
                                                 route('job.applicants', job.id)
                                             "
@@ -181,10 +216,10 @@ console.log(props.jobsProps);
                 <div
                     class="col-span-2 h-[432px] rounded border p-3 lg:col-span-1"
                 >
-                    <p class="font-bold">Notification</p>
+                    <p class="font-bold">Pending Invoices</p>
                 </div>
                 <div class="col-span-2 h-[300px] rounded border p-3">
-                    <p></p>
+                    <p>Currently hired workers</p>
                 </div>
             </div>
         </div>

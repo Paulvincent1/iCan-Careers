@@ -1,6 +1,6 @@
 <script setup>
 import { Link, router, useForm } from "@inertiajs/vue3";
-import { onMounted, ref, TransitionGroup, watch } from "vue";
+import { onMounted, ref, TransitionGroup, useTemplateRef, watch } from "vue";
 import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 import { debounce } from "lodash";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
@@ -155,6 +155,8 @@ function updateStatus(applicationId, e) {
                 },
             },
         );
+    } else {
+        e.target.value = "";
     }
 }
 
@@ -308,11 +310,6 @@ onMounted(() => console.log("mounted"));
                             </td>
                             <td class="p-3 text-start font-normal">
                                 {{ applicant.name }}
-                                Lorem ipsum dolor sit amet consectetur,
-                                adipisicing elit. Corrupti quidem minus porro
-                                hic ipsam, earum accusamus. Voluptatum, quaerat
-                                minima esse laboriosam maxime dolorem nisi quia
-                                id molestiae optio, quae tempore.
                             </td>
                             <td class="p-3 text-start font-normal">
                                 <a
@@ -343,7 +340,7 @@ onMounted(() => console.log("mounted"));
                             <td class="p-3 text-start font-normal">
                                 <p
                                     :class="[
-                                        'w-fit rounded-full p-2 text-start text-white',
+                                        'w-fit rounded-full p-2 text-center text-white xl:text-start',
                                         {
                                             'bg-yellow-400':
                                                 applicant.pivot.status ===

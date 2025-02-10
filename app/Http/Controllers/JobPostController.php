@@ -66,6 +66,7 @@ class JobPostController extends Controller
         foreach($fields['skills'] as $skill){
             $skills[] = $skill['name'];
         }
+        // dd($user->employerSubscription->subscription_type);
 
 
         $user->employerJobPosts()->create([
@@ -81,6 +82,7 @@ class JobPostController extends Controller
             'preferred_educational_attainment' =>  $fields['preferred_educational_attainment'],
             'skills' =>  $skills,
             'preferred_worker_types' =>  $fields['preferred_worker_types'],
+            'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open'
         ]);
 
         return redirect()->route('employer.dashboard');
@@ -130,6 +132,11 @@ class JobPostController extends Controller
         }
         $jobid->update([
             'job_status' => 'Closed'
+        ]);
+
+        $jobid->usersWhoApplied()->wherePivotNotIn('status',['Accepted','Rejected'])
+        ->update([
+            'status' => 'Rejected'
         ]);
       
         Inertia::clearHistory();

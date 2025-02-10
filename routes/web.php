@@ -69,7 +69,12 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class
     Route::get('/addskills',[WorkerSkillsController::class, 'create'])->name('add.skills');
     Route::post('/addskills',[WorkerSkillsController::class, 'store'])->name('add.skills.post');
 
+
     Route::get('/',[WorkerDashboard::class, 'index'])->name('worker.dashboard');
+
+    Route::get('/createinvoice', [WorkerDashboard::class,'createInvoice'])->name('worker.create.invoice');
+    Route::post('/createinvoice', [WorkerDashboard::class,'storeInvoice'])->name('worker.store.invoice');
+
 
     
     Route::get('/myprofile',[WorkerProfileController::class, 'myProfile'])->name('worker.profile');

@@ -64,7 +64,13 @@ class JobPost extends Model
 
     public function usersWhoApplied(){
         return $this->belongsToMany(User::class, 'application','job_post_id', 'worker_id')
-        ->withPivot(['id','status'])
+        ->withPivot('id','status')
+        ->withTimestamps();
+    }
+
+    public function employedWorkers(){
+        return $this->belongsToMany(User::class, 'hired_workers','job_post_id','worker_id')
+        ->wherePivot('current','id')
         ->withTimestamps();
     }
 }
