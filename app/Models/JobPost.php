@@ -70,7 +70,7 @@ class JobPost extends Model
 
     public function employedWorkers(){
         return $this->belongsToMany(User::class, 'hired_workers','job_post_id','worker_id')
-        ->wherePivot('current','id')
+        ->withPivot('current','id')
         ->withTimestamps();
     }
 }

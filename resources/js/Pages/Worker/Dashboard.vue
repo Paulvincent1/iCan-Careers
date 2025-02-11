@@ -75,11 +75,15 @@ onMounted(() => {
                     >
                         <div class="flex justify-between">
                             <p class="p-1 font-bold">Invoice status</p>
-                            <Link href="/" class="p-1">Create invoice</Link>
+                            <Link
+                                :href="route('worker.create.invoice')"
+                                class="p-1"
+                                >Create invoice</Link
+                            >
                         </div>
                     </div>
                     <div class="col-span-2 rounded border p-3 lg:col-span-1">
-                        <p class="font-bold">Notification</p>
+                        <p class="font-bold">Balance</p>
                     </div>
                 </div>
                 <div

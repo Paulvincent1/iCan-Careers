@@ -35,7 +35,7 @@ class InvoiceService {
         // dd($totalAmount);
 
         $create_invoice_request = new CreateInvoiceRequest([
-            'external_id' => 'ORDER-' . uniqid(),
+            'external_id' => 'INV-' . uniqid(),
             'description' => $description,
             'amount' => $totalAmount,
             'invoice_duration' => 172800,

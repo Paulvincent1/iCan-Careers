@@ -36,6 +36,16 @@ class WorkerDashboard extends Controller
         return inertia('Worker/Dashboard', ['user' => $user, 'isPending' => $isPending, 'savedJobsProps' => $savedJobs ,'jobsAppliedProps' => $appliedJobs]);
     }
 
+    public function createInvoice(){
+
+        $user = Auth::user();
+        $jobs = $user->myJobs()->with('employer')->wherePivot('current',true)->get();
+
+        $employers = $jobs->pluck('employer')->unique();
+
+        return inertia('Worker/CreateInvoice', ['employersProps' => $employers]);
+    }
+
     public function storeInvoice(){
 
         $this->invoiceService

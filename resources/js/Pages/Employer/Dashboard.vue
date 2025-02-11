@@ -5,21 +5,23 @@ import { onMounted, ref } from "vue";
 
 let props = defineProps({
     jobsProps: null,
+    currentWorkerProps: null,
 });
 let page = usePage();
 let jobs = ref(null);
-
-onMounted(() => {
-    jobs.value = props.jobsProps.filter((job) => {
-        return job.job_status === "Open";
-    });
-});
 
 let jobTag = ref(
     page.props.auth.user.employer.subscription.subscription_type === "Free"
         ? "Pending"
         : "Open",
 );
+
+onMounted(() => {
+    jobs.value = props.jobsProps.filter((job) => {
+        return job.job_status === jobTag.value;
+    });
+});
+
 // let jobTag = ref(page.props.auth.user.employer.subscription);
 
 function switchJobTag(jobstatus) {
@@ -29,7 +31,7 @@ function switchJobTag(jobstatus) {
     jobTag.value = jobstatus;
 }
 
-console.log(props.jobsProps);
+console.log(props.currentWorkerProps);
 </script>
 <template>
     <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
@@ -142,8 +144,8 @@ console.log(props.jobsProps);
                         </swiper-container>
                     </div>
 
-                    <div class="h-[350px] overflow-y-auto">
-                        <table class="w-full border-collapse">
+                    <div class="h-[300px] overflow-y-auto">
+                        <table class="w-full min-w-[500px] border-collapse">
                             <thead class="bg-slate-200 text-slate-500">
                                 <tr>
                                     <th class="p-2 text-start font-normal">
@@ -163,7 +165,7 @@ console.log(props.jobsProps);
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="text-sm">
                                 <tr v-for="(job, index) in jobs" :key="job.id">
                                     <td class="p-2 text-start">
                                         {{ job.job_title }}
@@ -176,10 +178,12 @@ console.log(props.jobsProps);
                                     </td>
                                     <td
                                         :class="[
-                                            'p-2 text-start text-blue-500 underline',
+                                            'p-2 text-start underline',
                                             {
                                                 'pointer-events-none text-black no-underline':
                                                     jobTag === 'Pending',
+                                                'text-blue-500':
+                                                    jobTag != 'Pending',
                                             },
                                         ]"
                                     >
@@ -213,13 +217,54 @@ console.log(props.jobsProps);
                         </table>
                     </div>
                 </div>
-                <div
-                    class="col-span-2 h-[432px] rounded border p-3 lg:col-span-1"
-                >
+                <div class="col-span-2 rounded border p-3 lg:col-span-1">
                     <p class="font-bold">Pending Invoices</p>
                 </div>
-                <div class="col-span-2 h-[300px] rounded border p-3">
-                    <p>Currently hired workers</p>
+                <div class="col-span-2 h-[380px] rounded border p-3">
+                    <div>
+                        <p class="">Currently hired workers</p>
+                    </div>
+                    <div class="overflow-auto">
+                        <table class="w-full min-w-[500px] table-fixed">
+                            <thead>
+                                <tr>
+                                    <th class="p-2 font-normal">Image</th>
+                                    <th class="p-2 font-normal">Name</th>
+                                    <th class="p-2 font-normal">Email</th>
+                                    <th class="p-2 font-normal">Profile</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr
+                                    v-for="(
+                                        worker, index
+                                    ) in currentWorkerProps"
+                                    :key="index"
+                                >
+                                    <td class="p-2">
+                                        <img
+                                            class="mx-auto h-12 w-12 rounded-full"
+                                            :src="
+                                                worker.profile_img
+                                                    ? worker.profile_img
+                                                    : '/assets/profile_placeholder.jpg'
+                                            "
+                                            alt=""
+                                        />
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        {{ worker.name }}
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        {{ worker.email }}
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        View Profile
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

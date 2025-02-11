@@ -88,7 +88,7 @@ class User extends Authenticatable
 
     public function myJobs(){
         return $this->belongsToMany(JobPost::class, 'hired_workers','worker_id','job_post_id')
-        ->wherePivot('current','id')
+        ->withPivot('current','id')
         ->withTimestamps();
     }
 

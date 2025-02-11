@@ -15,10 +15,14 @@ class EmployerDashboardController extends Controller
     public function index(){
 
         $user = Auth::user();
-        $jobs = JobPost::with(['usersWhoApplied'])->where('employer_id',  $user->id)->get();
+        $jobs = JobPost::with(['usersWhoApplied', 'employedWorkers' => function ($query) {
+            $query->wherePivot('current' , true);
+        }])->where('employer_id',  $user->id)->latest()->get();
+
+        $hiredWorkers = $jobs->pluck('employedWorkers')->flatten()->unique();
 
 
-        return inertia('Employer/Dashboard',['jobsProps' =>  $jobs]);
+        return inertia('Employer/Dashboard',['jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers]);
     }
 
     public function showJobApplicants(Request $request, JobPost $jobid){

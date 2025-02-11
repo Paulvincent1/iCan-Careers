@@ -76,7 +76,7 @@ window.addEventListener("resize", () => {
                         </Link>
                     </li>
                     <div
-                        v-if="!$page.props.auth.user"
+                        v-if="!$page.props.auth.user.authenticated"
                         class="flex items-center gap-5"
                     >
                         <li>
@@ -99,7 +99,7 @@ window.addEventListener("resize", () => {
 
                     <li
                         ref="drop"
-                        v-show="$page.props.auth.user"
+                        v-show="$page.props.auth.user.authenticated"
                         class="relative flex items-center justify-center gap-1 hover:cursor-pointer"
                         @click="profileDropdown = !profileDropdown"
                     >
