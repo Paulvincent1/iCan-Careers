@@ -26,6 +26,7 @@
         "lodash": "^4.17.21",
         "maplibre-gl": "^5.0.1",
         "nanoid": "^5.0.9",
+        "puppeteer": "^24.2.0",
         "swiper": "^11.2.1"
     }
 }

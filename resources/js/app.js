@@ -17,8 +17,22 @@ createInertiaApp({
         return page;
     },
     setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
-            .use(plugin)
+        window.formatCurrency = function (value) {
+            return new Intl.NumberFormat("en-PH", {
+                style: "currency",
+                currency: "PHP",
+            }).format(value);
+        };
+        const app = createApp({ render: () => h(App, props) });
+
+        app.config.globalProperties.$formatCurrency = function (value) {
+            return new Intl.NumberFormat("en-PH", {
+                style: "currency",
+                currency: "PHP",
+            }).format(value);
+        };
+
+        app.use(plugin)
             .use(ZiggyVue)
             .use(VueMaplibreGl)
             .component("Head", Head)

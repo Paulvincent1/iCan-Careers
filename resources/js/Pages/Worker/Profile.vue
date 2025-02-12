@@ -51,13 +51,6 @@ const age = dayjs().format("YYYY") - workerProfile.value.birth_year;
 let hourPay = ref(formatCurrency(workerProfile.value.hour_pay));
 let monthPay = ref(formatCurrency(workerProfile.value.month_pay));
 
-function formatCurrency(value) {
-    return new Intl.NumberFormat("en-PH", {
-        style: "currency",
-        currency: "PHP",
-    }).format(value);
-}
-
 function updateJobTitle() {
     router.put(
         "/jobseekers/myprofile/updateprofile",
@@ -85,6 +78,8 @@ function updateWorkDetails() {
         {
             onSuccess: () => {
                 showSuccessMessage();
+                hourPay.value = formatCurrency(workerProfile.value.hour_pay);
+                monthPay.value = formatCurrency(workerProfile.value.month_pay);
             },
             preserveScroll: true,
         },

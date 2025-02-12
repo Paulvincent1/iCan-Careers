@@ -12,33 +12,36 @@ class InvoiceService {
 
     public function __construct()
     {
+
+        // dd(env("XENDIT_SECRET_KEY"));
         Configuration::setXenditKey(env("XENDIT_SECRET_KEY"));
         $this->apiInstance = new InvoiceApi();
     }
 
-    public function createInvoice(int $amount, string $description, array $items){
+    public function createInvoice(string $externalId, string $description, array $items, int $duration){
 
         $invoicesItems = [];
         $totalAmount = 0;
+        dd($items);
 
         foreach($items as $item){
        
             $invoicesItems[] = new InvoiceItem(
             [
                 'name' => $item['name'], 
-                'price' => $item['price'], 
-                'quantity' => $item['quantity'],
+                'price' => $item['rate'], 
+                'quantity' => $item['hours'],
             ]);
 
-            $totalAmount+= $item['price'];
+            $totalAmount+= $item['rate'] * $item['hours'];
         }
         // dd($totalAmount);
 
         $create_invoice_request = new CreateInvoiceRequest([
-            'external_id' => 'INV-' . uniqid(),
+            'external_id' => $externalId,
             'description' => $description,
             'amount' => $totalAmount,
-            'invoice_duration' => 172800,
+            'invoice_duration' => $duration,
             'success_redirect_url' => 'facebook.com',
             'failure_redirect_url' => 'facebook.com',
             'currency' => 'PHP',
@@ -49,13 +52,14 @@ class InvoiceService {
          
           
         try {
-            $result = $this->apiInstance->createInvoice($create_invoice_request, $for_user_id );
-            dd($result);
-                print_r($result);
+            $result = $this->apiInstance->createInvoice($create_invoice_request, $for_user_id);
+            return $result->getInvoiceUrl();
+            // print_r($result);
         } catch (\Xendit\XenditSdkException $e) {
-        // dd('error');
-            echo 'Exception when calling InvoiceApi->createInvoice: ', $e->getMessage(), PHP_EOL;
-            echo 'Full Error: ', json_encode($e->getFullError()), PHP_EOL;
+            // dd('error');
+            // echo 'Exception when calling InvoiceApi->createInvoice: ', $e->getMessage(), PHP_EOL;
+            // echo 'Full Error: ', json_encode($e->getFullError()), PHP_EOL;
+            throw new \Exception('Error creating invoice with Xendit: ' . $e->getMessage());
         }
     }
     
