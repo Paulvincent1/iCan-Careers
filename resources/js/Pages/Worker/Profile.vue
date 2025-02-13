@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, getCurrentInstance, ref, watch, watchEffect } from "vue";
 import Skill from "../Components/Skill.vue";
 import dayjs from "dayjs";
 import WorkDetailsForm from "../Components/WorkDetailsForm.vue";
@@ -13,6 +13,9 @@ let props = defineProps({
     messageProp: String,
     visitor: null,
 });
+
+let { appContext } = getCurrentInstance();
+let formatCurrency = appContext.config.globalProperties.formatCurrency;
 
 let messageShow = ref(false);
 

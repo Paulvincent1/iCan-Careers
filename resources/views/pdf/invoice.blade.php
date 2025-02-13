@@ -17,16 +17,22 @@
                 <div>
                     <h1 class="text-2xl font-bold text-gray-700">Invoice</h1>
                     <p class="text-gray-500">Invoice #: {{ $invoiceId }}</p>
-                    <p class="text-gray-500">Date: {{ $dueDate }}</p>
+                    {{-- <p class="text-gray-500">Due Date: {{ $dueDate }} at 11:59 pm</p> --}}
                 </div>
             </div>
 
             <!-- Billing Details -->
-            <div class="mt-6">
-                <h3 class="font-semibold text-gray-700">Bill To:</h3>
-                <p class="text-gray-600">{{ $employer->employerProfile->full_name }}</p>
-                <p class="text-gray-500">{{ $employer->employerProfile->phone_number }}</p>
-                <p class="text-gray-500">{{ $employer->email }}</p>
+            <div class="mt-6 flex justify-between">
+                <div class="">
+                    <h3 class="font-semibold text-gray-700">Bill To:</h3>
+                    <p class="text-gray-600">{{ $employer->employerProfile->full_name }}</p>
+                    <p class="text-gray-500">{{ $employer->employerProfile->phone_number }}</p>
+                    <p class="text-gray-500">{{ $employer->email }}</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-700">Due Date:</h3>
+                    <p class="text-gray-500">{{ $dueDate }} at 11:59 PM</p>
+                </div>
             </div>
 
             <!-- Invoice Items -->
@@ -43,7 +49,7 @@
                     <tbody>
                         @foreach ($items as $item)
                         <tr>
-                            <td class="border p-3">{{ $item['id'] }}</td>
+                            <td class="border p-3">{{ $item['description'] }}</td>
                             <td class="border p-3 text-right">{{ $item['hours'] }}</td>
                             <td class="border p-3 text-right">₱ {{ number_format($item['rate'] , 2) }}</td>
                             <td class="border p-3 text-right">₱ {{ number_format($item['amount'] , 2) }}</td>
@@ -65,7 +71,7 @@
         </div>
         <!-- Payment Button -->
         <div class="mt-6 text-center ">
-            <a href="{{ $paymentUrl ? $paymentUrl : '#' }} target="_blank" class="w-full inline-block bg-[#1e2e50] text-white px-6 py-3 rounded-b-lg shadow-md hover:bg-blue-700 transition">
+            <a href="{{ $paymentUrl ? $paymentUrl : '#' }}" target="_blank" class="w-full inline-block bg-[#1e2e50] text-white px-6 py-3 rounded-b-lg shadow-md hover:bg-blue-700 transition">
                  PAY NOW
             </a>
         </div>

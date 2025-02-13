@@ -72,7 +72,7 @@ let errorMessage = ref({
     items: null,
 });
 
-function previewPdf() {
+function validateFields() {
     errorMessage.value.dueDate = null;
     errorMessage.value.billTo = null;
     errorMessage.value.description = null;
@@ -80,15 +80,15 @@ function previewPdf() {
 
     if (form.dueDate === null) {
         errorMessage.value.dueDate = "Please complete this field";
-        return;
+        return false;
     }
     if (form.billTo === null) {
         errorMessage.value.billTo = "Please complete this field";
-        return;
+        return false;
     }
     if (form.description === null) {
         errorMessage.value.description = "Please complete this field";
-        return;
+        return false;
     }
     if (
         form.items.description === null ||
@@ -98,17 +98,23 @@ function previewPdf() {
         form.items.rate === 0
     ) {
         errorMessage.value.items = "Please complete this field";
-        return;
+        return false;
     }
 
-    createForm();
+    return true;
 }
 
-function createForm() {
+function previewPdf() {
+    if (validateFields()) {
+        createForm("worker.preview.invoice");
+    }
+}
+
+function createForm(routeName) {
     const formElement = document.createElement("form");
 
     formElement.target = "_blank";
-    formElement.action = route("worker.preview.invoice");
+    formElement.action = route(routeName);
     formElement.method = "POST";
 
     formElement.classList.add("hidden");
@@ -156,12 +162,19 @@ function createForm() {
     formElement.submit();
 }
 
-function sendInvoice() {}
+function sendInvoice() {
+    // if (validateFields()) {
+    //     createForm("worker.send.invoice");
+    // }
+    if (validateFields()) {
+        form.post(route("worker.send.invoice"), {});
+    }
+}
 
 const { appContext } = getCurrentInstance();
-const $formatCurrency = appContext.config.globalProperties.$formatCurrency;
+const formatCurrency = appContext.config.globalProperties.formatCurrency;
 
-console.log($formatCurrency(1000));
+console.log(getCurrentInstance());
 </script>
 <template>
     <div class="mx-auto px-[0.5rem] pt-3 xl:max-w-7xl">
@@ -295,7 +308,7 @@ console.log($formatCurrency(1000));
                                         class="p-2 text-end"
                                     >
                                         {{
-                                            $formatCurrency(
+                                            formatCurrency(
                                                 item.hours * item.rate,
                                             )
                                         }}
@@ -336,7 +349,7 @@ console.log($formatCurrency(1000));
                         <div class="md:basis-[300px]">
                             <h3 class="text-end text-[20px]">Total Amount:</h3>
                             <p class="text-end text-[20px]">
-                                {{ $formatCurrency(totalAmount) }}
+                                {{ formatCurrency(totalAmount) }}
                             </p>
                         </div>
                     </div>
@@ -350,7 +363,10 @@ console.log($formatCurrency(1000));
                 >
                     Preview PDF
                 </button>
-                <button class="rounded-full bg-green-500 px-4 py-1 text-white">
+                <button
+                    @click="sendInvoice"
+                    class="rounded-full bg-green-500 px-4 py-1 text-white"
+                >
                     Send Invoice
                 </button>
             </div>

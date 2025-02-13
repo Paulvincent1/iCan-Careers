@@ -54,29 +54,19 @@ class WorkerDashboard extends Controller
 
     public function storeInvoice(){
 
-        // $this->invoiceService
-        // ->createInvoice(
-        //     externalId:  'INV-' . uniqid(),
-        //     description: 'test lang',
-        //     items: [
-        //         [
-        //             'name' => 'video editing',
-        //             'rate' => 5000,
-        //             'hours' => 1,
-        //         ],
-        //         [
-        //             'name' => 'video editing2',
-        //             'rate' => 5000,
-        //             'hours' => 1,
-        //         ]
-        //     ],
-        // );
+        // Pdf::view('pdf.invoice',[
+        //     'invoiceId' => '$this->externalId',
+        //     'dueDate' => '2025-02-20',
+        //     'description' => '$this->description',
+        //     'employer' => User::find(1),
+        //     'items' =>  [['description' => 'tesdasdas t', 'rate' => 100 ,'hours' => 2,'amount'=> 1000]],
+        //     'totalAmount' => 20000,
+        //     'paymentUrl' => '$this->paymentUrl'
+        // ])->disk('public')->save('/invoices/h.pdf');
     }
 
     public function previewInvoice(Request $request){
 
-        // dd($request);
-        // dd(Carbon::parse('2025-02-20 23:59:59'));
         $fields = $request->validate([
             'dueDate' => 'required',
             'description' => 'required',
@@ -90,18 +80,10 @@ class WorkerDashboard extends Controller
 
 
        $items = json_decode($fields['items'], true);
+    //    dd($items);
 
        $employer = User::where('email', $fields['billTo'])->with('employerProfile')->first();
        
-    //    dd($employer);
-
-    //    foreach($items as $item){
-    //     dd($item->id);
-    //    }
-
-        // $pdf = Pdf::view('pdf.invoice');
-        // dd($pdf);
-        // return $pdf->name('hi.pdf');
         return Pdf::view('pdf.invoice',[
             'invoiceId' => 'test',
             'dueDate' => $fields['dueDate'],
@@ -129,17 +111,19 @@ class WorkerDashboard extends Controller
         ]);
 
 
+
         DB::beginTransaction();
         try{
 
-            $items = json_decode($fields['items'], true);
+            $items = $fields['items'];
 
             $employer = User::where('email', $fields['billTo'])->with('employerProfile')->first();
 
-            $externalId = 'INV-' . uniqid();
+            $externalId = 'INV-' . strtoupper(uniqid());
 
     
-            $secondsDuration = Carbon::now()->diffInSeconds(Carbon::parse($fields['dueDate'].'23:59:59'));
+            $secondsDuration = Carbon::now()->diffInSeconds(Carbon::parse($fields['dueDate'] . ' 23:59:00'));
+            // dd(Carbon::now());
 
             $paymentUrl = $this->invoiceService
             ->createInvoice(
@@ -183,21 +167,9 @@ class WorkerDashboard extends Controller
         }catch(\Exception $e){
 
             DB::rollBack();
-            dd('error');
+            dd($e->getMessage());
 
         }
       
-
-
-
-        // return Pdf::view('pdf.invoice',[
-        //     'invoiceId' => 'test',
-        //     'dueDate' => $fields['dueDate'],
-        //     'description' => $fields['description'],
-        //     'employer' => $employer,
-        //     'items' =>  $items,
-        //     'totalAmount' => $fields['totalAmount'],
-        //     'paymentUrl' => null
-        // ]);
     }
 }

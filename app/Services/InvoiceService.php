@@ -22,13 +22,13 @@ class InvoiceService {
 
         $invoicesItems = [];
         $totalAmount = 0;
-        dd($items);
+        // dd($items);
 
         foreach($items as $item){
        
             $invoicesItems[] = new InvoiceItem(
             [
-                'name' => $item['name'], 
+                'name' => $item['description'], 
                 'price' => $item['rate'], 
                 'quantity' => $item['hours'],
             ]);
@@ -56,7 +56,7 @@ class InvoiceService {
             return $result->getInvoiceUrl();
             // print_r($result);
         } catch (\Xendit\XenditSdkException $e) {
-            // dd('error');
+            // dd($e->getMessage());
             // echo 'Exception when calling InvoiceApi->createInvoice: ', $e->getMessage(), PHP_EOL;
             // echo 'Full Error: ', json_encode($e->getFullError()), PHP_EOL;
             throw new \Exception('Error creating invoice with Xendit: ' . $e->getMessage());
