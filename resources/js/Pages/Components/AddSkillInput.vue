@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from "vue";
+import { debounce } from "lodash";
+import { ref, watch } from "vue";
 
 let query = ref("");
 let data = ref("");

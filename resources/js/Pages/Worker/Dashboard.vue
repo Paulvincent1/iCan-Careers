@@ -227,7 +227,7 @@ onMounted(() => {
                                                         'rounded-full bg-yellow-400 text-white':
                                                             job.pivot.status ===
                                                             'Pending',
-                                                        'rounded-full bg-slate-400 text-white':
+                                                        'rounded-full bg-slate-400 text-white under-review':
                                                             job.pivot.status ===
                                                             'Under Review',
                                                         'rounded-full bg-slate-400 text-white':

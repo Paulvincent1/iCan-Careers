@@ -115,6 +115,7 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
 
     Route::get('/applicants/{jobid}',[EmployerDashboardController::class, 'showJobApplicants'])->name('job.applicants');
     Route::put('/applicants/{pivotId}',[EmployerDashboardController::class, 'updateStatus'])->name('job.applicants.update.status');
+    Route::put('/applicants/{pivotId}/add-interview-schedule',[EmployerDashboardController::class, 'addInterview'])->name('job.applicants.addinterview');
 
 });
 

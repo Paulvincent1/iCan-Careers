@@ -73,7 +73,7 @@ console.log(props.currentWorkerProps);
                 <div class="border p-4">Inbox</div>
             </div>
             <div
-                class="grid grid-cols-1 gap-2 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
+                class="grid h-[400px] grid-cols-1 gap-2 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
             >
                 <div class="col-span-2 rounded border p-3 lg:col-span-1">
                     <div>
@@ -217,8 +217,437 @@ console.log(props.currentWorkerProps);
                         </table>
                     </div>
                 </div>
-                <div class="col-span-2 rounded border p-3 lg:col-span-1">
-                    <p class="font-bold">Pending Invoices</p>
+                <div
+                    class="col-span-2 h-[400px] overflow-hidden rounded border p-3 lg:col-span-1"
+                >
+                    <p class="p-1 font-bold">Invoices</p>
+                    <swiper-container
+                        class="mb-3 text-[12px]"
+                        slides-per-view="auto"
+                        :space-between="10"
+                    >
+                        <swiper-slide class="w-fit">
+                            <li
+                                @click="switchJobTag('Open')"
+                                :class="[
+                                    'cursor-pointer rounded border border-green-400 p-1 text-green-400',
+                                    {
+                                        'bg-green-400 text-white':
+                                            jobTag === 'Open',
+                                    },
+                                ]"
+                            >
+                                Pending
+                            </li></swiper-slide
+                        >
+                        <swiper-slide class="w-fit">
+                            <li
+                                @click="switchJobTag('Closed')"
+                                :class="[
+                                    'cursor-pointer rounded border border-red-400 p-1 text-red-400',
+                                    {
+                                        'bg-red-400 text-white':
+                                            jobTag === 'Closed',
+                                    },
+                                ]"
+                            >
+                                History
+                            </li></swiper-slide
+                        >
+                    </swiper-container>
+
+                    <div class="h-full overflow-y-auto">
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                        >
+                            <div class="h-11 w-11">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="text-sm">Nathaniel Manzano</p>
+                                <p class="text-[12px]">nath@gmail.com</p>
+                                <div class="flex gap-2 text-blue-500">
+                                    <a href="#" class="inline-block text-[12px]"
+                                        >See details</a
+                                    >
+                                    <a href="#" class="text-[12px]"
+                                        >Pay Now
+                                        <i
+                                            class="bi bi-arrow-up-right text-[12px]"
+                                        ></i
+                                    ></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-span-2 h-[380px] rounded border p-3">
                     <div>

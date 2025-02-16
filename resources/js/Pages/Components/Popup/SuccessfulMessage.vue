@@ -4,6 +4,7 @@ import { Teleport, Transition } from "vue";
 let props = defineProps({
     messageShow: false,
     messageProp: null,
+    type: "Success",
 });
 </script>
 <template>
@@ -11,10 +12,17 @@ let props = defineProps({
         <Transition name="message">
             <div v-if="messageShow" class="">
                 <div
-                    class="fixed left-[50%] top-20 flex translate-x-[-50%] items-center gap-2 rounded bg-green-200 p-4 text-green-600"
+                    :class="[
+                        'fixed left-[50%] top-20 flex translate-x-[-50%] items-center gap-2 rounded bg-green-200 p-4 text-green-600',
+                        { 'bg-red-200 p-4 text-red-600': type === 'Error' },
+                    ]"
                 >
-                    <i class="bi bi-check-circle-fill"></i>
-                    <p class="text-center">{{ props.messageProp }}</p>
+                    <i
+                        v-if="type === 'Success'"
+                        class="bi bi-check-circle-fill"
+                    ></i>
+                    <i v-else class="bi bi-x-circle-fill"></i>
+                    <p class="text-center">{{ messageProp }}</p>
                 </div>
             </div>
         </Transition>

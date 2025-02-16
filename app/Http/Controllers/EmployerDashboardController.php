@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JobPost;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,8 @@ class EmployerDashboardController extends Controller
         if($jobid->job_status === 'Pending'){
             abort(403, "You're not allowed to view this page");
         }
+        // dd(now()->format('H:i'));
+        // dd(Carbon::parse('2025-02-20' . ' 23:59:00'));
 
         $applicants = $jobid->usersWhoApplied()->with(['workerProfile'])->where('name' ,'like', '%' . $request->get('q') . '%')->get();
 
@@ -68,9 +71,22 @@ class EmployerDashboardController extends Controller
             $application = DB::table('application')->where('id', $pivotId)->first();
             $worker = User::find($application->worker_id);
 
+            // dd('hi');
             $worker->myJobs()->attach($application->job_post_id);
         }
 
+        return redirect()->back()->with('message','Successfully updated.');
+    }
+
+    public function addInterview(Request $request, int $pivotId) {
+        // dd( Carbon::parse("$request->date $request->time"));
+
+        if(Carbon::parse("$request->date $request->time")->isPast()){
+            return redirect()->back()->withErrors(['message'=>'Please select a time valid time.']);
+        }
+       
+        DB::table('application')->where('id',$pivotId)->update(['status' => 'Interview Scheduled','interview_schedule'=> Carbon::parse("$request->date $request->time")]);
+//   dd( Carbon::parse("$request->date $request->time"));
         return redirect()->back()->with('message','Successfully updated');
     }
 
