@@ -21,9 +21,11 @@ class EmployerDashboardController extends Controller
         }])->where('employer_id',  $user->id)->latest()->get();
 
         $hiredWorkers = $jobs->pluck('employedWorkers')->flatten()->unique();
+        
+        $invoices =  $user->employerInvoices()->with('worker')->get();
+        // dd($invoices);
 
-
-        return inertia('Employer/Dashboard',['jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers]);
+        return inertia('Employer/Dashboard',['jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices]);
     }
 
     public function showJobApplicants(Request $request, JobPost $jobid){

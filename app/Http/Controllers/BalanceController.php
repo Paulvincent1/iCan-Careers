@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invoice;
+use App\Models\Balance;
 use Illuminate\Http\Request;
 
-use function Illuminate\Log\log;
-
-class InvoiceController extends Controller
+class BalanceController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -33,27 +31,10 @@ class InvoiceController extends Controller
         //
     }
 
-    public function webhook(Request $request){
-
-        if($request->header('X-CALLBACK-TOKEN') === env('XENDIT_WEBHOOK_KEY')){
-
-            $invoice = Invoice::where('external_id', $request['external_id'])->with(['worker.balance'])->first();
-
-            $invoice->update([
-                'status' => $request['status']
-            ]);
-
-            $invoice->worker->balance()->increment('unsettlement', $invoice->amount);
-
-        }
-
-
-    }
-
     /**
      * Display the specified resource.
      */
-    public function show(Invoice $invoice)
+    public function show(Balance $balance)
     {
         //
     }
@@ -61,7 +42,7 @@ class InvoiceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Invoice $invoice)
+    public function edit(Balance $balance)
     {
         //
     }
@@ -69,7 +50,7 @@ class InvoiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Invoice $invoice)
+    public function update(Request $request, Balance $balance)
     {
         //
     }
@@ -77,7 +58,7 @@ class InvoiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Invoice $invoice)
+    public function destroy(Balance $balance)
     {
         //
     }

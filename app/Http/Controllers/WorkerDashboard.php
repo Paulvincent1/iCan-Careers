@@ -38,8 +38,20 @@ class WorkerDashboard extends Controller
         $savedJobs = $user->savedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
         
         $appliedJobs = $user->appliedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
-      
-        return inertia('Worker/Dashboard', ['user' => $user, 'isPending' => $isPending, 'savedJobsProps' => $savedJobs ,'jobsAppliedProps' => $appliedJobs]);
+
+        $invoiceTransactions = $user->workerInvoices()->whereIn('status',['PAID','SETTLED'])->with('employer')->get();
+        // dd($invoiceTransactions);
+
+        return inertia('Worker/Dashboard', 
+        [
+            'user' => $user,
+            'isPending' => $isPending,
+            'savedJobsProps' => $savedJobs,
+            'jobsAppliedProps' => $appliedJobs,
+            'balanceProps' => $user->balance,
+            'invoiceTransactionsProps' => $invoiceTransactions
+
+        ]);
     }
 
     public function createInvoice(){
@@ -125,7 +137,7 @@ class WorkerDashboard extends Controller
             $secondsDuration = Carbon::now()->diffInSeconds(Carbon::parse($fields['dueDate'] . ' 23:59:00'));
             // dd(Carbon::now());
 
-            $paymentUrl = $this->invoiceService
+            $resultInvoice = $this->invoiceService
             ->createInvoice(
                 externalId: $externalId,
                 description: $fields['description'],
@@ -136,13 +148,14 @@ class WorkerDashboard extends Controller
             $user->workerInvoices()
             ->create(
                 [
+                    'invoice_id' => $resultInvoice->getId(),
                     'external_id' => $externalId,
                     'description' =>  $fields['description'],
                     'amount' => $fields['totalAmount'],
                     'items' => $fields['items'],
-                    'payment_url' => $paymentUrl,
+                    'invoice_url' => $resultInvoice->getInvoiceUrl(),
                     'status' => 'pending',
-                    'due_date' => $fields['dueDate'],
+                    'due_date' => Carbon::parse($fields['dueDate'] .' 23:59:00'),
                     'paid_at' => null,
                     'employer_id' => $employer->id,
                 ]
@@ -155,7 +168,7 @@ class WorkerDashboard extends Controller
              description: $fields['description'],
              items: $items,
              totalAmount: $fields['totalAmount'],
-             paymentUrl: $paymentUrl
+             invoiceUrl: $resultInvoice->getInvoiceUrl()
             ));
 
 

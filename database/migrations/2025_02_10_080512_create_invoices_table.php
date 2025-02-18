@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
+            $table->string('invoice_id');
             $table->string('external_id');
             $table->string('description')->nullable();
-            $table->string('amount');   
+            $table->integer('amount');   
             $table->json('items');
-            $table->string('payment_url');
-            $table->enum('status', ['pending', 'paid', 'expired', 'cancelled'])->default('pending');
+            $table->string('invoice_url');
+            $table->enum('status', ['PENDING', 'PAID', 'EXPIRED','SETTLED'])->default('PENDING');
             $table->foreignId('worker_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('employer_id')->constrained('users')->cascadeOnDelete();
             $table->timestamp('due_date')->nullable();

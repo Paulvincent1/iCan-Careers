@@ -45,6 +45,15 @@ class AuthController extends Controller
                 ]);
             }
 
+            if($fields['role'] === 'PWD' || $fields['role'] === 'Senior'){
+
+                $user->balance()->create([
+                    'balance' => 0,
+                    'unsettlement' => 0,
+                ]);
+
+            }
+
             return redirect()->route('login')->with('status', 'Successfuly registered!');
     }
 

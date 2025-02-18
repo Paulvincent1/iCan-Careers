@@ -1,7 +1,8 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
-import { onMounted } from "vue";
+import { getCurrentInstance, onMounted, ref } from "vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
+import ReusableModal from "../Components/Modal/ReusableModal.vue";
 
 const props = defineProps({
     user: {
@@ -13,13 +14,24 @@ const props = defineProps({
     },
     savedJobsProps: null,
     jobsAppliedProps: null,
+    balanceProps: null,
+    invoiceTransactionsProps: null,
 });
 
-console.log(props.savedJobsProps);
+console.log(props.balanceProps);
+let balance = ref(props.balanceProps);
+let invoiceTransactions = ref(props.invoiceTransactionsProps);
 
 onMounted(() => {
     console.log(props.isVerified);
 });
+
+let openCardForm = ref(false);
+let openEwalletForm = ref(false);
+let openOnlineBanking = ref(false);
+
+const formatCurrency =
+    getCurrentInstance().appContext.config.globalProperties.formatCurrency;
 </script>
 <template>
     <div class="container mx-auto px-[0.5rem] xl:max-w-7xl">
@@ -71,7 +83,7 @@ onMounted(() => {
                     class="mb-4 grid grid-cols-1 gap-3 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
                 >
                     <div
-                        class="col-span-2 h-[350px] rounded border p-3 lg:col-span-1"
+                        class="col-span-2 h-[400px] rounded border p-3 lg:col-span-1"
                     >
                         <div class="flex justify-between">
                             <p class="p-1 font-bold">Invoice status</p>
@@ -82,8 +94,98 @@ onMounted(() => {
                             >
                         </div>
                     </div>
-                    <div class="col-span-2 rounded border p-3 lg:col-span-1">
+                    <div
+                        class="col-span-2 flex h-[400px] flex-col rounded border p-3 lg:col-span-1"
+                    >
                         <p class="font-bold">Balance</p>
+                        <div class="mb-2">
+                            <div class="mb-1">
+                                <h2 class="text-[32px]">
+                                    {{ formatCurrency(balance.balance) }}
+                                </h2>
+                                <div class="flex gap-1 text-[12px]">
+                                    <p class="text-slate-600">
+                                        {{
+                                            formatCurrency(balance.unsettlement)
+                                        }}
+                                    </p>
+                                    <p class="text-yellow-500">
+                                        (Waiting for settlement)
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex justify-start gap-3">
+                                <div
+                                    class="flex flex-col items-center justify-center"
+                                >
+                                    <div
+                                        class="flex h-10 w-10 items-center justify-center rounded bg-blue-500 p-2"
+                                    >
+                                        <i
+                                            class="bi bi-send-arrow-up-fill text-white"
+                                        ></i>
+                                    </div>
+                                    <p class="text-[12px]">Payout</p>
+                                </div>
+                                <div
+                                    class="flex flex-col items-center justify-center"
+                                >
+                                    <div
+                                        class="flex h-10 w-10 items-center justify-center rounded bg-blue-500 p-2"
+                                    >
+                                        <i
+                                            class="bi bi-info-circle-fill text-white"
+                                        ></i>
+                                    </div>
+                                    <p class="text-[12px]">Info</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p>Transactions</p>
+                        </div>
+
+                        <div class="flex-1 overflow-y-scroll">
+                            <div
+                                v-for="transaction in invoiceTransactions"
+                                class="mb-3 rounded p-4 shadow"
+                            >
+                                <div class="flex gap-2">
+                                    <div class="h-10 w-10">
+                                        <img
+                                            src="/assets/profile_placeholder.jpg"
+                                            alt=""
+                                            class="h-full w-full rounded-full"
+                                        />
+                                    </div>
+                                    <div>
+                                        <p class="text-sm">
+                                            {{ `${transaction.employer.name}` }}
+                                        </p>
+                                        <div class="flex gap-1 text-[12px]">
+                                            <p>
+                                                {{
+                                                    `PAID ${formatCurrency(transaction.amount)} `
+                                                }}
+                                            </p>
+                                            <p
+                                                :class="{
+                                                    'text-yellow-500':
+                                                        transaction.status ===
+                                                        'PAID',
+                                                    'text-green-500':
+                                                        transaction.status ===
+                                                        'SETTLED',
+                                                }"
+                                            >
+                                                {{ `(${transaction.status})` }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div
@@ -227,7 +329,7 @@ onMounted(() => {
                                                         'rounded-full bg-yellow-400 text-white':
                                                             job.pivot.status ===
                                                             'Pending',
-                                                        'rounded-full bg-slate-400 text-white under-review':
+                                                        'under-review rounded-full bg-slate-400 text-white':
                                                             job.pivot.status ===
                                                             'Under Review',
                                                         'rounded-full bg-slate-400 text-white':
@@ -284,6 +386,302 @@ onMounted(() => {
             </div>
         </div>
     </div>
+    <ReusableModal>
+        <div class="h-[500px] w-[350px] overflow-auto rounded bg-white p-2">
+            <div>
+                <h2 class="text-lg font-medium">Choose Payout option</h2>
+                <div>
+                    <div class="cursor-pointer">
+                        <div
+                            @click="openCardForm = !openCardForm"
+                            :class="[
+                                'flex items-center justify-between border p-3',
+                                {
+                                    'border-b-0': openCardForm,
+                                },
+                            ]"
+                        >
+                            <div class="flex items-center gap-2">
+                                <i class="bi bi-credit-card-2-front"></i>
+                                <p>Credit / Debit Card</p>
+                            </div>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div
+                            :class="[
+                                'card-form overflow-hidden transition-all',
+                                {
+                                    'h-[400px] border border-t-0': openCardForm,
+                                    'h-[0px]': !openCardForm,
+                                },
+                            ]"
+                        >
+                            <div class="p-4">
+                                <div class="mb-3 flex flex-col">
+                                    <label for="" class="mb-1 text-sm"
+                                        >Card Number</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="rounded border p-2"
+                                    />
+                                </div>
+                                <div class="mb-3 flex justify-between">
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >Valid Thru</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >CVN</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="mb-3 flex justify-between">
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >First Name</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >Last Name</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="mb-3 flex flex-col">
+                                    <label for="" class="mb-1 text-sm"
+                                        >Email Address</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="rounded border p-2"
+                                    />
+                                </div>
+                                <div class="flex justify-center">
+                                    <button
+                                        class="rounded bg-slate-400 p-2 text-white"
+                                    >
+                                        Pay Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cursor-pointer">
+                        <div
+                            @click="openEwalletForm = !openEwalletForm"
+                            :class="[
+                                'flex items-center justify-between border p-3',
+                                {
+                                    'border-b-0': openEwalletForm,
+                                },
+                            ]"
+                        >
+                            <div class="flex items-center gap-2">
+                                <i class="bi bi-credit-card-2-front"></i>
+                                <p>E-Wallet (Gcash)</p>
+                            </div>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div
+                            :class="[
+                                'card-form overflow-hidden transition-all',
+                                {
+                                    'h-[400px] border border-t-0':
+                                        openEwalletForm,
+                                    'h-[0px]': !openEwalletForm,
+                                },
+                            ]"
+                        >
+                            <div class="p-4">
+                                <div class="mb-3 flex flex-col">
+                                    <label for="" class="mb-1 text-sm"
+                                        >Card Number</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="rounded border p-2"
+                                    />
+                                </div>
+                                <div class="mb-3 flex justify-between">
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >Valid Thru</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >CVN</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="mb-3 flex justify-between">
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >First Name</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >Last Name</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="mb-3 flex flex-col">
+                                    <label for="" class="mb-1 text-sm"
+                                        >Email Address</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="rounded border p-2"
+                                    />
+                                </div>
+                                <div class="flex justify-center">
+                                    <button
+                                        class="rounded bg-slate-400 p-2 text-white"
+                                    >
+                                        Pay Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cursor-pointer">
+                        <div
+                            @click="openOnlineBanking = !openOnlineBanking"
+                            :class="[
+                                'flex items-center justify-between border p-3',
+                                {
+                                    'border-b-0': openOnlineBanking,
+                                },
+                            ]"
+                        >
+                            <div class="flex items-center gap-2">
+                                <i class="bi bi-credit-card-2-front"></i>
+                                <p>Online Banking (Gcash)</p>
+                            </div>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div
+                            :class="[
+                                'card-form overflow-hidden transition-all',
+                                {
+                                    'h-[400px] border border-t-0':
+                                        openOnlineBanking,
+                                    'h-[0px]': !openOnlineBanking,
+                                },
+                            ]"
+                        >
+                            <div class="p-4">
+                                <div class="mb-3 flex flex-col">
+                                    <label for="" class="mb-1 text-sm"
+                                        >Card Number</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="rounded border p-2"
+                                    />
+                                </div>
+                                <div class="mb-3 flex justify-between">
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >Valid Thru</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >CVN</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="mb-3 flex justify-between">
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >First Name</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label for="" class="mb-1 text-sm"
+                                            >Last Name</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="w-36 rounded border p-2"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="mb-3 flex flex-col">
+                                    <label for="" class="mb-1 text-sm"
+                                        >Email Address</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="rounded border p-2"
+                                    />
+                                </div>
+                                <div class="flex justify-center">
+                                    <button
+                                        class="rounded bg-slate-400 p-2 text-white"
+                                    >
+                                        Pay Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ReusableModal>
 </template>
 
 <style scoped>
@@ -294,4 +692,17 @@ onMounted(() => {
     /* background-color: green; */
     @apply bg-green-200;
 }
+
+/* @keyframes animation-down {
+    0% {
+        height: 0;
+    }
+    100% {
+        height: 300px;
+    }
+}
+
+.card-form {
+    animation: animation-down 0.2s ease-in;
+} */
 </style>

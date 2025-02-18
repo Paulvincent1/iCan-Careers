@@ -108,4 +108,8 @@ class User extends Authenticatable
     public function employerSubscription(){
         return $this->hasOne(EmployerSubscription::class,'employer_id');
     }
+
+    public function balance(){
+        return $this->hasOne(Balance::class,'worker_id');
+    }
 }

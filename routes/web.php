@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployerDashboardController;
 use App\Http\Controllers\EmployerProfileController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\JobPostController;
 use App\Http\Controllers\JobSearchController;
 use App\Http\Controllers\WorkerDashboard;
@@ -132,3 +133,6 @@ Route::middleware([ForceGetRedirect::class])->group(function() {
 
    
 });
+
+//for webhooks
+Route::post('/webhook',[InvoiceController::class, 'webhook']);

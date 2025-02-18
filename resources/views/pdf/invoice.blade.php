@@ -71,7 +71,7 @@
         </div>
         <!-- Payment Button -->
         <div class="mt-6 text-center ">
-            <a href="{{ $paymentUrl ? $paymentUrl : '#' }}" target="_blank" class="w-full inline-block bg-[#1e2e50] text-white px-6 py-3 rounded-b-lg shadow-md hover:bg-blue-700 transition">
+            <a href="{{ $invoiceUrl ? $invoiceUrl : '#' }}" target="_blank" class="w-full inline-block bg-[#1e2e50] text-white px-6 py-3 rounded-b-lg shadow-md hover:bg-blue-700 transition">
                  PAY NOW
             </a>
         </div>

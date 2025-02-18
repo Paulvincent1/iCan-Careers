@@ -2,10 +2,12 @@
 import { Link, usePage } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import { onMounted, ref } from "vue";
+import ReusableModal from "../Components/Modal/ReusableModal.vue";
 
 let props = defineProps({
     jobsProps: null,
     currentWorkerProps: null,
+    invoiceProps: null,
 });
 let page = usePage();
 let jobs = ref(null);
@@ -32,6 +34,40 @@ function switchJobTag(jobstatus) {
 }
 
 console.log(props.currentWorkerProps);
+
+let paymentModal = ref(false);
+let invoiceUrl = ref(null);
+function closePaymentModal() {
+    paymentModal.value = false;
+    invoiceUrl.value = null;
+    // location.reload();
+}
+
+function showPaymentModal(paymentUrlParam) {
+    paymentModal.value = true;
+    invoiceUrl.value = paymentUrlParam;
+}
+
+let invoiceTag = ref("PENDING");
+let invoices = ref(null);
+onMounted(() => {
+    invoices.value = props.invoiceProps.filter((invoice) => {
+        return invoice.status === "PENDING";
+    });
+});
+
+function switchInvoiceTag(tag) {
+    invoiceTag.value = tag;
+    if (tag === "PENDING") {
+        invoices.value = props.invoiceProps.filter((invoice) => {
+            return invoice.status === "PENDING";
+        });
+    } else {
+        invoices.value = props.invoiceProps.filter((invoice) => {
+            return invoice.status != "PENDING";
+        });
+    }
+}
 </script>
 <template>
     <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
@@ -218,442 +254,144 @@ console.log(props.currentWorkerProps);
                     </div>
                 </div>
                 <div
-                    class="col-span-2 h-[400px] overflow-hidden rounded border p-3 lg:col-span-1"
+                    class="col-span-1 flex h-[400px] flex-col overflow-hidden rounded border p-3"
                 >
-                    <p class="p-1 font-bold">Invoices</p>
-                    <swiper-container
-                        class="mb-3 text-[12px]"
-                        slides-per-view="auto"
-                        :space-between="10"
-                    >
-                        <swiper-slide class="w-fit">
-                            <li
-                                @click="switchJobTag('Open')"
-                                :class="[
-                                    'cursor-pointer rounded border border-green-400 p-1 text-green-400',
-                                    {
-                                        'bg-green-400 text-white':
-                                            jobTag === 'Open',
-                                    },
-                                ]"
-                            >
-                                Pending
-                            </li></swiper-slide
+                    <div>
+                        <p class="p-1 font-bold">Invoices</p>
+                        <swiper-container
+                            class="mb-3 text-[12px]"
+                            slides-per-view="auto"
+                            :space-between="10"
                         >
-                        <swiper-slide class="w-fit">
-                            <li
-                                @click="switchJobTag('Closed')"
-                                :class="[
-                                    'cursor-pointer rounded border border-red-400 p-1 text-red-400',
-                                    {
-                                        'bg-red-400 text-white':
-                                            jobTag === 'Closed',
-                                    },
-                                ]"
+                            <swiper-slide class="w-fit">
+                                <li
+                                    @click="switchInvoiceTag('PENDING')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-green-400 p-1',
+                                        {
+                                            'bg-green-400 text-white':
+                                                invoiceTag === 'PENDING',
+                                            'text-green-400':
+                                                invoiceTag != 'PENDING',
+                                        },
+                                    ]"
+                                >
+                                    Pending
+                                </li></swiper-slide
                             >
-                                History
-                            </li></swiper-slide
-                        >
-                    </swiper-container>
+                            <swiper-slide class="w-fit">
+                                <li
+                                    @click="switchInvoiceTag('HISTORY')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-green-400 p-1 text-green-400',
+                                        {
+                                            'bg-green-400 text-white':
+                                                invoiceTag === 'HISTORY',
+                                        },
+                                    ]"
+                                >
+                                    History
+                                </li></swiper-slide
+                            >
+                        </swiper-container>
+                    </div>
 
-                    <div class="h-full overflow-y-auto">
+                    <div class="flex-1 overflow-y-auto">
                         <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                            v-for="(invoice, index) in invoices"
+                            :key="invoice.id"
+                            class="mx-2 mb-2 flex items-center gap-4 rounded-full border p-3 shadow-lg"
                         >
                             <div class="h-11 w-11">
                                 <img
-                                    src="/assets/profile_placeholder.jpg"
+                                    :src="
+                                        invoice.worker.profile_img ??
+                                        '/assets/profile_placeholder.jpg'
+                                    "
                                     alt=""
                                     class="w-full rounded-full"
                                 />
                             </div>
                             <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
+                                <p class="text-sm">{{ invoice.worker.name }}</p>
+                                <p class="text-[12px]">
+                                    {{ invoice.worker.email }}
+                                </p>
+                                <div
+                                    v-if="invoice.status === 'PENDING'"
+                                    class="flex gap-2 text-blue-500"
+                                >
+                                    <a
+                                        :href="
+                                            '/storage/invoices/' +
+                                            invoice.external_id +
+                                            '.pdf'
+                                        "
+                                        target="_blank"
+                                        class="inline-block text-[12px]"
                                         >See details</a
                                     >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
+                                    <button
+                                        @click="
+                                            showPaymentModal(
+                                                invoice.invoice_url,
+                                            )
+                                        "
+                                        class="text-[12px]"
                                     >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
+                                        Pay Now
                                         <i
                                             class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
+                                        ></i>
+                                    </button>
                                 </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="mx-2 mb-1 flex items-center gap-4 rounded-full border p-3 shadow-lg"
-                        >
-                            <div class="h-11 w-11">
-                                <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
-                                    class="w-full rounded-full"
-                                />
-                            </div>
-                            <div>
-                                <p class="text-sm">Nathaniel Manzano</p>
-                                <p class="text-[12px]">nath@gmail.com</p>
-                                <div class="flex gap-2 text-blue-500">
-                                    <a href="#" class="inline-block text-[12px]"
-                                        >See details</a
-                                    >
-                                    <a href="#" class="text-[12px]"
-                                        >Pay Now
-                                        <i
-                                            class="bi bi-arrow-up-right text-[12px]"
-                                        ></i
-                                    ></a>
-                                </div>
+                                <p
+                                    v-else-if="invoice.status === 'PAID'"
+                                    :class="[
+                                        'text-[12px]',
+                                        {
+                                            'text-green-500':
+                                                invoice.status === 'PAID',
+                                        },
+                                    ]"
+                                >
+                                    {{ invoice.status }}
+                                </p>
+                                <p
+                                    v-else-if="invoice.status === 'SETTLED'"
+                                    :class="[
+                                        'text-[12px]',
+                                        {
+                                            'text-green-500':
+                                                invoice.status === 'SETTLED',
+                                        },
+                                    ]"
+                                >
+                                    {{ invoice.status }}
+                                </p>
+                                <p
+                                    v-else-if="invoice.status === 'EXPIRED'"
+                                    :class="[
+                                        'text-[12px]',
+                                        {
+                                            'text-red-500':
+                                                invoice.status === 'EXPIRED',
+                                        },
+                                    ]"
+                                >
+                                    {{ invoice.status }}
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-span-2 h-[380px] rounded border p-3">
+                <div
+                    class="col-span-2 flex h-[400px] flex-col rounded border p-3"
+                >
                     <div>
                         <p class="">Currently hired workers</p>
                     </div>
-                    <div class="overflow-auto">
+                    <div class="flex-1 overflow-auto">
                         <table class="w-full min-w-[500px] table-fixed">
                             <thead>
                                 <tr>
@@ -688,7 +426,18 @@ console.log(props.currentWorkerProps);
                                         {{ worker.email }}
                                     </td>
                                     <td class="p-2 text-center">
-                                        View Profile
+                                        <Link
+                                            as="button"
+                                            :href="
+                                                route(
+                                                    'worker.show.profile',
+                                                    worker.id,
+                                                )
+                                            "
+                                            class="text-blue-500"
+                                        >
+                                            View Profile</Link
+                                        >
                                     </td>
                                 </tr>
                             </tbody>
@@ -698,4 +447,14 @@ console.log(props.currentWorkerProps);
             </div>
         </div>
     </div>
+    <ReusableModal v-if="paymentModal" @closeModal="closePaymentModal">
+        <div class="h-[500px] w-[350px] rounded bg-white sm:w-[500px]">
+            <iframe
+                :src="invoiceUrl"
+                title="Xendit Invoice"
+                class="h-full w-full"
+            >
+            </iframe>
+        </div>
+    </ReusableModal>
 </template>

@@ -21,7 +21,7 @@ class ProcessInvoicePdf implements ShouldQueue
         public string $description,
         public array $items,
         public int $totalAmount,
-        public string $paymentUrl, 
+        public string $invoiceUrl, 
         )
     {
         //
@@ -40,7 +40,7 @@ class ProcessInvoicePdf implements ShouldQueue
             'employer' => $this->employer,
             'items' =>  $this->items,
             'totalAmount' => $this->totalAmount,
-            'paymentUrl' => $this->paymentUrl
+            'invoiceUrl' => $this->invoiceUrl
         ])->disk('public')->save('/invoices/' . $this->externalId . '.pdf');
     }
 }
