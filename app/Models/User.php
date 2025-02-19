@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_img',
+        'verified',
     ];
 
     /**
@@ -44,5 +46,70 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function roles(){
+        return $this->belongsToMany(Role::class,'role_user');
+    }
+
+    public function workerProfile(){
+        return $this->hasOne(WorkerProfile::class, 'user_id');
+    }
+
+    public function workerSkills() {
+        return $this->hasMany(WorkerSkills::class, 'user_id');
+    }
+
+    public function workerVerification(){
+        return $this->hasOne(WorkerVerification::class, 'user_id');
+    }
+
+    public function employerProfile(){
+        return $this->hasOne(EmployerProfile::class, 'user_id');
+    }
+
+    // public function businessInformation(){
+    //     return $this->hasOne(BusinessInformation::class, 'user_id');
+    // }
+
+    public function employerJobPosts(){
+        return $this->hasMany(JobPost::class,'employer_id');
+    }
+
+    public function savedJobs(){
+        return $this->belongsToMany(JobPost::class, 'job_post_user','user_id','job_post_id');
+    }
+
+    public function appliedJobs(){
+        return $this->belongsToMany(JobPost::class,'application','worker_id', 'job_post_id')
+        ->withPivot('id','status')
+        ->withTimestamps();
+    }
+
+    public function myJobs(){
+        return $this->belongsToMany(JobPost::class, 'hired_workers','worker_id','job_post_id')
+        ->withPivot('current','id')
+        ->withTimestamps();
+    }
+
+    public function workerInvoices(){
+        return $this->hasMany(Invoice::class,'worker_id');
+    }
+
+    public function employerInvoices(){
+        return $this->hasMany(Invoice::class,'employer_id');
+    }
+
+    public function employerSubscriptionInvoices(){
+        return $this->hasMany(EmployerSubscriptionInvoice::class,'employer_id');
+    }
+
+    // for tracking subscription
+    public function employerSubscription(){
+        return $this->hasOne(EmployerSubscription::class,'employer_id');
+    }
+
+    public function balance(){
+        return $this->hasOne(Balance::class,'worker_id');
     }
 }

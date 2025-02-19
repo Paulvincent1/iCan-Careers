@@ -4,6 +4,10 @@ import { createApp, h } from "vue";
 import { createInertiaApp, Head, Link } from "@inertiajs/vue3";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import Layout from "./Pages/Layouts/Layout.vue";
+import VueMaplibreGl from "@indoorequal/vue-maplibre-gl";
+import { register } from "swiper/element/bundle";
+// register Swiper custom elements
+register();
 
 createInertiaApp({
     resolve: (name) => {
@@ -13,9 +17,24 @@ createInertiaApp({
         return page;
     },
     setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
-            .use(plugin)
+        window.formatCurrencu = function (value) {
+            return new Intl.NumberFormat("en-PH", {
+                style: "currency",
+                currency: "PHP",
+            }).format(value);
+        };
+        const app = createApp({ render: () => h(App, props) });
+
+        app.config.globalProperties.formatCurrency = function (value) {
+            return new Intl.NumberFormat("en-PH", {
+                style: "currency",
+                currency: "PHP",
+            }).format(value);
+        };
+
+        app.use(plugin)
             .use(ZiggyVue)
+            .use(VueMaplibreGl)
             .component("Head", Head)
             .component("Link", Link)
             .mount(el);
