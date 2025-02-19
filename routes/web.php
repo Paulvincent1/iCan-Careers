@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployerDashboardController;
 use App\Http\Controllers\EmployerProfileController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
 use App\Http\Controllers\WorkerVerificationController;
 use App\Http\Middleware\ForceGetRedirect;
+use App\Http\Middleware\isAdmin;
 use App\Http\Middleware\isEmployer;
 use App\Http\Middleware\isWorker;
 use Illuminate\Support\Facades\Auth;
@@ -118,6 +120,15 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
     Route::put('/applicants/{pivotId}',[EmployerDashboardController::class, 'updateStatus'])->name('job.applicants.update.status');
     Route::put('/applicants/{pivotId}/add-interview-schedule',[EmployerDashboardController::class, 'addInterview'])->name('job.applicants.addinterview');
 
+});
+
+
+Route::prefix('admin')->middleware([])->group(function (){
+    Route::get('/',[AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/workers',[AdminDashboardController::class, 'workers'])->name('admin.workers');
+    Route::get('/employers',[AdminDashboardController::class, 'employers'])->name('admin.employers');
+    Route::get('/reported-users',[AdminDashboardController::class, 'reportedUsers'])->name('admin.reported.uers');
+    Route::get('/job-approvals',[AdminDashboardController::class, 'jobApprovals'])->name('admin.job.approvals');
 });
 
 
