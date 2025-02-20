@@ -1,4 +1,6 @@
 <script setup>
+import { Link } from "@inertiajs/vue3";
+import { getCurrentInstance, onMounted, ref } from "vue";
 import { defineProps, defineEmits } from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -48,33 +50,34 @@ const closeSidebarOnMobile = () => {
         </div>
 
         <nav class="mt-5">
-            <RouterLink
+            <!-- Use Inertia's Link component instead of RouterLink -->
+            <Link
                 @click="closeSidebarOnMobile"
-                to="/"
+                href="/admin"
                 class="block flex items-center p-3 hover:bg-gray-700"
             >
                 <font-awesome-icon :icon="['fas', 'chart-bar']" class="mr-2" />
                 Dashboard
-            </RouterLink>
-            <RouterLink
+            </Link>
+            <Link
                 @click="closeSidebarOnMobile"
-                to="/workers"
+                href="/admin/workers"
                 class="block flex items-center p-3 hover:bg-gray-700"
             >
                 <font-awesome-icon :icon="['fas', 'user-check']" class="mr-2" />
                 Workers
-            </RouterLink>
-            <RouterLink
+            </Link>
+            <Link
                 @click="closeSidebarOnMobile"
-                to="/employers"
+                href="/admin/employers"
                 class="block flex items-center p-3 hover:bg-gray-700"
             >
                 <font-awesome-icon :icon="['fas', 'building']" class="mr-2" />
                 Employers
-            </RouterLink>
-            <RouterLink
+            </Link>
+            <Link
                 @click="closeSidebarOnMobile"
-                to="/reported-users"
+                href="/admin/reported-users"
                 class="flex items-center p-3 hover:bg-gray-700"
             >
                 <font-awesome-icon
@@ -82,10 +85,10 @@ const closeSidebarOnMobile = () => {
                     class="mr-2"
                 />
                 Reported Users
-            </RouterLink>
-            <RouterLink
+            </Link>
+            <Link
                 @click="closeSidebarOnMobile"
-                to="/job-approvals"
+                href="/admin/job-approvals"
                 class="flex items-center p-3 hover:bg-gray-700"
             >
                 <font-awesome-icon
@@ -93,10 +96,11 @@ const closeSidebarOnMobile = () => {
                     class="mr-2"
                 />
                 Job Approvals
-            </RouterLink>
+            </Link>
         </nav>
     </aside>
 </template>
+
 <style scoped>
 /* Ensures smooth transitions */
 aside {

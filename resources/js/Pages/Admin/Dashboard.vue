@@ -1,4 +1,6 @@
 <script setup>
+import { useForm } from "@inertiajs/vue3";
+import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
 import DashboardChart from "../Components/Admin/DashboardChart.vue";
 
