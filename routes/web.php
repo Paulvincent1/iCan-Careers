@@ -125,7 +125,8 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
 
 Route::prefix('admin')->middleware([])->group(function (){
     Route::get('/',[AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/workers',[AdminDashboardController::class, 'workers'])->name('admin.workers');
+    Route::get('/workers', [AdminDashboardController::class, 'workers'])->name('admin.workers');
+    Route::put('/workers/{id}/verify', [AdminDashboardController::class, 'toggleVerification'])->name('admin.workers.verify');
     Route::get('/employers',[AdminDashboardController::class, 'employers'])->name('admin.employers');
     Route::get('/reported-users',[AdminDashboardController::class, 'reportedUsers'])->name('admin.reported.uers');
     Route::get('/job-approvals',[AdminDashboardController::class, 'jobApprovals'])->name('admin.job.approvals');
