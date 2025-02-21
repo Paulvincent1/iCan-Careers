@@ -57,4 +57,17 @@ class AdminDashboardController extends Controller
     {
         return Inertia::render('Admin/JobApprovals');
     }
+
+    public function paymentHistory()
+    {
+        return Inertia::render('Admin/PaymentHistory');
+    }
+
+    public function subscribeUsers()
+    
+    {
+        return Inertia::render('Admin/SubscribeUser');
+    }
+
+
 }

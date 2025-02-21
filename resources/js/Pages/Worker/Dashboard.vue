@@ -26,6 +26,16 @@ onMounted(() => {
     console.log(props.isVerified);
 });
 
+let openPayoutModal = ref(false);
+function openModalPayout() {
+    openPayoutModal.value = true;
+}
+
+function closeModalPayout() {
+    openPayoutModal.value = false;
+}
+
+
 let openCardForm = ref(false);
 let openEwalletForm = ref(false);
 let openOnlineBanking = ref(false);
@@ -115,7 +125,7 @@ const formatCurrency =
                                 </div>
                             </div>
                             <div class="flex justify-start gap-3">
-                                <div
+                                <div @click="openModalPayout"
                                     class="flex flex-col items-center justify-center"
                                 >
                                     <div
@@ -386,12 +396,12 @@ const formatCurrency =
             </div>
         </div>
     </div>
-    <ReusableModal>
+    <ReusableModal @closeModal="closeModalPayout" v-if="openPayoutModal">
         <div class="h-[500px] w-[350px] overflow-auto rounded bg-white p-2">
             <div>
                 <h2 class="text-lg font-medium">Choose Payout option</h2>
                 <div>
-                    <div class="cursor-pointer">
+                    <!-- <div class="cursor-pointer">
                         <div
                             @click="openCardForm = !openCardForm"
                             :class="[
@@ -485,7 +495,7 @@ const formatCurrency =
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="cursor-pointer">
                         <div
                             @click="openEwalletForm = !openEwalletForm"
@@ -507,7 +517,7 @@ const formatCurrency =
                             :class="[
                                 'card-form overflow-hidden transition-all',
                                 {
-                                    'h-[400px] border border-t-0':
+                                    'h-[350px] border border-t-0':
                                         openEwalletForm,
                                     'h-[0px]': !openEwalletForm,
                                 },
@@ -516,62 +526,35 @@ const formatCurrency =
                             <div class="p-4">
                                 <div class="mb-3 flex flex-col">
                                     <label for="" class="mb-1 text-sm"
-                                        >Card Number</label
+                                        >Amount</label
                                     >
                                     <input
-                                        type="text"
+                                        type="number"                      
                                         class="rounded border p-2"
                                     />
-                                </div>
-                                <div class="mb-3 flex justify-between">
-                                    <div class="flex flex-col">
-                                        <label for="" class="mb-1 text-sm"
-                                            >Valid Thru</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="w-36 rounded border p-2"
-                                        />
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label for="" class="mb-1 text-sm"
-                                            >CVN</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="w-36 rounded border p-2"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="mb-3 flex justify-between">
-                                    <div class="flex flex-col">
-                                        <label for="" class="mb-1 text-sm"
-                                            >First Name</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="w-36 rounded border p-2"
-                                        />
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label for="" class="mb-1 text-sm"
-                                            >Last Name</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="w-36 rounded border p-2"
-                                        />
-                                    </div>
                                 </div>
                                 <div class="mb-3 flex flex-col">
                                     <label for="" class="mb-1 text-sm"
-                                        >Email Address</label
+                                        >Account Name</label
                                     >
                                     <input
                                         type="text"
+                                        value="TEST"
+                                        disabled
                                         class="rounded border p-2"
                                     />
                                 </div>
+                                <div class="mb-3 flex flex-col">
+                                    <label for="" class="mb-1 text-sm"
+                                        >Gcash Number</label
+                                    >
+                                    <input
+                                        type="number"
+                                        value="09989878978"
+                                        class="rounded border p-2"
+                                    />
+                                </div>
+                                
                                 <div class="flex justify-center">
                                     <button
                                         class="rounded bg-slate-400 p-2 text-white"
@@ -594,7 +577,7 @@ const formatCurrency =
                         >
                             <div class="flex items-center gap-2">
                                 <i class="bi bi-credit-card-2-front"></i>
-                                <p>Online Banking (Gcash)</p>
+                                <p>Online Banking (BPI)</p>
                             </div>
                             <i class="bi bi-chevron-down"></i>
                         </div>
@@ -603,7 +586,7 @@ const formatCurrency =
                             :class="[
                                 'card-form overflow-hidden transition-all',
                                 {
-                                    'h-[400px] border border-t-0':
+                                    'h-[350px] border border-t-0':
                                         openOnlineBanking,
                                     'h-[0px]': !openOnlineBanking,
                                 },
@@ -612,62 +595,36 @@ const formatCurrency =
                             <div class="p-4">
                                 <div class="mb-3 flex flex-col">
                                     <label for="" class="mb-1 text-sm"
+                                        >Amount</label
+                                    >
+                                    <input
+                                        type="number"
+                                        class="rounded border p-2"
+                                    />
+                                </div>
+                                <div class="mb-3 flex flex-col">
+                                    <label for="" class="mb-1 text-sm"
+                                        >Acount Name</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="rounded border p-2"
+                                        value="John Doe"
+                                        disabled
+                                    />
+                                </div>
+                                <div class="mb-3 flex flex-col">
+                                    <label for="" class="mb-1 text-sm"
                                         >Card Number</label
                                     >
                                     <input
                                         type="text"
+                                        disabled
+                                        value="000000"
                                         class="rounded border p-2"
                                     />
                                 </div>
-                                <div class="mb-3 flex justify-between">
-                                    <div class="flex flex-col">
-                                        <label for="" class="mb-1 text-sm"
-                                            >Valid Thru</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="w-36 rounded border p-2"
-                                        />
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label for="" class="mb-1 text-sm"
-                                            >CVN</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="w-36 rounded border p-2"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="mb-3 flex justify-between">
-                                    <div class="flex flex-col">
-                                        <label for="" class="mb-1 text-sm"
-                                            >First Name</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="w-36 rounded border p-2"
-                                        />
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label for="" class="mb-1 text-sm"
-                                            >Last Name</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="w-36 rounded border p-2"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="mb-3 flex flex-col">
-                                    <label for="" class="mb-1 text-sm"
-                                        >Email Address</label
-                                    >
-                                    <input
-                                        type="text"
-                                        class="rounded border p-2"
-                                    />
-                                </div>
+                               
                                 <div class="flex justify-center">
                                     <button
                                         class="rounded bg-slate-400 p-2 text-white"

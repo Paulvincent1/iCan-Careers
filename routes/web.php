@@ -130,6 +130,8 @@ Route::prefix('admin')->middleware([])->group(function (){
     Route::get('/employers',[AdminDashboardController::class, 'employers'])->name('admin.employers');
     Route::get('/reported-users',[AdminDashboardController::class, 'reportedUsers'])->name('admin.reported.uers');
     Route::get('/job-approvals',[AdminDashboardController::class, 'jobApprovals'])->name('admin.job.approvals');
+    Route::get('/payment-history',[AdminDashboardController::class, 'paymentHistory'])->name('admin.payment-history');
+    Route::get('/table-subscription',[AdminDashboardController::class, 'subscribeUsers'])->name('admin.table-subscription');
 });
 
 
