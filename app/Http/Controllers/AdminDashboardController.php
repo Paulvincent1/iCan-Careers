@@ -25,6 +25,19 @@ class AdminDashboardController extends Controller
         ]);
     }
 
+    public function workerVerificationDetails($id)
+{
+    // Fetch the worker with verification details
+    $worker = User::with('workerVerification')->find($id);
+
+    if (!$worker) {
+        abort(404, 'Worker not found');
+    }
+    return Inertia::render('Admin/WorkerVerificationDetails', [
+        'worker' => $worker,
+        'verification' => $worker->workerVerification,
+    ]);
+}
     public function verifyWorker($id)
     {
         $worker = User::findOrFail($id);
@@ -33,6 +46,8 @@ class AdminDashboardController extends Controller
 
         return back()->with('success', 'Worker verified successfully.');
     }
+
+    
 
     public function toggleVerification($id)
     {
