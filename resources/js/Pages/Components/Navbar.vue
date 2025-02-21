@@ -55,7 +55,9 @@ window.addEventListener("resize", () => {
                         <Link href="/" @click="isActive = false">Learning</Link>
                     </li>
                     <li class="md:my-auto md:pr-5">
-                        <Link href="/" @click="isActive = false">Pricing</Link>
+                        <Link href="/pricing" @click="isActive = false"
+                            >Pricing</Link
+                        >
                     </li>
                     <!-- <li class="md:my-auto">
                         <Link

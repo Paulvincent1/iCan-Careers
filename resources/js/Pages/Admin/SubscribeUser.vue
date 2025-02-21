@@ -4,7 +4,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faSearch, faUser } from "@fortawesome/free-solid-svg-icons";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
-import DashboardChart from "../Components/Admin/DashboardChart.vue";
+
 
 defineOptions({
     layout: AdminLayout,

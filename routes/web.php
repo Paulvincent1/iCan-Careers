@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployerDashboardController;
 use App\Http\Controllers\EmployerProfileController;
+use App\Http\Controllers\EmployerSubscriptionController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\JobPostController;
 use App\Http\Controllers\JobSearchController;
@@ -127,11 +128,14 @@ Route::prefix('admin')->middleware([])->group(function (){
     Route::get('/',[AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/workers', [AdminDashboardController::class, 'workers'])->name('admin.workers');
     Route::put('/workers/{id}/verify', [AdminDashboardController::class, 'toggleVerification'])->name('admin.workers.verify');
+    Route::get('/workers/{id}/verification', [AdminDashboardController::class, 'workerVerificationDetails'])
+    ->name('admin.workers.verification'); 
     Route::get('/employers',[AdminDashboardController::class, 'employers'])->name('admin.employers');
     Route::get('/reported-users',[AdminDashboardController::class, 'reportedUsers'])->name('admin.reported.uers');
     Route::get('/job-approvals',[AdminDashboardController::class, 'jobApprovals'])->name('admin.job.approvals');
     Route::get('/payment-history',[AdminDashboardController::class, 'paymentHistory'])->name('admin.payment-history');
     Route::get('/table-subscription',[AdminDashboardController::class, 'subscribeUsers'])->name('admin.table-subscription');
+    
 });
 
 
@@ -150,3 +154,7 @@ Route::middleware([ForceGetRedirect::class])->group(function() {
 
 //for webhooks
 Route::post('/webhook',[InvoiceController::class, 'webhook']);
+
+Route::get('/pricing',[EmployerSubscriptionController::class, 'Pricing'])->name('pricing');
+
+

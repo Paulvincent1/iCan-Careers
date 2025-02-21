@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EmployerSubscription;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class EmployerSubscriptionController extends Controller
 {
@@ -13,6 +14,11 @@ class EmployerSubscriptionController extends Controller
     public function index()
     {
         //
+    }
+    
+    public function pricing()
+    {
+        return Inertia::render('Pricing/Pricing');
     }
 
     /**
@@ -62,4 +68,5 @@ class EmployerSubscriptionController extends Controller
     {
         //
     }
+    
 }
