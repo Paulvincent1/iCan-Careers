@@ -1,7 +1,6 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
-import { getCurrentInstance, onMounted, ref } from "vue";
-import { defineProps, defineEmits } from "vue";
+import { ref } from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
@@ -10,6 +9,9 @@ import {
     faBuilding,
     faExclamationTriangle,
     faClipboardCheck,
+    faMoneyBillWave, // Added payment icon
+    faHistory,
+    faUserTag
 } from "@fortawesome/free-solid-svg-icons";
 
 // Add icons to FontAwesome library
@@ -19,6 +21,9 @@ library.add(
     faBuilding,
     faExclamationTriangle,
     faClipboardCheck,
+    faMoneyBillWave,
+    faHistory,
+    faUserTag
 );
 
 defineProps({
@@ -31,6 +36,12 @@ const closeSidebarOnMobile = () => {
     if (window.innerWidth < 768) {
         emit("toggleSidebar"); // Only close on small screens
     }
+};
+
+// State to handle payment dropdown visibility
+const isPaymentOpen = ref(false);
+const togglePaymentDropdown = () => {
+    isPaymentOpen.value = !isPaymentOpen.value;
 };
 </script>
 
@@ -50,7 +61,6 @@ const closeSidebarOnMobile = () => {
         </div>
 
         <nav class="mt-5">
-            <!-- Use Inertia's Link component instead of RouterLink -->
             <Link
                 @click="closeSidebarOnMobile"
                 href="/admin"
@@ -97,6 +107,38 @@ const closeSidebarOnMobile = () => {
                 />
                 Job Approvals
             </Link>
+
+            <!-- Payment Section with Dropdown -->
+            <div>
+                <button
+                    @click="togglePaymentDropdown"
+                    class="w-full flex items-center justify-between p-3 hover:bg-gray-700 focus:outline-none"
+                >
+                    <div class="flex items-center">
+                        <font-awesome-icon :icon="['fas', 'money-bill-wave']" class="mr-2" />
+                        Payment
+                    </div>
+                    <span>{{ isPaymentOpen ? "▼" : "▶" }}</span>
+                </button>
+                <div v-if="isPaymentOpen" class="ml-6">
+                    <Link
+                        @click="closeSidebarOnMobile"
+                        href="/admin/payment-history"
+                        class="block flex items-center p-3 hover:bg-gray-700"
+                    >
+                        <font-awesome-icon :icon="['fas', 'history']" class="mr-2" />
+                        Payment History
+                    </Link>
+                    <Link
+                        @click="closeSidebarOnMobile"
+                        href="/admin/table-subscription"
+                        class="block flex items-center p-3 hover:bg-gray-700"
+                    >
+                        <font-awesome-icon :icon="['fas', 'user-tag']" class="mr-2" />
+                        Subscribed Users
+                    </Link>
+                </div>
+            </div>
         </nav>
     </aside>
 </template>
