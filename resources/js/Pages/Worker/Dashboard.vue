@@ -16,7 +16,20 @@ const props = defineProps({
     jobsAppliedProps: null,
     balanceProps: null,
     invoiceTransactionsProps: null,
+    invoicesProps: null,
 });
+
+console.log(props.invoicesProps);
+
+let invoices = ref(props.invoicesProps);
+let invoiceTag = ref("PENDING");
+
+function switchInvoiceTag(tag) {
+    invoices.value = props.invoicesProps.filter((invoice) => {
+        return invoice.status === tag;
+    });
+    invoiceTag.value = tag;
+}
 
 console.log(props.balanceProps);
 let balance = ref(props.balanceProps);
@@ -34,7 +47,6 @@ function openModalPayout() {
 function closeModalPayout() {
     openPayoutModal.value = false;
 }
-
 
 let openCardForm = ref(false);
 let openEwalletForm = ref(false);
@@ -96,12 +108,133 @@ const formatCurrency =
                         class="col-span-2 h-[400px] rounded border p-3 lg:col-span-1"
                     >
                         <div class="flex justify-between">
-                            <p class="p-1 font-bold">Invoice status</p>
+                            <p class="p-1 font-bold">Invoices</p>
                             <Link
                                 :href="route('worker.create.invoice')"
-                                class="p-1"
+                                class="p-1 text-blue-500"
                                 >Create invoice</Link
                             >
+                        </div>
+                        <swiper-container
+                            class="mb-3 text-[12px]"
+                            slides-per-view="auto"
+                            :space-between="10"
+                        >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    @click="switchInvoiceTag('PENDING')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-yellow-400 p-1',
+                                        {
+                                            'bg-yellow-400 text-white':
+                                                invoiceTag === 'PENDING',
+                                            'text-yellow-400':
+                                                invoiceTag != 'PENDING',
+                                        },
+                                    ]"
+                                >
+                                    Pending
+                                </li></swiper-slide
+                            >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    @click="switchInvoiceTag('PAID')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-green-400 p-1 text-green-400',
+                                        {
+                                            'bg-green-400 text-white':
+                                                invoiceTag === 'PAID',
+                                        },
+                                    ]"
+                                >
+                                    Paid
+                                </li></swiper-slide
+                            >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    @click="switchInvoiceTag('EXPIRED')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-red-400 p-1 text-red-400',
+                                        {
+                                            'bg-red-400 text-white':
+                                                invoiceTag === 'EXPIRED',
+                                        },
+                                    ]"
+                                >
+                                    Expired
+                                </li></swiper-slide
+                            >
+                        </swiper-container>
+                        <div class="w-full">
+                            <table class="w-full table-fixed">
+                                <thead class="bg-slate-300">
+                                    <tr>
+                                        <th class="font-normal text-slate-500">
+                                            External ID
+                                        </th>
+                                        <th class="font-normal text-slate-500">
+                                            Employer
+                                        </th>
+                                        <th class="font-normal text-slate-500">
+                                            Amount
+                                        </th>
+                                        <th class="font-normal text-slate-500">
+                                            Status
+                                        </th>
+                                        <th class="font-normal text-slate-500">
+                                            View
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm">
+                                    <tr
+                                        v-for="(invoice, index) in invoices"
+                                        :key="invoice.id"
+                                        class="break-words text-center"
+                                    >
+                                        <td class="p-1">
+                                            {{ invoice.external_id }}
+                                        </td>
+                                        <td class="p-1">
+                                            {{ invoice.employer.email }}
+                                        </td>
+                                        <td class="p-1">
+                                            {{ formatCurrency(invoice.amount) }}
+                                        </td>
+                                        <td
+                                            :class="[
+                                                'p-1',
+                                                {
+                                                    'text-yellow-500':
+                                                        invoice.status ===
+                                                        'PENDING',
+                                                    'text-green-500':
+                                                        invoice.status ===
+                                                            'PAID' ||
+                                                        invoice.status ===
+                                                            'SETTLED',
+                                                    'text-red-500':
+                                                        invoice.status ===
+                                                        'EXPIRED',
+                                                },
+                                            ]"
+                                        >
+                                            {{ invoice.status }}
+                                        </td>
+                                        <td class="p-1">
+                                            <a
+                                                class="rounded bg-blue-500 p-2 text-white"
+                                                :href="`/storage/invoices/${invoice.external_id}.pdf`"
+                                                target="_blank"
+                                            >
+                                                <i
+                                                    class="bi bi-box-arrow-up-right"
+                                                ></i
+                                            ></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     <div
@@ -125,7 +258,8 @@ const formatCurrency =
                                 </div>
                             </div>
                             <div class="flex justify-start gap-3">
-                                <div @click="openModalPayout"
+                                <div
+                                    @click="openModalPayout"
                                     class="flex flex-col items-center justify-center"
                                 >
                                     <div
@@ -399,7 +533,7 @@ const formatCurrency =
     <ReusableModal @closeModal="closeModalPayout" v-if="openPayoutModal">
         <div class="h-[500px] w-[350px] overflow-auto rounded bg-white p-2">
             <div>
-                <h2 class="text-lg font-medium">Choose Payout option</h2>
+                <h2 class="mb-5 text-xl font-medium">Choose Payout option</h2>
                 <div>
                     <!-- <div class="cursor-pointer">
                         <div
@@ -508,7 +642,16 @@ const formatCurrency =
                         >
                             <div class="flex items-center gap-2">
                                 <i class="bi bi-credit-card-2-front"></i>
-                                <p>E-Wallet (Gcash)</p>
+                                <div class="flex items-center">
+                                    <p>E-Wallet</p>
+                                    <div class="h-10 w-14">
+                                        <img
+                                            src="/assets/GCash.png"
+                                            alt=""
+                                            class="h-full w-full"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                             <i class="bi bi-chevron-down"></i>
                         </div>
@@ -529,9 +672,15 @@ const formatCurrency =
                                         >Amount</label
                                     >
                                     <input
-                                        type="number"                      
+                                        type="number"
                                         class="rounded border p-2"
+                                        :max="balance.balance"
+                                        min="0"
                                     />
+                                    <p class="text-sm">
+                                        Available Balance:
+                                        {{ formatCurrency(balance.balance) }}
+                                    </p>
                                 </div>
                                 <div class="mb-3 flex flex-col">
                                     <label for="" class="mb-1 text-sm"
@@ -550,11 +699,10 @@ const formatCurrency =
                                     >
                                     <input
                                         type="number"
-                                        value="09989878978"
                                         class="rounded border p-2"
                                     />
                                 </div>
-                                
+
                                 <div class="flex justify-center">
                                     <button
                                         class="rounded bg-slate-400 p-2 text-white"
@@ -577,7 +725,14 @@ const formatCurrency =
                         >
                             <div class="flex items-center gap-2">
                                 <i class="bi bi-credit-card-2-front"></i>
-                                <p>Online Banking (BPI)</p>
+                                <p>Online Banking</p>
+                                <div class="h-10 w-10">
+                                    <img
+                                        src="/assets/BPI.jpg"
+                                        alt=""
+                                        class="h-full w-full"
+                                    />
+                                </div>
                             </div>
                             <i class="bi bi-chevron-down"></i>
                         </div>
@@ -601,6 +756,10 @@ const formatCurrency =
                                         type="number"
                                         class="rounded border p-2"
                                     />
+                                    <p class="text-sm">
+                                        Available Balance:
+                                        {{ formatCurrency(balance.balance) }}
+                                    </p>
                                 </div>
                                 <div class="mb-3 flex flex-col">
                                     <label for="" class="mb-1 text-sm"
@@ -609,7 +768,6 @@ const formatCurrency =
                                     <input
                                         type="text"
                                         class="rounded border p-2"
-                                        value="John Doe"
                                         disabled
                                     />
                                 </div>
@@ -624,7 +782,7 @@ const formatCurrency =
                                         class="rounded border p-2"
                                     />
                                 </div>
-                               
+
                                 <div class="flex justify-center">
                                     <button
                                         class="rounded bg-slate-400 p-2 text-white"
@@ -642,13 +800,12 @@ const formatCurrency =
 </template>
 
 <style scoped>
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
     @apply w-1;
 }
 ::-webkit-scrollbar-thumb {
-    /* background-color: green; */
     @apply bg-green-200;
-}
+} */
 
 /* @keyframes animation-down {
     0% {

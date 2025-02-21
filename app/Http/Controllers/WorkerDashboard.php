@@ -40,6 +40,8 @@ class WorkerDashboard extends Controller
         $appliedJobs = $user->appliedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
 
         $invoiceTransactions = $user->workerInvoices()->whereIn('status',['PAID','SETTLED'])->with('employer')->get();
+
+        $invoices = $user->workerInvoices;
         // dd($invoiceTransactions);
 
         return inertia('Worker/Dashboard', 
@@ -49,7 +51,8 @@ class WorkerDashboard extends Controller
             'savedJobsProps' => $savedJobs,
             'jobsAppliedProps' => $appliedJobs,
             'balanceProps' => $user->balance,
-            'invoiceTransactionsProps' => $invoiceTransactions
+            'invoiceTransactionsProps' => $invoiceTransactions,
+            'invoicesProps' => $invoices->load('employer'),
 
         ]);
     }
