@@ -3,9 +3,17 @@ import PricingPlan from "../Components/Pricing/PricingPlan.vue";
 import WhyChooseUs from "../Components/Pricing/WhyChooseUs.vue";
 import FAQSection from "../Components/Pricing/FAQSection.vue";
 import Footer from "../Components/Admin/Footer.vue";
+import ReusableModal from "../Components/Modal/ReusableModal.vue";
+import { ref } from "vue";
+
+let props = defineProps({
+    subscriptionInvoicesProps: null,
+});
+
 const pricingPlans = [
     {
         title: "Free",
+        tag: "Free",
         subtitle: "Why No Free Trial?",
         price: "Free",
         features: [
@@ -16,9 +24,10 @@ const pricingPlans = [
         borderColor: "border-green-500",
     },
     {
-        title: "Complete Edition",
+        title: "Pro Tier",
+        tag: "Pro",
         subtitle: "Monthly",
-        price: "₱499",
+        price: "₱3999",
         features: [
             { text: "Communicate with Workers" },
             { text: "Hire Workers" },
@@ -28,9 +37,10 @@ const pricingPlans = [
         borderColor: "border-blue-500",
     },
     {
-        title: "Ultimate Edition",
-        subtitle: "Monthly",
-        price: "₱999",
+        title: "Premium Tier",
+        tag: "Premium",
+        subtitle: "Anually",
+        price: "₱5699",
         features: [
             { text: "Communicate with Workers" },
             { text: "Hire Workers" },
@@ -110,6 +120,31 @@ const faqs = [
         ],
     },
 ];
+
+let isOpenInvoiceModal = ref(false);
+let invoice = ref(null);
+function openInvoiceModal(e) {
+    if (e === "Pro") {
+        invoice.value = props.subscriptionInvoicesProps.find(
+            (invoice) => invoice.subscription_type === "Pro",
+        );
+        isOpenInvoiceModal.value = true;
+    }
+    if (e === "Premium") {
+        invoice.value = props.subscriptionInvoicesProps.find(
+            (invoice) => invoice.subscription_type === "Premium",
+        );
+        isOpenInvoiceModal.value = true;
+    }
+
+    // console.log(invoice.value);
+}
+
+function closeInvoiceModal() {
+    console.log("close");
+
+    isOpenInvoiceModal.value = false;
+}
 </script>
 
 <template>
@@ -145,6 +180,7 @@ const faqs = [
 
             <div class="my-5 grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3">
                 <PricingPlan
+                    @buyNow="openInvoiceModal"
                     v-for="(plan, index) in pricingPlans"
                     :key="index"
                     :title="plan.title"
@@ -152,6 +188,7 @@ const faqs = [
                     :price="plan.price"
                     :features="plan.features"
                     :borderColor="plan.borderColor"
+                    :tag="plan.tag"
                 />
             </div>
         </div>
@@ -162,4 +199,15 @@ const faqs = [
     <FAQSection :faqs="faqs" />
 
     <Footer />
+
+    <ReusableModal v-if="isOpenInvoiceModal" @closeModal="closeInvoiceModal">
+        <div class="h-[500px] w-[350px] rounded bg-white sm:w-[500px]">
+            <iframe
+                :src="invoice.payment_url"
+                title="Xendit Invoice"
+                class="h-full w-full"
+            >
+            </iframe>
+        </div>
+    </ReusableModal>
 </template>

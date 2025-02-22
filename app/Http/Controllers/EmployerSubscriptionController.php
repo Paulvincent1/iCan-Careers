@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmployerSubscription;
+use App\Models\EmployerSubscriptionInvoice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class EmployerSubscriptionController extends Controller
@@ -18,7 +20,10 @@ class EmployerSubscriptionController extends Controller
     
     public function pricing()
     {
-        return Inertia::render('Pricing/Pricing');
+
+        $user = Auth::user();
+        $subscriptionInvoices =  $user->employerSubscriptionInvoices;
+        return Inertia::render('Pricing/Pricing', ['subscriptionInvoicesProps' => $subscriptionInvoices]);
     }
 
     /**

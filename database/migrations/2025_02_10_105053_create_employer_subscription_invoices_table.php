@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('external_id');
             $table->string('description');
-            $table->string('payment_url');
+            $table->string('invoice_url');
             $table->enum('subscription_type',['Free','Pro','Premium']);
             $table->foreignId('employer_id')->constrained('users')->cascadeOnDelete();
             $table->timestamp('duration');

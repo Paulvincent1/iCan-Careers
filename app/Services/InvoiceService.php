@@ -21,7 +21,7 @@ class InvoiceService {
         $this->apiInstance = new InvoiceApi();
     }
 
-    public function createInvoice(string $externalId, string $description, array $items, int $duration){
+    public function createInvoice(string $externalId, string $description, array $items, int $duration = null){
 
         $invoicesItems = [];
         $totalAmount = 0;
