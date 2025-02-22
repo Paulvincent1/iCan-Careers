@@ -48,7 +48,7 @@ const togglePaymentDropdown = () => {
 <template>
     <aside
         :class="[
-            'fixed left-0 top-0 z-50 h-full w-64 bg-gray-900 text-white transition-transform duration-300 ease-in-out',
+            'fixed left-0 top-0 z-50 h-full w-64 bg-gradient-to-r from-blue-900 to-indigo-900 text-white transition-transform duration-300 ease-in-out',
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full', // Controls visibility
         ]"
     >
