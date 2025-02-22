@@ -14,7 +14,7 @@ defineProps({
         </svg>
       </button>
     </div>
-    <div class="text-xl font-bold">Admin Dashboard</div>
+    <div class="text-xl font-bold"> <img src="/assets/iCanCareersLogo.jpg" alt="" class="h-10 md:h-10 lg:h-16 w-auto object-contain"></div>
     <div>
       <!-- User Profile or Other Nav Items -->
     </div>

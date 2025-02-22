@@ -8,6 +8,7 @@ use App\Http\Controllers\EmployerSubscriptionController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\JobPostController;
 use App\Http\Controllers\JobSearchController;
+use App\Http\Controllers\LearningController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
@@ -155,6 +156,8 @@ Route::middleware([ForceGetRedirect::class])->group(function() {
 //for webhooks
 Route::post('/webhook',[InvoiceController::class, 'webhook']);
 
-Route::get('/pricing',[EmployerSubscriptionController::class, 'Pricing'])->name('pricing');
+Route::get('/pricing',[EmployerSubscriptionController::class, 'pricing'])->name('pricing');
+Route::get('/learning',[LearningController::class, 'learning'])->name('learning');
+
 
 

@@ -115,7 +115,7 @@ const faqs = [
 <template>
     <Head title="Pricing" />
     <section
-        class="relative bg-gradient-to-r from-blue-700 to-indigo-600 py-20 text-center text-white"
+        class="relative bg-gradient-to-r from-blue-900 to-indigo-900 py-20 text-center text-white"
     >
         <div class="container mx-auto px-6">
             <h1 class="animate-fadeIn mb-4 text-4xl font-bold sm:text-5xl">

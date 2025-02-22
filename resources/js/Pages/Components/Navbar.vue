@@ -39,7 +39,11 @@ window.addEventListener("resize", () => {
         <header
             class="xs container mx-auto flex h-[4.625rem] items-center justify-between px-[0.5rem] xl:max-w-7xl"
         >
-            <p class=""><Link :href="route('home')">iCan Careers</Link></p>
+            <p class="">
+                <Link :href="route('home')"
+                    ><img src="/assets/iCanCareersLogo.jpg" alt="" class="h-10 md:h-14 lg:h-16 w-auto object-contain"
+                /></Link>
+            </p>
             <nav
                 :class="[
                     'fixed inset-0 top-[4.626rem] z-[1000] flex h-[calc(100vh-4.625rem)] w-full flex-col items-center overflow-auto bg-white transition-all md:static md:inset-0 md:h-[100%] md:w-auto md:translate-x-0 md:flex-row md:overflow-visible',
@@ -52,7 +56,9 @@ window.addEventListener("resize", () => {
                     class="flex h-[100%] flex-col items-center justify-start gap-16 py-3 md:static md:flex-row md:gap-4"
                 >
                     <li class="mt-6 md:my-auto md:pr-5">
-                        <Link href="/" @click="isActive = false">Learning</Link>
+                        <Link href="/learning" @click="isActive = false"
+                            >Learning</Link
+                        >
                     </li>
                     <li class="md:my-auto md:pr-5">
                         <Link href="/pricing" @click="isActive = false"
@@ -71,7 +77,7 @@ window.addEventListener("resize", () => {
                     <li class="flex items-center md:pr-3 lg:border-r-[1px]">
                         <Link
                             :href="route('jobsearch')"
-                            class="rounded-3xl bg-green-500 px-7 py-2 font-medium text-white"
+                            class="rounded-3xl bg-indigo-600 px-7 py-2 font-medium text-white"
                             @click="isActive = false"
                         >
                             FIND JOBS
