@@ -48,32 +48,64 @@ const faqs = [
         sectionTitle: "General FAQs",
         faqs: [
             {
-                question: "How do I find the right worker?",
-                answer: "Our smart matching algorithm recommends top workers based on your job post and needs",
+                question:
+                    "How does your platform help senior citizens and PWDs find jobs?",
+                answer: " Our platform connects senior citizens and PWDs with inclusive employers who value their skills and experience. We offer job recommendations based on abilities, verified employers, and accessibility-friendly features to make job searching easy and effective.",
             },
             {
-                question: "Are the workers verified?",
-                answer: "Yes, every worker undergoes a background check before being listed on our platform.",
+                question: "Are employers on this platform verified?",
+                answer: `Yes! We carefully verify all employers to ensure they provide fair opportunities for senior citizens and PWDs. Employers who meet our inclusion standards are marked as "Verified."`,
             },
             {
                 question:
-                    "How do I communicate with workers?",
-                answer: "With our Complete and Ultimate plans, you can message and hire workers directly.",
-            },
-
-            {
-                question:
-                    "Can I post jobs for free?",
-                answer: "Yes! Free users can create up to 3 job posts per month.",
+                    "Can I apply for a job even if I have limited work experience?",
+                answer: "Absolutely! Many employers value life experience, skills, and dedication over formal work history. Our platform allows you to showcase your strengths, even if you have limited job experience.",
             },
         ],
     },
     {
-        sectionTitle: "Cancelling Your Subscription",
+        sectionTitle: "Job Seeker FAQs",
         faqs: [
             {
-                question: "How do I cancel my subscription?",
-                answer: "You can cancel your subscription at any time...",
+                question: "How do I improve my chances of getting hired?",
+                answer: `Here are some tips to increase your chances:<br>
+                        ✅ Complete your profile with detailed skills and experience.<br>
+                        ✅ Apply for jobs that match your abilities and interests.<br>
+                        ✅ Stay active and respond to employer messages quickly.<br>
+                        ✅ Take advantage of mentorship and training resources available on our platform.`,
+            },
+            {
+                question:
+                    "Is there a fee to use this platform as a job seeker?",
+                answer: `No, job seekers can sign up and apply for jobs for free. Some premium features, like mentorship programs or priority applications, may have additional benefits for subscribers.`,
+            },
+        ],
+    },
+
+    {
+        sectionTitle: "Employer FAQs",
+        faqs: [
+            {
+                question: "Why should I hire senior citizens and PWDs?",
+                answer: `Senior citizens bring years of experience and reliability, while PWDs offer unique skills and perspectives that enhance workplace diversity. Hiring inclusively also improves company reputation and attracts socially responsible customers.`,
+            },
+            {
+                question: "How do I post a job for senior citizens or PWDs?",
+                answer: `Simply create an employer account, complete your profile, and click “Post a Job.” Specify any accommodations or flexible work options to attract the right candidates.`,
+            },
+        ],
+    },
+
+    {
+        sectionTitle: "Technical & Account FAQs",
+        faqs: [
+            {
+                question: "Is my personal information safe on this platform?",
+                answer: `Yes! We prioritize data privacy and use encryption to protect user information. Your details are only shared with employers when you apply for a job.`,
+            },
+            {
+                question: "How do I reset my password if I forget it?",
+                answer: `Click on "Forgot Password" on the login page, enter your email, and follow the instructions to reset your password securely.`,
             },
         ],
     },
