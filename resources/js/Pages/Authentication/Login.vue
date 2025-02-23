@@ -50,7 +50,7 @@ const submit = () => {
             >
 
             <button
-                class="mb-2 rounded-xl bg-blue-600 p-4 text-white"
+                class="mb-2 rounded-xl bg-[#fa8334] p-4 text-white"
                 @click="submit"
             >
                 Login
