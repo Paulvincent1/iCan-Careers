@@ -45,10 +45,10 @@ const verifyEmployer = (id) => {
 </script>
 
 <template>
-    <div>
+    <div class="p-4">
         <!-- Sub-navigation -->
         <nav class="mb-6">
-            <ul class="flex space-x-4 border-b">
+            <ul class="flex space-x-4 border-b overflow-x-auto whitespace-nowrap">
                 <li
                     v-for="tab in tabs"
                     :key="tab.id"
@@ -58,57 +58,56 @@ const verifyEmployer = (id) => {
                         'text-gray-500 hover:text-gray-700':
                             activeTab !== tab.id,
                     }"
-                    class="cursor-pointer px-4 py-2"
+                    class="cursor-pointer px-4 py-2 text-sm md:text-base"
                 >
                     {{ tab.label }}
                 </li>
             </ul>
         </nav>
 
-        <!-- Main content -->
-        <h1 class="mb-4 text-2xl font-bold">Employer Verification</h1>
-        <table class="min-w-full rounded-lg bg-white shadow-md">
-            <thead>
-                <tr class="bg-gray-200 text-left">
-                    <th class="p-3">ID</th>
-                    <th class="p-3">Company</th>
-                    <th class="p-3">Owner</th>
-                    <th class="p-3">Status</th>
-                    <th class="p-3">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr
-                    v-for="employer in filteredEmployers"
-                    :key="employer.id"
-                    class="border-b"
-                >
-                    <td class="p-3">{{ employer.id }}</td>
-                    <td class="p-3">{{ employer.company }}</td>
-                    <td class="p-3">{{ employer.owner }}</td>
-                    <td class="p-3">
-                        <span
-                            :class="
-                                employer.verified
-                                    ? 'text-green-600'
-                                    : 'text-red-600'
-                            "
-                        >
-                            {{ employer.verified ? "Verified" : "Unverified" }}
-                        </span>
-                    </td>
-                    <td class="p-3">
-                        <button
-                            v-if="!employer.verified"
-                            @click="verifyEmployer(employer.id)"
-                            class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-                        >
-                            Verify
-                        </button>
-                        <span v-else class="text-gray-500">✔ Verified</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <h1 class="mb-4 text-xl md:text-2xl font-bold">Employer Verification</h1>
+
+        <!-- Responsive Table Wrapper -->
+        <div class="overflow-x-auto rounded-lg shadow-md">
+            <table class="min-w-full bg-white">
+                <thead>
+                    <tr class="bg-gray-200 text-left text-xs md:text-sm">
+                        <th class="p-3">ID</th>
+                        <th class="p-3">Company</th>
+                        <th class="p-3 hidden md:table-cell">Owner</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="employer in filteredEmployers"
+                        :key="employer.id"
+                        class="border-b text-xs md:text-sm"
+                    >
+                        <td class="p-3">{{ employer.id }}</td>
+                        <td class="p-3">{{ employer.company }}</td>
+                        <td class="p-3 hidden md:table-cell">{{ employer.owner }}</td>
+                        <td class="p-3">
+                            <span
+                                :class="employer.verified ? 'text-green-600' : 'text-red-600'"
+                            >
+                                {{ employer.verified ? "Verified" : "Unverified" }}
+                            </span>
+                        </td>
+                        <td class="p-3">
+                            <button
+                                v-if="!employer.verified"
+                                @click="verifyEmployer(employer.id)"
+                                class="rounded bg-blue-500 px-3 py-1 md:px-4 md:py-2 text-white hover:bg-blue-600 text-xs md:text-sm"
+                            >
+                                Verify
+                            </button>
+                            <span v-else class="text-gray-500">✔ Verified</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>

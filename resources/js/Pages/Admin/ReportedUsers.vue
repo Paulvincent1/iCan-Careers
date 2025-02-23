@@ -14,7 +14,7 @@ const reportedUsers = ref([
     { id: 4, name: "Alice Brown", reason: "Fraud", status: "Banned" },
 ]);
 
-// Tabs for sub-navigation
+// Tabs for filtering users
 const tabs = [
     { id: "all", label: "All" },
     { id: "pending", label: "Pending" },
@@ -27,66 +27,60 @@ const activeTab = ref("all");
 
 // Filter users based on active tab
 const filteredUsers = computed(() => {
-    if (activeTab.value === "all") {
-        return reportedUsers.value;
-    } else {
-        return reportedUsers.value.filter(
-            (user) => user.status.toLowerCase() === activeTab.value,
-        );
-    }
+    return activeTab.value === "all"
+        ? reportedUsers.value
+        : reportedUsers.value.filter(
+              (user) => user.status.toLowerCase() === activeTab.value
+          );
 });
 
-// Function to change status styles
+// Function to determine status styles
 const statusClass = (status) => {
     return {
-        "text-gray-600": status === "Pending",
-        "text-yellow-600": status === "Warned",
-        "text-red-600": status === "Banned",
+        "text-gray-700 bg-gray-200 px-2 py-1 rounded-full": status === "Pending",
+        "text-yellow-700 bg-yellow-200 px-2 py-1 rounded-full": status === "Warned",
+        "text-red-700 bg-red-200 px-2 py-1 rounded-full": status === "Banned",
     };
 };
 
 // Warn user function
 const warnUser = (id) => {
     const user = reportedUsers.value.find((u) => u.id === id);
-    if (user) {
-        user.status = "Warned";
-    }
+    if (user) user.status = "Warned";
 };
 
 // Ban user function
 const banUser = (id) => {
     const user = reportedUsers.value.find((u) => u.id === id);
-    if (user) {
-        user.status = "Banned";
-    }
+    if (user) user.status = "Banned";
 };
 </script>
 
 <template>
-    <div>
-        <!-- Sub-navigation -->
+    <div class="p-4">
+        <!-- Tabs Navigation -->
         <nav class="mb-6">
-            <ul class="flex space-x-4 border-b">
+            <ul class="flex w-full flex-wrap gap-2 border-b overflow-x-auto">
                 <li
                     v-for="tab in tabs"
                     :key="tab.id"
                     @click="activeTab = tab.id"
                     :class="{
-                        'border-b-2 border-blue-500': activeTab === tab.id,
-                        'text-gray-500 hover:text-gray-700':
-                            activeTab !== tab.id,
+                        'border-b-2 border-blue-500 font-semibold': activeTab === tab.id,
+                        'text-gray-500 hover:text-gray-700': activeTab !== tab.id,
                     }"
-                    class="cursor-pointer px-4 py-2"
+                    class="cursor-pointer px-4 py-2 whitespace-nowrap"
                 >
                     {{ tab.label }}
                 </li>
             </ul>
         </nav>
 
-        <!-- Main content -->
         <h1 class="mb-4 text-2xl font-bold">Reported Users</h1>
-        <div class="overflow-x-auto">
-            <table class="min-w-full rounded-lg bg-white shadow-md">
+
+        <!-- Desktop Table (Hidden on Mobile) -->
+        <div class="hidden md:block overflow-x-auto">
+            <table class="w-full bg-white shadow-md rounded-lg">
                 <thead>
                     <tr class="bg-gray-200 text-left">
                         <th class="p-3">ID</th>
@@ -97,20 +91,14 @@ const banUser = (id) => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        v-for="user in filteredUsers"
-                        :key="user.id"
-                        class="border-b"
-                    >
+                    <tr v-for="user in filteredUsers" :key="user.id" class="border-b">
                         <td class="p-3">{{ user.id }}</td>
                         <td class="p-3">{{ user.name }}</td>
                         <td class="p-3">{{ user.reason }}</td>
                         <td class="p-3">
-                            <span :class="statusClass(user.status)">{{
-                                user.status
-                            }}</span>
+                            <span :class="statusClass(user.status)">{{ user.status }}</span>
                         </td>
-                        <td class="flex gap-2 p-3">
+                        <td class="p-3 flex gap-2">
                             <button
                                 v-if="user.status === 'Pending'"
                                 @click="warnUser(user.id)"
@@ -129,6 +117,38 @@ const banUser = (id) => {
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile Layout (Hidden on Desktop) -->
+        <div class="md:hidden space-y-4">
+            <div
+                v-for="user in filteredUsers"
+                :key="user.id"
+                class="bg-white p-4 rounded-lg shadow border"
+            >
+                <p class="text-lg font-semibold text-gray-800">{{ user.name }}</p>
+                <p class="text-sm text-gray-600"><strong>Reason:</strong> {{ user.reason }}</p>
+                <p class="text-sm text-gray-600 flex items-center gap-1">
+                    <strong>Status:</strong> 
+                    <span :class="statusClass(user.status)">{{ user.status }}</span>
+                </p>
+                <div class="mt-3 flex flex-col sm:flex-row sm:gap-2">
+                    <button
+                        v-if="user.status === 'Pending'"
+                        @click="warnUser(user.id)"
+                        class="rounded bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600 sm:w-1/2"
+                    >
+                        Warn
+                    </button>
+                    <button
+                        v-if="user.status !== 'Banned'"
+                        @click="banUser(user.id)"
+                        class="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600 sm:w-1/2"
+                    >
+                        Ban
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
