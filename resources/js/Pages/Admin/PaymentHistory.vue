@@ -4,7 +4,6 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faSearch, faSort, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
-import DashboardChart from "../Components/Admin/DashboardChart.vue";
 
 defineOptions({
     layout: AdminLayout,
@@ -24,23 +23,31 @@ const paymentHistory = ref([
 <template>
     <div class="bg-white p-5 rounded-lg shadow">
         <h2 class="text-xl font-bold mb-4">💰 Payment History</h2>
-        <div class="mb-4 flex items-center space-x-2">
+
+        <!-- Search Input -->
+        <div class="mb-4 flex items-center space-x-2 border p-2 rounded-lg">
             <font-awesome-icon :icon="['fas', 'search']" class="text-gray-500" />
-            <input type="text" placeholder="Search..." class="p-2 border rounded w-full">
+            <input type="text" placeholder="Search..." class="w-full p-2 outline-none">
         </div>
-        <div class="overflow-x-auto">
+
+        <!-- Desktop Table -->
+        <div class="overflow-x-auto hidden md:block">
             <table class="w-full border-collapse border rounded-lg">
                 <thead>
-                    <tr class="bg-gray-200 text-left">
+                    <tr class="bg-gray-200 text-left text-sm">
                         <th class="p-3">#</th>
                         <th class="p-3">User</th>
-                        <th class="p-3">Amount <font-awesome-icon :icon="['fas', 'sort']" /></th>
-                        <th class="p-3">Date <font-awesome-icon :icon="['fas', 'calendar']" /></th>
+                        <th class="p-3">
+                            Amount <font-awesome-icon :icon="['fas', 'sort']" />
+                        </th>
+                        <th class="p-3">
+                            Date <font-awesome-icon :icon="['fas', 'calendar']" />
+                        </th>
                         <th class="p-3">Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="payment in paymentHistory" :key="payment.id" class="border-t">
+                    <tr v-for="payment in paymentHistory" :key="payment.id" class="border-t text-sm">
                         <td class="p-3">{{ payment.id }}</td>
                         <td class="p-3">{{ payment.user }}</td>
                         <td class="p-3">{{ payment.amount }}</td>
@@ -53,6 +60,25 @@ const paymentHistory = ref([
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile Card Layout -->
+        <div class="md:hidden space-y-4">
+            <div v-for="payment in paymentHistory" :key="payment.id" class="bg-gray-100 p-4 rounded-lg shadow">
+                <p class="text-sm font-semibold">
+                    <span class="text-gray-500">User:</span> {{ payment.user }}
+                </p>
+                <p class="text-sm">
+                    <span class="text-gray-500">Amount:</span> {{ payment.amount }}
+                </p>
+                <p class="text-sm">
+                    <span class="text-gray-500">Date:</span> {{ payment.date }}
+                </p>
+                <p class="text-sm font-medium"
+                    :class="payment.status === 'Completed' ? 'text-green-500' : 'text-yellow-500'">
+                    {{ payment.status }}
+                </p>
+            </div>
         </div>
     </div>
 </template>

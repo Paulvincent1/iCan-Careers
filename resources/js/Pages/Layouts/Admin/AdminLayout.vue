@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import Sidebar from "../../Components/Admin/Sidebar.vue";
 import Navbar from "../../Components/Admin/Navbar.vue";
-import Footer from "../../Components/Admin/Footer.vue";
+// import Footer from "../../Components/Admin/Footer.vue";
 
 const isSidebarOpen = ref(window.innerWidth >= 768);
 const isDesktop = ref(window.innerWidth >= 768);

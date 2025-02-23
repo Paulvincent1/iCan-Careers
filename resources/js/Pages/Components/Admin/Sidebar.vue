@@ -11,7 +11,7 @@ import {
     faClipboardCheck,
     faMoneyBillWave, // Added payment icon
     faHistory,
-    faUserTag
+    faUserTag,
 } from "@fortawesome/free-solid-svg-icons";
 
 // Add icons to FontAwesome library
@@ -23,7 +23,7 @@ library.add(
     faClipboardCheck,
     faMoneyBillWave,
     faHistory,
-    faUserTag
+    faUserTag,
 );
 
 defineProps({
@@ -52,94 +52,116 @@ const togglePaymentDropdown = () => {
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full', // Controls visibility
         ]"
     >
-        <div class="flex items-center justify-between p-4 text-xl font-bold">
-            Admin Dashboard
+        <div class="">
+            
             <!-- Close Button (Only visible on small screens) -->
             <button @click="closeSidebarOnMobile" class="text-white md:hidden">
                 ✖
             </button>
         </div>
 
-        <nav class="mt-5">
-            <Link
-                @click="closeSidebarOnMobile"
-                href="/admin"
-                class="block flex items-center p-3 hover:bg-gray-100"
-            >
-                <font-awesome-icon :icon="['fas', 'chart-bar']" class="mr-2" />
-                Dashboard
-            </Link>
-            <Link
-                @click="closeSidebarOnMobile"
-                href="/admin/workers"
-                class="block flex items-center p-3 hover:bg-gray-100"
-            >
-                <font-awesome-icon :icon="['fas', 'user-check']" class="mr-2" />
-                Workers
-            </Link>
-            <Link
-                @click="closeSidebarOnMobile"
-                href="/admin/employers"
-                class="block flex items-center p-3 hover:bg-gray-100"
-            >
-                <font-awesome-icon :icon="['fas', 'building']" class="mr-2" />
-                Employers
-            </Link>
-            <Link
-                @click="closeSidebarOnMobile"
-                href="/admin/reported-users"
-                class="flex items-center p-3 hover:bg-gray-100"
-            >
-                <font-awesome-icon
-                    :icon="['fas', 'exclamation-triangle']"
-                    class="mr-2"
-                />
-                Reported Users
-            </Link>
-            <Link
-                @click="closeSidebarOnMobile"
-                href="/admin/job-approvals"
-                class="flex items-center p-3 hover:bg-gray-100"
-            >
-                <font-awesome-icon
-                    :icon="['fas', 'clipboard-check']"
-                    class="mr-2"
-                />
-                Job Approvals
-            </Link>
+        
 
-            <!-- Payment Section with Dropdown -->
-            <div>
-                <button
-                    @click="togglePaymentDropdown"
-                    class="w-full flex items-center justify-between p-3 hover:bg-gray-100 focus:outline-none"
+        <div class="mt-20">
+            <nav class="mt-5">
+                <Link
+                    @click="closeSidebarOnMobile"
+                    href="/admin"
+                    class="block flex items-center p-3 hover:bg-gray-100"
                 >
-                    <div class="flex items-center">
-                        <font-awesome-icon :icon="['fas', 'money-bill-wave']" class="mr-2" />
-                        Payment
+                    <font-awesome-icon
+                        :icon="['fas', 'chart-bar']"
+                        class="mr-2"
+                    />
+                    Dashboard
+                </Link>
+                <Link
+                    @click="closeSidebarOnMobile"
+                    href="/admin/workers"
+                    class="block flex items-center p-3 hover:bg-gray-100"
+                >
+                    <font-awesome-icon
+                        :icon="['fas', 'user-check']"
+                        class="mr-2"
+                    />
+                    Workers
+                </Link>
+                <Link
+                    @click="closeSidebarOnMobile"
+                    href="/admin/employers"
+                    class="block flex items-center p-3 hover:bg-gray-100"
+                >
+                    <font-awesome-icon
+                        :icon="['fas', 'building']"
+                        class="mr-2"
+                    />
+                    Employers
+                </Link>
+                <Link
+                    @click="closeSidebarOnMobile"
+                    href="/admin/reported-users"
+                    class="flex items-center p-3 hover:bg-gray-100"
+                >
+                    <font-awesome-icon
+                        :icon="['fas', 'exclamation-triangle']"
+                        class="mr-2"
+                    />
+                    Reported Users
+                </Link>
+                <Link
+                    @click="closeSidebarOnMobile"
+                    href="/admin/job-approvals"
+                    class="flex items-center p-3 hover:bg-gray-100"
+                >
+                    <font-awesome-icon
+                        :icon="['fas', 'clipboard-check']"
+                        class="mr-2"
+                    />
+                    Job Approvals
+                </Link>
+
+                <!-- Payment Section with Dropdown -->
+                <div>
+                    <button
+                        @click="togglePaymentDropdown"
+                        class="flex w-full items-center justify-between p-3 hover:bg-gray-100 focus:outline-none"
+                    >
+                        <div class="flex items-center">
+                            <font-awesome-icon
+                                :icon="['fas', 'money-bill-wave']"
+                                class="mr-2"
+                            />
+                            Payment
+                        </div>
+                        <span>{{ isPaymentOpen ? "▼" : "▶" }}</span>
+                    </button>
+                    <div v-if="isPaymentOpen" class="ml-6">
+                        <Link
+                            @click="closeSidebarOnMobile"
+                            href="/admin/payment-history"
+                            class="block flex items-center p-3 hover:bg-gray-100"
+                        >
+                            <font-awesome-icon
+                                :icon="['fas', 'history']"
+                                class="mr-2"
+                            />
+                            Payment History
+                        </Link>
+                        <Link
+                            @click="closeSidebarOnMobile"
+                            href="/admin/table-subscription"
+                            class="block flex items-center p-3 hover:bg-gray-100"
+                        >
+                            <font-awesome-icon
+                                :icon="['fas', 'user-tag']"
+                                class="mr-2"
+                            />
+                            Subscribed Users
+                        </Link>
                     </div>
-                    <span>{{ isPaymentOpen ? "▼" : "▶" }}</span>
-                </button>
-                <div v-if="isPaymentOpen" class="ml-6">
-                    <Link
-                        @click="closeSidebarOnMobile"
-                        href="/admin/payment-history"
-                        class="block flex items-center p-3 hover:bg-gray-100"
-                    >
-                        <font-awesome-icon :icon="['fas', 'history']" class="mr-2" />
-                        Payment History
-                    </Link>
-                    <Link
-                        @click="closeSidebarOnMobile"
-                        href="/admin/table-subscription"
-                        class="block flex items-center p-3 hover:bg-gray-100"
-                    >
-                        <font-awesome-icon :icon="['fas', 'user-tag']" class="mr-2" />
-                        Subscribed Users
-                    </Link>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </div>
     </aside>
 </template>
 
