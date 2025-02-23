@@ -48,12 +48,12 @@ const togglePaymentDropdown = () => {
 <template>
     <aside
         :class="[
-            'fixed left-0 top-0 z-50 h-full w-64 bg-gradient-to-r from-blue-900 to-indigo-900 text-white transition-transform duration-300 ease-in-out',
+            'fixed left-0 top-0 z-50 h-full w-64 bg-white text-black transition-transform duration-300 ease-in-out',
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full', // Controls visibility
         ]"
     >
         <div class="flex items-center justify-between p-4 text-xl font-bold">
-            Admin Panel
+            Admin Dashboard
             <!-- Close Button (Only visible on small screens) -->
             <button @click="closeSidebarOnMobile" class="text-white md:hidden">
                 ✖
@@ -64,7 +64,7 @@ const togglePaymentDropdown = () => {
             <Link
                 @click="closeSidebarOnMobile"
                 href="/admin"
-                class="block flex items-center p-3 hover:bg-gray-700"
+                class="block flex items-center p-3 hover:bg-gray-100"
             >
                 <font-awesome-icon :icon="['fas', 'chart-bar']" class="mr-2" />
                 Dashboard
@@ -72,7 +72,7 @@ const togglePaymentDropdown = () => {
             <Link
                 @click="closeSidebarOnMobile"
                 href="/admin/workers"
-                class="block flex items-center p-3 hover:bg-gray-700"
+                class="block flex items-center p-3 hover:bg-gray-100"
             >
                 <font-awesome-icon :icon="['fas', 'user-check']" class="mr-2" />
                 Workers
@@ -80,7 +80,7 @@ const togglePaymentDropdown = () => {
             <Link
                 @click="closeSidebarOnMobile"
                 href="/admin/employers"
-                class="block flex items-center p-3 hover:bg-gray-700"
+                class="block flex items-center p-3 hover:bg-gray-100"
             >
                 <font-awesome-icon :icon="['fas', 'building']" class="mr-2" />
                 Employers
@@ -88,7 +88,7 @@ const togglePaymentDropdown = () => {
             <Link
                 @click="closeSidebarOnMobile"
                 href="/admin/reported-users"
-                class="flex items-center p-3 hover:bg-gray-700"
+                class="flex items-center p-3 hover:bg-gray-100"
             >
                 <font-awesome-icon
                     :icon="['fas', 'exclamation-triangle']"
@@ -99,7 +99,7 @@ const togglePaymentDropdown = () => {
             <Link
                 @click="closeSidebarOnMobile"
                 href="/admin/job-approvals"
-                class="flex items-center p-3 hover:bg-gray-700"
+                class="flex items-center p-3 hover:bg-gray-100"
             >
                 <font-awesome-icon
                     :icon="['fas', 'clipboard-check']"
@@ -112,7 +112,7 @@ const togglePaymentDropdown = () => {
             <div>
                 <button
                     @click="togglePaymentDropdown"
-                    class="w-full flex items-center justify-between p-3 hover:bg-gray-700 focus:outline-none"
+                    class="w-full flex items-center justify-between p-3 hover:bg-gray-100 focus:outline-none"
                 >
                     <div class="flex items-center">
                         <font-awesome-icon :icon="['fas', 'money-bill-wave']" class="mr-2" />
@@ -124,7 +124,7 @@ const togglePaymentDropdown = () => {
                     <Link
                         @click="closeSidebarOnMobile"
                         href="/admin/payment-history"
-                        class="block flex items-center p-3 hover:bg-gray-700"
+                        class="block flex items-center p-3 hover:bg-gray-100"
                     >
                         <font-awesome-icon :icon="['fas', 'history']" class="mr-2" />
                         Payment History
@@ -132,7 +132,7 @@ const togglePaymentDropdown = () => {
                     <Link
                         @click="closeSidebarOnMobile"
                         href="/admin/table-subscription"
-                        class="block flex items-center p-3 hover:bg-gray-700"
+                        class="block flex items-center p-3 hover:bg-gray-100"
                     >
                         <font-awesome-icon :icon="['fas', 'user-tag']" class="mr-2" />
                         Subscribed Users

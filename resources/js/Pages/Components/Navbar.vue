@@ -41,7 +41,7 @@ window.addEventListener("resize", () => {
         >
             <p class="">
                 <Link :href="route('home')"
-                    ><img src="/assets/iCanCareersLogo.jpg" alt="" class="h-10 md:h-14 lg:h-16 w-auto object-contain"
+                    ><img src="/assets/iCanCareersLogo.png" alt="" class="h-10 md:h-14 lg:h-16 w-auto object-contain"
                 /></Link>
             </p>
             <nav
@@ -77,7 +77,7 @@ window.addEventListener("resize", () => {
                     <li class="flex items-center md:pr-3 lg:border-r-[1px]">
                         <Link
                             :href="route('jobsearch')"
-                            class="rounded-3xl bg-indigo-600 px-7 py-2 font-medium text-white"
+                            class="rounded-3xl bg-[#fa8334] px-7 py-2 font-medium text-white"
                             @click="isActive = false"
                         >
                             FIND JOBS

@@ -55,7 +55,7 @@ const verification = page.props.verification;
         </div>
 
         <div class="mt-6 text-center">
-            <Link href="/admin/workers" class="px-6 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md transition">
+            <Link href="/admin/workers" class="px-6 py-2 text-white bg-[#fa8334]  rounded-lg shadow-md transition">
                 Back to Workers
             </Link>
         </div>

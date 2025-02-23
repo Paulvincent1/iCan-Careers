@@ -113,7 +113,7 @@ onMounted(() => {
             </div>
 
             <button
-                class="mb-3 rounded bg-blue-600 p-3 text-white"
+                class="mb-3 rounded bg-[#fa8334] p-3 text-white"
                 :disabled="form.processing"
                 @click="submit"
             >
