@@ -44,7 +44,7 @@ onUnmounted(() => {
 
         <!-- Logo -->
         <Link href="/admin" class="flex-1 flex w-full justify-center md:justify-start">
-            <img src="/assets/iCanCareersLogo.png" alt="Logo" class="h-10" />
+            <img src="/assets/iCanCareersLogofinal.png" alt="Logo" class="h-10" />
         </Link>
 
         <!-- Profile Dropdown (Top Right) -->

@@ -9,6 +9,7 @@ defineOptions({
 });
 </script>
 <template>
+    <Head title="Dashboard | iCan Careers" />
     <div>
         <h1 class="text-2xl font-bold">Dashboard</h1>
         <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">

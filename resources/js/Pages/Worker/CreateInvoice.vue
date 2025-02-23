@@ -177,6 +177,7 @@ const formatCurrency = appContext.config.globalProperties.formatCurrency;
 console.log(getCurrentInstance());
 </script>
 <template>
+    <Head title="Create Invoice | iCan Careers" />
     <div class="mx-auto px-[0.5rem] pt-3 xl:max-w-7xl">
         <div class="mx-auto sm:w-[90%]">
             <div class="my-3">
@@ -239,7 +240,7 @@ console.log(getCurrentInstance());
 
                 <div class="mb-7">
                     <table class="w-full border-b">
-                        <thead class="bg-[#024570]">
+                        <thead class="bg-[#fa8334]">
                             <tr class="">
                                 <th class="w-[40px] rounded-tl-lg p-3">
                                     <p class=""></p>
@@ -365,7 +366,7 @@ console.log(getCurrentInstance());
                 </button>
                 <button
                     @click="sendInvoice"
-                    class="rounded-full bg-green-500 px-4 py-1 text-white"
+                    class="rounded-full bg-[#fa8334] px-4 py-1 text-white"
                 >
                     Send Invoice
                 </button>

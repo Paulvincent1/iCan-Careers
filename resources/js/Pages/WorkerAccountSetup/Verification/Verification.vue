@@ -7,6 +7,7 @@ function goBack() {
 }
 </script>
 <template>
+    <Head title="Verification | iCan Careers" />
     <div
         class="xs container mx-auto flex h-[calc(100vh-4.625rem)] flex-col items-center px-[0.5rem] xl:max-w-7xl"
     >

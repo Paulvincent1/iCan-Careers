@@ -16,6 +16,7 @@ const submit = () => {
 };
 </script>
 <template>
+    <Head title="Forgot Password | iCan Careers" />
     <div
         class="container mx-auto grid h-[100vh-64px] justify-items-center px-[05.rem] xl:max-w-7xl"
     >
@@ -33,7 +34,7 @@ const submit = () => {
             ></AuthInput>
             <button
                 @click="submit"
-                class="rounded bg-[#024570] px-2 py-3 font-semibold text-white"
+                class="rounded bg-[#fa8334] px-2 py-3 font-semibold text-white"
             >
                 Send Verification Code
             </button>

@@ -35,7 +35,6 @@ function closeModalPayout() {
     openPayoutModal.value = false;
 }
 
-
 let openCardForm = ref(false);
 let openEwalletForm = ref(false);
 let openOnlineBanking = ref(false);
@@ -44,6 +43,7 @@ const formatCurrency =
     getCurrentInstance().appContext.config.globalProperties.formatCurrency;
 </script>
 <template>
+    <Head title="Profile | iCan Careers" />
     <div class="container mx-auto px-[0.5rem] xl:max-w-7xl">
         <div class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-10">
             <div>
@@ -125,7 +125,8 @@ const formatCurrency =
                                 </div>
                             </div>
                             <div class="flex justify-start gap-3">
-                                <div @click="openModalPayout"
+                                <div
+                                    @click="openModalPayout"
                                     class="flex flex-col items-center justify-center"
                                 >
                                     <div
@@ -529,7 +530,7 @@ const formatCurrency =
                                         >Amount</label
                                     >
                                     <input
-                                        type="number"                      
+                                        type="number"
                                         class="rounded border p-2"
                                     />
                                 </div>
@@ -554,7 +555,7 @@ const formatCurrency =
                                         class="rounded border p-2"
                                     />
                                 </div>
-                                
+
                                 <div class="flex justify-center">
                                     <button
                                         class="rounded bg-slate-400 p-2 text-white"
@@ -624,7 +625,7 @@ const formatCurrency =
                                         class="rounded border p-2"
                                     />
                                 </div>
-                               
+
                                 <div class="flex justify-center">
                                     <button
                                         class="rounded bg-slate-400 p-2 text-white"

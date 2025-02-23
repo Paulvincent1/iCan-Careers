@@ -15,6 +15,7 @@ const verification = page.props.verification;
 </script>
 
 <template>
+    <Head title="WorkersVerification | iCan Careers" />
     <div class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg mt-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Worker Verification Details</h1>
         

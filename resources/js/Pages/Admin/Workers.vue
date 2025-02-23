@@ -29,6 +29,7 @@ const toggleVerification = (id) => {
 </script>
 
 <template>
+    <Head title="Workers | iCan Careers" />
     <div class="rounded-lg bg-white p-6 shadow">
         <h1 class="mb-4 text-2xl font-bold">Workers Management</h1>
 

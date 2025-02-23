@@ -307,6 +307,7 @@ function openModal(e) {
 }
 </script>
 <template>
+    <Head title="Applicants| iCan Careers" />
     <div class="container mx-auto px-[0.5rem] pt-3 xl:max-w-7xl">
         <div class="mb-2">
             <h2 class="text-[32px] font-bold">{{ jobProps.job_title }}</h2>

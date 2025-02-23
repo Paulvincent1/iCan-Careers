@@ -179,6 +179,7 @@ const submit = () => {
 </script>
 
 <template>
+    <Head title="Create Job | iCan Careers" />
     <div class="container mx-auto mt-9 p-7 px-[0.5rem] lg:max-w-7xl">
         <h2 class="my-3 text-2xl font-semibold">Post a job</h2>
         <p class="text-sm">

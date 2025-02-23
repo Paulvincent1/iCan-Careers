@@ -30,6 +30,7 @@ const submit = () => {
 };
 </script>
 <template>
+    <Head title="Verification ID | iCan Careers" />
     <div class="xs container mx-auto px-[0.5rem] lg:px-[5rem] xl:max-w-7xl">
         <div class="flex items-center pt-12">
             <div class="">

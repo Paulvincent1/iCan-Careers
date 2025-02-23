@@ -70,6 +70,7 @@ function switchInvoiceTag(tag) {
 }
 </script>
 <template>
+    <Head title="Dashboard | iCan Careers" />
     <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
         <div class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-10">
             <div>

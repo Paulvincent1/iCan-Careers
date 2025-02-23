@@ -45,6 +45,7 @@ const approveJob = (id) => {
 </script>
 
 <template>
+    <Head title="JobApprovals | iCan Careers" />
     <div class="p-4">
         <!-- Sub-navigation -->
         <nav class="mb-6">

@@ -21,6 +21,7 @@ const submit = () => {
 </script>
 
 <template>
+    <Head title="Login | iCan Careers" />
     <div
         class="container mx-auto grid h-[calc(100vh-4.625rem)] items-start justify-items-center px-[0.5rem] md:max-w-7xl"
     >

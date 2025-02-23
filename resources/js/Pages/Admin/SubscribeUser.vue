@@ -21,6 +21,7 @@ const subscribedUsers = ref([
 </script>
 
 <template>
+    <Head title="SubscribeUser | iCan Careers" />
     <div class="bg-white p-5 rounded-lg shadow">
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
             <font-awesome-icon :icon="['fas', 'user']" class="text-blue-500" /> Subscribed Users
