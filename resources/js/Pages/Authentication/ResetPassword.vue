@@ -21,6 +21,7 @@ const submit = () => {
 };
 </script>
 <template>
+    <Head title="Forgot Password | iCan Careers" />
     <div
         class="container mx-auto grid justify-items-center px-[0.5rem] xl:max-w-7xl"
     >

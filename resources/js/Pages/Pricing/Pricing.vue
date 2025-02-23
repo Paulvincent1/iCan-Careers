@@ -113,7 +113,7 @@ const faqs = [
 </script>
 
 <template>
-    <Head title="Pricing" />
+    <Head title="Pricing | iCan Careers" />
     <section
         class="relative bg-[#fa8334] py-20 text-center text-white"
     >

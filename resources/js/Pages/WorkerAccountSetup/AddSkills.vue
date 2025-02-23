@@ -93,6 +93,7 @@ const submit = () => {
 };
 </script>
 <template>
+    <Head title="Skills Add | iCan Careers" />
     <div class="mt-9 border p-7">
         <h2 class="my-3 text-2xl font-semibold">Tell us about your Skills</h2>
         <p>

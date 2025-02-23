@@ -21,6 +21,7 @@ const paymentHistory = ref([
 </script>
 
 <template>
+    <Head title="PaymentHistory | iCan Careers" />
     <div class="bg-white p-5 rounded-lg shadow">
         <h2 class="text-xl font-bold mb-4">💰 Payment History</h2>
 

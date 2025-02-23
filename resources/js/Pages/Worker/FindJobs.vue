@@ -229,6 +229,7 @@ let search = ref("");
 watch(search, debounce(submit, 500));
 </script>
 <template>
+    <Head title="Find Jobs | iCan Careers" />
     <div class="container mx-auto px-[0.5rem] xl:max-w-7xl">
         <div
             class="grid items-start gap-8 pt-4 md:grid-cols-[200px,1fr] xl:grid-cols-[300px,1fr]"

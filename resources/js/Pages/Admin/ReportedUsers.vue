@@ -57,6 +57,7 @@ const banUser = (id) => {
 </script>
 
 <template>
+    <Head title="ReportedUser | iCan Careers" />
     <div class="p-4">
         <!-- Tabs Navigation -->
         <nav class="mb-6">

@@ -45,6 +45,7 @@ const verifyEmployer = (id) => {
 </script>
 
 <template>
+    <Head title="Employers | iCan Careers" />
     <div class="p-4">
         <!-- Sub-navigation -->
         <nav class="mb-6">

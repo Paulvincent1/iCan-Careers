@@ -86,6 +86,7 @@ function closeJob() {
 }
 </script>
 <template>
+    <Head title="Show Job | iCan Careers" />
     <div class="flex min-h-[calc(100vh-4.625rem)] flex-col">
         <div class="relative h-32 bg-[#FAFAFA]">
             <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">

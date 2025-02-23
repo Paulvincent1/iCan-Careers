@@ -39,6 +39,7 @@ onMounted(() => {
 </script>
 
 <template>
+    <Head title="Register | iCan Careers" />
     <div
         class="container mx-auto grid justify-items-center px-[0.5rem] md:max-w-7xl"
     >

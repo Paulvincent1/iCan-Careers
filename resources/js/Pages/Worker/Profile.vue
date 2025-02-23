@@ -231,6 +231,7 @@ function removeSkill(skillId) {
 }
 </script>
 <template>
+    <Head title="Profile | iCan Careers" />
     <div class="min-h-[calc(100vh-4.625rem)] bg-[#f3f7fa]">
         <div class="bg- relative h-32 bg-[#FAFAFA]">
             <label
