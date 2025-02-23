@@ -21,7 +21,7 @@ class InvoiceService {
         $this->apiInstance = new InvoiceApi();
     }
 
-    public function createInvoice(string $externalId, string $description, array $items, int $duration = null){
+    public function createInvoice(string $externalId, string $description, array $items, int $duration = null, float $totalAmountWithTaxes = null){
 
         $invoicesItems = [];
         $totalAmount = 0;
@@ -43,7 +43,7 @@ class InvoiceService {
         $create_invoice_request = new CreateInvoiceRequest([
             'external_id' => $externalId,
             'description' => $description,
-            'amount' => $totalAmount,
+            'amount' => $totalAmountWithTaxes ?? $totalAmount,
             'invoice_duration' => $duration,
             'success_redirect_url' => 'http://127.0.0.1:8000/employers',
             'failure_redirect_url' => 'http://127.0.0.1:8000/employers',

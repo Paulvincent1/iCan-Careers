@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('balances', function (Blueprint $table) {
             $table->id();
-            $table->integer('balance');
-            $table->integer('unsettlement');
+            $table->decimal('balance',10,2);
+            $table->decimal('unsettlement',10,2);
             $table->foreignId('worker_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });

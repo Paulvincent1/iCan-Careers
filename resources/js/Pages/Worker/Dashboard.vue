@@ -24,9 +24,19 @@ console.log(props.invoicesProps);
 let invoices = ref(props.invoicesProps);
 let invoiceTag = ref("PENDING");
 
+onMounted(() => {
+    invoices.value = props.invoicesProps.filter((invoice) => {
+        return invoice.status === invoiceTag.value;
+    });
+});
+
 function switchInvoiceTag(tag) {
     invoices.value = props.invoicesProps.filter((invoice) => {
-        return invoice.status === tag;
+        if (tag === "PAID") {
+            return invoice.status === "PAID" || invoice.status === "SETTLED";
+        } else {
+            return invoice.status === tag;
+        }
     });
     invoiceTag.value = tag;
 }
@@ -35,9 +45,23 @@ console.log(props.balanceProps);
 let balance = ref(props.balanceProps);
 let invoiceTransactions = ref(props.invoiceTransactionsProps);
 
-onMounted(() => {
-    console.log(props.isVerified);
-});
+let transactionTag = ref("INVOICES");
+
+let showInvoices = ref(true);
+let showPayouts = ref(false);
+
+function switchTransactionTag(tag) {
+    transactionTag.value = tag;
+
+    if (tag === "INVOICES") {
+        showPayouts.value = false;
+        showInvoices.value = true;
+        return;
+    }
+
+    showInvoices.value = false;
+    showPayouts.value = true;
+}
 
 let openPayoutModal = ref(false);
 function openModalPayout() {
@@ -51,6 +75,10 @@ function closeModalPayout() {
 let openCardForm = ref(false);
 let openEwalletForm = ref(false);
 let openOnlineBanking = ref(false);
+
+let bpiCardNumber = ref(null);
+let bpiAccountName = ref(null);
+let bpiAmount = ref(null);
 
 const formatCurrency =
     getCurrentInstance().appContext.config.globalProperties.formatCurrency;
@@ -104,9 +132,7 @@ const formatCurrency =
                 <div
                     class="mb-4 grid grid-cols-1 gap-3 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
                 >
-                    <div
-                        class="col-span-2 h-[400px] rounded border p-3 lg:col-span-1"
-                    >
+                    <div class="col-span-2 rounded border p-3 lg:col-span-1">
                         <div class="flex justify-between">
                             <p class="p-1 font-bold">Invoices</p>
                             <Link
@@ -165,7 +191,7 @@ const formatCurrency =
                                 </li></swiper-slide
                             >
                         </swiper-container>
-                        <div class="w-full">
+                        <div class="h-[300px] overflow-auto">
                             <table class="w-full table-fixed">
                                 <thead class="bg-slate-300">
                                     <tr>
@@ -288,10 +314,51 @@ const formatCurrency =
 
                         <div>
                             <p>Transactions</p>
+                            <swiper-container
+                                class="mb-3 text-[12px]"
+                                slides-per-view="auto"
+                                :space-between="10"
+                            >
+                                <swiper-slide class="w-fit">
+                                    <li
+                                        @click="
+                                            switchTransactionTag('INVOICES')
+                                        "
+                                        :class="[
+                                            'cursor-pointer rounded border border-blue-500 p-1',
+                                            {
+                                                'bg-blue-500 text-white':
+                                                    transactionTag ===
+                                                    'INVOICES',
+                                                'text-blue-500':
+                                                    transactionTag !=
+                                                    'INVOICES',
+                                            },
+                                        ]"
+                                    >
+                                        Invoices
+                                    </li></swiper-slide
+                                >
+                                <swiper-slide class="w-fit">
+                                    <li
+                                        @click="switchTransactionTag('PAYOUT')"
+                                        :class="[
+                                            'cursor-pointer rounded border border-blue-500 p-1 text-blue-500',
+                                            {
+                                                'bg-blue-500 text-white':
+                                                    transactionTag === 'PAYOUT',
+                                            },
+                                        ]"
+                                    >
+                                        Payout
+                                    </li></swiper-slide
+                                >
+                            </swiper-container>
                         </div>
 
                         <div class="flex-1 overflow-y-scroll">
                             <div
+                                v-if="showInvoices"
                                 v-for="transaction in invoiceTransactions"
                                 class="mb-3 rounded p-4 shadow"
                             >
@@ -688,8 +755,6 @@ const formatCurrency =
                                     >
                                     <input
                                         type="text"
-                                        value="TEST"
-                                        disabled
                                         class="rounded border p-2"
                                     />
                                 </div>
@@ -754,6 +819,7 @@ const formatCurrency =
                                     >
                                     <input
                                         type="number"
+                                        v-model="bpiAmount"
                                         class="rounded border p-2"
                                     />
                                     <p class="text-sm">
@@ -767,8 +833,8 @@ const formatCurrency =
                                     >
                                     <input
                                         type="text"
+                                        v-model="bpiAccountName"
                                         class="rounded border p-2"
-                                        disabled
                                     />
                                 </div>
                                 <div class="mb-3 flex flex-col">
@@ -777,18 +843,25 @@ const formatCurrency =
                                     >
                                     <input
                                         type="text"
-                                        disabled
-                                        value="000000"
+                                        v-model="bpiCardNumber"
                                         class="rounded border p-2"
                                     />
                                 </div>
 
                                 <div class="flex justify-center">
-                                    <button
+                                    <Link
+                                        :href="route('worker.payout')"
+                                        as="button"
+                                        method="post"
+                                        :data="{
+                                            bpiAmount: "bpiAmount",
+                                            bpiAccountName,
+                                            bpiCardNumber,
+                                        }"
                                         class="rounded bg-slate-400 p-2 text-white"
                                     >
                                         Pay Now
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>

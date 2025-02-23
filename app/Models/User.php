@@ -112,4 +112,8 @@ class User extends Authenticatable
     public function balance(){
         return $this->hasOne(Balance::class,'worker_id');
     }
+
+    public function payouts(){
+        return $this->hasMany(Payout::class, 'worker_id');
+    }
 }

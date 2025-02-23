@@ -76,6 +76,9 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class
 
     Route::get('/',[WorkerDashboard::class, 'index'])->name('worker.dashboard');
 
+    Route::post('/payout', [WorkerDashboard::class, 'payout'])->name('worker.payout');
+
+
     Route::get('/create-invoice', [WorkerDashboard::class,'createInvoice'])->name('worker.create.invoice');
     Route::get('/test-invoice', [WorkerDashboard::class,'storeInvoice'])->name('worker.store.invoice');
     Route::post('/preview-invoice', [WorkerDashboard::class,'previewInvoice'])->name('worker.preview.invoice');

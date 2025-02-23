@@ -7,7 +7,9 @@ use App\Models\Invoice;
 use App\Models\JobPost;
 use App\Models\User;
 use App\Services\InvoiceService;
+use App\Services\PayoutService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,11 +19,13 @@ class WorkerDashboard extends Controller
 {
 
     protected $invoiceService;
+    protected $payoutService;
 
     // Inject the InvoiceService into the controller
-    public function __construct(InvoiceService $invoiceService)
+    public function __construct(InvoiceService $invoiceService, PayoutService $payoutService)
     {
         $this->invoiceService = $invoiceService;
+        $this->payoutService = $payoutService;
     }
 
     public function index(){
@@ -98,6 +102,13 @@ class WorkerDashboard extends Controller
     //    dd($items);
 
        $employer = User::where('email', $fields['billTo'])->with('employerProfile')->first();
+
+       $xenditTransactionFee = (($fields['totalAmount'] / 0.955) * 0.045);
+       $vatTransactionFee = $xenditTransactionFee * 0.12;
+
+       $totalAmount = $fields['totalAmount'] + $xenditTransactionFee + $vatTransactionFee;
+
+    //    dd($totalAmount);
        
         return Pdf::view('pdf.invoice',[
             'invoiceId' => 'test',
@@ -105,8 +116,10 @@ class WorkerDashboard extends Controller
             'description' => $fields['description'],
             'employer' => $employer,
             'items' =>  $items,
-            'totalAmount' => $fields['totalAmount'],
-            'paymentUrl' => null
+            'xenditTransactionFee' => $xenditTransactionFee, // 4.5%
+            'vatTransactionFee' => $vatTransactionFee, // 12%
+            'totalAmount' =>  $totalAmount,
+            'invoiceUrl' => null,
         ]);
     }
 
@@ -122,7 +135,7 @@ class WorkerDashboard extends Controller
             'items.*.description' => 'required',
             'items.*.hours' => 'required',
             'items.*.rate' => 'required',
-            'totalAmount' => 'required',
+            'totalAmount' => 'required|numeric|max:50000',
         ]);
 
 
@@ -140,12 +153,19 @@ class WorkerDashboard extends Controller
             $secondsDuration = Carbon::now()->diffInSeconds(Carbon::parse($fields['dueDate'] . ' 23:59:00'));
             // dd(Carbon::now());
 
+            
+            $xenditTransactionFee = (($fields['totalAmount'] / 0.955) * 0.045);
+            $vatTransactionFee = $xenditTransactionFee * 0.12;
+
+            $totalAmount = $fields['totalAmount'] + $xenditTransactionFee + $vatTransactionFee;
+
             $resultInvoice = $this->invoiceService
             ->createInvoice(
                 externalId: $externalId,
                 description: $fields['description'],
                 items: $items,
                 duration: $secondsDuration,
+                totalAmountWithTaxes: $totalAmount
             );
 
             $user->workerInvoices()
@@ -154,7 +174,7 @@ class WorkerDashboard extends Controller
                     'invoice_id' => $resultInvoice->getId(),
                     'external_id' => $externalId,
                     'description' =>  $fields['description'],
-                    'amount' => $fields['totalAmount'],
+                    'amount' => $totalAmount,
                     'items' => $fields['items'],
                     'invoice_url' => $resultInvoice->getInvoiceUrl(),
                     'status' => 'pending',
@@ -170,6 +190,8 @@ class WorkerDashboard extends Controller
              dueDate: $fields['dueDate'],
              description: $fields['description'],
              items: $items,
+             xenditTransactionFee: $xenditTransactionFee,
+             vatTransactionFee: $vatTransactionFee,
              totalAmount: $fields['totalAmount'],
              invoiceUrl: $resultInvoice->getInvoiceUrl()
             ));
@@ -187,5 +209,57 @@ class WorkerDashboard extends Controller
 
         }
       
+    }
+
+    public function payout(Request $request){
+        dd($request);
+
+        $fields = $request->validate([
+            'amount' => 'required|numeric|min:100',
+            'channelCode' => 'required',
+            'accountName' => 'required',
+            'accountNumber' => 'required',
+        ]);
+
+        $user = Auth::user();
+
+        $payoutUniqueId = 'DISB-' . uniqid();
+
+        DB::beginTransaction();
+
+        try{
+
+            $this->payoutService->createPayoutRequest(
+                payoutUniqueId:  $payoutUniqueId,
+                channelCode:$fields['channelCode'],
+                accountHolderName:$fields['accountName'],
+                accountNumber:$fields['accountNumber'] ,
+                amount: $fields['amount'],
+            );
+
+            
+            $user->payouts()->create(
+                [
+                    'reference_id' => $payoutUniqueId,
+                    'channel_code' => $fields['channelCode'],
+                    'account_holder_name' => $fields['accountName'],
+                    'account_number' => $fields['accountNumber'],
+                    'amount' => $fields['amount'],
+                    ]
+            );
+
+            $user->balance()->decrement('balance', $fields['amount']);
+
+            DB::commit();
+                
+        }catch(Exception $e){
+
+            DB::rollBack();
+
+            dd($e->getMessage());
+            
+
+        }
+
     }
 }
