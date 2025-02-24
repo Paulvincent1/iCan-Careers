@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('account_number');
             $table->decimal('amount', 10,2);
             $table->foreignId('worker_id')->constrained('users')->cascadeOnDelete();
-            $table->id();
             $table->timestamps();
         });
     }

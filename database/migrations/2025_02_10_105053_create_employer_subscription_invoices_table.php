@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('employer_subscription_invoices', function (Blueprint $table) {
             $table->id();
             $table->string('external_id');
+            $table->string('invoice_id');
             $table->string('description');
             $table->string('invoice_url');
             $table->enum('subscription_type',['Free','Pro','Premium']);

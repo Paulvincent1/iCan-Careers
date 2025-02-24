@@ -43,9 +43,9 @@ class WorkerDashboard extends Controller
         
         $appliedJobs = $user->appliedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
 
-        $invoiceTransactions = $user->workerInvoices()->whereIn('status',['PAID','SETTLED'])->with('employer')->get();
+        $invoiceTransactions = $user->workerInvoices()->whereIn('status',['PAID','SETTLED'])->with('employer')->latest()->get();
 
-        $invoices = $user->workerInvoices;
+        $invoices = $user->workerInvoices()->latest()->get();
         // dd($invoiceTransactions);
 
         return inertia('Worker/Dashboard', 
@@ -57,6 +57,7 @@ class WorkerDashboard extends Controller
             'balanceProps' => $user->balance,
             'invoiceTransactionsProps' => $invoiceTransactions,
             'invoicesProps' => $invoices->load('employer'),
+            'payoutProps' => $user->payouts()->latest()->get(),
 
         ]);
     }
@@ -212,16 +213,19 @@ class WorkerDashboard extends Controller
     }
 
     public function payout(Request $request){
-        dd($request);
-
+        // dd($request);
         $fields = $request->validate([
             'amount' => 'required|numeric|min:100',
             'channelCode' => 'required',
             'accountName' => 'required',
-            'accountNumber' => 'required',
+            'accountNumber' => 'required|numeric',
         ]);
 
         $user = Auth::user();
+
+        if ($user->balance->balance < $fields['amount']){
+            return redirect()->back()->withErrors(['error'=> 'Not Enough balance to make this request.']);
+        }
 
         $payoutUniqueId = 'DISB-' . uniqid();
 
@@ -236,7 +240,8 @@ class WorkerDashboard extends Controller
                 accountNumber:$fields['accountNumber'] ,
                 amount: $fields['amount'],
             );
-
+           
+      
             
             $user->payouts()->create(
                 [
@@ -251,6 +256,9 @@ class WorkerDashboard extends Controller
             $user->balance()->decrement('balance', $fields['amount']);
 
             DB::commit();
+
+            return redirect()->back();
+        
                 
         }catch(Exception $e){
 

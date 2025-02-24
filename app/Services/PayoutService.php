@@ -13,7 +13,7 @@ class PayoutService {
 
     public function __construct()
     {
-        Configuration::setXenditKey("YOUR_API_KEY_HERE");
+        Configuration::setXenditKey(env("XENDIT_SECRET_KEY"));
         $this->apiInstance = new PayoutApi();
     }
 
@@ -41,8 +41,7 @@ class PayoutService {
             $result = $this->apiInstance->createPayout($idempotency_key, $for_user_id, $create_payout_request);
                 return $result;
         } catch (\Xendit\XenditSdkException $e) {
-            echo 'Exception when calling PayoutApi->createPayout: ', $e->getMessage(), PHP_EOL;
-            echo 'Full Error: ', json_encode($e->getFullError()), PHP_EOL;
+            throw new \Exception('Error creating payout request with Xendit: ' . $e->getMessage());
         }
 
 

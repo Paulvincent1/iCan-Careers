@@ -9,8 +9,9 @@ class EmployerSubscriptionInvoice extends Model
     
     protected $fillable = [
         'external_id',
+        'invoice_id',
         'description',
-        'payment_url',
+        'invoice_url',
         'subscription_type',
         'duration',
     ];

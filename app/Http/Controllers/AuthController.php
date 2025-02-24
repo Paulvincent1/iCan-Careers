@@ -81,8 +81,9 @@ class AuthController extends Controller
 
                     $user->employerSubscriptionInvoices()->create([
                         'external_id' =>  $externalIdProTier,
+                        'invoice_id' =>  $proTierInvoice->getId(),
                         'description' => 'Pro Tier Subscription (Monthly)',
-                        'payment_url' =>  $proTierInvoice->getInvoiceUrl(),
+                        'invoice_url' =>  $proTierInvoice->getInvoiceUrl(),
                         'subscription_type' => 'Pro',
                         'duration' => now(),
                     ]);
@@ -107,8 +108,9 @@ class AuthController extends Controller
 
                     $user->employerSubscriptionInvoices()->create([
                         'external_id' =>  $externalIdPremiumTier,
+                        'invoice_id' =>  $proTierInvoice->getId(),
                         'description' => 'Premium Tier Subscription (Anually)',
-                        'payment_url' =>  $premiumTierInvoice->getInvoiceUrl(),
+                        'invoice_url' =>  $premiumTierInvoice->getInvoiceUrl(),
                         'subscription_type' => 'Premium',
                         'duration' => now(),
                     ]);

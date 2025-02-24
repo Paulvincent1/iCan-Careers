@@ -203,7 +203,7 @@ function closeInvoiceModal() {
     <ReusableModal v-if="isOpenInvoiceModal" @closeModal="closeInvoiceModal">
         <div class="h-[500px] w-[350px] rounded bg-white sm:w-[500px]">
             <iframe
-                :src="invoice.payment_url"
+                :src="invoice.invoice_url"
                 title="Xendit Invoice"
                 class="h-full w-full"
             >
