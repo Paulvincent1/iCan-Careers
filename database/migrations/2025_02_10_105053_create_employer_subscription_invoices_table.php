@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('employer_subscription_invoices', function (Blueprint $table) {
             $table->id();
             $table->string('external_id');
+            $table->string('invoice_id');
             $table->string('description');
-            $table->string('payment_url');
+            $table->string('invoice_url');
             $table->enum('subscription_type',['Free','Pro','Premium']);
             $table->foreignId('employer_id')->constrained('users')->cascadeOnDelete();
             $table->timestamp('duration');

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('invoice_id');
             $table->string('external_id');
             $table->string('description')->nullable();
-            $table->integer('amount');   
+            $table->decimal('amount',10,2);   
             $table->json('items');
             $table->string('invoice_url');
             $table->enum('status', ['PENDING', 'PAID', 'EXPIRED','SETTLED'])->default('PENDING');

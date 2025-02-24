@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('balances', function (Blueprint $table) {
+        Schema::create('payouts', function (Blueprint $table) {
             $table->id();
-            $table->decimal('balance',10,2);
-            $table->decimal('unsettlement',10,2);
-            $table->foreignId('worker_id')->unique()->constrained('users')->cascadeOnDelete();
+            $table->string('reference_id');
+            $table->string('channel_code');
+            $table->string('account_holder_name');
+            $table->string('account_number');
+            $table->decimal('amount', 10,2);
+            $table->foreignId('worker_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('balances');
+        Schema::dropIfExists('payouts');
     }
 };
