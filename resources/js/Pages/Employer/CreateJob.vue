@@ -9,29 +9,37 @@ import Maps from "../Components/Maps.vue";
 
 let props = defineProps({
     locationProps: null,
+
+    // for edit
+    jobPostProp: null,
 });
 
-console.log(props.locationProps);
+console.log(props.jobPostProp);
 
 let form = useForm({
-    job_title: null,
-    job_type: null,
-    work_arrangement: null,
-    location: props.locationProps,
-    experience: null,
-    hour_per_day: null,
-    hourly_rate: null,
-    salary: null,
-    description: null,
-    preferred_educational_attainment: null,
-    skills: null,
-    preferred_worker_types: null,
+    job_title: props.jobPostProp?.job_title ?? null,
+    job_type: props.jobPostProp?.job_type ?? null,
+    work_arrangement: props.jobPostProp?.work_arrangement ?? null,
+    location: props.jobPostProp?.location ?? props.locationProps,
+    experience: props.jobPostProp?.experience ?? null,
+    hour_per_day: props.jobPostProp?.hour_per_day ?? null,
+    hourly_rate: props.jobPostProp?.hourly_rate ?? null,
+    salary: props.jobPostProp?.salary ?? null,
+    description: props.jobPostProp?.description ?? null,
+    preferred_educational_attainment:
+        props.jobPostProp?.preferred_educational_attainment ?? null,
+    skills: props.jobPostProp?.skills ?? null,
+    preferred_worker_types: props.jobPostProp?.preferred_worker_types ?? null,
 });
 
 onMounted(() => {
-    form.location = props.locationProps
-        ? [...props.locationProps]
-        : [120.9842, 14.5995];
+    if (!form.location) {
+        form.location = props.locationProps
+            ? [...props.locationProps]
+            : [120.9842, 14.5995];
+    } else {
+        showMap();
+    }
     console.log(form.location);
 });
 
@@ -133,7 +141,12 @@ let otherInput = useTemplateRef("otherInput");
 let otherValue = ref("");
 
 let skillInput = useTemplateRef("skillInput");
-let skills = ref([]);
+let skills = ref(form.skills ?? []);
+if (props.jobPostProp?.skills) {
+    skills.value = props.jobPostProp?.skills.map((skill) => {
+        return { id: nanoid(), name: skill };
+    });
+}
 function addSkill() {
     if (skillInput.value.value != "") {
         skills.value.push({
@@ -173,8 +186,16 @@ const submit = () => {
 
     form.skills = skills.value;
     form.preferred_worker_types = candidateType.value;
-    console.log(candidateType.value);
-    form.post(route("create.job.post"));
+    console.log(form.skills);
+    if (!route().params.jobid) {
+        form.post(route("create.job.post"));
+    } else {
+        form.put(
+            route("employer.jobpost.update", {
+                jobid: route().params.jobid,
+            }),
+        );
+    }
 };
 </script>
 
