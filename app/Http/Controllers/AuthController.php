@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmployerSubscriptionInvoice;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\InvoiceService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -17,6 +21,12 @@ use function Illuminate\Log\log;
 
 class AuthController extends Controller
 {
+
+    public function __construct(public InvoiceService $invoiceService)
+    {
+        
+    }
+
     public function registerCreate(Request $request){
         return inertia('Authentication/Register');
     }
@@ -43,6 +53,78 @@ class AuthController extends Controller
                     'subscription_type' => 'Free',
                     'start_date' => Carbon::now(),
                 ]);
+
+                DB::beginTransaction();
+
+                try {
+
+               
+                $externalIdProTier =  'INV-'.uniqid();
+                $externalIdPremiumTier =  'INV-'.uniqid();
+
+
+                 // creating pro tier invoice
+                $proTierInvoice = $this->invoiceService
+                ->createInvoice(
+                   externalId: $externalIdProTier,
+                    description: 'Pro Tier Subscription (Monthly)',
+                    items:  [
+                        [
+                        'description' => 'Pro Tier Subscription',
+                        'rate' => 3999,
+                        'hours' => 1,
+                        ]
+                      ],
+                    duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0)) 
+                    );
+                    // dd($proTierInvoice->getInvoiceUrl());
+
+                    $user->employerSubscriptionInvoices()->create([
+                        'external_id' =>  $externalIdProTier,
+                        'invoice_id' =>  $proTierInvoice->getId(),
+                        'description' => 'Pro Tier Subscription (Monthly)',
+                        'invoice_url' =>  $proTierInvoice->getInvoiceUrl(),
+                        'subscription_type' => 'Pro',
+                        'duration' => now(),
+                    ]);
+
+
+
+                    
+                    // creating premium tier invoice
+                $premiumTierInvoice = $this->invoiceService
+                ->createInvoice(
+                    externalId: $externalIdPremiumTier,
+                    description: 'Premium Tier Subscription (Anually)',
+                    items: [
+                        [
+                        'description' => 'Premium Tier Subscription',
+                        'rate' => 5699,
+                        'hours' => 1,
+                        ]
+                      ],
+                     duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0))           
+                    );
+
+                    $user->employerSubscriptionInvoices()->create([
+                        'external_id' =>  $externalIdPremiumTier,
+                        'invoice_id' =>  $proTierInvoice->getId(),
+                        'description' => 'Premium Tier Subscription (Anually)',
+                        'invoice_url' =>  $premiumTierInvoice->getInvoiceUrl(),
+                        'subscription_type' => 'Premium',
+                        'duration' => now(),
+                    ]);
+
+                    DB::commit();
+
+                }catch(Exception $e){
+
+                    DB::rollBack();
+                    dd($e->getMessage());
+
+                }
+
+                   
             }
 
             if($fields['role'] === 'PWD' || $fields['role'] === 'Senior'){

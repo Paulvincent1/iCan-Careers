@@ -1,8 +1,11 @@
 <script setup>
-import { Link } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
 import { getCurrentInstance, onMounted, ref } from "vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
+import InputFlashMessage from "../Components/InputFlashMessage.vue";
+import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
+import dayjs from "dayjs";
 
 const props = defineProps({
     user: {
@@ -16,15 +19,52 @@ const props = defineProps({
     jobsAppliedProps: null,
     balanceProps: null,
     invoiceTransactionsProps: null,
+    invoicesProps: null,
+    payoutProps: null,
 });
+
+let invoices = ref(props.invoicesProps);
+let invoiceTag = ref("PENDING");
+
+onMounted(() => {
+    invoices.value = props.invoicesProps.filter((invoice) => {
+        return invoice.status === invoiceTag.value;
+    });
+});
+
+function switchInvoiceTag(tag) {
+    invoices.value = props.invoicesProps.filter((invoice) => {
+        if (tag === "PAID") {
+            return invoice.status === "PAID" || invoice.status === "SETTLED";
+        } else {
+            return invoice.status === tag;
+        }
+    });
+    invoiceTag.value = tag;
+}
 
 console.log(props.balanceProps);
 let balance = ref(props.balanceProps);
 let invoiceTransactions = ref(props.invoiceTransactionsProps);
+let payoutTransactions = ref(props.payoutProps);
 
-onMounted(() => {
-    console.log(props.isVerified);
-});
+let transactionTag = ref("INVOICES");
+
+let showInvoices = ref(true);
+let showPayouts = ref(false);
+
+function switchTransactionTag(tag) {
+    transactionTag.value = tag;
+
+    if (tag === "INVOICES") {
+        showPayouts.value = false;
+        showInvoices.value = true;
+        return;
+    }
+
+    showInvoices.value = false;
+    showPayouts.value = true;
+}
 
 let openPayoutModal = ref(false);
 function openModalPayout() {
@@ -38,6 +78,159 @@ function closeModalPayout() {
 let openCardForm = ref(false);
 let openEwalletForm = ref(false);
 let openOnlineBanking = ref(false);
+
+let bpiCardNumber = ref("");
+let bpiAccountName = ref("");
+let bpiAmount = ref("");
+
+let gcashCardNumber = ref("");
+let gcashAccountName = ref("");
+let gcashAmount = ref("");
+
+let popupErrorMessage = ref(null);
+function createPayout(channelCode) {
+    if (channelCode === "PH_BPI") {
+        if (validatePayoutInput(channelCode)) {
+            router.post(
+                route("worker.payout"),
+                {
+                    channelCode: null,
+                    accountNumber: bpiCardNumber.value,
+                    accountName: bpiAccountName.value,
+                    amount: bpiAmount.value,
+                },
+                {
+                    onSuccess: () => {
+                        location.reload();
+                    },
+                    onError: (error) => {
+                        closeModalPayout();
+                        popupErrorMessage.value = error.error;
+                        setTimeout(() => {
+                            popupErrorMessage.value = null;
+                        }, 2000);
+                    },
+                },
+            );
+        }
+    }
+    if (channelCode === "PH_GCASH") {
+        if (validatePayoutInput(channelCode)) {
+            router.post(
+                route("worker.payout"),
+                {
+                    channelCode,
+                    accountNumber: gcashCardNumber.value,
+                    accountName: gcashAccountName.value,
+                    amount: gcashAmount.value,
+                },
+                {
+                    onSuccess: () => {
+                        location.reload();
+                    },
+                    onError: (error) => {
+                        closeModalPayout();
+                        popupErrorMessage.value = error.error;
+                        setTimeout(() => {
+                            popupErrorMessage.value = null;
+                        }, 2000);
+                    },
+                },
+            );
+        }
+    }
+}
+
+let errorMessage = ref({
+    bpiAmount: null,
+    bpiCardNumber: null,
+
+    gcashAmount: null,
+    gcashCardNumber: null,
+});
+function validatePayoutInput(channelCode) {
+    if (channelCode === "PH_BPI") {
+        errorMessage.value.bpiAmount = null;
+        errorMessage.value.bpiCardNumber = null;
+
+        if (
+            String(bpiAmount.value).toLowerCase().includes("e") ||
+            isNaN(bpiAmount.value)
+        ) {
+            errorMessage.value.bpiAmount = "BPI Amount must be a number.";
+            return false;
+        }
+
+        if (bpiAmount.value > balance.value.balance) {
+            errorMessage.value.bpiAmount =
+                "You do not have enough balance to payout this amount.";
+            return false;
+        }
+
+        if (bpiAmount.value < 100) {
+            errorMessage.value.bpiAmount =
+                "Payout amount must be at least ₱100. Please enter a valid amount.";
+            return false;
+        }
+        if (bpiAmount.value > 50000) {
+            errorMessage.value.bpiAmount =
+                "Payout amount cannot exceed ₱50,000. Please enter a valid amount.";
+            return false;
+        }
+
+        if (
+            String(bpiCardNumber.value).toLowerCase().includes("e") ||
+            isNaN(bpiCardNumber.value) ||
+            String(bpiCardNumber.value) === ""
+        ) {
+            errorMessage.value.bpiCardNumber =
+                "BPI Card Number must be a number.";
+            return false;
+        }
+    }
+
+    if (channelCode === "PH_GCASH") {
+        errorMessage.value.gcashAmount = null;
+        errorMessage.value.gcashCardNumber = null;
+
+        if (
+            String(gcashAmount.value).toLowerCase().includes("e") ||
+            isNaN(gcashAmount.value)
+        ) {
+            errorMessage.value.gcashAmount = "Gcash Amount must be a number.";
+            return false;
+        }
+
+        if (gcashAmount.value > balance.value.balance) {
+            errorMessage.value.gcashAmount =
+                "You do not have enough balance to payout this amount.";
+            return false;
+        }
+
+        if (gcashAmount.value < 100) {
+            errorMessage.value.gcashAmount =
+                "Payout amount must be at least ₱100. Please enter a valid amount.";
+            return false;
+        }
+        if (gcashAmount.value > 50000) {
+            errorMessage.value.gcashAmount =
+                "Payout amount cannot exceed ₱50,000. Please enter a valid amount.";
+            return false;
+        }
+
+        if (
+            String(gcashCardNumber.value).toLowerCase().includes("e") ||
+            isNaN(gcashCardNumber.value) ||
+            String(gcashCardNumber.value) === ""
+        ) {
+            errorMessage.value.gcashCardNumber =
+                "Gcash Number must be a number.";
+            return false;
+        }
+    }
+
+    return true;
+}
 
 const formatCurrency =
     getCurrentInstance().appContext.config.globalProperties.formatCurrency;
@@ -92,16 +285,135 @@ const formatCurrency =
                 <div
                     class="mb-4 grid grid-cols-1 gap-3 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
                 >
-                    <div
-                        class="col-span-2 h-[400px] rounded border p-3 lg:col-span-1"
-                    >
+                    <div class="col-span-2 rounded border p-3 lg:col-span-1">
                         <div class="flex justify-between">
-                            <p class="p-1 font-bold">Invoice status</p>
+                            <p class="p-1 font-bold">Invoices</p>
                             <Link
                                 :href="route('worker.create.invoice')"
-                                class="p-1"
+                                class="p-1 text-blue-500"
                                 >Create invoice</Link
                             >
+                        </div>
+                        <swiper-container
+                            class="mb-3 text-[12px]"
+                            slides-per-view="auto"
+                            :space-between="10"
+                        >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    @click="switchInvoiceTag('PENDING')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-yellow-400 p-1',
+                                        {
+                                            'bg-yellow-400 text-white':
+                                                invoiceTag === 'PENDING',
+                                            'text-yellow-400':
+                                                invoiceTag != 'PENDING',
+                                        },
+                                    ]"
+                                >
+                                    Pending
+                                </li></swiper-slide
+                            >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    @click="switchInvoiceTag('PAID')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-green-400 p-1 text-green-400',
+                                        {
+                                            'bg-green-400 text-white':
+                                                invoiceTag === 'PAID',
+                                        },
+                                    ]"
+                                >
+                                    Paid
+                                </li></swiper-slide
+                            >
+                            <swiper-slide class="w-fit">
+                                <li
+                                    @click="switchInvoiceTag('EXPIRED')"
+                                    :class="[
+                                        'cursor-pointer rounded border border-red-400 p-1 text-red-400',
+                                        {
+                                            'bg-red-400 text-white':
+                                                invoiceTag === 'EXPIRED',
+                                        },
+                                    ]"
+                                >
+                                    Expired
+                                </li></swiper-slide
+                            >
+                        </swiper-container>
+                        <div class="h-[300px] overflow-auto">
+                            <table class="w-full table-fixed">
+                                <thead class="bg-slate-300">
+                                    <tr>
+                                        <th class="font-normal text-slate-500">
+                                            External ID
+                                        </th>
+                                        <th class="font-normal text-slate-500">
+                                            Employer
+                                        </th>
+                                        <th class="font-normal text-slate-500">
+                                            Amount
+                                        </th>
+                                        <th class="font-normal text-slate-500">
+                                            Status
+                                        </th>
+                                        <th class="font-normal text-slate-500">
+                                            View
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm">
+                                    <tr
+                                        v-for="(invoice, index) in invoices"
+                                        :key="invoice.id"
+                                        class="break-words text-center"
+                                    >
+                                        <td class="p-1">
+                                            {{ invoice.external_id }}
+                                        </td>
+                                        <td class="p-1">
+                                            {{ invoice.employer.email }}
+                                        </td>
+                                        <td class="p-1">
+                                            {{ formatCurrency(invoice.amount) }}
+                                        </td>
+                                        <td
+                                            :class="[
+                                                'p-1',
+                                                {
+                                                    'text-yellow-500':
+                                                        invoice.status ===
+                                                        'PENDING',
+                                                    'text-green-500':
+                                                        invoice.status ===
+                                                            'PAID' ||
+                                                        invoice.status ===
+                                                            'SETTLED',
+                                                    'text-red-500':
+                                                        invoice.status ===
+                                                        'EXPIRED',
+                                                },
+                                            ]"
+                                        >
+                                            {{ invoice.status }}
+                                        </td>
+                                        <td class="p-1">
+                                            <a
+                                                class="rounded bg-blue-500 p-2 text-white"
+                                                :href="`/storage/invoices/${invoice.external_id}.pdf`"
+                                                target="_blank"
+                                            >
+                                                <i
+                                                    class="bi bi-box-arrow-up-right"
+                                                ></i
+                                            ></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     <div
@@ -127,7 +439,7 @@ const formatCurrency =
                             <div class="flex justify-start gap-3">
                                 <div
                                     @click="openModalPayout"
-                                    class="flex flex-col items-center justify-center"
+                                    class="flex cursor-pointer flex-col items-center justify-center"
                                 >
                                     <div
                                         class="flex h-10 w-10 items-center justify-center rounded bg-blue-500 p-2"
@@ -142,7 +454,7 @@ const formatCurrency =
                                     class="flex flex-col items-center justify-center"
                                 >
                                     <div
-                                        class="flex h-10 w-10 items-center justify-center rounded bg-blue-500 p-2"
+                                        class="flex h-10 w-10 cursor-pointer items-center justify-center rounded bg-blue-500 p-2"
                                     >
                                         <i
                                             class="bi bi-info-circle-fill text-white"
@@ -155,10 +467,51 @@ const formatCurrency =
 
                         <div>
                             <p>Transactions</p>
+                            <swiper-container
+                                class="mb-3 text-[12px]"
+                                slides-per-view="auto"
+                                :space-between="10"
+                            >
+                                <swiper-slide class="w-fit">
+                                    <li
+                                        @click="
+                                            switchTransactionTag('INVOICES')
+                                        "
+                                        :class="[
+                                            'cursor-pointer rounded border border-blue-500 p-1',
+                                            {
+                                                'bg-blue-500 text-white':
+                                                    transactionTag ===
+                                                    'INVOICES',
+                                                'text-blue-500':
+                                                    transactionTag !=
+                                                    'INVOICES',
+                                            },
+                                        ]"
+                                    >
+                                        Invoices
+                                    </li></swiper-slide
+                                >
+                                <swiper-slide class="w-fit">
+                                    <li
+                                        @click="switchTransactionTag('PAYOUT')"
+                                        :class="[
+                                            'cursor-pointer rounded border border-blue-500 p-1 text-blue-500',
+                                            {
+                                                'bg-blue-500 text-white':
+                                                    transactionTag === 'PAYOUT',
+                                            },
+                                        ]"
+                                    >
+                                        Payout
+                                    </li></swiper-slide
+                                >
+                            </swiper-container>
                         </div>
 
                         <div class="flex-1 overflow-y-scroll">
                             <div
+                                v-if="showInvoices"
                                 v-for="transaction in invoiceTransactions"
                                 class="mb-3 rounded p-4 shadow"
                             >
@@ -191,6 +544,41 @@ const formatCurrency =
                                                 }"
                                             >
                                                 {{ `(${transaction.status})` }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                v-if="showPayouts"
+                                v-for="payout in payoutTransactions"
+                                class="mb-3 rounded p-4 shadow"
+                            >
+                                <!-- {{ payout }} -->
+                                <div class="flex gap-2">
+                                    <div class="flex-1">
+                                        <p class="text-sm">
+                                            {{ formatCurrency(payout.amount) }}
+                                        </p>
+                                        <div
+                                            class="flex justify-between text-[12px]"
+                                        >
+                                            <p>{{ payout.reference_id }}</p>
+                                            <p
+                                                :class="{
+                                                    'text-yellow-500':
+                                                        payout.status ===
+                                                        'PAID',
+                                                    'text-green-500':
+                                                        payout.status ===
+                                                        'SETTLED',
+                                                }"
+                                            >
+                                                {{
+                                                    dayjs(
+                                                        payout.created_at,
+                                                    ).format("MM-DD-YYYY")
+                                                }}
                                             </p>
                                         </div>
                                     </div>
@@ -400,7 +788,7 @@ const formatCurrency =
     <ReusableModal @closeModal="closeModalPayout" v-if="openPayoutModal">
         <div class="h-[500px] w-[350px] overflow-auto rounded bg-white p-2">
             <div>
-                <h2 class="text-lg font-medium">Choose Payout option</h2>
+                <h2 class="mb-5 text-xl font-medium">Choose Payout option</h2>
                 <div>
                     <!-- <div class="cursor-pointer">
                         <div
@@ -509,14 +897,23 @@ const formatCurrency =
                         >
                             <div class="flex items-center gap-2">
                                 <i class="bi bi-credit-card-2-front"></i>
-                                <p>E-Wallet (Gcash)</p>
+                                <div class="flex items-center">
+                                    <p>E-Wallet</p>
+                                    <div class="h-10 w-14">
+                                        <img
+                                            src="/assets/GCash.png"
+                                            alt=""
+                                            class="h-full w-full"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                             <i class="bi bi-chevron-down"></i>
                         </div>
 
                         <div
                             :class="[
-                                'card-form overflow-hidden transition-all',
+                                'card-form overflow-auto transition-all',
                                 {
                                     'h-[350px] border border-t-0':
                                         openEwalletForm,
@@ -530,9 +927,21 @@ const formatCurrency =
                                         >Amount</label
                                     >
                                     <input
-                                        type="number"
+                                        type="text"
                                         class="rounded border p-2"
+                                        v-model="gcashAmount"
+                                        :max="balance.balance"
+                                        min="0"
                                     />
+                                    <InputFlashMessage
+                                        class="text-sm"
+                                        :message="errorMessage.gcashAmount"
+                                        type="error"
+                                    ></InputFlashMessage>
+                                    <p class="text-sm">
+                                        Available Balance:
+                                        {{ formatCurrency(balance.balance) }}
+                                    </p>
                                 </div>
                                 <div class="mb-3 flex flex-col">
                                     <label for="" class="mb-1 text-sm"
@@ -540,8 +949,7 @@ const formatCurrency =
                                     >
                                     <input
                                         type="text"
-                                        value="TEST"
-                                        disabled
+                                        v-model="gcashAccountName"
                                         class="rounded border p-2"
                                     />
                                 </div>
@@ -550,14 +958,20 @@ const formatCurrency =
                                         >Gcash Number</label
                                     >
                                     <input
-                                        type="number"
-                                        value="09989878978"
+                                        type="text"
+                                        v-model="gcashCardNumber"
                                         class="rounded border p-2"
                                     />
+                                    <InputFlashMessage
+                                        class="text-sm"
+                                        :message="errorMessage.gcashCardNumber"
+                                        type="error"
+                                    ></InputFlashMessage>
                                 </div>
 
                                 <div class="flex justify-center">
                                     <button
+                                        @click="createPayout('PH_GCASH')"
                                         class="rounded bg-slate-400 p-2 text-white"
                                     >
                                         Pay Now
@@ -578,14 +992,21 @@ const formatCurrency =
                         >
                             <div class="flex items-center gap-2">
                                 <i class="bi bi-credit-card-2-front"></i>
-                                <p>Online Banking (BPI)</p>
+                                <p>Online Banking</p>
+                                <div class="h-10 w-10">
+                                    <img
+                                        src="/assets/BPI.jpg"
+                                        alt=""
+                                        class="h-full w-full"
+                                    />
+                                </div>
                             </div>
                             <i class="bi bi-chevron-down"></i>
                         </div>
 
                         <div
                             :class="[
-                                'card-form overflow-hidden transition-all',
+                                'card-form overflow-auto transition-all',
                                 {
                                     'h-[350px] border border-t-0':
                                         openOnlineBanking,
@@ -599,9 +1020,19 @@ const formatCurrency =
                                         >Amount</label
                                     >
                                     <input
-                                        type="number"
+                                        type="text"
+                                        v-model="bpiAmount"
                                         class="rounded border p-2"
                                     />
+                                    <InputFlashMessage
+                                        class="text-sm"
+                                        :message="errorMessage.bpiAmount"
+                                        type="error"
+                                    ></InputFlashMessage>
+                                    <p class="text-sm">
+                                        Available Balance:
+                                        {{ formatCurrency(balance.balance) }}
+                                    </p>
                                 </div>
                                 <div class="mb-3 flex flex-col">
                                     <label for="" class="mb-1 text-sm"
@@ -609,9 +1040,8 @@ const formatCurrency =
                                     >
                                     <input
                                         type="text"
+                                        v-model="bpiAccountName"
                                         class="rounded border p-2"
-                                        value="John Doe"
-                                        disabled
                                     />
                                 </div>
                                 <div class="mb-3 flex flex-col">
@@ -620,14 +1050,19 @@ const formatCurrency =
                                     >
                                     <input
                                         type="text"
-                                        disabled
-                                        value="000000"
+                                        v-model="bpiCardNumber"
                                         class="rounded border p-2"
                                     />
+                                    <InputFlashMessage
+                                        class="text-sm"
+                                        :message="errorMessage.bpiCardNumber"
+                                        type="error"
+                                    ></InputFlashMessage>
                                 </div>
 
                                 <div class="flex justify-center">
                                     <button
+                                        @click="createPayout('PH_BPI')"
                                         class="rounded bg-slate-400 p-2 text-white"
                                     >
                                         Pay Now
@@ -640,16 +1075,21 @@ const formatCurrency =
             </div>
         </div>
     </ReusableModal>
+
+    <SuccessfulMessage
+        :messageShow="popupErrorMessage"
+        :messageProp="popupErrorMessage"
+        type="Error"
+    ></SuccessfulMessage>
 </template>
 
 <style scoped>
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
     @apply w-1;
 }
 ::-webkit-scrollbar-thumb {
-    /* background-color: green; */
     @apply bg-green-200;
-}
+} */
 
 /* @keyframes animation-down {
     0% {

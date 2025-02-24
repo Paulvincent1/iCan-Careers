@@ -20,6 +20,8 @@ class ProcessInvoicePdf implements ShouldQueue
         public string $dueDate,
         public string $description,
         public array $items,
+        public float $xenditTransactionFee,
+        public float $vatTransactionFee,
         public int $totalAmount,
         public string $invoiceUrl, 
         )
@@ -39,7 +41,9 @@ class ProcessInvoicePdf implements ShouldQueue
             'description' => $this->description,
             'employer' => $this->employer,
             'items' =>  $this->items,
-            'totalAmount' => $this->totalAmount,
+            'xenditTransactionFee' => $this->xenditTransactionFee,
+            'vatTransactionFee' => $this->vatTransactionFee,
+            'totalAmount' => $this->totalAmount + $this->xenditTransactionFee + $this->vatTransactionFee,
             'invoiceUrl' => $this->invoiceUrl
         ])->disk('public')->save('/invoices/' . $this->externalId . '.pdf');
     }

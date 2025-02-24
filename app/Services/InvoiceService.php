@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\EmployerSubscriptionInvoice;
 use App\Models\Invoice;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Xendit\Configuration;
 use Xendit\Invoice\CreateInvoiceRequest;
@@ -21,7 +23,7 @@ class InvoiceService {
         $this->apiInstance = new InvoiceApi();
     }
 
-    public function createInvoice(string $externalId, string $description, array $items, int $duration){
+    public function createInvoice(string $externalId, string $description, array $items, int $duration = null, float $totalAmountWithTaxes = null){
 
         $invoicesItems = [];
         $totalAmount = 0;
@@ -43,10 +45,10 @@ class InvoiceService {
         $create_invoice_request = new CreateInvoiceRequest([
             'external_id' => $externalId,
             'description' => $description,
-            'amount' => $totalAmount,
+            'amount' => $totalAmountWithTaxes ?? $totalAmount,
             'invoice_duration' => $duration,
-            'success_redirect_url' => 'http://127.0.0.1:8000/employers',
-            'failure_redirect_url' => 'http://127.0.0.1:8000/employers',
+            'success_redirect_url' => 'http://127.0.0.1:8000/',
+            'failure_redirect_url' => 'http://127.0.0.1:8000/',
             'currency' => 'PHP',
             'reminder_time' => 1,
             'items' => $invoicesItems,
@@ -101,6 +103,74 @@ class InvoiceService {
             }
         }
     
+    }
+
+    public function renewEmployerSubscriptionInvoices(){
+        $employerSubscriptionInvoices = EmployerSubscriptionInvoice::all();
+
+        $for_user_id = "679097a12e753bd42605ae99";
+
+        foreach($employerSubscriptionInvoices as $subscriptionInvoice) {
+
+            DB::beginTransaction();
+
+            try {
+
+                $result = $this->apiInstance->getInvoiceById($subscriptionInvoice->invoice_id, $for_user_id);
+
+                $status = $result->getStatus();
+
+                if($status === 'EXPIRED'){
+                    
+
+                    $externalId = 'INV-' . uniqid();
+
+                    $price = 0;
+                    $duration = Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,19,0));
+
+                    if($subscriptionInvoice->subscription_type === 'Pro'){
+                        $price = 3999;
+                    }
+                    if($subscriptionInvoice->subscription_type === 'Premium'){
+                        $price = 5699;                     
+                    }
+
+                    $newInvoice = $this->createInvoice(
+                        externalId:$externalId,
+                        description:$subscriptionInvoice->description,
+                        items:[
+                            [
+                               'description' => $subscriptionInvoice->description, 
+                               'rate' => $price, 
+                               'hours'=> 1,
+                            ]
+                        ],
+                        duration: $duration,
+                    );
+                    
+
+                    EmployerSubscriptionInvoice::create([
+                        'external_id' => $externalId,
+                        'invoice_id' => $newInvoice->getId(),
+                        'description' =>  $subscriptionInvoice->description,
+                        'invoice_url' =>  $newInvoice->getInvoiceUrl(),
+                        'subscription_type' => $subscriptionInvoice->subscription_type,
+                        'duration' => $duration
+                    ]);
+
+                    $subscriptionInvoice->delete();
+
+                    DB::commit();
+                }
+                
+            }catch (\Xendit\XenditSdkException $e) {
+                echo 'Exception when calling InvoiceApi->getInvoiceById: ', $e->getMessage(), PHP_EOL;
+                echo 'Full Error: ', json_encode($e->getFullError()), PHP_EOL;
+
+                DB::rollBack();
+            }
+
+        }
     }
     
 }

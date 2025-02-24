@@ -56,6 +56,14 @@
                         </tr>
                         @endforeach
                         <tr class="font-bold">
+                            <td colspan="3" class="border p-3 text-right">Xendit Transaction Fee(4.5%)</td>
+                            <td class="border p-3 text-right text-green-600">₱ {{ number_format($xenditTransactionFee ,2) }}</td>
+                        </tr>
+                        <tr class="font-bold">
+                            <td colspan="3" class="border p-3 text-right">Vat Transaction Fee(12%)</td>
+                            <td class="border p-3 text-right text-green-600">₱ {{ number_format($vatTransactionFee, 2) }}</td>
+                        </tr>
+                        <tr class="font-bold">
                             <td colspan="3" class="border p-3 text-right">Total Amount</td>
                             <td class="border p-3 text-right text-green-600">₱ {{ number_format($totalAmount, 2) }}</td>
                         </tr>

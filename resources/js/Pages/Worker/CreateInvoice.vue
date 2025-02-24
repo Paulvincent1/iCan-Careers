@@ -348,10 +348,47 @@ console.log(getCurrentInstance());
                             ></InputFlashMessage>
                         </div>
                         <div class="md:basis-[300px]">
-                            <h3 class="text-end text-[20px]">Total Amount:</h3>
-                            <p class="text-end text-[20px]">
-                                {{ formatCurrency(totalAmount) }}
-                            </p>
+                            <div>
+                                <h3 class="text-md text-end">
+                                    Xendit Transaction Fee (4.5%)
+                                </h3>
+                                <p class="text-md text-end">
+                                    {{
+                                        formatCurrency(
+                                            totalAmount / 0.955 - totalAmount,
+                                        )
+                                    }}
+                                </p>
+                            </div>
+                            <div>
+                                <h3 class="text-md text-end">
+                                    Vat Transaction Fee (12%)
+                                </h3>
+                                <p class="text-md text-end">
+                                    {{
+                                        formatCurrency(
+                                            (totalAmount / 0.955 -
+                                                totalAmount) *
+                                                0.12,
+                                        )
+                                    }}
+                                </p>
+                            </div>
+                            <div>
+                                <h3 class="text-md text-end">Total Amount:</h3>
+                                <p class="text-md text-end">
+                                    {{
+                                        formatCurrency(
+                                            totalAmount / 0.955 -
+                                                totalAmount +
+                                                (totalAmount / 0.955 -
+                                                    totalAmount) *
+                                                    0.12 +
+                                                totalAmount,
+                                        )
+                                    }}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
