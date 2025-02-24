@@ -145,13 +145,13 @@ function closeInvoiceModal() {
 
     isOpenInvoiceModal.value = false;
 }
+
+console.log(pricingPlans);
 </script>
 
 <template>
     <Head title="Pricing | iCan Careers" />
-    <section
-        class="relative bg-[#fa8334] py-20 text-center text-white"
-    >
+    <section class="relative bg-[#fa8334] py-20 text-center text-white">
         <div class="container mx-auto px-6">
             <h1 class="animate-fadeIn mb-4 text-4xl font-bold sm:text-5xl">
                 Find the Best Workers for Your Needs

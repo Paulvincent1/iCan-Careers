@@ -41,7 +41,10 @@ window.addEventListener("resize", () => {
         >
             <p class="">
                 <Link :href="route('home')"
-                    ><img src="/assets/iCanCareersLogofinal.png" alt="" class="h-10 md:h-14 lg:h-16 w-auto object-contain"
+                    ><img
+                        src="/assets/iCanCareersLogofinal.png"
+                        alt=""
+                        class="h-10 w-auto object-contain md:h-14 lg:h-16"
                 /></Link>
             </p>
             <nav
@@ -74,7 +77,13 @@ window.addEventListener("resize", () => {
                             POST A JOB
                         </Link>
                     </li> -->
-                    <li class="flex items-center md:pr-3 lg:border-r-[1px]">
+                    <li
+                        v-if="
+                            !$page.props.auth.user.role?.name === 'Employer' ||
+                            !$page.props.auth.user.authenticated
+                        "
+                        class="flex items-center md:pr-3 lg:border-r-[1px]"
+                    >
                         <Link
                             :href="route('jobsearch')"
                             class="rounded-3xl bg-[#fa8334] px-7 py-2 font-medium text-white"

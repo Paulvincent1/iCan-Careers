@@ -22,7 +22,7 @@ class EmployerSubscriptionController extends Controller
     {
 
         $user = Auth::user();
-        $subscriptionInvoices =  $user->employerSubscriptionInvoices;
+        $subscriptionInvoices =  $user?->employerSubscriptionInvoices;
         return Inertia::render('Pricing/Pricing', ['subscriptionInvoicesProps' => $subscriptionInvoices]);
     }
 
