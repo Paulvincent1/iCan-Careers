@@ -79,8 +79,9 @@ window.addEventListener("resize", () => {
                     </li> -->
                     <li
                         v-if="
-                            !$page.props.auth.user.role?.name === 'Employer' ||
-                            !$page.props.auth.user.authenticated
+                            !(
+                                $page.props.auth.user.role?.name === 'Employer'
+                            ) || !$page.props.auth.user.authenticated
                         "
                         class="flex items-center md:pr-3 lg:border-r-[1px]"
                     >
