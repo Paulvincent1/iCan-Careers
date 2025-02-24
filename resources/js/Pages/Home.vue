@@ -1,6 +1,67 @@
 <script setup>
 import Rating from "./Components/Rating.vue";
 import Searchbar from "./Components/Searchbar.vue";
+import Statistic from "./Components/Statistic.vue";
+import Joblisting from "./Components/Joblisting.vue";
+import Testimonials from "./Components/Testimonials.vue";
+import Footer from "./Components/Admin/Footer.vue";
+
+const jobs = [
+    {
+        id: 1,
+        title: "Remote Customer Support",
+        company: "ABC Corp",
+        description: "Work from home providing customer service.",
+    },
+    {
+        id: 2,
+        title: "Freelance Graphic Designer",
+        company: "XYZ Designs",
+        description: "Flexible job for experienced designers.",
+    },
+    {
+        id: 3,
+        title: "Part-time Data Entry",
+        company: "DataWorks",
+        description: "Easy typing job with flexible hours.",
+    },
+];
+
+const stats = [
+    { value: "1000+", label: "Jobs Listed" },
+    { value: "500+", label: "Employers Hiring" },
+    { value: "10,000+", label: "Job Seekers" },
+];
+
+const testimonials = [
+    {
+        name: "Jane Doe",
+        message:
+            "iCan Careers helped me find a flexible job that suits my abilities!",
+    },
+    {
+        name: "John Smith, XYZ Corp",
+        message:
+            "Hiring through iCan was quick and efficient. Highly recommend!",
+    },
+    {
+        name: "Edgar Alan Poe, XYZ Corp",
+        message: "We loved with a love that was more than love",
+    },
+    {
+        name: "Maria Santos",
+        message:
+            "Thanks to iCan Careers, I found a remote job that allows me to support my family while managing my disability. This platform truly empowers people like me!",
+    },
+    {
+        name: "John Dela Cruz",
+        message: "As a senior citizen, I struggled to find work. iCan Careers connected me with an employer who values my experience, and now I feel productive again!"
+    },
+    {
+        name: "Anna Reyes",
+        message: "I was hesitant about job hunting due to my mobility challenges, but iCan Careers provided me with opportunities I never thought possible. Grateful for this platform!"
+    },
+];
 </script>
 
 <template>
@@ -14,6 +75,7 @@ import Searchbar from "./Components/Searchbar.vue";
                     <p class="my-7 text-center text-[32px]">
                         Where Others Can't, We Do.
                     </p>
+
                     <div class="flex flex-col">
                         <label class="mb-2">Looking for Talent?</label>
                         <Searchbar endpoint="/" name="Talent" class="mb-4" />
@@ -42,4 +104,9 @@ import Searchbar from "./Components/Searchbar.vue";
             </div>
         </div>
     </section>
+
+    <Statistic :stats="stats" />
+    <Joblisting :jobs="jobs" />
+    <Testimonials :testimonials="testimonials" />
+    <Footer />
 </template>
