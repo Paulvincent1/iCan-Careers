@@ -137,8 +137,11 @@ Route::prefix('admin')->middleware([])->group(function (){
     Route::get('/workers/{id}/verification', [AdminDashboardController::class, 'workerVerificationDetails'])
     ->name('admin.workers.verification'); 
     Route::get('/employers',[AdminDashboardController::class, 'employers'])->name('admin.employers');
-    Route::get('/reported-users',[AdminDashboardController::class, 'reportedUsers'])->name('admin.reported.uers');
-    Route::get('/job-approvals',[AdminDashboardController::class, 'jobApprovals'])->name('admin.job.approvals');
+    Route::get('/reported-users',[AdminDashboardController::class, 'reportedUsers'])->name('admin.reported.users');
+    Route::get('/job-approvals', [AdminDashboardController::class, 'jobApprovals'])->name('admin.job.approvals');
+    Route::put('/job-approvals/{id}/update', [JobPostController::class, 'updateJobStatus'])
+        ->name('admin.job.approvals.update');
+    Route::get('/job-posts/{id}', [JobPostController::class, 'showJob']);
     Route::get('/payment-history',[AdminDashboardController::class, 'paymentHistory'])->name('admin.payment-history');
     Route::get('/table-subscription',[AdminDashboardController::class, 'subscribeUsers'])->name('admin.table-subscription');
     
