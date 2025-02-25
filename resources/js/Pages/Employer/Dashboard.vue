@@ -3,12 +3,25 @@ import { Link, usePage } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import { onMounted, ref } from "vue";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
+import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 
 let props = defineProps({
     jobsProps: null,
     currentWorkerProps: null,
     invoiceProps: null,
+    successMessage: null,
 });
+
+let messageShow = ref(false);
+onMounted(() => {
+    if (props.successMessage) {
+        messageShow.value = true;
+        setTimeout(() => {
+            messageShow.value = false;
+        }, 2000);
+    }
+});
+
 let page = usePage();
 let jobs = ref(null);
 
@@ -458,4 +471,8 @@ function switchInvoiceTag(tag) {
             </iframe>
         </div>
     </ReusableModal>
+    <SuccessfulMessage
+        :messageShow="messageShow"
+        :messageProp="successMessage"
+    ></SuccessfulMessage>
 </template>

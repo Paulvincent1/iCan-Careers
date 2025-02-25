@@ -178,9 +178,9 @@ function closeJob() {
                 <Link
                     v-if="!isClosed"
                     as="button"
-                    method="post"
+                    method="get"
                     preserve-scroll
-                    :href="route('jobsearch.save.job', jobPostProps.id)"
+                    :href="route('employer.jobpost.edit', jobPostProps.id)"
                     class="w-44 rounded border border-blue-400 p-2 px-8 font-bold text-blue-400"
                 >
                     Edit
@@ -229,7 +229,7 @@ function closeJob() {
                             <p class="text-lg font-bold">Required Skills</p>
                             <div>
                                 <p
-                                    class="w-fit rounded bg-slate-300 px-2 font-bold"
+                                    class="mb-1 w-fit rounded bg-slate-300 px-2 font-bold"
                                     v-for="(
                                         skill, index
                                     ) in jobPostProps.skills"

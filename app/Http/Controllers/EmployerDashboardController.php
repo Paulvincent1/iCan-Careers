@@ -25,7 +25,7 @@ class EmployerDashboardController extends Controller
         $invoices =  $user->employerInvoices()->with('worker')->get();
         // dd($invoices);
 
-        return inertia('Employer/Dashboard',['jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices]);
+        return inertia('Employer/Dashboard',['jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices, 'successMessage' => session()->get('successMessage')]);
     }
 
     public function showJobApplicants(Request $request, JobPost $jobid){

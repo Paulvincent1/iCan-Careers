@@ -110,17 +110,68 @@ class JobPostController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(JobPost $jobPost)
+    public function edit(JobPost $jobid)
     {
-        //
+        // dd($jobid);
+        return inertia('Employer/CreateJob', ['jobPostProp' => $jobid]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, JobPost $jobPost)
+    public function update(Request $request, JobPost $jobid)
     {
-        //
+
+        // dd($request);
+        
+        $user = Auth::user();
+        $fields = $request->validate([
+            'job_title' => 'required|max:255',
+            'job_type' => 'required|max:255',
+            'work_arrangement' => 'required|max:255',
+            'location' => 'nullable',
+            'experience' => 'required',
+            'hour_per_day' => 'required|max:255',
+            'hourly_rate' => 'required|max:255',
+            'salary' => 'required|max:255',
+            'description' => 'required|max:255',
+            'preferred_educational_attainment' => 'required|max:255',
+            'skills' => 'required',
+            'preferred_worker_types' => 'required',
+        ]);
+
+
+
+        if($fields['work_arrangement'] === 'On site' || $fields['work_arrangement'] === 'Hybrid'){
+            $request->validate([
+                'location' => 'required'
+            ]);
+        }
+
+        $skills = [];
+        foreach($fields['skills'] as $skill){
+            $skills[] = $skill['name'];
+        }
+        // dd($user->employerSubscription->subscription_type);
+
+
+        $user->employerJobPosts()->where('id', $jobid->id)->update([
+            'job_title' =>  $fields['job_title'],
+            'job_type' =>  $fields['job_type'],
+            'work_arrangement' =>  $fields['work_arrangement'],
+            'location' =>  $fields['location'],
+            'experience' =>  $fields['experience'],
+            'hour_per_day' =>  $fields['hour_per_day'],
+            'hourly_rate' =>  $fields['hourly_rate'],
+            'salary' =>  $fields['salary'],
+            'description' =>  $fields['description'],
+            'preferred_educational_attainment' =>  $fields['preferred_educational_attainment'],
+            'skills' =>  $skills,
+            'preferred_worker_types' =>  $fields['preferred_worker_types'],
+            'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open'
+        ]);
+
+        return redirect()->route('employer.dashboard')->with('successMessage', 'Sucessfully updated!');
     }
 
     public function closeJob(JobPost $jobid){

@@ -118,6 +118,8 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
 
 
     Route::get('/jobpost/{jobid}',[JobPostController::class,'show'])->name('employer.jobpost.show');
+    Route::get('/jobpost/{jobid}/edit',[JobPostController::class,'edit'])->name('employer.jobpost.edit');
+    Route::put('/jobpost/{jobid}/update',[JobPostController::class,'update'])->name('employer.jobpost.update');
     Route::put('/jobpost/{jobid}',[JobPostController::class,'closeJob'])->name('employer.jobpost.close');
 
 
