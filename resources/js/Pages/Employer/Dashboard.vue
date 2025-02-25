@@ -120,7 +120,12 @@ function switchInvoiceTag(tag) {
                     </div>
                 </div>
 
-                <div class="border p-4">Inbox</div>
+                <div class="border p-4">
+                    <div class="flex justify-between">
+                        <p>Inbox</p>
+                        <Link class="text-blue-500">See All</Link>
+                    </div>
+                </div>
             </div>
             <div
                 class="grid h-[400px] grid-cols-1 gap-2 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"

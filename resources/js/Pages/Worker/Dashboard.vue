@@ -279,7 +279,14 @@ const formatCurrency =
                     </div>
                 </div>
 
-                <div class="border p-4">Inbox</div>
+                <div class="border p-4">
+                    <div class="flex justify-between">
+                        <p>Inbox</p>
+                        <Link :href="route('messages')" class="text-blue-500"
+                            >See All</Link
+                        >
+                    </div>
+                </div>
             </div>
             <div>
                 <div
