@@ -9,6 +9,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\JobPostController;
 use App\Http\Controllers\JobSearchController;
 use App\Http\Controllers\LearningController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
@@ -151,6 +152,15 @@ Route::prefix('admin')->middleware([])->group(function (){
 
 //shared route for authenticated users
 Route::middleware([ForceGetRedirect::class])->group(function() {
+
+    //chat routes
+    Route::prefix('/messages', function(){
+
+        Route::get('/',[MessageController::class,'index'])->name('messages');
+        
+
+    });
+
 
 
     Route::get('/view/applicant-profile/{applicantId}', [WorkerProfileController::class,'show'])->name('worker.show.profile');

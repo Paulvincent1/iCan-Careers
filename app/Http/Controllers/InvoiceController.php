@@ -57,12 +57,33 @@ class InvoiceController extends Controller
 
                 if($employerSubscriptionInvoice->subscription_type === 'Pro'){
 
-                    $employer->employerSubscription->update([
-                        'subscription_type'=> 'Pro',
-                        'start_date' => Carbon::now(),
-                        'expiry_date' => Carbon::now()->addMonth(),
-                    ]);
+                    if($employerSubscriptionInvoice->expiry_date){
+                        if(Carbon::parse($employerSubscriptionInvoice->expiry_date)->isBefore(Carbon::now())){
+ 
+                         $employer->employerSubscription->update([
+                             'subscription_type'=> 'Pro',
+                             'start_date' => Carbon::now(),
+                             'expiry_date' => Carbon::now()->addMonth(),
+                         ]);
+     
+                        }else{
+                     
+                         $employer->employerSubscription->update([
+                             'subscription_type'=> 'Pro',
+                             'start_date' => Carbon::now(),
+                             'expiry_date' => Carbon::parse($employer->employerSubscription)->addMonth(),
+                         ]);
+ 
+                        }
+                    }else{
 
+                        $employer->employerSubscription->update([
+                            'subscription_type'=> 'Pro',
+                            'start_date' => Carbon::now(),
+                            'expiry_date' => Carbon::now()->addMonth(),
+                        ]);
+    
+                    }
 
 
                     $employerSubscriptionInvoice->delete();
@@ -110,11 +131,33 @@ class InvoiceController extends Controller
 
                 if($employerSubscriptionInvoice->subscription_type === 'Premium'){
 
-                    $employer->employerSubscription->update([
-                        'subscription_type'=> 'Premium',
-                        'start_date' => Carbon::now(),
-                        'expiry_date' => Carbon::now()->addYear(),
-                    ]);
+                    if($employerSubscriptionInvoice->expiry_date){
+                       if(Carbon::parse($employerSubscriptionInvoice->expiry_date)->isBefore(Carbon::now())){
+
+                        $employer->employerSubscription->update([
+                            'subscription_type'=> 'Premium',
+                            'start_date' => Carbon::now(),
+                            'expiry_date' => Carbon::now()->addYear(),
+                        ]);
+    
+                       }else{
+                    
+                        $employer->employerSubscription->update([
+                            'subscription_type'=> 'Premium',
+                            'start_date' => Carbon::now(),
+                            'expiry_date' => Carbon::parse($employer->employerSubscription)->addYear(),
+                        ]);
+
+                       }
+                    }else{
+
+                        
+                        $employer->employerSubscription->update([
+                            'subscription_type'=> 'Premium',
+                            'start_date' => Carbon::now(),
+                            'expiry_date' => Carbon::now()->addYear(),
+                        ]);
+                    }
 
                     $employerSubscriptionInvoice->delete();
 
