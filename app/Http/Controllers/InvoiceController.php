@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use function Illuminate\Log\log;
 
@@ -46,9 +47,10 @@ class InvoiceController extends Controller
 
     public function webhook(Request $request){
 
-      
 
         if($request->header('X-CALLBACK-TOKEN') === env('XENDIT_WEBHOOK_KEY')){
+
+     
 
             if($employerSubscriptionInvoice = EmployerSubscriptionInvoice::where('external_id', $request['external_id'])->with('employer')->first()){
 
@@ -57,8 +59,8 @@ class InvoiceController extends Controller
 
                 if($employerSubscriptionInvoice->subscription_type === 'Pro'){
 
-                    if($employerSubscriptionInvoice->expiry_date){
-                        if(Carbon::parse($employerSubscriptionInvoice->expiry_date)->isBefore(Carbon::now())){
+                    if($employer->employerSubscription->expiry_date){
+                        if(Carbon::parse($employer->employerSubscription->expiry_date)->isBefore(Carbon::now())){
  
                          $employer->employerSubscription->update([
                              'subscription_type'=> 'Pro',
@@ -68,10 +70,11 @@ class InvoiceController extends Controller
      
                         }else{
                      
+                            //if on going
                          $employer->employerSubscription->update([
                              'subscription_type'=> 'Pro',
                              'start_date' => Carbon::now(),
-                             'expiry_date' => Carbon::parse($employer->employerSubscription)->addMonth(),
+                             'expiry_date' => Carbon::parse($employer->employerSubscription->expiry_date)->addMonth(),
                          ]);
  
                         }
@@ -108,12 +111,12 @@ class InvoiceController extends Controller
                           ],                  
                         duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0)) 
                         );
-                        // dd($proTierInvoice->getInvoiceUrl());
     
                         $employer->employerSubscriptionInvoices()->create([
                             'external_id' =>  $externalIdProTier,
+                            'invoice_id' =>  $proTierInvoice->getId(),
                             'description' => 'Pro Tier Subscription (Monthly)',
-                            'payment_url' =>  $proTierInvoice->getInvoiceUrl(),
+                            'invoice_url' =>  $proTierInvoice->getInvoiceUrl(),
                             'subscription_type' => 'Pro',
                             'duration' => now(),
                         ]);
@@ -131,8 +134,8 @@ class InvoiceController extends Controller
 
                 if($employerSubscriptionInvoice->subscription_type === 'Premium'){
 
-                    if($employerSubscriptionInvoice->expiry_date){
-                       if(Carbon::parse($employerSubscriptionInvoice->expiry_date)->isBefore(Carbon::now())){
+                    if($employer->employerSubscription->expiry_date){
+                       if(Carbon::parse($employer->employerSubscription->expiry_date)->isBefore(Carbon::now())){
 
                         $employer->employerSubscription->update([
                             'subscription_type'=> 'Premium',
@@ -141,11 +144,11 @@ class InvoiceController extends Controller
                         ]);
     
                        }else{
-                    
+                            // if on going
                         $employer->employerSubscription->update([
                             'subscription_type'=> 'Premium',
                             'start_date' => Carbon::now(),
-                            'expiry_date' => Carbon::parse($employer->employerSubscription)->addYear(),
+                            'expiry_date' => Carbon::parse($employer->employerSubscription->expiry_date)->addYear(),
                         ]);
 
                        }
@@ -182,11 +185,12 @@ class InvoiceController extends Controller
                           ],
                         duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0))           
                         );
-    
+                     
                         $employer->employerSubscriptionInvoices()->create([
                             'external_id' =>  $externalIdPremiumTier,
+                            'invoice_id' =>  $premiumTierInvoice->getId(),
                             'description' => 'Premium Tier Subscription (Anually)',
-                            'payment_url' =>  $premiumTierInvoice->getInvoiceUrl(),
+                            'invoice_url' =>  $premiumTierInvoice->getInvoiceUrl(),
                             'subscription_type' => 'Premium',
                             'duration' => now(),
                         ]);
