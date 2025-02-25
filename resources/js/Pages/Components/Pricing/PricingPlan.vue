@@ -10,7 +10,7 @@ defineProps({
 </script>
 
 <template>
-    <div class="m-5 mx-auto max-w-xs">
+    <div class="m-5 mx-auto max-w-xs transition-transform transform hover:scale-105">
         <div class="border bg-white shadow-lg" :class="borderColor">
             <div class="py-6 text-center">
                 <h4 class="text-xl font-semibold">{{ title }}</h4>

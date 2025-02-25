@@ -1,20 +1,18 @@
 <script setup>
 import { ref, computed } from "vue";
+import { usePage, router } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
+import DataTable from "vue3-easy-data-table";
 
-defineOptions({
-    layout: AdminLayout,
-});
+// Import styles for the DataTable component
+import "vue3-easy-data-table/dist/style.css";
 
-// Dummy job post data
-const jobs = ref([
-    { id: 1, title: "Data Analyst", employer: "Tech Solutions", approved: false },
-    { id: 2, title: "Security Guard", employer: "Secure Corp", approved: true },
-    { id: 3, title: "Graphic Designer", employer: "Future Web", approved: false },
-    { id: 4, title: "Software Engineer", employer: "Global Tech", approved: true },
-]);
+defineOptions({ layout: AdminLayout });
 
-// Tabs for sub-navigation
+// Fetch jobs from Laravel
+const jobs = ref(usePage().props.jobs);
+
+// Tabs for filtering jobs
 const tabs = [
     { id: "all", label: "All" },
     { id: "approved", label: "Approved" },
@@ -24,107 +22,152 @@ const tabs = [
 // Active tab state
 const activeTab = ref("all");
 
-// Filter jobs based on active tab
+// Search input state
+const searchQuery = ref("");
+
+// Filter jobs based on status and search query
 const filteredJobs = computed(() => {
-    if (activeTab.value === "all") {
-        return jobs.value;
-    } else if (activeTab.value === "approved") {
-        return jobs.value.filter((job) => job.approved);
-    } else {
-        return jobs.value.filter((job) => !job.approved);
+    let filtered = jobs.value;
+
+    // Filter by tab
+    if (activeTab.value !== "all") {
+        filtered = filtered.filter(job =>
+            activeTab.value === "approved" ? job.job_status === "Open" : job.job_status === "Pending"
+        );
     }
+
+    // Search filtering
+    if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase();
+        filtered = filtered.filter(job =>
+            job.job_title.toLowerCase().includes(query) ||
+            job.employer?.name?.toLowerCase().includes(query) ||
+            job.job_status.toLowerCase().includes(query)
+        );
+    }
+
+    return filtered;
 });
 
-// Approve job function
-const approveJob = (id) => {
-    const job = jobs.value.find((j) => j.id === id);
-    if (job) {
-        job.approved = true;
-    }
+// Table Headers
+const headers = [
+    { text: "Profile", value: "profile", sortable: false },
+    { text: "Job Title", value: "job_title", sortable: true },
+    { text: "Employer", value: "employer.name", sortable: true },
+    { text: "Status", value: "job_status", sortable: true },
+    { text: "Actions", value: "actions", sortable: false },
+];
+
+// Toggle job approval
+const toggleApproval = (id, newStatus) => {
+    router.put(`/admin/job-approvals/${id}/update`, { status: newStatus }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            const job = jobs.value.find(job => job.id === id);
+            if (job) job.job_status = newStatus;
+        },
+        onError: (errors) => console.error("Error updating job status:", errors),
+    });
 };
 </script>
 
 <template>
-    <Head title="JobApprovals | iCan Careers" />
+    <Head title="Job Approvals | iCan Careers" />
     <div class="p-4">
-        <!-- Sub-navigation -->
+        <!-- Tab Navigation -->
         <nav class="mb-6">
-            <ul class="flex space-x-4 border-b overflow-x-auto whitespace-nowrap">
-                <li
-                    v-for="tab in tabs"
-                    :key="tab.id"
+            <ul class="flex space-x-4 border-b overflow-x-auto">
+                <li v-for="tab in tabs" :key="tab.id" 
                     @click="activeTab = tab.id"
                     :class="{
-                        'border-b-2 border-blue-500': activeTab === tab.id,
-                        'text-gray-500 hover:text-gray-700': activeTab !== tab.id,
+                        'border-b-2 border-blue-500 font-semibold': activeTab === tab.id,
+                        'text-gray-500 hover:text-gray-700': activeTab !== tab.id
                     }"
-                    class="cursor-pointer px-4 py-2 text-sm md:text-base"
-                >
+                    class="cursor-pointer px-4 py-2 whitespace-nowrap">
                     {{ tab.label }}
                 </li>
             </ul>
         </nav>
 
-        <h1 class="mb-4 text-xl md:text-2xl font-bold">Job Post Approval</h1>
+        <h1 class="mb-4 text-xl font-bold">Job Post Approval</h1>
 
-        <!-- Responsive Table Wrapper -->
-        <div class="overflow-x-auto rounded-lg shadow-md">
-            <table class="min-w-full bg-white hidden md:table">
-                <thead>
-                    <tr class="bg-gray-200 text-left text-xs md:text-sm">
-                        <th class="p-3">ID</th>
-                        <th class="p-3">Job Title</th>
-                        <th class="p-3">Employer</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="job in filteredJobs" :key="job.id" class="border-b text-xs md:text-sm">
-                        <td class="p-3">{{ job.id }}</td>
-                        <td class="p-3">{{ job.title }}</td>
-                        <td class="p-3">{{ job.employer }}</td>
-                        <td class="p-3">
-                            <span :class="job.approved ? 'text-green-600' : 'text-red-600'">
-                                {{ job.approved ? "Approved" : "Pending" }}
-                            </span>
-                        </td>
-                        <td class="p-3">
-                            <button
-                                v-if="!job.approved"
-                                @click="approveJob(job.id)"
-                                class="rounded bg-blue-500 px-3 py-1 md:px-4 md:py-2 text-white hover:bg-blue-600 text-xs md:text-sm"
-                            >
-                                Approve
-                            </button>
-                            <span v-else class="text-gray-500">✔ Approved</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Search Bar -->
+        <div class="mb-4">
+            <input 
+                v-model="searchQuery" 
+                type="text" 
+                placeholder="Search job title, employer, or status..."
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
         </div>
 
-        <!-- Mobile Card View -->
-        <div class="md:hidden space-y-4">
-            <div v-for="job in filteredJobs" :key="job.id" class="bg-white p-4 rounded-lg shadow-md">
-                <p class="text-sm font-semibold text-gray-700">
-                    <span class="text-gray-500">Job Title:</span> {{ job.title }}
+        <!-- DataTable for larger screens -->
+        <div class="hidden sm:block">
+            <DataTable
+                :headers="headers"
+                :items="filteredJobs"
+                :rows-per-page="10"
+                :sort-by="'job_title'"
+                :sort-type="'asc'"
+            >
+                <!-- Custom slot for Profile (View Post) -->
+                <template #item-profile="{ id }">
+                    <a :href="`/admin/job-posts/${id}`" 
+                       class="text-blue-500 hover:underline">
+                        View Post
+                    </a>
+                </template>
+
+                <!-- Custom slot for status -->
+                <template #item-job_status="{ job_status }">
+                    <span :class="job_status === 'Open' ? 'text-green-600' : 'text-red-600'">
+                        {{ job_status }}
+                    </span>
+                </template>
+
+                <!-- Custom slot for actions -->
+                <template #item-actions="{ id, job_status }">
+                    <div class="flex items-center space-x-2">
+                        <button v-if="job_status !== 'Open'"
+                            @click="toggleApproval(id, 'Open')"
+                            class="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600">
+                            Approve
+                        </button>
+                        <button v-else
+                            @click="toggleApproval(id, 'Pending')"
+                            class="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600">
+                            Revoke
+                        </button>
+                    </div>
+                </template>
+            </DataTable>
+        </div>
+
+        <!-- Card layout for mobile screens -->
+        <div class="sm:hidden space-y-4">
+            <div v-for="job in filteredJobs" :key="job.id" 
+                class="bg-white p-4 rounded-lg shadow-md">
+                <h2 class="text-lg font-semibold">{{ job.job_title }}</h2>
+                <p class="text-gray-600">Employer: {{ job.employer?.name }}</p>
+                <p class="text-gray-600">
+                    Status: 
+                    <span :class="job.job_status === 'Open' ? 'text-green-600' : 'text-red-600'">
+                        {{ job.job_status }}
+                    </span>
                 </p>
-                <p class="text-sm text-gray-600">
-                    <span class="text-gray-500">Employer:</span> {{ job.employer }}
-                </p>
-                <p class="text-sm font-medium"
-                    :class="job.approved ? 'text-green-600' : 'text-red-600'">
-                    {{ job.approved ? "Approved" : "Pending" }}
-                </p>
-                <button
-                    v-if="!job.approved"
-                    @click="approveJob(job.id)"
-                    class="mt-2 w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 text-sm"
-                >
-                    Approve
-                </button>
-                <p v-else class="text-gray-500 text-sm mt-2">✔ Approved</p>
+                <div class="mt-3 flex justify-between items-center">
+                    <a :href="`/admin/job-posts/${job.id}`" class="text-blue-500 hover:underline">View Post</a>
+                    <button v-if="job.job_status !== 'Open'"
+                        @click="toggleApproval(job.id, 'Open')"
+                        class="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600">
+                        Approve
+                    </button>
+                    <button v-else
+                        @click="toggleApproval(job.id, 'Pending')"
+                        class="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600">
+                        Revoke
+                    </button>
+                </div>
             </div>
         </div>
     </div>

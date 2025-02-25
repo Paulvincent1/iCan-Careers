@@ -123,6 +123,30 @@ class JobPostController extends Controller
         //
     }
 
+   public function updateJobStatus(Request $request, $id)
+{
+    $jobPost = JobPost::findOrFail($id);
+    $jobPost->update(['job_status' => $request->status]);
+
+    return redirect()->route('admin.job.approvals')->with('success', 'Job status updated successfully.');
+}
+
+public function showJob($id)
+{
+    $job = JobPost::with('employer')->findOrFail($id);
+
+    // Ensure location is properly formatted
+    if (is_string($job->location)) {
+        $job->location = json_decode($job->location, true); // Decode only if it's a string
+    }
+
+    return Inertia::render('Admin/JobPostDetails', [
+        'job' => $job
+    ]);
+}
+
+
+
     public function closeJob(JobPost $jobid){
         $user = Auth::user();
 

@@ -69,9 +69,18 @@ class AdminDashboardController extends Controller
     }
 
     public function jobApprovals()
-    {
-        return Inertia::render('Admin/JobApprovals');
-    }
+{
+    $jobs = \App\Models\JobPost::with('employer:id,name') // Fetch employer name
+        ->select('id', 'job_title', 'job_status', 'employer_id')
+        ->get();
+
+    return Inertia::render('Admin/JobApprovals', [
+        'jobs' => $jobs
+    ]);
+}
+
+
+
 
     public function paymentHistory()
     {
