@@ -10,6 +10,7 @@ class EmployerSubscription extends Model
         'subscription_type',
         'start_date',
         'expiry_date',
+        'employer_id',
     ];
 
     public function employer(){

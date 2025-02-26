@@ -144,7 +144,8 @@ Route::prefix('admin')->middleware([])->group(function (){
         ->name('admin.job.approvals.update');
     Route::get('/job-posts/{id}', [JobPostController::class, 'showJob']);
     Route::get('/payment-history',[AdminDashboardController::class, 'paymentHistory'])->name('admin.payment-history');
-    Route::get('/table-subscription',[AdminDashboardController::class, 'subscribeUsers'])->name('admin.table-subscription');
+    Route::get('/table-subscription', [AdminDashboardController::class, 'subscribeUsers'])
+        ->name('admin.table-subscription');
     
 });
 

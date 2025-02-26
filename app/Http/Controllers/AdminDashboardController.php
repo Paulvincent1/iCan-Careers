@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmployerSubscription;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -88,10 +89,15 @@ class AdminDashboardController extends Controller
     }
 
     public function subscribeUsers()
-    
-    {
-        return Inertia::render('Admin/SubscribeUser');
-    }
+{
+    // Fetch employer subscriptions along with employer details
+    $subscribedUsers = EmployerSubscription::with('employer:id,name,email')
+        ->select('id', 'subscription_type', 'start_date', 'expiry_date', 'employer_id')
+        ->get();
 
+    return Inertia::render('Admin/SubscribeUser', [
+        'subscribedUsers' => $subscribedUsers
+    ]);
+}
 
 }
