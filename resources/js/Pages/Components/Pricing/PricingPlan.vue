@@ -10,7 +10,9 @@ defineProps({
 </script>
 
 <template>
-    <div class="m-5 mx-auto max-w-xs transition-transform transform hover:scale-105">
+    <div
+        class="m-5 mx-auto max-w-xs transform transition-transform hover:scale-105"
+    >
         <div class="border bg-white shadow-lg" :class="borderColor">
             <div class="py-6 text-center">
                 <h4 class="text-xl font-semibold">{{ title }}</h4>
@@ -35,7 +37,10 @@ defineProps({
                     </ul>
                 </div>
                 <button
-                    v-if="$page.props.auth.user.authenticated"
+                    v-if="
+                        $page.props.auth.user.authenticated &&
+                        $page.props.auth.user.role?.name === 'Employer'
+                    "
                     @click="$emit('buyNow', tag)"
                     class="mt-4 inline-block rounded-lg border border-blue-500 bg-transparent px-4 py-2 font-bold text-blue-500 transition hover:bg-blue-500 hover:text-white"
                 >
