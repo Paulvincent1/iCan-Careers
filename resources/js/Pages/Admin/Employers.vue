@@ -1,114 +1,133 @@
 <script setup>
 import { ref, computed } from "vue";
+import { usePage } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
+import DataTable from "vue3-easy-data-table";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faSearch, faBuilding, faFilter } from "@fortawesome/free-solid-svg-icons";
 
-defineOptions({
-    layout: AdminLayout,
-});
+// Add icons
+library.add(faSearch, faBuilding, faFilter);
 
-// Dummy employer data
-const employers = ref([
-    { id: 1, company: "Tech Solutions", owner: "Alice Brown", verified: false },
-    { id: 2, company: "Secure Corp", owner: "Bob Smith", verified: true },
-    { id: 3, company: "Future Web", owner: "Charlie Johnson", verified: false },
-    { id: 4, company: "Global Tech", owner: "Diana Evans", verified: true },
-]);
+// Define Layout
+defineOptions({ layout: AdminLayout });
 
-// Tabs for sub-navigation
+// Get employers data from Laravel
+const employers = ref(usePage().props.employers || []);
+
+// Tabs for filtering employer types
 const tabs = [
     { id: "all", label: "All" },
-    { id: "verified", label: "Verified" },
-    { id: "unverified", label: "Unverified" },
+    { id: "business", label: "Business" },
+    { id: "individual", label: "Individual" },
 ];
 
 // Active tab state
 const activeTab = ref("all");
 
-// Filter employers based on active tab
+// Search input state
+const searchQuery = ref("");
+
+// Filtered Employers (Based on Type and Search)
 const filteredEmployers = computed(() => {
-    if (activeTab.value === "all") {
-        return employers.value;
-    } else if (activeTab.value === "verified") {
-        return employers.value.filter((employer) => employer.verified);
-    } else {
-        return employers.value.filter((employer) => !employer.verified);
+    let filtered = employers.value;
+
+    // Filter by Employer Type
+    if (activeTab.value !== "all") {
+        filtered = filtered.filter(employer => employer.employer_type.toLowerCase() === activeTab.value);
     }
+
+    // Search Filtering
+    if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase();
+        filtered = filtered.filter(employer =>
+            employer.user?.username.toLowerCase().includes(query) ||
+            employer.user?.email.toLowerCase().includes(query) ||
+            employer.business_information?.business_name.toLowerCase().includes(query) ||
+            employer.employer_type.toLowerCase().includes(query)
+        );
+    }
+
+    return filtered;
 });
 
-// Verify employer function
-const verifyEmployer = (id) => {
-    const employer = employers.value.find((e) => e.id === id);
-    if (employer) {
-        employer.verified = true;
-    }
-};
+// Table Headers
+const headers = [
+     { text: "ID", value: "id", sortable: true },
+    { text: "Employer Name", value: "user.username", sortable: true },
+    { text: "Email", value: "user.email", sortable: true },
+    { text: "Business Name", value: "business_information.business_name", sortable: true },
+    { text: "Employer Type", value: "employer_type", sortable: true },
+];
 </script>
 
 <template>
     <Head title="Employers | iCan Careers" />
     <div class="p-4">
-        <!-- Sub-navigation -->
+        <!-- Tabs for Employer Type Filters -->
         <nav class="mb-6">
-            <ul class="flex space-x-4 border-b overflow-x-auto whitespace-nowrap">
-                <li
-                    v-for="tab in tabs"
-                    :key="tab.id"
+            <ul class="flex space-x-4 border-b overflow-x-auto">
+                <li v-for="tab in tabs" :key="tab.id"
                     @click="activeTab = tab.id"
                     :class="{
-                        'border-b-2 border-blue-500': activeTab === tab.id,
-                        'text-gray-500 hover:text-gray-700':
-                            activeTab !== tab.id,
+                        'border-b-2 border-blue-500 font-semibold': activeTab === tab.id,
+                        'text-gray-500 hover:text-gray-700': activeTab !== tab.id
                     }"
-                    class="cursor-pointer px-4 py-2 text-sm md:text-base"
-                >
+                    class="cursor-pointer px-4 py-2 whitespace-nowrap">
                     {{ tab.label }}
                 </li>
             </ul>
         </nav>
 
-        <h1 class="mb-4 text-xl md:text-2xl font-bold">Employer Verification</h1>
+        <h1 class="mb-4 text-xl font-bold flex items-center gap-2">
+            <font-awesome-icon :icon="['fas', 'building']" class="text-blue-500" />
+            Employer List
+        </h1>
 
-        <!-- Responsive Table Wrapper -->
-        <div class="overflow-x-auto rounded-lg shadow-md">
-            <table class="min-w-full bg-white">
-                <thead>
-                    <tr class="bg-gray-200 text-left text-xs md:text-sm">
-                        <th class="p-3">ID</th>
-                        <th class="p-3">Company</th>
-                        <th class="p-3 hidden md:table-cell">Owner</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="employer in filteredEmployers"
-                        :key="employer.id"
-                        class="border-b text-xs md:text-sm"
-                    >
-                        <td class="p-3">{{ employer.id }}</td>
-                        <td class="p-3">{{ employer.company }}</td>
-                        <td class="p-3 hidden md:table-cell">{{ employer.owner }}</td>
-                        <td class="p-3">
-                            <span
-                                :class="employer.verified ? 'text-green-600' : 'text-red-600'"
-                            >
-                                {{ employer.verified ? "Verified" : "Unverified" }}
-                            </span>
-                        </td>
-                        <td class="p-3">
-                            <button
-                                v-if="!employer.verified"
-                                @click="verifyEmployer(employer.id)"
-                                class="rounded bg-blue-500 px-3 py-1 md:px-4 md:py-2 text-white hover:bg-blue-600 text-xs md:text-sm"
-                            >
-                                Verify
-                            </button>
-                            <span v-else class="text-gray-500">✔ Verified</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Search Bar -->
+        <div class="mb-4 flex items-center gap-2 bg-gray-100 p-3 rounded-md">
+            <font-awesome-icon :icon="['fas', 'search']" class="text-gray-500" />
+            <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search by employer, email, or business name..."
+                class="w-full bg-transparent outline-none"
+            />
+        </div>
+
+        <!-- DataTable for Larger Screens -->
+        <div class="hidden sm:block">
+            <DataTable
+                :headers="headers"
+                :items="filteredEmployers"
+                :rows-per-page="10"
+                :sort-by="'user.username'"
+                :sort-type="'asc'"
+            >
+                <!-- Custom slot for Employer Type -->
+                <template #item-employer_type="{ employer_type }">
+                    <span :class="employer_type === 'business' ? 'text-green-600' : 'text-blue-600'">
+                        {{ employer_type }}
+                    </span>
+                </template>
+            </DataTable>
+        </div>
+
+        <!-- Card Layout for Mobile -->
+        <div class="sm:hidden space-y-4">
+            <div v-for="employer in filteredEmployers" :key="employer.id"
+                class="bg-white p-4 rounded-lg shadow-md">
+                <h2 class="text-lg font-semibold">{{ employer.user?.username || "N/A" }}</h2>
+                <p class="text-gray-600"><strong>Email:</strong> {{ employer.user?.email || "N/A" }}</p>
+                <p class="text-gray-600"><strong>Business:</strong> {{ employer.business_information?.business_name || "N/A" }}</p>
+                <p class="text-gray-600">
+                    <strong>Type:</strong>
+                    <span :class="employer.employer_type === 'business' ? 'text-green-600' : 'text-blue-600'">
+                        {{ employer.employer_type }}
+                    </span>
+                </p>
+            </div>
         </div>
     </div>
 </template>
