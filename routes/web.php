@@ -159,6 +159,8 @@ Route::middleware([ForceGetRedirect::class])->group(function() {
 
         
         Route::get('/', [MessageController::class,'index'])->name('messages');
+
+        Route::post('/send/{receiverId}', [MessageController::class,'store'])->name('messages.send');
         
     });
 

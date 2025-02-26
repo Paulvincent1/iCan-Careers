@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import WorkDetailsForm from "../Components/WorkDetailsForm.vue";
 import { router } from "@inertiajs/vue3";
 import AddSkillModal from "../Components/Modal/AddSkillModal.vue";
+import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 
 let props = defineProps({
     userProp: Object,
@@ -267,8 +268,14 @@ function removeSkill(skillId) {
             <div
                 class="xs container mx-auto flex flex-col items-center justify-center pt-16 xl:max-w-7xl"
             >
-                <p class="mb-2 text-lg">{{ userProp.name }}</p>
-
+                <div class="mb-2 flex items-end gap-3">
+                    <p class="text-lg">{{ userProp.name }}</p>
+                    <Link
+                        :href="route('messages')"
+                        :data="{ user: userProp.id }"
+                        class="bi bi-chat-dots text-lg text-blue-500 hover:cursor-pointer"
+                    ></Link>
+                </div>
                 <div class="mb-3">
                     <p
                         @click="isEditJobTitleActive = true"
