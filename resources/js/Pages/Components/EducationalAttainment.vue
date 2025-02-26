@@ -2,23 +2,24 @@
 import InputFlashMessage from "./InputFlashMessage.vue";
 
 let model = defineModel({
-    type: null,
+    type: String,
     required: true,
 });
 
 let props = defineProps({
-    error: null,
-    openToAll: null,
+    error: String, // Ensure error is passed down
+    openToAll: Boolean,
 });
 </script>
+
 <template>
     <div class="relative">
         <select
             v-model="model"
-            name=""
-            id=""
-            class="w-full appearance-none border px-3 py-2 outline-blue-400"
+            class="w-full appearance-none border px-3 py-2 outline-blue-400 bg-gray-100"
+            :class="{ 'border-red-500': error }" 
         >
+            <option disabled value="">Select your highest education</option>
             <option value="Primary School Completed">
                 Primary School Completed
             </option>

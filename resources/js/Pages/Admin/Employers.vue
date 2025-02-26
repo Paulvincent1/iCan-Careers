@@ -55,10 +55,10 @@ const filteredEmployers = computed(() => {
 // Table Headers
 const headers = [
      { text: "ID", value: "id", sortable: true },
-    { text: "Employer Name", value: "user.username", sortable: true },
-    { text: "Email", value: "user.email", sortable: true },
-    { text: "Business Name", value: "business_information.business_name", sortable: true },
-    { text: "Employer Type", value: "employer_type", sortable: true },
+    { text: "Employer Name", value: "user.username", sortable: false },
+    { text: "Email", value: "user.email", sortable: false },
+    { text: "Business Name", value: "business_information.business_name", sortable: false },
+    { text: "Employer Type", value: "employer_type", sortable: false },
 ];
 </script>
 
@@ -102,7 +102,7 @@ const headers = [
                 :headers="headers"
                 :items="filteredEmployers"
                 :rows-per-page="10"
-                :sort-by="'user.username'"
+                :sort-by="'id'"
                 :sort-type="'asc'"
             >
                 <!-- Custom slot for Employer Type -->

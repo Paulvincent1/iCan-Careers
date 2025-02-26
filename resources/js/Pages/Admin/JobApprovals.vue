@@ -47,7 +47,7 @@ const filteredJobs = computed(() => {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(job =>
             job.job_title.toLowerCase().includes(query) ||
-            job.employer?.name?.toLowerCase().includes(query) ||
+            job.employer?.email?.toLowerCase().includes(query) ||
             job.job_status.toLowerCase().includes(query)
         );
     }
@@ -59,9 +59,9 @@ const filteredJobs = computed(() => {
 const headers = [
     { text: "ID", value: "id", sortable: true },
     { text: "Profile", value: "profile", sortable: false },
-    { text: "Job Title", value: "job_title", sortable: true },
-    { text: "Employer", value: "employer.name", sortable: true },
-    { text: "Status", value: "job_status", sortable: true },
+    { text: "Job Title", value: "job_title", sortable: false },
+    { text: "Email", value: "employer.email", sortable: false },
+    { text: "Status", value: "job_status", sortable: false},
     { text: "Actions", value: "actions", sortable: false },
 ];
 
@@ -118,7 +118,7 @@ const toggleApproval = (id, newStatus) => {
                 :headers="headers"
                 :items="filteredJobs"
                 :rows-per-page="10"
-                :sort-by="'job_title'"
+                :sort-by="'id'"
                 :sort-type="'asc'"
             >
                 <!-- Custom slot for Profile (View Post) -->
@@ -159,7 +159,7 @@ const toggleApproval = (id, newStatus) => {
             <div v-for="job in filteredJobs" :key="job.id" 
                 class="bg-white p-4 rounded-lg shadow-md">
                 <h2 class="text-lg font-semibold">{{ job.job_title }}</h2>
-                <p class="text-gray-600">Employer: {{ job.employer?.name }}</p>
+                <p class="text-gray-600">Email: {{ job.employer?.email}}</p>
                 <p class="text-gray-600">
                     Status: 
                     <span :class="job.job_status === 'Open' ? 'text-green-600' : 'text-red-600'">

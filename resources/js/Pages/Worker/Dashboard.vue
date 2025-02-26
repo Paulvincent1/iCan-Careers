@@ -293,13 +293,17 @@ const formatCurrency =
                     class="mb-4 grid grid-cols-1 gap-3 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
                 >
                     <div class="col-span-2 rounded border p-3 lg:col-span-1">
-                        <div class="flex justify-between">
-                            <p class="p-1 font-bold">Invoices</p>
+                        <div class="mb-4 flex items-center justify-between">
+                            <p class="p-1 text-lg font-bold">Job Status</p>
                             <Link
                                 :href="route('worker.create.invoice')"
-                                class="p-1 text-blue-500"
-                                >Create invoice</Link
+                                class="flex items-center gap-2 rounded-lg bg-[#fa8334] px-4 py-2 font-semibold text-white shadow-md transition duration-300 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300"
+                                title="Click to Create Invoice"
                             >
+                                <i class="bi bi-plus-lg text-xl"></i>
+                                <!-- Add Plus Icon -->
+                                <span>Create Invoice</span>
+                            </Link>
                         </div>
                         <swiper-container
                             class="mb-3 text-[12px]"
