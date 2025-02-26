@@ -1,27 +1,38 @@
 <script setup>
-import { usePage } from "@inertiajs/vue3";
+import { usePage, router } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
+import { ref, computed } from "vue";
 import {
-    BriefcaseIcon,
-    MapPinIcon,
-    ClockIcon,
-    CurrencyDollarIcon,
-    AcademicCapIcon,
-    CheckIcon,
-    XCircleIcon,
+    BriefcaseIcon, MapPinIcon, ClockIcon, CurrencyDollarIcon,
+    AcademicCapIcon, CheckIcon, XCircleIcon
 } from "@heroicons/vue/24/outline";
 
 defineOptions({
     layout: AdminLayout,
 });
 
-// Fetch job details from Inertia props
+// Fetch job details
 const jobPost = usePage().props.job;
+
+// Computed property to check if the job is approved
+const isApproved = computed(() => jobPost.job_status === "Open");
+
+// Function to toggle job approval
+const toggleApproval = () => {
+    const newStatus = isApproved.value ? "Pending" : "Open";
+    router.put(`/admin/job-approvals/${jobPost.id}/update`, { status: newStatus }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            jobPost.job_status = newStatus; // Update UI state
+        },
+        onError: (errors) => console.error("Error updating job status:", errors),
+    });
+};
 </script>
 
 <template>
     <Head :title="`Job Details - ${jobPost.job_title}`" />
-    
+
     <div class="mx-auto max-w-4xl rounded-lg bg-white p-6 shadow-md">
         <!-- Job Title & Status -->
         <div class="mb-6 flex items-center justify-between">
@@ -131,14 +142,24 @@ const jobPost = usePage().props.job;
             </div>
         </div>
 
-        <!-- Back Button -->
-        <div class="mt-8">
+        <!-- Toggle Approval Button -->
+        <div class="mt-8 flex justify-between items-center">
             <a
                 href="/admin/job-approvals"
                 class="flex items-center font-semibold text-blue-600 hover:text-blue-800"
             >
                 ← Back to Job Approvals
             </a>
+            
+            <button
+                @click="toggleApproval"
+                class="flex items-center gap-2 rounded px-4 py-2 text-white transition"
+                :class="isApproved ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'"
+            >
+                <CheckIcon v-if="!isApproved" class="h-5 w-5" />
+                <XCircleIcon v-else class="h-5 w-5" />
+                {{ isApproved ? "Revoke Approval" : "Approve Job" }}
+            </button>
         </div>
     </div>
 </template>

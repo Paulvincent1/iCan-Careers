@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmployerProfile;
 use App\Models\EmployerSubscription;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -59,10 +60,30 @@ class AdminDashboardController extends Controller
          return back()->with('success', 'Worker verification status updated.');
     }
 
-    public function employers()
-    {
-        return Inertia::render('Admin/Employers');
-    }
+   public function employers()
+{
+    $employers = EmployerProfile::with(['user', 'businessInformation'])
+        ->select('id', 'user_id', 'full_name', 'employer_type', 'business_id')
+        ->get()
+        ->map(function ($employer) {
+            return [
+                'id' => $employer->id,
+                'user' => [
+                    'username' => $employer->user->name ?? 'N/A',
+                    'email' => $employer->user->email ?? 'N/A',
+                ],
+                'employer_type' => $employer->employer_type,
+                'business_information' => [
+                    'business_name' => $employer->businessInformation->business_name ?? 'N/A',
+                ],
+            ];
+        });
+
+    return Inertia::render('Admin/Employers', [
+        'employers' => $employers
+    ]);
+}
+
 
     public function reportedUsers()
     {

@@ -3,6 +3,12 @@ import { ref, computed } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
 import DataTable from "vue3-easy-data-table";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
+
+// Add the search icon
+library.add(faSearch);
 
 // Import styles for the DataTable component
 import "vue3-easy-data-table/dist/style.css";
@@ -51,6 +57,7 @@ const filteredJobs = computed(() => {
 
 // Table Headers
 const headers = [
+    { text: "ID", value: "id", sortable: true },
     { text: "Profile", value: "profile", sortable: false },
     { text: "Job Title", value: "job_title", sortable: true },
     { text: "Employer", value: "employer.name", sortable: true },
@@ -89,15 +96,19 @@ const toggleApproval = (id, newStatus) => {
             </ul>
         </nav>
 
-        <h1 class="mb-4 text-xl font-bold">Job Post Approval</h1>
+        <h1 class="mb-4 text-xl font-bold flex items-center gap-2">
+            <font-awesome-icon :icon="['fas', 'clipboard-check']" class="text-blue-500" />
+            Job Approval
+        </h1>
 
         <!-- Search Bar -->
-        <div class="mb-4">
+        <div class="mb-4 flex items-center gap-2 bg-gray-100 p-3 rounded-md">
+            <font-awesome-icon :icon="['fas', 'search']" class="text-gray-500" />
             <input 
                 v-model="searchQuery" 
                 type="text" 
                 placeholder="Search job title, employer, or status..."
-                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                class="w-full bg-transparent outline-none"
             />
         </div>
 

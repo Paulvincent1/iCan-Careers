@@ -1,37 +1,62 @@
 <script setup>
-import { usePage } from "@inertiajs/vue3";
+import { usePage, router } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
-import { Link } from "@inertiajs/vue3";
+import { CheckIcon, XCircleIcon } from "@heroicons/vue/24/outline";
 
-// Define layout
-defineOptions({
-    layout: AdminLayout,
-});
+defineOptions({ layout: AdminLayout });
 
-// Fetch props from Inertia
 const page = usePage();
 const worker = page.props.worker;
 const verification = page.props.verification;
+
+// Toggle verification function
+const toggleVerification = () => {
+    router.put(`/admin/workers/${worker.id}/verify`, {}, {
+        onSuccess: () => {
+            worker.verified = !worker.verified;
+        },
+    });
+};
 </script>
 
 <template>
-    <Head title="WorkersVerification | iCan Careers" />
-    <div class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg mt-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Worker Verification Details</h1>
-        
-        <div v-if="verification" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <p class="text-gray-700"><strong class="text-gray-900">First Name:</strong> {{ verification.first_name }}</p>
-                    <p class="text-gray-700"><strong class="text-gray-900">Middle Name:</strong> {{ verification.middle_name ?? 'N/A' }}</p>
-                    <p class="text-gray-700"><strong class="text-gray-900">Last Name:</strong> {{ verification.last_name }}</p>
-                    <p class="text-gray-700"><strong class="text-gray-900">Suffix:</strong> {{ verification.suffix ?? 'N/A' }}</p>
-                </div>
-            </div>
+    <Head :title="`Worker Details - ${worker.username}`" />
+    
+    <div class="mx-auto max-w-4xl rounded-lg bg-white p-6 shadow-md">
+        <!-- Worker Name & Verification Status -->
+        <div class="mb-6 flex items-center justify-between">
+            <h1 class="text-3xl font-bold text-gray-800">
+                {{ worker.username }}
+            </h1>
+            <span
+                class="rounded-full px-3 py-1 text-sm font-semibold"
+                :class="{
+                    'bg-green-100 text-green-600': worker.verified,
+                    'bg-red-100 text-red-600': !worker.verified,
+                }"
+            >
+                {{ worker.verified ? "Verified" : "Not Verified" }}
+            </span>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Worker Details Section -->
+        <div class="space-y-6">
+            <h2 class="border-b pb-2 text-lg font-semibold text-gray-800">Worker Information</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <p class="text-gray-700"><strong class="font-semibold">First Name:</strong> {{ verification.first_name }}</p>
+                <p class="text-gray-700"><strong class="font-semibold">Middle Name:</strong> {{ verification.middle_name ?? 'N/A' }}</p>
+                <p class="text-gray-700"><strong class="font-semibold">Last Name:</strong> {{ verification.last_name }}</p>
+                <p class="text-gray-700"><strong class="font-semibold">Suffix:</strong> {{ verification.suffix ?? 'N/A' }}</p>
+            </div>
+        </div>
+
+        <!-- Verification Images -->
+        <div class="mt-6">
+            <h2 class="border-b pb-2 text-lg font-semibold text-gray-800">Verification Images</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
                 <div class="text-center">
-                    <h3 class="text-lg font-semibold text-gray-900">ID Image</h3>
+                    <h3 class="text-md font-semibold text-gray-900">ID Image</h3>
                     <img 
                         v-if="verification.id_image" 
                         :src="verification.id_image" 
@@ -40,7 +65,7 @@ const verification = page.props.verification;
                     />
                 </div>
                 <div class="text-center">
-                    <h3 class="text-lg font-semibold text-gray-900">Selfie Image</h3>
+                    <h3 class="text-md font-semibold text-gray-900">Selfie Image</h3>
                     <img 
                         v-if="verification.selfie_image" 
                         :src="verification.selfie_image" 
@@ -51,14 +76,27 @@ const verification = page.props.verification;
             </div>
         </div>
 
-        <div v-else class="text-center text-red-500 font-semibold mt-4">
-            <p>No verification details available.</p>
+        <!-- Verification Toggle Button -->
+        <div class="mt-6 text-center">
+            <button
+                @click="toggleVerification"
+                class="flex items-center justify-center gap-2 px-6 py-2 text-white rounded-lg shadow-md transition"
+                :class="worker.verified ? 'bg-red-500 hover:bg-red-700' : 'bg-blue-500 hover:bg-blue-700'"
+            >
+                <CheckIcon v-if="!worker.verified" class="h-5 w-5 text-white" />
+                <XCircleIcon v-else class="h-5 w-5 text-white" />
+                {{ worker.verified ? "Unverify Worker" : "Verify Worker" }}
+            </button>
         </div>
 
-        <div class="mt-6 text-center">
-            <Link href="/admin/workers" class="px-6 py-2 text-white bg-[#fa8334]  rounded-lg shadow-md transition">
-                Back to Workers
-            </Link>
+        <!-- Back Button -->
+        <div class="mt-8">
+            <a
+                href="/admin/workers"
+                class="flex items-center font-semibold text-blue-600 hover:text-blue-800"
+            >
+                ← Back to Workers
+            </a>
         </div>
     </div>
 </template>
