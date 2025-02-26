@@ -154,12 +154,14 @@ Route::prefix('admin')->middleware([])->group(function (){
 Route::middleware([ForceGetRedirect::class])->group(function() {
 
     //chat routes
-    Route::prefix('/messages', function(){
+    Route::prefix('/messages')->group(function(){
 
-        Route::get('/',[MessageController::class,'index'])->name('messages');
         
-
+        Route::get('/', [MessageController::class,'index'])->name('messages');
+        
     });
+
+
 
 
 

@@ -63,7 +63,13 @@ window.addEventListener("resize", () => {
                             >Learning</Link
                         >
                     </li>
-                    <li class="md:my-auto md:pr-5">
+                    <li
+                        class="md:my-auto md:pr-5"
+                        v-if="
+                            $page.props.auth.user.role?.name === 'Employer' ||
+                            !$page.props.auth.user.authenticated
+                        "
+                    >
                         <Link href="/pricing" @click="isActive = false"
                             >Pricing</Link
                         >
