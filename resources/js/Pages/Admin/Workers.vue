@@ -56,10 +56,10 @@ const filteredWorkers = computed(() => {
 // Table headers
 const headers = [
     { text: "ID", value: "id", sortable: true },
-    { text: "Name", value: "name", sortable: true },
-    { text: "Email", value: "email", sortable: true },
+    { text: "Name", value: "name", sortable: false },
+    { text: "Email", value: "email", sortable: false },
     { text: "Profile", value: "profile", sortable: false },
-    { text: "Verified", value: "verified", sortable: true },
+    { text: "Verified", value: "verified", sortable: false },
     { text: "Action", value: "actions", sortable: false },
 ];
 

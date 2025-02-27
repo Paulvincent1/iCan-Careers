@@ -94,82 +94,68 @@ const submit = () => {
 </script>
 <template>
     <Head title="Skills Add | iCan Careers" />
-    <div class="mt-9 border p-7">
-        <h2 class="my-3 text-2xl font-semibold">Tell us about your Skills</h2>
-        <p>
-            Select, rate, and describe your experience for your top skills. You
-            can only select up to a maximum of 15 skills.
-        </p>
 
-        <AddSkillInput @addSkill="addSkill" />
-
-        <!-- <div class="relative mb-4">
-            <div class="relative">
-                <input
-                    v-model="query"
-                    type="text"
-                    placeholder="ex. Social Media Manager"
-                    class="mt-3 w-full rounded border p-3 outline-blue-400"
-                />
-                <i
-                    @click="addSkill(query)"
-                    class="bi bi-plus-lg absolute right-3 top-[50%] translate-y-[-20%] cursor-pointer text-lg font-bold text-blue-500"
-                ></i>
-            </div>
-
-            <div
-                v-if="isOpen"
-                :class="[
-                    'absolute left-0 h-20 w-full overflow-auto rounded bg-slate-500 p-3 text-white',
-                    {
-                        'h-fit': !data.length || data.length <= 5,
-                    },
-                ]"
-            >
-                <p v-show="!data.length">No Skills found</p>
-                <p
-                    v-for="(res, index) in data"
-                    :key="index"
-                    class="cursor-pointer p-1"
-                    @click="addSkill(res)"
-                >
-                    {{ res }}
+    <div class="flex justify-center">
+        <div class="w-full max-w-5xl bg-white shadow-md rounded-lg p-8 mt-8 border border-gray-300 flex flex-col md:flex-row">
+            <!-- Left Side: Skills Form -->
+            <div class="w-full md:w-2/3 pr-6">
+                <h2 class="text-3xl font-bold text-gray-900 text-center md:text-left">Tell us about your Skills</h2>
+                <p class="text-lg text-gray-700 text-center md:text-left mb-6">
+                    Select, rate, and describe your experience for your top skills. You can select up to <strong>15 skills</strong>.
                 </p>
-            </div>
-        </div> -->
 
-        <div class="mb-7">
-            <p class="mb-2">Your Skills:</p>
-            <div>
-                <div>
-                    <Skill
-                        class="mb-2"
-                        v-for="skill in form.skills"
-                        :key="skill.id"
-                        :modelValue="skill"
-                        @addstar="addStar"
-                        @removeSkill="removeSkill"
-                        @updateSkillName="updateSkillName"
-                        @updateExperience="updateExperience"
-                    />
-                    <!-- owner="true" -->
-                    <!-- starValue="1" -->
+                <!-- Add Skill Input -->
+                <div class="p-6 bg-gray-100 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Add a Skill</h3>
+                    <AddSkillInput @addSkill="addSkill" />
                 </div>
-                <InputFlashMessage
-                    class="mt-2"
-                    :message="errorMessage"
-                    type="error"
-                />
+
+                <!-- Skills List -->
+                <div class="p-6 bg-gray-100 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Your Skills</h3>
+
+                    <div v-if="form.skills.length" class="space-y-4">
+                        <Skill
+                            v-for="skill in form.skills"
+                            :key="skill.id"
+                            :modelValue="skill"
+                            @addstar="addStar"
+                            @removeSkill="removeSkill"
+                            @updateSkillName="updateSkillName"
+                            @updateExperience="updateExperience"
+                        />
+                    </div>
+
+                    <p v-else class="text-gray-500 text-center mt-4">No skills added yet. Add your first skill above.</p>
+
+                    <InputFlashMessage class="mt-2" :message="errorMessage" type="error" />
+                </div>
+
+                <hr class="my-7" />
+
+                <!-- Save Button -->
+                <div class="flex justify-center">
+                    <button
+                        @click="submit"
+                        class="w-full bg-green-500 text-white font-bold px-6 py-4 text-xl rounded-lg hover:bg-green-600 transition shadow-md disabled:opacity-50"
+                    >
+                        Save Skills
+                    </button>
+                </div>
             </div>
-        </div>
-        <hr class="mb-7" />
-        <div>
-            <button
-                @click="submit"
-                class="rounded bg-blue-500 px-4 py-2 text-white"
-            >
-                Save
-            </button>
+
+            <!-- Right Side: Step-by-Step Instructions -->
+            <div class="hidden md:block w-1/3 bg-gray-50 p-6 rounded-lg shadow-md border border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">How to Add Skills</h3>
+                <ol class="list-decimal pl-5 text-gray-700 space-y-3">
+                    <li>Add a skill using the input field above.</li>
+                    <li>Click the <strong>+</strong> button to add it to your list.</li>
+                    <li>Rate your skill by clicking on the <strong>stars</strong>.</li>
+                    <li>Optionally, describe your experience in the provided field.</li>
+                    <li>Once done, click the <strong>Save Skills</strong> button to save.</li>
+                </ol>
+                <p class="text-gray-600 mt-4 text-sm">Need help? Contact support for assistance.</p>
+            </div>
         </div>
     </div>
 </template>

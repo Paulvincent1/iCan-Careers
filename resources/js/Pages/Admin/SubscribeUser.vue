@@ -54,11 +54,11 @@ const filteredUsers = computed(() => {
 // Table Headers
 const headers = [
     { text: "ID", value: "id", sortable: true },
-    { text: "Employer", value: "employer.name", sortable: true },
-    { text: "Email", value: "employer.email", sortable: true },
-    { text: "Plan", value: "subscription_type", sortable: true },
-    { text: "Start Date", value: "start_date", sortable: true },
-    { text: "Expiry Date", value: "expiry_date", sortable: true },
+    { text: "Employer", value: "employer.name", sortable: false },
+    { text: "Email", value: "employer.email", sortable: false },
+    { text: "Plan", value: "subscription_type", sortable: false },
+    { text: "Start Date", value: "start_date", sortable: false },
+    { text: "Expiry Date", value: "expiry_date", sortable: false },
 ];
 </script>
 
@@ -102,7 +102,7 @@ const headers = [
                 :headers="headers"
                 :items="filteredUsers"
                 :rows-per-page="10"
-                :sort-by="'employer.name'"
+                :sort-by="'id'"
                 :sort-type="'asc'"
             >
                 <!-- Custom slot for Subscription Type -->

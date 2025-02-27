@@ -92,7 +92,7 @@ class AdminDashboardController extends Controller
 
     public function jobApprovals()
 {
-    $jobs = \App\Models\JobPost::with('employer:id,name') // Fetch employer name
+    $jobs = \App\Models\JobPost::with('employer:id,email') // Fetch employer name
         ->select('id', 'job_title', 'job_status', 'employer_id')
         ->get();
 

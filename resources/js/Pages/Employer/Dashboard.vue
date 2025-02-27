@@ -132,13 +132,17 @@ function switchInvoiceTag(tag) {
             >
                 <div class="col-span-2 rounded border p-3 lg:col-span-1">
                     <div>
-                        <div class="flex justify-between">
-                            <p class="p-1 font-bold">Job status</p>
+                        <div class="mb-4 flex items-center justify-between">
+                            <p class="p-1 text-lg font-bold">Job Status</p>
                             <Link
                                 :href="route('create.job')"
-                                class="p-1 text-blue-500"
-                                >Post job</Link
+                                class="flex items-center gap-2 rounded-lg bg-[#fa8334] px-4 py-2 font-semibold text-white shadow-md transition duration-300 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300"
+                                title="Click to post a new job"
                             >
+                                <i class="bi bi-plus-lg text-xl"></i>
+                                <!-- Add Plus Icon -->
+                                <span>Post Job</span>
+                            </Link>
                         </div>
 
                         <swiper-container

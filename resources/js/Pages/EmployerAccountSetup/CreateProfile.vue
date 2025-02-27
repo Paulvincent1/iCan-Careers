@@ -5,7 +5,7 @@ import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import dayjs from "dayjs";
-import { ref, Transition, watch } from "vue";
+import { ref, watch } from "vue";
 import SubmitImage from "../Components/SubmitImage.vue";
 import Maps from "../Components/Maps.vue";
 import { debounce } from "lodash";
@@ -14,96 +14,82 @@ defineOptions({
     layout: [Layout, SetupProfileLayout],
 });
 
-let props = defineProps({
-    bussinessProps: null,
+const props = defineProps({
+    bussinessProps: Array,
 });
 
-let searchBusiness = ref("");
-let isBusinessSelected = ref(false);
-let businessSelected = ref(null);
+const searchBusiness = ref("");
+const isBusinessSelected = ref(false);
+const businessSelected = ref(null);
+
+const form = useForm({
+    full_name: "",
+    phone_number: "",
+    birth_year: "",
+    gender: "",
+    employer_type: "",
+    business_id: null,
+    business_name: "",
+    business_logo: null,
+    industry: "",
+    business_description: "",
+    business_location: [120.9842, 14.5995],
+});
 
 watch(
     searchBusiness,
     debounce(() => {
-        search();
-    }, 1000),
+        if (searchBusiness.value.trim()) {
+            search();
+        }
+    }, 1000)
 );
 
-function selectBusiness(business) {
+const selectBusiness = (business) => {
     isBusinessSelected.value = true;
     form.business_id = business.id;
     businessSelected.value = business;
-}
+};
 
-function removeSelectedBusiness() {
+const removeSelectedBusiness = () => {
     isBusinessSelected.value = false;
     form.business_id = null;
     businessSelected.value = null;
-}
+};
 
-let form = useForm({
-    full_name: null,
-    phone_number: null,
-    birth_year: null,
-    gender: null,
-    employer_type: null,
-    business_id: null,
-    business_name: null,
-    business_logo: null,
-    industry: null,
-    business_description: null,
-    business_location: [120.9842, 14.5995],
-});
-
-function setMarkLocation(coordinates, newvalue) {
-    console.log(newvalue);
-
+const setMarkLocation = (coordinates) => {
     form.business_location = coordinates;
-}
+};
 
-let otherIndustry = ref("");
-let showInput = ref(false);
+const otherIndustry = ref("");
+const showInput = ref(false);
+
 watch(
     () => form.industry,
-    (e) => {
-        if (e === "Other") {
-            showInput.value = true;
-            // console.log(e);
-        } else {
-            showInput.value = false;
-        }
-    },
+    (newValue) => {
+        showInput.value = newValue === "Other";
+    }
 );
 
-let showCompanyForm = ref(false);
+const showCompanyForm = ref(false);
 watch(
     () => form.employer_type,
-    () => {
-        if (form.employer_type === "business") {
-            showCompanyForm.value = true;
-        }
-        if (form.employer_type === "individual") {
-            showCompanyForm.value = false;
-        }
-    },
+    (newValue) => {
+        showCompanyForm.value = newValue === "business";
+    }
 );
 
-function imageAdded(image) {
+const imageAdded = (image) => {
     form.business_logo = image;
-}
+};
 
-function search() {
+const search = () => {
     router.get(
         "/employers/createprofile",
-        {
-            business_name: searchBusiness.value,
-        },
-        {
-            preserveScroll: true,
-            preserveState: true,
-        },
+        { business_name: searchBusiness.value },
+        { preserveScroll: true, preserveState: true }
     );
-}
+};
 
 const submit = () => {
     if (form.industry === "Other") {
@@ -115,278 +101,213 @@ const submit = () => {
 
 <template>
     <Head title="Create Profile | iCan Careers" />
-    <div class="mt-9 border p-7">
-        <h2 class="my-3 text-2xl font-semibold">Tell us about you</h2>
-        <p class="text-sm">
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Reiciendis
-            corporis itaque eum eius unde aperiam aliquid vel ratione
-            doloremque! Ullam illo pariatur officiis tempore iste totam soluta
-            dignissimos libero. Hic?
-        </p>
 
-        <form @submit.prevent="submit">
-            <div class="flex flex-col">
-                <label class="mb-2 mt-4 font-semibold">Full name</label>
-                <input
-                    v-model="form.full_name"
-                    type="text"
-                    class="border px-3 py-2 outline-blue-400"
-                    placeholder="John Doe"
-                    required
-                />
-                <InputFlashMessage
-                    type="error"
-                    :message="form.errors.full_name"
-                />
-            </div>
-            <div class="flex flex-col">
-                <label class="mb-2 mt-4 font-semibold">Phone number</label>
-                <input
-                    v-model="form.phone_number"
-                    type="number"
-                    class="border px-3 py-2 outline-blue-400"
-                    placeholder="951...."
-                    required
-                />
-                <InputFlashMessage
-                    type="error"
-                    :message="form.errors.phone_number"
-                />
-            </div>
+    <div class="flex justify-center">
+        <div class="w-full max-w-3xl bg-white shadow-md rounded-lg p-8 mt-8 border border-gray-300">
+            <h2 class="text-3xl font-bold text-gray-900 text-center">Create Your Employer Profile</h2>
+            <p class="text-lg text-gray-700 text-center mb-6">
+                Please provide your details to create your employer profile.
+            </p>
 
-            <div class="mt-4">
-                <label class="mb-2 mr-3 mt-4 font-semibold">BIRTH YEAR</label>
-                <input
-                    v-model="form.birth_year"
-                    type="number"
-                    min="1900"
-                    :max="dayjs().format('YYYY') - 18"
-                    class="w-20 border p-3 text-center outline-blue-500"
-                    placeholder="YYYY"
-                    required
-                />
-            </div>
-            <div class="mt-4">
-                <p class="mb-2 mt-4 font-semibold">GENDER</p>
+            <form @submit.prevent="submit" class="space-y-6">
+                <!-- Full Name -->
                 <div>
-                    <label class="mr-2" for="male">Male</label>
+                    <label class="block text-lg font-semibold text-gray-800">Full Name</label>
                     <input
-                        v-model="form.gender"
-                        type="radio"
-                        class="text-center"
-                        id="male"
-                        value="Male"
+                        v-model.trim="form.full_name"
+                        type="text"
+                        class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="John Doe"
+                        required
+                    />
+                    <InputFlashMessage type="error" :message="form.errors.full_name" />
+                </div>
+
+                <!-- Phone Number -->
+                <div>
+                    <label class="block text-lg font-semibold text-gray-800">Phone Number</label>
+                    <input
+                        v-model.trim="form.phone_number"
+                        type="number"
+                        class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="09123456789"
+                        required
+                    />
+                    <InputFlashMessage type="error" :message="form.errors.phone_number" />
+                </div>
+
+                <!-- Birth Year -->
+                <div>
+                    <label class="block text-lg font-semibold text-gray-800">Birth Year</label>
+                    <input
+                        v-model.number="form.birth_year"
+                        type="number"
+                        min="1900"
+                        :max="dayjs().year() - 18"
+                        class="w-32 mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg text-center focus:ring-2 focus:ring-blue-500"
+                        placeholder="YYYY"
+                        required
                     />
                 </div>
+
+                <!-- Gender -->
                 <div>
-                    <label class="mr-2" for="female">Female</label>
-                    <input
-                        v-model="form.gender"
-                        type="radio"
-                        class="text-center"
-                        id="female"
-                        value="Female"
-                    />
+                    <p class="text-lg font-semibold text-gray-800">Gender</p>
+                    <div class="flex items-center gap-6 mt-2">
+                        <label class="flex items-center gap-2 cursor-pointer text-lg">
+                            <input v-model="form.gender" type="radio" value="Male" class="w-6 h-6" />
+                            <span class="text-gray-700">Male</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-lg">
+                            <input v-model="form.gender" type="radio" value="Female" class="w-6 h-6" />
+                            <span class="text-gray-700">Female</span>
+                        </label>
+                    </div>
+                    <InputFlashMessage type="error" :message="form.errors.gender" />
                 </div>
-                <InputFlashMessage type="error" :message="form.errors.gender" />
-            </div>
 
-            <div class="mt-5 flex flex-col">
-                <label class="mb-2 mr-3 mt-4 font-semibold"
-                    >What kind of employer are you?</label
-                >
-                <select
-                    name=""
-                    id=""
-                    class="border p-3"
-                    v-model="form.employer_type"
-                    required
-                >
-                    <option value="business">
-                        Business / Company Employer
-                    </option>
-                    <option value="individual" class="">
-                        Individual (Freelance)
-                    </option>
-                </select>
-            </div>
+                <!-- Employer Type -->
+                <div>
+                    <label class="block text-lg font-semibold text-gray-800">What kind of employer are you?</label>
+                    <select
+                        v-model="form.employer_type"
+                        class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                        required
+                    >
+                        <option value="business">Business / Company Employer</option>
+                        <option value="individual">Individual (Freelance)</option>
+                    </select>
+                </div>
 
-            <Transition
-                enter-active-class="animate__animated animate__fadeIn"
-                leave-active-class="animate__animated animate__fadeOut"
-            >
-                <div v-if="showCompanyForm" class="mb-3">
-                    <div>
-                        <h2 class="my-3 text-2xl font-semibold">
-                            Search exisiting company
-                        </h2>
+                <!-- Company Form (Conditional) -->
+                <Transition name="fade">
+                    <div v-if="showCompanyForm" class="space-y-6">
+                        <h3 class="text-xl font-bold text-gray-900">Company Details</h3>
 
-                        <input
-                            v-model="searchBusiness"
-                            type="text"
-                            class="mb-2 border p-2"
-                            placeholder="Search exisitng company"
-                        />
-
-                        <div class="mb-2 h-52 w-72 overflow-y-auto border p-2">
-                            <div
-                                v-for="(business, index) in bussinessProps"
-                                :key="business.id"
-                                @click="selectBusiness(business)"
-                                class="flex cursor-pointer items-center gap-3 p-2 shadow"
-                            >
-                                <img
-                                    src="/assets/images.png"
-                                    class="w-12 rounded object-cover"
-                                    alt=""
-                                />
-                                <p class="text-lg">
-                                    {{ business.business_name }}
-                                </p>
-                            </div>
-                        </div>
-                        <div v-if="businessSelected">
-                            <p>Selected Company</p>
-                            <div
-                                class="flex w-72 cursor-pointer items-center justify-between p-2 shadow"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <div>
-                                        <img
-                                            src="/assets/images.png"
-                                            class="w-12 rounded object-cover"
-                                            alt=""
-                                        />
-                                    </div>
-                                    <p class="text-lg">
-                                        {{ businessSelected.business_name }}
-                                    </p>
+                        <!-- Search Existing Company -->
+                        <div>
+                            <label class="block text-lg font-semibold text-gray-800">Search Existing Company</label>
+                            <input
+                                v-model.trim="searchBusiness"
+                                type="text"
+                                class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                                placeholder="Search existing company"
+                                autocomplete="off"
+                            />
+                            <div class="mt-2 h-52 w-full overflow-y-auto border border-gray-400 rounded-lg p-2">
+                                <div
+                                    v-for="business in bussinessProps"
+                                    :key="business.id"
+                                    @click="selectBusiness(business)"
+                                    class="flex cursor-pointer items-center gap-3 p-2 hover:bg-gray-100 rounded-lg"
+                                >
+                                    <img src="/assets/images.png" class="w-12 rounded object-cover" alt="Company Logo" />
+                                    <p class="text-lg">{{ business.business_name }}</p>
                                 </div>
-                                <i
-                                    @click="removeSelectedBusiness"
-                                    class="bi bi-x text-lg"
-                                ></i>
+                            </div>
+                        </div>
+
+                        <!-- Selected Company -->
+                        <div v-if="businessSelected" class="flex items-center justify-between p-2 border border-gray-400 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <img src="/assets/images.png" class="w-12 rounded object-cover" alt="Selected Company Logo" />
+                                <p class="text-lg">{{ businessSelected.business_name }}</p>
+                            </div>
+                            <i @click="removeSelectedBusiness" class="bi bi-x text-lg cursor-pointer hover:text-red-500"></i>
+                        </div>
+
+                        <!-- Company Information -->
+                        <div v-if="!isBusinessSelected">
+                            <h3 class="text-xl font-bold text-gray-900">Company Information</h3>
+
+                            <!-- Business Name -->
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-800">Business / Company Name</label>
+                                <input
+                                    v-model.trim="form.business_name"
+                                    type="text"
+                                    class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                                    placeholder="e.g. iCan Careers"
+                                />
+                                <InputFlashMessage type="error" :message="form.errors.business_name" />
+                            </div>
+
+                            <!-- Business Logo -->
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-800">Business Logo</label>
+                                <SubmitImage
+                                    @imageAdded="imageAdded"
+                                    description="Upload the business logo here"
+                                    :error="form.errors.business_logo"
+                                />
+                            </div>
+
+                            <!-- Industry -->
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-800">Industry</label>
+                                <select
+                                    v-model="form.industry"
+                                    class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="Technology and IT">Technology and IT</option>
+                                    <option value="Remote Customer Support">Remote Customer Support</option>
+                                    <option value="Creative and Design">Creative and Design</option>
+                                    <option value="Accounting and Financial Services">Accounting and Financial Services</option>
+                                    <option value="Social Media Management">Social Media Management</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <input
+                                    v-if="showInput"
+                                    v-model.trim="otherIndustry"
+                                    type="text"
+                                    class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Please Specify"
+                                />
+                                <InputFlashMessage type="error" :message="form.errors.industry" />
+                            </div>
+
+                            <!-- Company Description -->
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-800">Company Description</label>
+                                <textarea
+                                    v-model.trim="form.business_description"
+                                    class="w-full h-40 mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Tell us about your company..."
+                                ></textarea>
+                                <InputFlashMessage type="error" :message="form.errors.business_description" />
+                            </div>
+
+                            <!-- Company Location -->
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-800">Company Location</label>
+                                <Maps @update:coordinates="setMarkLocation" />
                             </div>
                         </div>
                     </div>
+                </Transition>
 
-                    <div v-if="!isBusinessSelected">
-                        <h2 class="my-3 text-2xl font-semibold">
-                            Company Information
-                        </h2>
-                        <p class="text-sm">
-                            Lorem, ipsum dolor sit amet consectetur adipisicing
-                            elit. Reiciendis corporis itaque eum eius unde
-                            aperiam aliquid vel ratione doloremque! Ullam illo
-                            pariatur officiis tempore iste totam soluta
-                            dignissimos libero. Hic?
-                        </p>
-
-                        <div class="flex flex-col">
-                            <label class="mb-2 mt-4 font-semibold"
-                                >Business / Company name</label
-                            >
-                            <input
-                                v-model="form.business_name"
-                                type="text"
-                                class="border px-3 py-2 outline-blue-400"
-                                placeholder="ex. iCan Careers"
-                            />
-                            <InputFlashMessage
-                                type="error"
-                                :message="form.errors.business_name"
-                            />
-                        </div>
-                        <div class="flex flex-col">
-                            <label class="mb-2 mt-4 font-semibold"
-                                >Business logo</label
-                            >
-                            <SubmitImage
-                                @imageAdded="imageAdded"
-                                description="Upload the business logo here"
-                                :error="form.errors.business_logo"
-                            ></SubmitImage>
-                        </div>
-                        <div class="flex flex-col">
-                            <label class="mb-2 mt-4 font-semibold"
-                                >Industry</label
-                            >
-                            <select
-                                name=""
-                                id=""
-                                class="border p-3"
-                                v-model="form.industry"
-                            >
-                                <option value="Technology and IT">
-                                    Technology and IT
-                                </option>
-                                <option
-                                    value="Remote Customer Support"
-                                    class=""
-                                >
-                                    Remote Customer Support
-                                </option>
-                                <option value="Creative and Design" class="">
-                                    Creative and Design
-                                </option>
-                                <option
-                                    value="Accounting and Financial Services"
-                                    class=""
-                                >
-                                    Accounting and Financial Services
-                                </option>
-                                <option
-                                    value="Social Media Management"
-                                    class=""
-                                >
-                                    Social Media Management
-                                </option>
-                                <option value="Other" class="">Other</option>
-                            </select>
-                            <input
-                                v-if="showInput"
-                                v-model="otherIndustry"
-                                type="text"
-                                class="mt-3 border px-3 py-2 outline-blue-400"
-                                placeholder="Please Specify"
-                            />
-                            <InputFlashMessage
-                                type="error"
-                                :message="form.errors.industry"
-                            />
-                        </div>
-                        <div class="flex flex-col">
-                            <label class="mb-2 mt-4 font-semibold"
-                                >Company description</label
-                            >
-                            <textarea
-                                v-model="form.business_description"
-                                type="text"
-                                class="border px-3 pb-9 pt-2 outline-blue-400"
-                                placeholder="Tell us summary about your skills and how you want to be known as worker."
-                            ></textarea>
-                            <InputFlashMessage
-                                type="error"
-                                :message="form.errors.business_description"
-                            />
-                        </div>
-
-                        <div class="flex flex-col">
-                            <label class="mb-2 mt-4 font-semibold"
-                                >Please select your company location</label
-                            >
-                        </div>
-                        <Maps @update:coordinates="setMarkLocation"></Maps>
-                    </div>
+                <!-- Submit Button -->
+                <div class="flex justify-center">
+                    <button
+                        class="w-full bg-green-500 text-white font-bold px-6 py-4 text-xl rounded-lg hover:bg-green-600 transition shadow-md"
+                        type="submit"
+                    >
+                        Save Profile
+                    </button>
                 </div>
-            </Transition>
-
-            <div class="mt-3 flex justify-end">
-                <button class="rounded border bg-blue-500 px-4 py-2 text-white">
-                    Save
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </template>
-<style></style>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+</style>
