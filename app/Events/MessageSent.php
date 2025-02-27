@@ -31,11 +31,21 @@ class MessageSent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new Channel('message' . $this->message->receiver_id);
+        return new Channel('message-' . $this->message->receiver_id . '-' . $this->message->sender_id);
     }
 
     public function broadcastAs()
     {
         return 'message.event';
+    }
+
+    public function broadcastWith()
+    {
+        return [
+            'id' => $this->message->id,
+            'message' => $this->message->message,
+            'receiver_id' => $this->message->receiver_id,
+            'sender_id' => $this->message->sender_id,
+        ];
     }
 }

@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
+use function Illuminate\Log\log;
 
 class MessageController extends Controller
 {
@@ -25,7 +28,7 @@ class MessageController extends Controller
         $firstMessageChatHead = null;
       
         if($userDirectMessage){
-            if(!$userDirectMessage->sentMessages()->first() && !$userDirectMessage->receivedMessages()->first()){            
+            if(!$userDirectMessage->sentMessages()->where('receiver_id',$user->id)->first() && !$userDirectMessage->receivedMessages()->where('sender_id',$user->id)->first()){            
             //    dd('hi');
                 $firstMessageChatHead = [
                     'user' => $userDirectMessage,
@@ -41,7 +44,7 @@ class MessageController extends Controller
 
                 $query->where('receiver_id', $user->id)->where('sender_id', $userDirectMessage->id);
 
-            })->get();
+            })->orderBy('created_at','desc')->paginate(20)->withQueryString();
             
         }else{
             $firstMessageChatHead = null;
@@ -116,6 +119,9 @@ class MessageController extends Controller
      */
     public function store(Request $request, User $receiverId)
     {
+
+        log($request);
+        
         $field = $request->validate([
             'message' => 'required',
         ]);
@@ -126,7 +132,9 @@ class MessageController extends Controller
             'message' => $field['message'],
         ]);
         
-        broadcast($message)->toOthers();
+        log($message->message);
+
+        broadcast(new MessageSent($message))->toOthers();
 
         return redirect()->back();
 

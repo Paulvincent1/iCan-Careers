@@ -1,7 +1,18 @@
 <script setup>
-import { router, usePage } from "@inertiajs/vue3";
-import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
+import { router, useForm, usePage } from "@inertiajs/vue3";
+import {
+    computed,
+    nextTick,
+    onMounted,
+    onUpdated,
+    ref,
+    useTemplateRef,
+    watch,
+} from "vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
+import MessageBox from "../Components/MessageBox.vue";
+import { nanoid } from "nanoid";
+import { debounce } from "lodash";
 
 let props = defineProps({
     chatHeadProps: null,
@@ -12,55 +23,143 @@ let props = defineProps({
 let chatContainer = useTemplateRef("chat-container");
 let messageInput = useTemplateRef("messageInput");
 
+function loadMessages() {
+    nextTick(() => {
+        chatContainer.value.scrollTo({
+            top: chatContainer.value.scrollHeight,
+            behavior: "smooth",
+        });
+    });
+    chatContainer.value.addEventListener("scroll", loadMoreMessagesDebounce);
+}
+
+let startedFromTheBottom = ref(false);
+let highestPage = ref(null);
+let lowestPage = ref(null);
+
+const loadMoreMessagesDebounce = debounce(() => {
+    if (chatContainer.value.scrollTop <= 0) {
+        const previousScrollHeight = chatContainer.value.scrollHeight;
+
+        if (props.messageProps.next_page_url > highestPage.value) {
+            if (
+                props.messageProps.current_page === 1 &&
+                messages.value.length <= 20
+            ) {
+                startedFromTheBottom.value = true;
+            }
+
+            router.get(
+                props.messageProps.next_page_url,
+                {},
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        messages.value = [
+                            ...props.messageProps.data.reverse(),
+                            ...messages.value,
+                        ];
+                        nextTick(() => {
+                            chatContainer.value.scrollTop +=
+                                chatContainer.value.scrollHeight -
+                                previousScrollHeight;
+                        });
+                    },
+                },
+            );
+        }
+    }
+    if (
+        chatContainer.value.scrollTop +
+            chatContainer.value.getBoundingClientRect().height >=
+        chatContainer.value.scrollHeight
+    ) {
+        const previousScrollHeight = chatContainer.value.scrollHeight;
+        if (props.messageProps.prev_page_url) {
+            if (startedFromTheBottom.value) {
+                console.log(startedFromTheBottom.value);
+                return;
+            }
+
+            router.get(
+                props.messageProps.prev_page_url,
+                {},
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        if (!startedFromTheBottom.value) {
+                            console.log("called");
+                            messages.value = [
+                                ...messages.value,
+                                ...props.messageProps.data.reverse(),
+                            ];
+                        }
+
+                        if (props.messageProps.current_page === 1) {
+                            startedFromTheBottom.value = true;
+                        }
+
+                        nextTick(() => {
+                            chatContainer.value.scrollTop =
+                                previousScrollHeight;
+                        });
+                    },
+                },
+            );
+        }
+    }
+}, 500);
+
 let chatHeads = ref(props.chatHeadProps ?? []);
-let messages = computed(() => props.messageProps);
+let messages = ref(props.messageProps?.data.reverse() ?? null);
 
 onMounted(() => {
-    // console.log(chatContainer.value.scrollHeight);
-    chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
-    chatContainer.value.addEventListener("scroll", () => {
-        if (chatContainer.value.scrollTop <= 0) {
-            //load more
-            console.log("hi");
-        }
-    });
+    console.log(props.messageProps);
+    highestPage.value = props.messageProps.current_page;
+    lowestPage.value = props.messageProps.current_page;
 
     if (props.firstMessageChatHeadProps) {
         chatHeads.value.unshift(props.firstMessageChatHeadProps);
     }
+    if (route().params.user) {
+        listenToChannelMessage(route().params.user);
+    }
 
-    console.log(chatHeads.value);
+    loadMessages();
+    updateMessageInputVisibility();
 });
 
-watch(
-    () => props.chatHeadProps,
-    () => {},
-);
-
 let page = usePage();
-function sendMessage() {
-    console.log(messageInput.value.value);
-
+async function sendMessage() {
     if (messageInput.value.value) {
-        router.post(
+        messages.value.push({
+            id: nanoid(),
+            message: messageInput.value.value,
+            sender_id: page.props.auth.user.authenticated.id,
+            receiver_id: route().params.user,
+        });
+        loadMessages();
+        const messageToBeSent = messageInput.value.value;
+        messageInput.value.value = null;
+
+        const response = await fetch(
             route("messages.send", {
                 receiverId: route().params.user,
             }),
             {
-                message: messageInput.value.value,
-            },
-            {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {
-                    messages.value.push({
-                        message: messageInput.value,
-                        sender_id: page.props.auth.user.authenticated.id,
-                        receiver_id: route().params.user,
-                    });
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": page.props.csrf_token,
                 },
+                method: "POST",
+                body: JSON.stringify({ message: messageToBeSent }),
             },
         );
+        console.log(response.ok);
+
+        console.log(messages.value);
     }
 }
 
@@ -73,6 +172,13 @@ function switchChat(id) {
         {
             preserveScroll: true,
             preserveState: true,
+            onSuccess: () => {
+                messages.value = props.messageProps?.data.reverse();
+                updateMessageInputVisibility();
+                loadMessages();
+
+                listenToChannelMessage(id);
+            },
         },
     );
 }
@@ -94,9 +200,25 @@ function updateMessageInputVisibility() {
         isShowMessageInput.value = false;
     }
 }
-onMounted(() => {
-    updateMessageInputVisibility();
-});
+
+//pusher
+function listenToChannelMessage(senderId) {
+    window.onload = () => {
+        window.Echo.channel(
+            "message-" + page.props.auth.user.authenticated.id + "-" + senderId,
+        ).listen(".message.event", (e) => {
+            console.log(e);
+            messages.value.push({
+                id: e.id,
+                message: e.message,
+                sender_id: e.sender_id,
+                receiver_id: e.receiver_id,
+            });
+
+            loadMessages();
+        });
+    };
+}
 </script>
 <template>
     <div
@@ -124,7 +246,7 @@ onMounted(() => {
                         @click="switchChat(chatHead.user.id)"
                         :key="chatHead.id"
                         :class="[
-                            'flex gap-2 p-4',
+                            'flex cursor-pointer gap-2 p-4',
                             {
                                 'bg-slate-300':
                                     chatHead.user.id ===
@@ -142,7 +264,7 @@ onMounted(() => {
                         <div>
                             <p>{{ chatHead.user.email }}</p>
                             <p class="text-sm">
-                                {{ chatHead.latestMessage.message }}
+                                {{ chatHead.latestMessage?.message }}
                             </p>
                         </div>
                     </div>
@@ -158,7 +280,12 @@ onMounted(() => {
                             ref="chat-container"
                             class="chat-container overflow-auto p-4"
                         >
-                            <div
+                            <MessageBox
+                                v-for="message in messages"
+                                :key="message.id"
+                                :message="message"
+                            ></MessageBox>
+                            <!-- <div
                                 v-for="message in messages"
                                 :class="[
                                     'mb-6 flex justify-start',
@@ -177,7 +304,7 @@ onMounted(() => {
                                         {{ message.message }}
                                     </p>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
