@@ -2,10 +2,14 @@
 import { usePage } from "@inertiajs/vue3";
 import Navbar from "../Components/Navbar.vue";
 import ProfileSetupMessage from "../Components/ProfileSetupMessage.vue";
-import { ref } from "vue";
+import { onUpdated, ref } from "vue";
 
 let page = usePage();
 let closeProfileSetupMessage = ref(false);
+
+onUpdated(() => {
+    console.log("logging");
+});
 </script>
 
 <template>
@@ -17,9 +21,9 @@ let closeProfileSetupMessage = ref(false);
         <ProfileSetupMessage
             @close="closeProfileSetupMessage = true"
             v-if="
-                (page.props.auth.worker_profile &&
+                page.props.auth.worker_profile &&
                 page.component != 'WorkerAccountSetup/AddSkills' &&
-                page.component != 'WorkerAccountSetup/CreateProfile')   && 
+                page.component != 'WorkerAccountSetup/CreateProfile' &&
                 !closeProfileSetupMessage
                     ? true
                     : false

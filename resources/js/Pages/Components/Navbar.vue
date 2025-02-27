@@ -18,18 +18,18 @@ onMounted(() => {
 watch(isActive, () => {
     isActive.value
         ? (document.body.style.overflow = "hidden")
-        : (document.body.style.overflow = "static");
+        : (document.body.style.overflow = "auto");
 });
 
 window.addEventListener("resize", () => {
     if (window.innerWidth >= 768) {
         if (isActive.value === true) {
-            document.body.style.position = "static";
+            document.body.style.overflow = "auto";
         }
     }
     if (window.innerWidth <= 768) {
         if (isActive.value === true) {
-            document.body.style.position = "fixed";
+            document.body.style.overflow = "hidden";
         }
     }
 });

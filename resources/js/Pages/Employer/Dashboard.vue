@@ -123,7 +123,9 @@ function switchInvoiceTag(tag) {
                 <div class="border p-4">
                     <div class="flex justify-between">
                         <p>Inbox</p>
-                        <Link class="text-blue-500">See All</Link>
+                        <Link :href="route('messages')" class="text-blue-500"
+                            >See All</Link
+                        >
                     </div>
                 </div>
             </div>
