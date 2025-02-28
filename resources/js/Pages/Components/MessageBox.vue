@@ -4,15 +4,15 @@ import { onMounted, onUnmounted, onUpdated } from "vue";
 defineProps({
     message: null,
 });
-onUpdated(() => {
-    console.log("updated");
-});
-onMounted(() => {
-    console.log("mounted");
-});
-onUnmounted(() => {
-    console.log("unmounted");
-});
+// onUpdated(() => {
+//     console.log("updated");
+// });
+// onMounted(() => {
+//     console.log("mounted");
+// });
+// onUnmounted(() => {
+//     console.log("unmounted");
+// });
 </script>
 <template>
     <div
