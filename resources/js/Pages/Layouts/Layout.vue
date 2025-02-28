@@ -6,10 +6,6 @@ import { onUpdated, ref } from "vue";
 
 let page = usePage();
 let closeProfileSetupMessage = ref(false);
-
-onUpdated(() => {
-    console.log("logging");
-});
 </script>
 
 <template>

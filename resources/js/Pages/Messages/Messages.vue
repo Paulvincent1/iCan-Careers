@@ -34,14 +34,103 @@ function loadMessages() {
 }
 
 let startedFromTheBottom = ref(false);
-let highestPage = ref(null);
-let lowestPage = ref(null);
+let loadedPages = ref([]);
+
+function nextPageUrlVisited() {
+    if (props.messageProps?.next_page_url) {
+        const url = new URL(props.messageProps?.next_page_url);
+        const nextPageNumber = Number(url.searchParams.get("page"));
+
+        const isNextPageNumberVisited = loadedPages.value.find(
+            (pageNumber) => pageNumber === nextPageNumber,
+        );
+        return isNextPageNumberVisited;
+    }
+    return null;
+}
+
+function previousPageVisited() {
+    if (props.messageProps?.prev_page_url) {
+        const url = new URL(props.messageProps?.prev_page_url);
+        const prevPageNumber = Number(url.searchParams.get("page"));
+
+        const isPrevPageNumberVisited = loadedPages.value.find(
+            (pageNumber) => pageNumber === prevPageNumber,
+        );
+
+        return isPrevPageNumberVisited;
+    }
+    return null;
+}
 
 const loadMoreMessagesDebounce = debounce(() => {
     if (chatContainer.value.scrollTop <= 0) {
         const previousScrollHeight = chatContainer.value.scrollHeight;
 
-        if (props.messageProps.next_page_url > highestPage.value) {
+        let isNextPageNumberVisited = nextPageUrlVisited();
+        console.log(isNextPageNumberVisited);
+
+        if (isNextPageNumberVisited) {
+            //check if the next next page after the next page is visited.
+            const nextNextPageVisited = loadedPages.value.find(
+                (pageNumber) => isNextPageNumberVisited + 1 === pageNumber,
+            );
+
+            console.log(loadedPages.value);
+            console.log(isNextPageNumberVisited + 1);
+            if (!nextNextPageVisited) {
+                const nextNextPageValid = props.messageProps.links.find(
+                    (link) => {
+                        const url = new URL(
+                            "http://127.0.0.1:8000/messages?user=1&page=1",
+                        );
+
+                        url.searchParams.set(
+                            "page",
+                            isNextPageNumberVisited + 1,
+                        );
+
+                        console.log(link.url);
+                        console.log(url.toString());
+                        return link.url === url.toString();
+                    },
+                );
+                console.log(nextNextPageValid);
+
+                if (nextNextPageValid) {
+                    console.log("trigger is nextNextValid");
+                    router.get(
+                        nextNextPageValid.url,
+                        {},
+                        {
+                            preserveState: true,
+                            preserveScroll: true,
+                            onSuccess: () => {
+                                messages.value = [
+                                    ...props.messageProps.data.reverse(),
+                                    ...messages.value,
+                                ];
+                                loadedPages.value.push(
+                                    props.messageProps?.current_page,
+                                );
+                                nextTick(() => {
+                                    chatContainer.value.scrollTop +=
+                                        chatContainer.value.scrollHeight -
+                                        previousScrollHeight;
+                                    loadedPages.value = [
+                                        ...new Set([...loadedPages.value]),
+                                    ];
+                                });
+                            },
+                        },
+                    );
+
+                    return;
+                }
+            }
+        }
+
+        if (props.messageProps?.next_page_url && !isNextPageNumberVisited) {
             if (
                 props.messageProps.current_page === 1 &&
                 messages.value.length <= 20
@@ -60,10 +149,16 @@ const loadMoreMessagesDebounce = debounce(() => {
                             ...props.messageProps.data.reverse(),
                             ...messages.value,
                         ];
+                        loadedPages.value.push(
+                            props.messageProps?.current_page,
+                        );
                         nextTick(() => {
                             chatContainer.value.scrollTop +=
                                 chatContainer.value.scrollHeight -
                                 previousScrollHeight;
+                            loadedPages.value = [
+                                ...new Set([...loadedPages.value]),
+                            ];
                         });
                     },
                 },
@@ -75,10 +170,74 @@ const loadMoreMessagesDebounce = debounce(() => {
             chatContainer.value.getBoundingClientRect().height >=
         chatContainer.value.scrollHeight
     ) {
+        let isPrevPageNumberVisited = previousPageVisited();
+        if (isPrevPageNumberVisited) {
+            if (isPrevPageNumberVisited != 1) {
+                const prevPrevPageVisited = loadedPages.value.find(
+                    (pageNumber) => isPrevPageNumberVisited - 1 === pageNumber,
+                );
+
+                if (!prevPrevPageVisited) {
+                    if (prevPrevPageVisited != 1) {
+                        const prevPrevPageValid = props.messageProps.links.find(
+                            (link) => {
+                                const url = new URL(
+                                    "http://127.0.0.1:8000/messages?user=1&page=1",
+                                );
+                                url.searchParams.set(
+                                    "page",
+                                    isPrevPageNumberVisited - 1,
+                                );
+
+                                return link.url === url.toString();
+                            },
+                        );
+
+                        if (prevPrevPageValid) {
+                            router.get(
+                                prevPrevPageValid.url,
+                                {},
+                                {
+                                    preserveState: true,
+                                    preserveScroll: true,
+                                    onSuccess: () => {
+                                        if (!startedFromTheBottom.value) {
+                                            messages.value = [
+                                                ...messages.value,
+                                                ...props.messageProps.data.reverse(),
+                                            ];
+                                        }
+
+                                        if (
+                                            props.messageProps.current_page ===
+                                            1
+                                        ) {
+                                            startedFromTheBottom.value = true;
+                                        }
+
+                                        nextTick(() => {
+                                            chatContainer.value.scrollTop =
+                                                previousScrollHeight;
+                                        });
+                                        loadedPages.value.push(
+                                            props.messageProps?.current_page,
+                                        );
+                                        loadedPages.value = [
+                                            ...new Set([...loadedPages.value]),
+                                        ];
+                                    },
+                                },
+                            );
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
         const previousScrollHeight = chatContainer.value.scrollHeight;
-        if (props.messageProps.prev_page_url) {
+        if (props.messageProps.prev_page_url && !isPrevPageNumberVisited) {
             if (startedFromTheBottom.value) {
-                console.log(startedFromTheBottom.value);
                 return;
             }
 
@@ -90,7 +249,6 @@ const loadMoreMessagesDebounce = debounce(() => {
                     preserveScroll: true,
                     onSuccess: () => {
                         if (!startedFromTheBottom.value) {
-                            console.log("called");
                             messages.value = [
                                 ...messages.value,
                                 ...props.messageProps.data.reverse(),
@@ -105,6 +263,12 @@ const loadMoreMessagesDebounce = debounce(() => {
                             chatContainer.value.scrollTop =
                                 previousScrollHeight;
                         });
+                        loadedPages.value.push(
+                            props.messageProps?.current_page,
+                        );
+                        loadedPages.value = [
+                            ...new Set([...loadedPages.value]),
+                        ];
                     },
                 },
             );
@@ -116,9 +280,51 @@ let chatHeads = ref(props.chatHeadProps ?? []);
 let messages = ref(props.messageProps?.data.reverse() ?? null);
 
 onMounted(() => {
-    console.log(props.messageProps);
-    highestPage.value = props.messageProps.current_page;
-    lowestPage.value = props.messageProps.current_page;
+    console.log(
+        props.messageProps.current_page != 1 &&
+            props.messageProps.data.length < 20,
+    );
+
+    if (props.messageProps?.current_page) {
+        if (
+            props.messageProps.current_page != 1 &&
+            props.messageProps.data.length < 20
+        ) {
+            loadedPages.value.push(props.messageProps?.current_page);
+            loadedPages.value = [...new Set([...loadedPages.value])];
+            router.get(
+                props.messageProps.prev_page_url,
+                {},
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        if (!startedFromTheBottom.value) {
+                            messages.value = [
+                                ...messages.value,
+                                ...props.messageProps.data.reverse(),
+                            ];
+                        }
+
+                        if (props.messageProps.current_page === 1) {
+                            startedFromTheBottom.value = true;
+                        }
+
+                        nextTick(() => {
+                            loadedPages.value.push(
+                                props.messageProps?.current_page,
+                            );
+                            loadedPages.value = [
+                                ...new Set([...loadedPages.value]),
+                            ];
+                        });
+                    },
+                },
+            );
+
+            console.log(loadedPages.value);
+        }
+    }
 
     if (props.firstMessageChatHeadProps) {
         chatHeads.value.unshift(props.firstMessageChatHeadProps);
@@ -157,9 +363,9 @@ async function sendMessage() {
                 body: JSON.stringify({ message: messageToBeSent }),
             },
         );
-        console.log(response.ok);
+        // console.log(response.ok);
 
-        console.log(messages.value);
+        // console.log(messages.value);
     }
 }
 
@@ -178,6 +384,7 @@ function switchChat(id) {
                 loadMessages();
 
                 listenToChannelMessage(id);
+                loadedPages.value = [1];
             },
         },
     );
@@ -189,8 +396,6 @@ function updateMessageInputVisibility() {
         let res = chatHeads.value.find((chatHead) => {
             return chatHead.user.id === Number(route().params.user);
         });
-        console.log(res);
-
         if (res) {
             isShowMessageInput.value = true;
         } else {
@@ -207,7 +412,6 @@ function listenToChannelMessage(senderId) {
         window.Echo.channel(
             "message-" + page.props.auth.user.authenticated.id + "-" + senderId,
         ).listen(".message.event", (e) => {
-            console.log(e);
             messages.value.push({
                 id: e.id,
                 message: e.message,
