@@ -273,6 +273,10 @@ const formatCurrency =
                             Click here to verify!
                         </Link>
                     </div>
+                    <div v-if="$page.props.auth.user.authenticated.verified" class="flex items-center gap-1">
+                        <p class="text-sm font-bold text-gray-600">Verified</p>
+                        <i class="bi bi-patch-check-fill text-green-400"></i>
+                    </div>
 
                     <div v-if="isPending">
                         <p class="text-yellow-400">{{ isPending }}</p>

@@ -1,13 +1,18 @@
 <script setup>
-import { ref } from "vue";
+import { getCurrentInstance, ref } from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faSearch, faSort, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
+import dayjs from "dayjs";
 
 defineOptions({
     layout: AdminLayout,
 });
+
+let props = defineProps({
+    subscriptionPaymentHistoryProps: null
+})
 
 // Add icons to FontAwesome library
 library.add(faSearch, faSort, faCalendar);
@@ -18,6 +23,8 @@ const paymentHistory = ref([
     { id: 2, user: "Jane Smith", amount: "$30", date: "2025-02-14", status: "Pending" },
     { id: 3, user: "Mike Johnson", amount: "$25", date: "2025-02-13", status: "Completed" },
 ]);
+
+const formatCurrency = getCurrentInstance().appContext.config.globalProperties.formatCurrency;
 </script>
 
 <template>
@@ -42,22 +49,22 @@ const paymentHistory = ref([
                             Amount <font-awesome-icon :icon="['fas', 'sort']" />
                         </th>
                         <th class="p-3">
+                            Subscription Type <font-awesome-icon :icon="['fas', 'sort']" />
+                        </th>
+                        <th class="p-3">
                             Date <font-awesome-icon :icon="['fas', 'calendar']" />
                         </th>
-                        <th class="p-3">Status</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="payment in paymentHistory" :key="payment.id" class="border-t text-sm">
+                    <tr v-for="payment in subscriptionPaymentHistoryProps" :key="payment.id" class="border-t text-sm">
                         <td class="p-3">{{ payment.id }}</td>
-                        <td class="p-3">{{ payment.user }}</td>
-                        <td class="p-3">{{ payment.amount }}</td>
-                        <td class="p-3">{{ payment.date }}</td>
-                        <td class="p-3">
-                            <span :class="payment.status === 'Completed' ? 'text-green-500' : 'text-yellow-500'">
-                                {{ payment.status }}
-                            </span>
-                        </td>
+                        <td class="p-3">{{ payment.employer.email }}</td>
+                        <td class="p-3">{{ formatCurrency(payment.amount) }}</td>
+                        <td class="p-3">{{ payment.subscription_type }}</td>
+                        <td class="p-3">{{ dayjs(payment.created_at).format('MMMM DD, YYYY')}}</td>
+                        
                     </tr>
                 </tbody>
             </table>

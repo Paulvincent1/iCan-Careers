@@ -3,10 +3,22 @@ import { useForm } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
 import DashboardChart from "../Components/Admin/DashboardChart.vue";
+import { getCurrentInstance } from "vue";
+
+let props = defineProps({
+    salaryProps: null,
+    userCountProps:null,
+})
+
+
+
 
 defineOptions({
     layout: AdminLayout,
 });
+
+
+let formatCurreny = getCurrentInstance().appContext.config.globalProperties.formatCurrency;
 </script>
 
 <template>
@@ -27,7 +39,7 @@ defineOptions({
                 <!-- Total Users -->
                 <div class="bg-gray-800 rounded-xl shadow-2xl p-6 border border-gray-700 hover:border-cyan-400 transition-all animate-fade-in delay-100">
                     <h2 class="text-lg font-medium text-gray-400">Total Users</h2>
-                    <p class="text-3xl font-bold text-cyan-400 glow">50</p>
+                    <p class="text-3xl font-bold text-cyan-400 glow">{{ userCountProps ?? 0  }}</p>
                 </div>
 
                 <!-- Total Jobs -->
@@ -45,7 +57,7 @@ defineOptions({
                 <!-- Total Earnings -->
                 <div class="bg-gray-800 rounded-xl shadow-2xl p-6 border border-gray-700 hover:border-cyan-400 transition-all animate-fade-in delay-400">
                     <h2 class="text-lg font-medium text-gray-400">Total Earnings</h2>
-                    <p class="text-3xl font-bold text-green-400 glow">₱100,000</p>
+                    <p class="text-3xl font-bold text-green-400 glow">{{ formatCurreny(salaryProps.total_earnings ?? 0)  }}</p>
                 </div>
             </div>
         </div>

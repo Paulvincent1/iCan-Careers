@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote')->everyMinute();
+})->purpose('Display an inspiring quote')->daily();
 
 
 Schedule::command(InvoiceUpdateStatus::class)->everyMinute();

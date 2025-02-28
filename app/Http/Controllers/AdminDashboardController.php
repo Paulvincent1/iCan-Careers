@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\EmployerProfile;
 use App\Models\EmployerSubscription;
 use App\Models\User;
+use App\Models\Salary;
+use App\Models\SubscriptionPaymentHistory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -12,7 +14,15 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/Dashboard');
+        $salary = Salary::find(1);
+        // dd($salary);    
+
+        $userCount = User::whereDoesntHave('roles', function ($query) {
+            $query->where('name','Admin');
+        })->count();
+
+        // dd($userCount);
+        return Inertia::render('Admin/Dashboard', ['salaryProps' => $salary, 'userCountProps' => $userCount]);
     }
 
     public function workers()
@@ -62,7 +72,9 @@ class AdminDashboardController extends Controller
 
    public function employers()
 {
-    $employers = EmployerProfile::with(['user', 'businessInformation'])
+    $employers = EmployerProfile::with(['user', 'businessInformation'])->whereHas('user.roles', function($query){
+        $query->where('name','!=','Admin');
+    })
         ->select('id', 'user_id', 'full_name', 'employer_type', 'business_id')
         ->get()
         ->map(function ($employer) {
@@ -106,13 +118,18 @@ class AdminDashboardController extends Controller
 
     public function paymentHistory()
     {
-        return Inertia::render('Admin/PaymentHistory');
+        $subscriptionPaymentHistory = SubscriptionPaymentHistory::query()->with('employer')->latest()->get();
+
+        // dd($subscriptionPaymentHistory);    
+        return Inertia::render('Admin/PaymentHistory',['subscriptionPaymentHistoryProps'=> $subscriptionPaymentHistory]);
     }
 
     public function subscribeUsers()
 {
     // Fetch employer subscriptions along with employer details
-    $subscribedUsers = EmployerSubscription::with('employer:id,name,email')
+    $subscribedUsers = EmployerSubscription::with('employer:id,name,email')->whereHas('employer.roles', function ($query) {
+      $query->where('name', '!=','Admin');
+    })
         ->select('id', 'subscription_type', 'start_date', 'expiry_date', 'employer_id')
         ->get();
 

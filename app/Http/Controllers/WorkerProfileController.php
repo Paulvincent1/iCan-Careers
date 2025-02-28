@@ -241,8 +241,6 @@ class WorkerProfileController extends Controller
     public function showResume(string $path, User $workerId){
        $user = Auth::user();
 
-      
-
     //    dd($user->employerJobPosts()->whereHas('usersWhoApplied', function ($query) use ($workerId){
     //     $query->where('worker_id',4);
     //    })->first());
