@@ -55,7 +55,7 @@ onUnmounted(() => {
             <!-- Dropdown Menu -->
             <div v-if="isDropdownOpen" class="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-gray-300/20 bg-white/10 backdrop-blur-md shadow-lg">
                 <a href="/admin" class="block px-4 py-2 text-cyan-300 hover:bg-cyan-500/20 transition">Profile</a>
-                <a href="/admin" class="block px-4 py-2 text-cyan-300 hover:bg-cyan-500/20 transition">Logout</a>
+                <Link :href="route('logout')" method="post" class="block px-4 py-2 text-cyan-300 hover:bg-cyan-500/20 transition">Logout</Link>
             </div>
         </div>
     </nav>

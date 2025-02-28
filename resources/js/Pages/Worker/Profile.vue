@@ -270,7 +270,7 @@ function removeSkill(skillId) {
             >
                 <div class="mb-2 flex items-end gap-3">
                     <p class="text-lg">{{ userProp.name }}</p>
-                    <Link
+                    <Link v-if="visitor"
                         :href="route('messages')"
                         :data="{ user: userProp.id }"
                         class="bi bi-chat-dots text-lg text-blue-500 hover:cursor-pointer"

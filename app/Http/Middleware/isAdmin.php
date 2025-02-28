@@ -15,7 +15,7 @@ class isAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if($request->user()->roles()->where('name','Admin')->exists()){
+        if($request->user()?->roles()->where('name','Admin')->exists()){
             return $next($request);
         }
 

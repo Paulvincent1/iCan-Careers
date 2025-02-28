@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\Salary;
 
 use function Illuminate\Log\log;
 
@@ -76,6 +77,7 @@ class InvoiceController extends Controller
                              'start_date' => Carbon::now(),
                              'expiry_date' => Carbon::parse($employer->employerSubscription->expiry_date)->addMonth(),
                          ]);
+
  
                         }
                     }else{
@@ -89,6 +91,24 @@ class InvoiceController extends Controller
                     }
 
 
+                    if($salary = Salary::find(1)){
+
+                        $salary->increment('total_earnings',3797.4504);
+
+                    }else{
+                        Salary::create([
+                            'total_earnings'=> 3797.4504,
+                         ]);
+    
+                    }
+
+
+                    $employer->subscriptionPaymentHistory()->create([
+                        'amount' => 3797.4504,
+                        'subscription_type' => 'Pro',
+                    ]);
+                    
+                  
                     $employerSubscriptionInvoice->delete();
 
                     DB::beginTransaction();
@@ -161,6 +181,22 @@ class InvoiceController extends Controller
                             'expiry_date' => Carbon::now()->addYear(),
                         ]);
                     }
+
+                    
+                    if($salary = Salary::find(1)){
+
+                        $salary->increment('total_earnings',5411.7704);
+                        
+                    }else{
+                        Salary::create([
+                            'total_earnings'=> 5411.7704,
+                        ]);
+                    }
+
+                    $employer->subscriptionPaymentHistory()->create([
+                        'amount' => 5411.7704,
+                        'subscription_type' => 'Premium',
+                    ]);
 
                     $employerSubscriptionInvoice->delete();
 

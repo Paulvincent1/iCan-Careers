@@ -37,7 +37,7 @@ class HandleInertiaRequests extends Middleware
     {
         return array_merge(parent::share($request), [
             'auth.user.authenticated' => fn () => $request->user()
-            ? $request->user()->only('id', 'name', 'email', 'profile_img')
+            ? $request->user()->only('id', 'name', 'email', 'profile_img','verified')
             : null,
             'auth.worker_profile' => function () use($request) {
                 if($request->user()){

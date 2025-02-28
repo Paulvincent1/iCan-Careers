@@ -31,9 +31,12 @@ Route::get('/', function () {
 
         if($userRole === 'Senior' || $userRole ==='PWD'){
             return redirect()->route('worker.dashboard');
+        }elseif($userRole === 'Employer'){
+            return redirect()->route('employer.dashboard');
         }
+
+        return redirect()->route('admin.dashboard');
        
-        return redirect()->route('employer.dashboard');
     }
     return inertia('Home');
 })->name('home');
@@ -131,7 +134,7 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
 });
 
 
-Route::prefix('admin')->middleware([])->group(function (){
+Route::prefix('admin')->middleware([isAdmin::class])->group(function (){
     Route::get('/',[AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/workers', [AdminDashboardController::class, 'workers'])->name('admin.workers');
     Route::put('/workers/{id}/verify', [AdminDashboardController::class, 'toggleVerification'])->name('admin.workers.verify');

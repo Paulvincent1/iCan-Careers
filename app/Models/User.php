@@ -126,4 +126,8 @@ class User extends Authenticatable
     public function receivedMessages(){
         return $this->hasMany(Message::class,'receiver_id');
     }
+
+    public function subscriptionPaymentHistory(){
+        return $this->hasMany(SubscriptionPaymentHistory::class, 'employer_id');
+    }
 }
