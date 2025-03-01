@@ -83,12 +83,13 @@ function switchInvoiceTag(tag) {
 }
 </script>
 <template>
+   
     <Head title="Dashboard | iCan Careers" />
     <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
         <div class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-10">
             <div>
                 <div
-                    class="mb-4 flex flex-col items-center justify-center rounded border p-4"
+                    class="mb-4 flex flex-col items-center justify-center rounded border p-4 "
                 >
                     <div class="mb-3 mt-4 w-[84px]">
                         <img
@@ -97,19 +98,14 @@ function switchInvoiceTag(tag) {
                             class="w-full rounded-[500px]"
                         />
                     </div>
-                    <p class="font-bol mb-3">{{ page.props.auth.user.name }}</p>
-                    <Link
-                        :href="route('worker.profile')"
-                        as="button"
-                        class="mb-3 w-full max-w-[500px] rounded-lg border px-4 py-2 font-bold"
-                    >
-                        View Profile
-                    </Link>
+                    <p class="font-bol mb-3">{{ page.props.auth.user.authenticated.name }}</p>
+                   
                     <div class="flex flex-col items-center">
-                        <p class="mb-3 text-center text-red-500">
+                        <p v-if="page.props.auth.user.employer.subscription.subscription_type === 'Free'" class="mb-3 text-center text-red-500">
                             Your account is currently on free tier, Please
                             upgrade to pro tier to hire workers.
                         </p>
+                        
                         <!-- <Link
                             :href="route('account.verify')"
                             as="button"

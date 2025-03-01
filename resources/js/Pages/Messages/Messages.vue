@@ -3,6 +3,7 @@ import { router, useForm, usePage } from "@inertiajs/vue3";
 import {
     computed,
     nextTick,
+    onBeforeMount,
     onMounted,
     onUpdated,
     ref,
@@ -280,11 +281,6 @@ let chatHeads = ref(props.chatHeadProps ?? []);
 let messages = ref(props.messageProps?.data.reverse() ?? null);
 
 onMounted(() => {
-    console.log(
-        props.messageProps.current_page != 1 &&
-            props.messageProps.data.length < 20,
-    );
-
     if (props.messageProps?.current_page) {
         if (
             props.messageProps.current_page != 1 &&
@@ -406,11 +402,21 @@ function updateMessageInputVisibility() {
     }
 }
 
+let channel = null;
 //pusher
 function listenToChannelMessage(senderId) {
-    window.onload = () => {
-        window.Echo.channel(
-            "message-" + page.props.auth.user.authenticated.id + "-" + senderId,
+    const channelName = "message-" + page.props.auth.user.authenticated.id + "-" + senderId;
+    console.log('listen');
+
+
+    if(channel){
+        console.log('unsub');
+        
+        channel.unsubscribe();
+    }
+
+     channel = window.Echo.channel(
+            channelName,
         ).listen(".message.event", (e) => {
             messages.value.push({
                 id: e.id,
@@ -418,11 +424,20 @@ function listenToChannelMessage(senderId) {
                 sender_id: e.sender_id,
                 receiver_id: e.receiver_id,
             });
+            console.log('listen');
 
             loadMessages();
         });
-    };
+  
 }
+
+onBeforeMount(()=> {
+    if(channel){
+
+        channel.unsubscribe();
+        channel.stopListening(".message.event");
+    }
+})
 </script>
 <template>
     <div
