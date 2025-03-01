@@ -21,7 +21,7 @@ export default {
 
 <template>
   <Head title="Learning | iCan Careers" />
-  <div class="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
+  <div class="min-h-screen bg-gray-100 p-6">
     <div class="max-w-6xl mx-auto">
       <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Learning Resources</h1>
 

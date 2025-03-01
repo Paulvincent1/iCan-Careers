@@ -298,7 +298,7 @@ const formatCurrency =
                 >
                     <div class="col-span-2 rounded border p-3 lg:col-span-1">
                         <div class="mb-4 flex items-center justify-between">
-                            <p class="p-1 text-lg font-bold">Job Status</p>
+                            <p class="p-1 text-lg font-bold">Invoice Status</p>
                             <Link
                                 :href="route('worker.create.invoice')"
                                 class="flex items-center gap-2 rounded-lg bg-[#fa8334] px-4 py-2 font-semibold text-white shadow-md transition duration-300 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300"
