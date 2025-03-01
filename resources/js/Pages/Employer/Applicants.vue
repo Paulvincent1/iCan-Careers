@@ -15,6 +15,7 @@ import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import dayjs from "dayjs";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
+import Maps from "../Components/Maps.vue";
 
 let props = defineProps({
     jobProps: null,
@@ -22,6 +23,8 @@ let props = defineProps({
     statusCountProps: null,
     messageProp: null,
 });
+
+console.log(props.jobProps);
 
 let page = usePage();
 
@@ -33,9 +36,6 @@ function showMessageProp() {
         showMessage.value = false;
     }, 2000);
 }
-
-console.log(props.statusCountProps);
-console.log(props.applicantsProps);
 
 let applicants = ref(props.applicantsProps);
 
@@ -74,7 +74,6 @@ function showSpecificStatus(status, event) {
         } else {
             applicants.value = props.applicantsProps;
         }
-        console.log("if");
 
         lastTagValueClicked.value = status ?? lastTagValueClicked.value;
     } else {
@@ -84,12 +83,10 @@ function showSpecificStatus(status, event) {
             });
             lastTagValueClicked.value = status ?? lastTagValueClicked.value;
 
-            console.log("if if");
             return;
         }
 
         applicants.value = props.applicantsProps;
-        console.log("else");
 
         lastTagValueClicked.value = null;
     }
@@ -143,8 +140,6 @@ function updateStatus(applicationId, e) {
 
     if (e.target.value != "") {
         if (confirm("Are you sure you want to update the status?")) {
-            console.log(e.target);
-
             router.post(
                 route("job.applicants.update.status", {
                     pivotId: applicationId,
@@ -163,23 +158,16 @@ function updateStatus(applicationId, e) {
                                 return applicant.pivot.id === applicationId;
                             },
                         );
-                        console.log(indexOfApplicant);
-
-                        console.log(applicants.value);
 
                         updateCount(indexOfApplicant, e.target.value);
 
                         applicants.value[indexOfApplicant].pivot.status =
                             e.target.value;
 
-                        console.log(applicants.value);
-
                         showSpecificStatus();
                         // applicants.value[indexOfApplicant].name = e.target.value;
                     },
                     onError: (e) => {
-                        console.log(e);
-
                         showMessageProp();
                     },
                     preserveState: true,
@@ -212,10 +200,6 @@ function submit() {
 
 watch(search, debounce(submit, 500));
 
-onMounted(() => console.log("mounted"));
-console.log(dayjs().format("HH:mm"));
-// console.log(dayjs().format("YYYY MMMM DD"));
-
 let now = ref(dayjs().format("YYYY-MM-DD"));
 let intervalId;
 onMounted(() => {
@@ -237,11 +221,7 @@ let time = ref(null);
 
 let errorMessage = ref(null);
 function schedInterview(e) {
-    console.log(date.value);
-    console.log(time.value);
     if (!date.value || !time.value) {
-        console.log(date.value);
-        console.log(time.value);
         errorMessage.value = "Please fill all the field.";
         return;
     }
@@ -261,23 +241,17 @@ function schedInterview(e) {
                         return applicationPivotId.value === applicant.pivot.id;
                     },
                 );
-                console.log(applicationPivotId.value);
 
                 updateCount(indexOfApplicant, "Interview Scheduled");
 
                 applicants.value[indexOfApplicant].pivot.status =
                     "Interview Scheduled";
 
-                console.log(applicants.value);
-
                 showSpecificStatus();
                 applicationPivotId.value = null;
                 closeModal();
-                console.log("sucess");
             },
             onError: () => {
-                console.log("error ");
-
                 applicationPivotId.value = null;
                 showMessageProp();
                 event.target.value = "";
@@ -563,8 +537,17 @@ function openModal(e) {
                     class="mb-5"
                     type="error"
                     :message="errorMessage"
-                    >dasd</InputFlashMessage
-                >
+                ></InputFlashMessage>
+                <select name="" id="" class="border p-2">
+                    <option value="">remote</option>
+                    <option value="">onsite</option>
+                </select>
+                <div>
+                    <Maps
+                        :centerProps="jobProps.location"
+                        :markedCoordinatesProps="jobProps.location"
+                    ></Maps>
+                </div>
                 <div class="flex justify-end">
                     <button
                         class="inline-block rounded bg-slate-500 p-2 text-white"
