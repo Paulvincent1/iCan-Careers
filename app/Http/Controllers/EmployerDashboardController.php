@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Gate;
 
 class EmployerDashboardController extends Controller
 {
-    
+
     public function index(){
 
         $user = Auth::user();
@@ -21,7 +21,7 @@ class EmployerDashboardController extends Controller
         }])->where('employer_id',  $user->id)->latest()->get();
 
         $hiredWorkers = $jobs->pluck('employedWorkers')->flatten()->unique();
-        
+
         $invoices =  $user->employerInvoices()->with('worker')->get();
         // dd($invoices);
 
@@ -40,25 +40,25 @@ class EmployerDashboardController extends Controller
 
         $applicants = $jobid->usersWhoApplied()->with(['workerProfile'])->where('name' ,'like', '%' . $request->get('q') . '%')->get();
 
-     
+
         // $applicantsCount = $jobid->usersWhoApplied()
         // ->selectRaw('status, count(*) as count')
         // ->where('application.job_post_id', $jobid->id)
         // ->groupBy('status')
         // ->get();
-    
-    
+
+
         $statusCounts = $jobid->usersWhoApplied()
         ->selectRaw('status, count(*) as count')
         ->wherePivot('job_post_id', $jobid->id)
         ->groupBy('status')
         ->pluck('count', 'status');
-        
+
         // dd($statusCounts);
-        
-        return inertia('Employer/Applicants', 
+
+        return inertia('Employer/Applicants',
             [
-                'applicantsProps' => $applicants, 
+                'applicantsProps' => $applicants,
                 'statusCountProps' => $statusCounts ,
                 'messageProp' => session()->get('message'),
                 'jobProps' => $jobid,
@@ -68,7 +68,17 @@ class EmployerDashboardController extends Controller
 
     public function updateStatus(Request $request, int $pivotId){
 
-        $update = DB::table('application')->where('id', $pivotId)->update(['status' => $request->status]);
+        $request->validate(
+            [
+                'status' => 'required',
+            ]
+        );
+
+        $update = DB::table('application')->where('id', $pivotId)->update(
+            [
+                'status' => $request->status,
+            ]
+        );
         if($request->status === 'Accepted' && $update){
             $application = DB::table('application')->where('id', $pivotId)->first();
             $worker = User::find($application->worker_id);
@@ -82,12 +92,30 @@ class EmployerDashboardController extends Controller
 
     public function addInterview(Request $request, int $pivotId) {
         // dd( Carbon::parse("$request->date $request->time"));
+        $fields = $request->validate(
+            [
+                'date' => 'required',
+                'time' => 'required',
+                'interview_schedule' => 'nullable',
+                'interview_mode' => 'nullable',
+                'coordinates' => 'nullable|array',
+            ]
+        );
 
         if(Carbon::parse("$request->date $request->time")->isPast()){
             return redirect()->back()->withErrors(['message'=>'Please select a time valid time.']);
         }
-       
-        DB::table('application')->where('id',$pivotId)->update(['status' => 'Interview Scheduled','interview_schedule'=> Carbon::parse("$request->date $request->time")]);
+
+        DB::table('application')->where('id',$pivotId)
+        ->update(
+            [
+                'status' => 'Interview Scheduled',
+                'interview_schedule'=> Carbon::parse("$request->date $request->time"),
+                'interview_mode'=> $fields['interview_mode'],
+                'coordinates'=>  $fields['coordinates'],
+            ]
+        );
+
 //   dd( Carbon::parse("$request->date $request->time"));
         return redirect()->back()->with('message','Successfully updated');
     }

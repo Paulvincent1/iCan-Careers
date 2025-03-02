@@ -216,14 +216,25 @@ function updateTime() {
     return dayjs().format("H:mm");
 }
 
+let coordinates = ref(null);
+
+function setCoordinates(coord) {
+    coordinates.value = coord;
+}
+
 let date = ref(null);
 let time = ref(null);
+let interviewMode = ref("remote");
 
 let errorMessage = ref(null);
 function schedInterview(e) {
     if (!date.value || !time.value) {
         errorMessage.value = "Please fill all the field.";
         return;
+    }
+
+    if (interviewMode.value === "onsite" && !coordinates.value) {
+        coordinates.value = [120.9842, 14.5995];
     }
 
     router.put(
@@ -233,9 +244,12 @@ function schedInterview(e) {
         {
             date: date.value,
             time: time.value,
+            interview_mode: interviewMode.value,
+            coordinates: coordinates.value,
         },
         {
             onSuccess: () => {
+                showMessageProp();
                 let indexOfApplicant = applicants.value.findIndex(
                     (applicant) => {
                         return applicationPivotId.value === applicant.pivot.id;
@@ -515,10 +529,12 @@ function openModal(e) {
         </div>
     </div>
     <ReusableModal v-if="showModal" @closeModal="closeModal">
-        <div class="w-[400px] rounded bg-white px-2 py-4">
+        <div
+            class="h-[400px] w-[400px] overflow-y-auto rounded bg-white px-2 py-4"
+        >
             <h2 class="mb-3 text-xl font-bold">Set an interview date</h2>
             <form @submit.prevent="schedInterview">
-                <div class="flex justify-start gap-3">
+                <div class="mb-3 flex justify-start gap-3">
                     <div class="flex flex-col">
                         <label for="" class="text-gray-500">Date</label>
                         <input
@@ -538,12 +554,18 @@ function openModal(e) {
                     type="error"
                     :message="errorMessage"
                 ></InputFlashMessage>
-                <select name="" id="" class="border p-2">
-                    <option value="">remote</option>
-                    <option value="">onsite</option>
+                <select
+                    v-model="interviewMode"
+                    name=""
+                    id=""
+                    class="mb-3 border p-2"
+                >
+                    <option value="remote">remote</option>
+                    <option value="onsite">onsite</option>
                 </select>
-                <div>
+                <div v-if="interviewMode === 'onsite'" class="mb-3">
                     <Maps
+                        @update:coordinates="setCoordinates"
                         :centerProps="jobProps.location"
                         :markedCoordinatesProps="jobProps.location"
                     ></Maps>
