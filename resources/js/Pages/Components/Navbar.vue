@@ -7,10 +7,16 @@ let isActive = ref(false);
 let profileDropdown = ref(false);
 
 const dropdownButton = useTemplateRef("drop");
+const notficationButton = useTemplateRef("dropNotification");
 onMounted(() => {
     document.addEventListener("click", (event) => {
+        console.log(!notficationButton.value.contains(event.target));
+
         if (!dropdownButton.value.contains(event.target)) {
             profileDropdown.value = false;
+        }
+        if (!notficationButton.value.contains(event.target)) {
+            showNotificationDropDown.value = false;
         }
     });
 });
@@ -20,6 +26,8 @@ watch(isActive, () => {
         ? (document.body.style.overflow = "hidden")
         : (document.body.style.overflow = "auto");
 });
+
+let showNotificationDropDown = ref(false);
 
 window.addEventListener("resize", () => {
     if (window.innerWidth >= 768) {
@@ -122,38 +130,63 @@ window.addEventListener("resize", () => {
                     </div>
 
                     <li
-                        ref="drop"
                         v-show="$page.props.auth.user.authenticated"
-                        class="relative flex items-center justify-center gap-1 hover:cursor-pointer"
-                        @click="profileDropdown = !profileDropdown"
+                        class="relative flex items-center justify-center gap-3 hover:cursor-pointer"
                     >
-                        <img
-                            class="w-7 rounded-[400px] object-cover"
-                            src="/assets/profile_placeholder.jpg"
-                            alt=""
-                        />
-                        <div class="flex gap-1">
-                            <p class="text-[12px]">Me</p>
-                            <i class="bi bi-chevron-down text-[12px]"></i>
-                        </div>
-
                         <div
-                            v-show="profileDropdown"
-                            class="absolute top-10 w-40 rounded bg-white px-3 py-2 text-sm shadow md:right-0 md:top-14"
+                            ref="dropNotification"
+                            @click="
+                                showNotificationDropDown =
+                                    !showNotificationDropDown
+                            "
+                            class="relative flex flex-col"
                         >
-                            <Link class="flex gap-2 p-2" href="/">
-                                <i class="bi bi-person"></i>
-                                <p>My Profile</p>
-                            </Link>
-                            <Link
-                                :href="route('logout')"
-                                method="post"
-                                as="button"
-                                class="flex gap-2 p-2"
+                            <i class="bi bi-bell text-lg"></i>
+                            <div
+                                v-show="showNotificationDropDown"
+                                class="absolute top-10 w-56 rounded bg-white px-3 py-2 text-sm shadow md:right-0 md:top-14"
                             >
-                                <i class="bi bi-box-arrow-left"></i>
-                                <p>Logout</p>
-                            </Link>
+                                das
+                            </div>
+                        </div>
+                        <div
+                            ref="drop"
+                            @click="profileDropdown = !profileDropdown"
+                            class="flex items-center gap-1"
+                        >
+                            <img
+                                class="w-7 rounded-[400px] object-cover"
+                                src="/assets/profile_placeholder.jpg"
+                                alt=""
+                            />
+                            <div class="flex gap-1">
+                                <p class="text-[12px]">Me</p>
+                                <i class="bi bi-chevron-down text-[12px]"></i>
+                            </div>
+
+                            <div
+                                v-show="profileDropdown"
+                                class="absolute top-10 w-40 rounded bg-white px-3 py-2 text-sm shadow md:right-0 md:top-14"
+                            >
+                                <Link
+                                    class="flex gap-2 p-2"
+                                    :href="route('home')"
+                                    @click="isActive = false"
+                                >
+                                    <i class="bi bi-person"></i>
+                                    <p>Dashboard</p>
+                                </Link>
+                                <Link
+                                    :href="route('logout')"
+                                    method="post"
+                                    as="button"
+                                    class="flex gap-2 p-2"
+                                    @click="isActive = false"
+                                >
+                                    <i class="bi bi-box-arrow-left"></i>
+                                    <p>Logout</p>
+                                </Link>
+                            </div>
                         </div>
                     </li>
                 </ul>
