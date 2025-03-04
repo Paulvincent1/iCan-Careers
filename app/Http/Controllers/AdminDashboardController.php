@@ -4,26 +4,53 @@ namespace App\Http\Controllers;
 
 use App\Models\EmployerProfile;
 use App\Models\EmployerSubscription;
+use App\Models\JobPost;
 use App\Models\User;
 use App\Models\Salary;
 use App\Models\SubscriptionPaymentHistory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 class AdminDashboardController extends Controller
 {
     public function index()
-    {
-        $salary = Salary::find(1);
-        // dd($salary);    
+{
+    $salary = Salary::sum('total_earnings'); // Total earnings
+    $job = JobPost::find(1);
+    $application = DB::table('application')->get();
+    $date = EmployerSubscription::find(1);
+    
+    // Count users except admins
+    $userCount = User::whereDoesntHave('roles', function ($query) {
+        $query->where('name', 'Admin');
+    })->count();
 
-        $userCount = User::whereDoesntHave('roles', function ($query) {
-            $query->where('name','Admin');
-        })->count();
+    // Earnings grouped by month
+    $monthlyEarnings = Salary::selectRaw('MONTH(created_at) as month, SUM(total_earnings) as total')
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
 
-        // dd($userCount);
-        return Inertia::render('Admin/Dashboard', ['salaryProps' => $salary, 'userCountProps' => $userCount]);
-    }
+    // Convert month numbers to names (e.g., 1 -> Jan, 2 -> Feb)
+    $months = $monthlyEarnings->map(function ($item) {
+        return Carbon::create()->month($item->month)->format('M'); // "Jan", "Feb", etc.
+    });
+
+    $earnings = $monthlyEarnings->pluck('total');
+
+    return Inertia::render('Admin/Dashboard', [
+        'salaryProps' => [
+            'total_earnings' => $salary,
+            'months' => $months,
+            'monthlyEarnings' => $earnings,
+        ],
+        'userCountProps' => $userCount,
+        'applicationProps' => $application,
+        'jobProps' => $job,
+        'dateProps' => $date,
+    ]);
+}
 
     public function workers()
     {
