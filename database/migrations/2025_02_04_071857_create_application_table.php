@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('job_post_id')->constrained('job_posts')->cascadeOnDelete();
             $table->enum('status',['Pending', 'Under Review','Interview Scheduled','Accepted', 'Rejected']);
             $table->timestamp('interview_schedule')->nullable();
+            $table->enum('interview_mode',['onsite','remote'])->nullable();
+            $table->json('coordinates')->nullable();
             $table->timestamps();
         });
     }

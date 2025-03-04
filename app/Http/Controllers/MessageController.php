@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChatHeadMessage;
 use App\Events\MessageSent;
 use App\Models\Message;
 use App\Models\User;
@@ -17,18 +18,18 @@ class MessageController extends Controller
      */
     public function index(Request $request)
     {
-       
+        // this code is used when theres a query params user in the url.
         $userDirectMessage = User::where('id', $request->get('user'))->with('sentMessages', 'receivedMessages')->first();
 
-        
+
         $user = Auth::user();
 
 
         $messages = null;
         $firstMessageChatHead = null;
-      
+
         if($userDirectMessage){
-            if(!$userDirectMessage->sentMessages()->where('receiver_id',$user->id)->first() && !$userDirectMessage->receivedMessages()->where('sender_id',$user->id)->first()){            
+            if(!$userDirectMessage->sentMessages()->where('receiver_id',$user->id)->first() && !$userDirectMessage->receivedMessages()->where('sender_id',$user->id)->first()){
             //    dd('hi');
                 $firstMessageChatHead = [
                     'user' => $userDirectMessage,
@@ -45,7 +46,7 @@ class MessageController extends Controller
                 $query->where('receiver_id', $user->id)->where('sender_id', $userDirectMessage->id);
 
             })->orderBy('created_at','desc')->paginate(20)->withQueryString();
-            
+
         }else{
             $firstMessageChatHead = null;
         }
@@ -103,7 +104,7 @@ class MessageController extends Controller
 
 
 
-        return inertia('Messages/Messages', ['firstMessageChatHeadProps' => $firstMessageChatHead, 'chatHeadProps' => $chatHeads , 'messageProps' => $messages]);
+        return inertia('Messages/Messages', ['firstMessageChatHeadProps' => $firstMessageChatHead, 'chatHeadProps' => $chatHeads , 'messageProps' => $messages, 'userDirectMessageProps' => $userDirectMessage]);
     }
 
     /**
@@ -121,20 +122,22 @@ class MessageController extends Controller
     {
 
         log($request);
-        
+
         $field = $request->validate([
             'message' => 'required',
         ]);
-        
+
         $user = Auth::user();
         $message = $user->sentMessages()->create([
             'receiver_id' => $receiverId->id,
             'message' => $field['message'],
         ]);
-        
+
         log($message->message);
+        $message->load('sender');
 
         broadcast(new MessageSent($message))->toOthers();
+        broadcast(new ChatHeadMessage($message))->toOthers();
 
         return redirect()->back();
 

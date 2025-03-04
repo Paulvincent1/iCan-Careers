@@ -19,6 +19,7 @@ let props = defineProps({
     chatHeadProps: null,
     firstMessageChatHeadProps: null,
     messageProps: null,
+    userDirectMessageProps: null,
 });
 
 let chatContainer = useTemplateRef("chat-container");
@@ -72,24 +73,22 @@ const loadMoreMessagesDebounce = debounce(() => {
         console.log(isNextPageNumberVisited);
 
         if (isNextPageNumberVisited) {
+            let pageToCheck = isNextPageNumberVisited + 1;
+
             //check if the next next page after the next page is visited.
-            const nextNextPageVisited = loadedPages.value.find(
-                (pageNumber) => isNextPageNumberVisited + 1 === pageNumber,
-            );
+            while (!loadedPages.value.includes(pageToCheck)) {
+                pageToCheck++;
+            }
 
             console.log(loadedPages.value);
-            console.log(isNextPageNumberVisited + 1);
-            if (!nextNextPageVisited) {
+            if (!loadedPages.value.includes(pageToCheck)) {
                 const nextNextPageValid = props.messageProps.links.find(
                     (link) => {
                         const url = new URL(
                             "http://127.0.0.1:8000/messages?user=1&page=1",
                         );
 
-                        url.searchParams.set(
-                            "page",
-                            isNextPageNumberVisited + 1,
-                        );
+                        url.searchParams.set("page", pageToCheck);
 
                         console.log(link.url);
                         console.log(url.toString());
@@ -278,9 +277,13 @@ const loadMoreMessagesDebounce = debounce(() => {
 }, 500);
 
 let chatHeads = ref(props.chatHeadProps ?? []);
+console.log(props.userDirectMessageProps);
+
 let messages = ref(props.messageProps?.data.reverse() ?? null);
 
 onMounted(() => {
+    listenChannelChatHeads();
+
     if (props.messageProps?.current_page) {
         if (
             props.messageProps.current_page != 1 &&
@@ -335,6 +338,8 @@ onMounted(() => {
 
 let page = usePage();
 async function sendMessage() {
+    console.log(chatHeads.value);
+
     if (messageInput.value.value) {
         messages.value.push({
             id: nanoid(),
@@ -345,6 +350,18 @@ async function sendMessage() {
         loadMessages();
         const messageToBeSent = messageInput.value.value;
         messageInput.value.value = null;
+
+        const newChatHead = {
+            latestMessage: {
+                id: nanoid(),
+                message: messageToBeSent,
+                receiver_id: route().params.user,
+                sender_id: page.props.auth.user.authenticated.id,
+            },
+            user: props.userDirectMessageProps,
+        };
+
+        unshiftLatestChatHead(route().params.user, newChatHead);
 
         const response = await fetch(
             route("messages.send", {
@@ -405,39 +422,66 @@ function updateMessageInputVisibility() {
 let channel = null;
 //pusher
 function listenToChannelMessage(senderId) {
-    const channelName = "message-" + page.props.auth.user.authenticated.id + "-" + senderId;
-    console.log('listen');
+    const channelName =
+        "message-" + page.props.auth.user.authenticated.id + "-" + senderId;
+    console.log("listen");
 
+    if (channel) {
+        console.log("unsub");
 
-    if(channel){
-        console.log('unsub');
-        
         channel.unsubscribe();
     }
 
-     channel = window.Echo.channel(
-            channelName,
-        ).listen(".message.event", (e) => {
-            messages.value.push({
-                id: e.id,
-                message: e.message,
-                sender_id: e.sender_id,
-                receiver_id: e.receiver_id,
-            });
-            console.log('listen');
-
-            loadMessages();
+    channel = window.Echo.channel(channelName).listen(".message.event", (e) => {
+        messages.value.push({
+            id: e.id,
+            message: e.message,
+            sender_id: e.sender_id,
+            receiver_id: e.receiver_id,
         });
-  
+        console.log("listen");
+
+        loadMessages();
+    });
 }
 
-onBeforeMount(()=> {
-    if(channel){
+let channelChatHeads = null;
+function listenChannelChatHeads() {
+    const channelName = "chathead-" + page.props.auth.user.authenticated.id;
 
+    channelChatHeads = window.Echo.channel(channelName).listen(
+        ".message.event",
+        (e) => {
+            unshiftLatestChatHead(e.user.id, e);
+
+            console.log(chatHeads.value);
+        },
+    );
+}
+
+function unshiftLatestChatHead(userId, newChatHead) {
+    const index = chatHeads.value.find((ch) => {
+        return Number(ch?.user.id) === Number(userId);
+    });
+
+    if (index) {
+        if (index != 0) {
+            chatHeads.value.splice(index, 1);
+            chatHeads.value.unshift(newChatHead);
+        } else {
+            chatHeads.value[index] = newChatHead;
+        }
+    } else {
+        chatHeads.value.unshift(newChatHead);
+    }
+}
+
+onBeforeMount(() => {
+    if (channel) {
         channel.unsubscribe();
         channel.stopListening(".message.event");
     }
-})
+});
 </script>
 <template>
     <div
@@ -463,7 +507,7 @@ onBeforeMount(()=> {
                     <div
                         v-for="(chatHead, index) in chatHeads"
                         @click="switchChat(chatHead.user.id)"
-                        :key="chatHead.id"
+                        :key="chatHead.latestMessage.id"
                         :class="[
                             'flex cursor-pointer gap-2 p-4',
                             {
