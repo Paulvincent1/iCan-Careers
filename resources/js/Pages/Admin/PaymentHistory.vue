@@ -1,91 +1,95 @@
 <script setup>
-import { getCurrentInstance, ref } from "vue";
+import { ref, computed, getCurrentInstance } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
+import DataTable from "vue3-easy-data-table";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faSearch, faSort, faCalendar } from "@fortawesome/free-solid-svg-icons";
-import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
+import { faSearch, faCalendar, faSort } from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
 
-defineOptions({
-    layout: AdminLayout,
+// Add icons to FontAwesome library
+library.add(faSearch, faCalendar, faSort);
+
+// Define Layout
+defineOptions({ layout: AdminLayout });
+
+// Get payments from Laravel
+const payments = ref(usePage().props.subscriptionPaymentHistoryProps || []);
+
+// Search input state
+const searchQuery = ref("");
+
+// Filtered Payments (Based on Search)
+const filteredPayments = computed(() => {
+    if (!searchQuery.value) return payments.value;
+
+    const query = searchQuery.value.toLowerCase();
+    return payments.value.filter(payment =>
+        payment.employer.email.toLowerCase().includes(query) ||
+        payment.subscription_type.toLowerCase().includes(query)
+    );
 });
 
-let props = defineProps({
-    subscriptionPaymentHistoryProps: null
-})
+// Table Headers
+const headers = [
+    { text: "ID", value: "id", sortable: true },
+    { text: "Employer", value: "employer.email", sortable: true },
+    { text: "Amount", value: "amount", sortable: true },
+    { text: "Subscription Type", value: "subscription_type", sortable: true },
+    { text: "Date", value: "created_at", sortable: true },
+];
 
-// Add icons to FontAwesome library
-library.add(faSearch, faSort, faCalendar);
-
-// Dummy Data for Payment History
-const paymentHistory = ref([
-    { id: 1, user: "John Doe", amount: "$50", date: "2025-02-15", status: "Completed" },
-    { id: 2, user: "Jane Smith", amount: "$30", date: "2025-02-14", status: "Pending" },
-    { id: 3, user: "Mike Johnson", amount: "$25", date: "2025-02-13", status: "Completed" },
-]);
-
-const formatCurrency = getCurrentInstance().appContext.config.globalProperties.formatCurrency;
+// Format currency function
+let formatCurrency =
+    getCurrentInstance().appContext.config.globalProperties.formatCurrency;
 </script>
 
 <template>
-    <Head title="PaymentHistory | iCan Careers" />
-    <div class="bg-white p-5 rounded-lg shadow">
-        <h2 class="text-xl font-bold mb-4">💰 Payment History</h2>
+    <Head title="Payment History | iCan Careers" />
+    <div class="p-4">
+        <h1 class="mb-4 text-xl font-bold flex items-center gap-2">
+            <font-awesome-icon :icon="['fas', 'calendar']" class="text-[#fa8334]" />
+            Payment History
+        </h1>
 
-        <!-- Search Input -->
-        <div class="mb-4 flex items-center space-x-2 border p-2 rounded-lg">
+        <!-- Search Bar -->
+        <div class="mb-4 flex items-center gap-2 bg-gray-100 p-3 rounded-md">
             <font-awesome-icon :icon="['fas', 'search']" class="text-gray-500" />
-            <input type="text" placeholder="Search..." class="w-full p-2 outline-none">
+            <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search by employer or subscription type..."
+                class="w-full bg-transparent outline-none"
+            />
         </div>
 
-        <!-- Desktop Table -->
-        <div class="overflow-x-auto hidden md:block">
-            <table class="w-full border-collapse border rounded-lg">
-                <thead>
-                    <tr class="bg-gray-200 text-left text-sm">
-                        <th class="p-3">#</th>
-                        <th class="p-3">User</th>
-                        <th class="p-3">
-                            Amount <font-awesome-icon :icon="['fas', 'sort']" />
-                        </th>
-                        <th class="p-3">
-                            Subscription Type <font-awesome-icon :icon="['fas', 'sort']" />
-                        </th>
-                        <th class="p-3">
-                            Date <font-awesome-icon :icon="['fas', 'calendar']" />
-                        </th>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="payment in subscriptionPaymentHistoryProps" :key="payment.id" class="border-t text-sm">
-                        <td class="p-3">{{ payment.id }}</td>
-                        <td class="p-3">{{ payment.employer.email }}</td>
-                        <td class="p-3">{{ formatCurrency(payment.amount) }}</td>
-                        <td class="p-3">{{ payment.subscription_type }}</td>
-                        <td class="p-3">{{ dayjs(payment.created_at).format('MMMM DD, YYYY')}}</td>
-                        
-                    </tr>
-                </tbody>
-            </table>
+        <!-- DataTable for Larger Screens -->
+        <div class="hidden sm:block">
+            <DataTable
+                :headers="headers"
+                :items="filteredPayments"
+                :rows-per-page="10"
+                :sort-by="'id'"
+                :sort-type="'asc'"
+            >
+                <template #item-amount="{ amount }">
+                    {{ formatCurrency(amount) }}
+                </template>
+                <template #item-created_at="{ created_at }">
+                    {{ dayjs(created_at).format("MMMM DD, YYYY") }}
+                </template>
+            </DataTable>
         </div>
 
-        <!-- Mobile Card Layout -->
-        <div class="md:hidden space-y-4">
-            <div v-for="payment in paymentHistory" :key="payment.id" class="bg-gray-100 p-4 rounded-lg shadow">
-                <p class="text-sm font-semibold">
-                    <span class="text-gray-500">User:</span> {{ payment.user }}
-                </p>
-                <p class="text-sm">
-                    <span class="text-gray-500">Amount:</span> {{ payment.amount }}
-                </p>
-                <p class="text-sm">
-                    <span class="text-gray-500">Date:</span> {{ payment.date }}
-                </p>
-                <p class="text-sm font-medium"
-                    :class="payment.status === 'Completed' ? 'text-green-500' : 'text-yellow-500'">
-                    {{ payment.status }}
-                </p>
+        <!-- Card Layout for Mobile -->
+        <div class="sm:hidden space-y-4">
+            <div v-for="payment in filteredPayments" :key="payment.id"
+                class="bg-white p-4 rounded-lg shadow-md">
+                <h2 class="text-lg font-semibold">{{ payment.employer.email }}</h2>
+                <p class="text-gray-600"><strong>Amount:</strong> {{ formatCurrency(payment.amount) }}</p>
+                <p class="text-gray-600"><strong>Subscription:</strong> {{ payment.subscription_type }}</p>
+                <p class="text-gray-600"><strong>Date:</strong> {{ dayjs(payment.created_at).format("MMMM DD, YYYY") }}</p>
             </div>
         </div>
     </div>

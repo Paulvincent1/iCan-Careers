@@ -1,38 +1,47 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, watch, defineProps } from "vue";
 import Chart from "chart.js/auto";
+
+const props = defineProps({
+    chartData: Object,  
+    earningsData: Object,
+    type: String,       
+});
 
 const chartCanvas = ref(null);
 let chartInstance = null;
 
 const createChart = () => {
+    if (!chartCanvas.value) return;
+
     if (chartInstance) chartInstance.destroy();
 
+    const isEarningsChart = props.type === "earnings";
+
     chartInstance = new Chart(chartCanvas.value, {
-        type: "bar",
+        type: isEarningsChart ? "line" : "bar",
         data: {
-            labels: ["Users", "Jobs", "Applications"],
+            labels: isEarningsChart
+                ? props.earningsData.months 
+                : ["Users", "Jobs", "Applications"],
             datasets: [
                 {
-                    label: "Count",
-                    data: [50, 20, 10], // Replace with dynamic data
-                    backgroundColor: [
-                        "rgba(59, 130, 246, 0.8)", // Blue
-                        "rgba(239, 68, 68, 0.8)", // Red
-                        "rgba(16, 185, 129, 0.8)", // Green
-                    ],
-                    borderColor: [
-                        "rgba(59, 130, 246, 1)", // Blue
-                        "rgba(239, 68, 68, 1)", // Red
-                        "rgba(16, 185, 129, 1)", // Green
-                    ],
+                    label: isEarningsChart ? "Earnings Over Time" : "Count",
+                    data: isEarningsChart
+                        ? props.earningsData.earnings 
+                        : [props.chartData.users, props.chartData.jobs, props.chartData.applications],
+                    backgroundColor: isEarningsChart
+                        ? "rgba(34, 197, 94, 0.2)"
+                        : ["rgba(59, 130, 246, 0.8)", "rgba(239, 68, 68, 0.8)", "rgba(16, 185, 129, 0.8)"],
+                    borderColor: isEarningsChart
+                        ? "rgba(34, 197, 94, 1)"
+                        : ["rgba(59, 130, 246, 1)", "rgba(239, 68, 68, 1)", "rgba(16, 185, 129, 1)"],
                     borderWidth: 2,
-                    hoverBackgroundColor: [
-                        "rgba(59, 130, 246, 1)", // Blue
-                        "rgba(239, 68, 68, 1)", // Red
-                        "rgba(16, 185, 129, 1)", // Green
-                    ],
-                    hoverBorderColor: "#fff",
+                    hoverBackgroundColor: isEarningsChart
+                        ? "rgba(34, 197, 94, 0.8)"
+                        : ["rgba(59, 130, 246, 1)", "rgba(239, 68, 68, 1)", "rgba(16, 185, 129, 1)"],
+                    fill: isEarningsChart,
+                    tension: 0.4,
                 },
             ],
         },
@@ -56,33 +65,25 @@ const createChart = () => {
                 },
             },
             animation: {
-                duration: 1000, // Animation duration
-                easing: "easeInOutQuart", // Smooth easing
+                duration: 1000,
+                easing: "easeInOutQuart",
             },
         },
     });
 };
 
-onMounted(() => {
-    // Delay chart creation to ensure the container is fully visible
-    setTimeout(createChart, 500); // Adjust delay as needed
-});
+watch(() => props.chartData, createChart, { deep: true });
+watch(() => props.earningsData, createChart, { deep: true });
 
-onBeforeUnmount(() => chartInstance?.destroy());
+onMounted(() => {
+    setTimeout(createChart, 500);
+});
 </script>
 
 <template>
     <div class="w-full">
-        <div class="relative h-[300px] w-full">
+        <div class="relative h-[100px] sm:h-[100px] md:h-[350px] w-full">
             <canvas ref="chartCanvas"></canvas>
         </div>
     </div>
 </template>
-
-<style scoped>
-/* Glow effect for the chart bars */
-canvas {
-    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))
-            drop-shadow(0 0 15px rgba(59, 130, 246, 0.3));
-}
-</style>

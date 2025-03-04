@@ -97,7 +97,7 @@ const toggleApproval = (id, newStatus) => {
         </nav>
 
         <h1 class="mb-4 text-xl font-bold flex items-center gap-2">
-            <font-awesome-icon :icon="['fas', 'clipboard-check']" class="text-blue-500" />
+            <font-awesome-icon :icon="['fas', 'clipboard-check']" class="text-[#fa8334]" />
             Job Approval
         </h1>
 

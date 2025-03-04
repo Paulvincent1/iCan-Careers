@@ -81,7 +81,7 @@ const headers = [
         </nav>
 
         <h1 class="mb-4 text-xl font-bold flex items-center gap-2">
-            <font-awesome-icon :icon="['fas', 'user']" class="text-blue-500" />
+            <font-awesome-icon :icon="['fas', 'user']" class="text-[#fa8334]" />
             Subscribed Users
         </h1>
 
