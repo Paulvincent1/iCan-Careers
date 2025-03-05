@@ -3,14 +3,16 @@ import { computed, getCurrentInstance, ref, watch, watchEffect } from "vue";
 import Skill from "../Components/Skill.vue";
 import dayjs from "dayjs";
 import WorkDetailsForm from "../Components/WorkDetailsForm.vue";
-import { router } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
 import AddSkillModal from "../Components/Modal/AddSkillModal.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
+import InputFlashMessage from "../Components/InputFlashMessage.vue";
 
 let props = defineProps({
     userProp: Object,
     workerSkillsProp: Object,
     workerProfileProp: Object,
+    workerBasicInfoProp: null,
     messageProp: String,
     visitor: null,
 });
@@ -108,6 +110,8 @@ function updateDescription() {
 let profilePreview = ref(props.userProp.profile_img);
 function uploadProfileImage(e) {
     profilePreview = URL.createObjectURL(e.target.files[0]);
+
+    console.log(e.target.files[0]);
 
     router.post(
         "/jobseekers/myprofile/updateprofile",
@@ -230,6 +234,76 @@ function removeSkill(skillId) {
         },
     );
 }
+
+// basic info
+
+let websiteLink = ref(props.workerBasicInfoProp?.website_link ?? "N/A");
+let address = ref(props.workerBasicInfoProp?.address ?? "N/A");
+
+let showWebsiteLinkSaveButton = ref(false);
+let showAddressSaveButton = ref(false);
+
+function updateWebsiteLink() {
+    console.log("jfsdfs");
+
+    if (websiteLink.value != "" && websiteLink.value != "N/A") {
+        router.put(
+            route("update.basicInfo.put"),
+            {
+                website_link: websiteLink.value,
+            },
+            {
+                onSuccess: () => {
+                    showSuccessMessage();
+                    showWebsiteLinkSaveButton.value = false;
+                },
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    }
+}
+
+function updateAdress() {
+    if (address.value != "" && address.value != "N/A") {
+        router.put(
+            route("update.basicInfo.put"),
+            {
+                address: address.value,
+            },
+            {
+                onSuccess: () => {
+                    showSuccessMessage();
+                    showAddressSaveButton.value = false;
+                },
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    }
+}
+
+let inputResumeError = ref("");
+function updateResume(e) {
+    router.post(
+        "/jobseekers/myprofile/updateprofile",
+        {
+            _method: "put",
+            resume: e.target.files[0],
+        },
+        {
+            onError: (e) => {
+                inputResumeError.value = e.resume;
+            },
+            onSuccess: () => {
+                workerProfile.value = props.workerProfileProp;
+                showSuccessMessage();
+            },
+            preserveScroll: true,
+            preserveState: true,
+        },
+    );
+}
 </script>
 <template>
     <Head title="Profile | iCan Careers" />
@@ -270,7 +344,8 @@ function removeSkill(skillId) {
             >
                 <div class="mb-2 flex items-end gap-3">
                     <p class="text-lg">{{ userProp.name }}</p>
-                    <Link v-if="visitor"
+                    <Link
+                        v-if="visitor"
                         :href="route('messages')"
                         :data="{ user: userProp.id }"
                         class="bi bi-chat-dots text-lg text-blue-500 hover:cursor-pointer"
@@ -486,32 +561,73 @@ function removeSkill(skillId) {
                     </div>
                     <div class="mb-2">
                         <label class="text-sm" for="">Address</label>
-                        <p>19</p>
-                        <!-- <input
-                            type="number"
-                            value="2025"
-                            class="appearance-none outline-none hover:underline"
-                        /> -->
+                        <input
+                            @focus="showAddressSaveButton = true"
+                            type="text"
+                            v-model="address"
+                            class="outline-none hover:underline"
+                        />
+                        <button
+                            v-show="showAddressSaveButton"
+                            @click="updateAdress()"
+                            class="rounded bg-green-500 p-1 text-white"
+                        >
+                            Save
+                        </button>
                     </div>
                     <div class="mb-2">
                         <label class="text-sm" s for=""
                             >Website / Account</label
                         >
-                        <p>link</p>
-                        <!-- <input
-                            type="number"
-                            value="2025"
-                            class="appearance-none outline-none hover:underline"
-                        /> -->
+                        <input
+                            @focus="showWebsiteLinkSaveButton = true"
+                            type="text"
+                            v-model="websiteLink"
+                            class="outline-none hover:underline"
+                        />
+                        <button
+                            v-show="showWebsiteLinkSaveButton"
+                            @click="updateWebsiteLink()"
+                            class="rounded bg-green-500 p-1 text-white"
+                        >
+                            Save
+                        </button>
                     </div>
                     <div class="mb-2">
-                        <label class="text-sm" s for="">Resume</label>
-                        <p>link</p>
-                        <!-- <input
-                            type="number"
-                            value="2025"
-                            class="appearance-none outline-none hover:underline"
-                        /> -->
+                        <label class="text-sm" for="">Resume</label>
+                        <label for="resume" class="cursor-pointer">
+                            <p
+                                class="hover:underline"
+                                v-if="!workerProfile.resume"
+                            >
+                                N/A
+                            </p>
+                            <div v-else class="flex items-center gap-2">
+                                <p class="hover:underline">
+                                    {{ workerProfile.resume }}
+                                </p>
+                                <a
+                                    v-if="!visitor"
+                                    target="_blank"
+                                    :href="'/' + workerProfile.resume_path"
+                                    as="button"
+                                    class="rounded bg-green-500 px-2 py-1 text-white"
+                                >
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                            </div>
+                            <input
+                                @change="updateResume"
+                                type="file"
+                                id="resume"
+                                class="hidden"
+                            />
+                            <InputFlashMessage
+                                class="mt-3 text-sm"
+                                :message="inputResumeError"
+                                type="error"
+                            ></InputFlashMessage>
+                        </label>
                     </div>
                 </div>
             </div>

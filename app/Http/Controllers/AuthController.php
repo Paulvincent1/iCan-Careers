@@ -133,6 +133,7 @@ class AuthController extends Controller
                     'balance' => 0,
                     'unsettlement' => 0,
                 ]);
+                $user->workerBasicInfo()->create();
 
             }
 

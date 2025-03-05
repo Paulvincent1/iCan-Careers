@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\JobPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class JobPostController extends Controller
@@ -37,7 +38,7 @@ class JobPostController extends Controller
     {
 
         // dd($request);
-        
+
         $user = Auth::user();
         $fields = $request->validate([
             'job_title' => 'required|max:255',
@@ -52,6 +53,7 @@ class JobPostController extends Controller
             'preferred_educational_attainment' => 'required|max:255',
             'skills' => 'required',
             'preferred_worker_types' => 'required',
+            'job_image' => 'nullable|image'
         ]);
 
 
@@ -68,6 +70,10 @@ class JobPostController extends Controller
         }
         // dd($user->employerSubscription->subscription_type);
 
+        $jobImage;
+        if($request->hasFile('job_image')){
+            $jobImage = Storage::disk('public')->put('images',$request->job_image);
+        }
 
         $user->employerJobPosts()->create([
             'job_title' =>  $fields['job_title'],
@@ -82,7 +88,8 @@ class JobPostController extends Controller
             'preferred_educational_attainment' =>  $fields['preferred_educational_attainment'],
             'skills' =>  $skills,
             'preferred_worker_types' =>  $fields['preferred_worker_types'],
-            'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open'
+            'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open',
+            // 'job_image' => $
         ]);
 
         return redirect()->route('employer.dashboard');
@@ -93,7 +100,7 @@ class JobPostController extends Controller
      */
     public function show(JobPost $jobid)
     {
-        
+
         $user = Auth::user();
 
         $jobid->load('employer.employerProfile.businessInformation');
@@ -102,9 +109,9 @@ class JobPostController extends Controller
             abort(403,'Your not authorize to see this');
         }
         // dd($job);
-    
+
         return inertia('ShowJob', ['jobPostProps' =>  $jobid,'messageProp' => session()->get('messageProp')]);
-      
+
     }
 
     /**
@@ -123,7 +130,7 @@ class JobPostController extends Controller
     {
 
         // dd($request);
-        
+
         $user = Auth::user();
         $fields = $request->validate([
             'job_title' => 'required|max:255',
@@ -213,7 +220,7 @@ public function showJob($id)
         ->update([
             'status' => 'Rejected'
         ]);
-      
+
         Inertia::clearHistory();
         return redirect()->route('employer.dashboard');
     }
