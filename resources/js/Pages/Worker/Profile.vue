@@ -15,6 +15,9 @@ let props = defineProps({
     workerBasicInfoProp: null,
     messageProp: String,
     visitor: null,
+    isPending: {
+        type: null,
+    },
 });
 
 let { appContext } = getCurrentInstance();
@@ -74,7 +77,7 @@ function updateJobTitle() {
 
 function updateWorkDetails() {
     router.put(
-        "/jobseekers/myprofile/updateprofile",
+        "",
         {
             job_type: workerProfile.value.job_type,
             work_hour_per_day: workerProfile.value.work_hour_per_day,
@@ -308,7 +311,7 @@ function updateResume(e) {
 <template>
     <Head title="Profile | iCan Careers" />
     <div class="min-h-[calc(100vh-4.625rem)] bg-[#f3f7fa]">
-        <div class="bg- relative h-32 bg-[#FAFAFA]">
+        <div class="relative h-32 bg-[#FAFAFA]">
             <label
                 for="profileimg"
                 :class="[
@@ -318,7 +321,8 @@ function updateResume(e) {
                     },
                 ]"
             >
-                <div class="mb-3 h-full w-full">
+                <div class="relative mb-3 h-full w-full">
+                    <!-- Profile Image -->
                     <img
                         draggable="false"
                         :src="
@@ -326,10 +330,18 @@ function updateResume(e) {
                                 ? profilePreview
                                 : '/assets/profile_placeholder.jpg'
                         "
-                        alt=""
-                        class="h-full w-full rounded-full object-cover"
+                        alt="Profile"
+                        class="h-full w-full rounded-full border object-cover"
                     />
+
+                    <!-- Camera Icon (Positioned at Bottom-Right) -->
+                    <div
+                        class="absolute bottom-1 right-1 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 shadow-md"
+                    >
+                        <i class="bi bi-camera text-lg text-gray-600"></i>
+                    </div>
                 </div>
+
                 <input
                     @change="uploadProfileImage"
                     id="profileimg"
@@ -338,6 +350,7 @@ function updateResume(e) {
                 />
             </label>
         </div>
+
         <div class="bg-white pb-2">
             <div
                 class="xs container mx-auto flex flex-col items-center justify-center pt-16 xl:max-w-7xl"
@@ -385,9 +398,31 @@ function updateResume(e) {
                         </button>
                     </form>
                 </div>
-                <div class="flex items-center gap-1">
+                <div
+                    v-if="!$page.props.auth.worker_verified"
+                    class="flex flex-col items-center"
+                >
+                    <p class="mb-3 text-center text-red-500">
+                        Please verify your account to apply for jobs!
+                    </p>
+                    <Link
+                        :href="route('account.verify')"
+                        as="button"
+                        class="w-full rounded-lg border bg-red-500 py-2 text-white"
+                    >
+                        Click here to verify!
+                    </Link>
+                </div>
+                <div
+                    v-if="$page.props.auth.user.authenticated.verified"
+                    class="flex items-center gap-1"
+                >
                     <p class="text-sm font-bold text-gray-600">Verified</p>
                     <i class="bi bi-patch-check-fill text-green-400"></i>
+                </div>
+
+                <div v-if="isPending">
+                    <p class="text-yellow-400">{{ isPending }}</p>
                 </div>
             </div>
         </div>

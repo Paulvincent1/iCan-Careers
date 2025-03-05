@@ -19,6 +19,7 @@ use App\Http\Middleware\ForceGetRedirect;
 use App\Http\Middleware\isAdmin;
 use App\Http\Middleware\isEmployer;
 use App\Http\Middleware\isWorker;
+use App\Models\EmployerProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -118,6 +119,9 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
 
     Route::get('/createprofile',[EmployerProfileController::class, 'createProfile'])->name('create.profile.employer');
     Route::post('/createprofile',[EmployerProfileController::class, 'storeProfile'])->name('create.profile.employer.post');
+    Route::get('/myprofile',[EmployerProfileController::class, 'myProfile'])->name('employer.profile');
+    Route::put('/myprofile/updateprofile',[EmployerProfileController::class, 'updateProfile'])->name('update.profile.put');
+ 
 
     Route::get('/',[EmployerDashboardController::class, 'index'])->name('employer.dashboard');
     Route::get('/createjob',[JobPostController::class, 'create'])->name('create.job');

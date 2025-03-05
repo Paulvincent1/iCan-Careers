@@ -81,7 +81,7 @@ const submit = () => {
             if (form.skills[i].star === "") {
                 errorMessage.value = "Please rate all your skills";
                 return;
-            }
+            }   
         }
     } else {
         errorMessage.value = "Please add a skill";

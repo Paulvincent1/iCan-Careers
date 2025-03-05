@@ -16,6 +16,7 @@ defineOptions({
 
 const props = defineProps({
     bussinessProps: Array,
+
 });
 
 const searchBusiness = ref("");
@@ -48,6 +49,8 @@ watch(
 const selectBusiness = (business) => {
     isBusinessSelected.value = true;
     form.business_id = business.id;
+    form.business_name = business.business_name;
+    form.business_logo = business.business_logo;
     businessSelected.value = business;
 };
 
@@ -201,7 +204,7 @@ const submit = () => {
                                     @click="selectBusiness(business)"
                                     class="flex cursor-pointer items-center gap-3 p-2 hover:bg-gray-100 rounded-lg"
                                 >
-                                    <img src="/assets/images.png" class="w-12 rounded object-cover" alt="Company Logo" />
+                                    <img :src=" business.business_logo " class="w-12 rounded object-cover" alt="Company Logo" />
                                     <p class="text-lg">{{ business.business_name }}</p>
                                 </div>
                             </div>
@@ -210,7 +213,7 @@ const submit = () => {
                         <!-- Selected Company -->
                         <div v-if="businessSelected" class="flex items-center justify-between p-2 border border-gray-400 rounded-lg">
                             <div class="flex items-center gap-3">
-                                <img src="/assets/images.png" class="w-12 rounded object-cover" alt="Selected Company Logo" />
+                                <img :src="businessSelected.business_logo" class="w-12 rounded object-cover" alt="Selected Company Logo" />
                                 <p class="text-lg">{{ businessSelected.business_name }}</p>
                             </div>
                             <i @click="removeSelectedBusiness" class="bi bi-x text-lg cursor-pointer hover:text-red-500"></i>

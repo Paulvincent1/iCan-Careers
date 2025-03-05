@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmployerSubscription;
 use App\Models\JobPost;
 use App\Models\User;
 use App\Notifications\HiringProcessNotification;
@@ -22,11 +23,16 @@ class EmployerDashboardController extends Controller
         }])->where('employer_id',  $user->id)->latest()->get();
 
         $hiredWorkers = $jobs->pluck('employedWorkers')->flatten()->unique();
+        $subscription = EmployerSubscription::where('employer_id', $user->id)->first(); 
 
         $invoices =  $user->employerInvoices()->with('worker')->get();
         // dd($invoices);
 
-        return inertia('Employer/Dashboard',['jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices, 'successMessage' => session()->get('successMessage')]);
+        return inertia('Employer/Dashboard',['user' => [
+            'name' => $user->name,
+            
+            'profile_photo_path' => $user->profile_img ?? null, // Ensure it's included
+        ],'subscriptionProps' => $subscription,'jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices, 'successMessage' => session()->get('successMessage')]);
     }
 
     public function showJobApplicants(Request $request, JobPost $jobid){

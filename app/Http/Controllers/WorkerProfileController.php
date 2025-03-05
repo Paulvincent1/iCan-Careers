@@ -75,11 +75,26 @@ class WorkerProfileController extends Controller
         if(!$user->workerProfile){
             return redirect()->route('create.profile');
         }
+
+        $isPending = '';
+        if(!$user->verified){
+            if($user->workerVerification){
+                $isPending = 'Pending verification';
+            }else{
+                $isPending = null;
+            }
+        }
         $workerSkills = $user->workerSkills;
         $workerProfile = $user->workerProfile;
+
+        
+        return inertia('Worker/Profile',['userProp' => $user, 
+        'isPending' => $isPending,
+
         $workerBasicInfo = $user->workerBasicInfo;
 
         return inertia('Worker/Profile',['userProp' => $user,
+
          'workerSkillsProp' => $workerSkills,
          'workerProfileProp' => $workerProfile,
          'workerBasicInfoProp' => $workerBasicInfo,
