@@ -32,7 +32,7 @@ class JobPost extends Model
 
 
     public function scopeFilter(EloquentBuilder $query, array $filters){
-        
+
         if($filters['job_type'] ?? false) {
             $query->whereIn('job_type', request('job_type'));
         }

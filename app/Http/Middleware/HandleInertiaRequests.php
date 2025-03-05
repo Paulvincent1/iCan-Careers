@@ -56,6 +56,7 @@ class HandleInertiaRequests extends Middleware
             },
             'auth.user.employer.subscription' => fn () => $request->user()?->employerSubscription,
             'auth.user.role' => fn () => $request->user()?->roles()->first(),
+            'auth.user.unreadNotifications' => fn () => $request->user()?->unreadNotifications,
             'csrf_token' => fn() => $request->session()->token(),
         ]);
     }

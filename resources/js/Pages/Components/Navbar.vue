@@ -1,7 +1,8 @@
 <script setup>
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
+import { nanoid } from "nanoid";
 
 let isActive = ref(false);
 let profileDropdown = ref(false);
@@ -10,8 +11,6 @@ const dropdownButton = useTemplateRef("drop");
 const notficationButton = useTemplateRef("dropNotification");
 onMounted(() => {
     document.addEventListener("click", (event) => {
-        console.log(!notficationButton.value.contains(event.target));
-
         if (!dropdownButton.value.contains(event.target)) {
             profileDropdown.value = false;
         }
@@ -41,6 +40,32 @@ window.addEventListener("resize", () => {
         }
     }
 });
+
+// notfications
+let page = usePage();
+
+let notifications = ref(page.props.auth.user.unreadNotifications);
+
+function unshiftLatestNotification(notif) {
+    notifications.value.unshift(notif);
+}
+
+onMounted(() => {
+    window.Echo.channel(
+        "notification-" + page.props.auth.user.authenticated?.id,
+    ).listen(".notification.event", (notif) => {
+        console.log(notif);
+        unshiftLatestNotification({
+            id: nanoid(),
+            data: {
+                status: notif.status,
+                message: notif.message,
+            },
+        });
+    });
+});
+
+console.log(page.props.auth.user.unreadNotifications);
 </script>
 <template>
     <div class="fixed top-0 z-50 w-full border-b bg-white shadow">
@@ -139,14 +164,60 @@ window.addEventListener("resize", () => {
                                 showNotificationDropDown =
                                     !showNotificationDropDown
                             "
-                            class="relative flex flex-col"
+                            class="flex flex-col"
                         >
                             <i class="bi bi-bell text-lg"></i>
                             <div
                                 v-show="showNotificationDropDown"
-                                class="absolute top-10 w-56 rounded bg-white px-3 py-2 text-sm shadow md:right-0 md:top-14"
+                                class="absolute right-[50%] top-10 h-fit max-h-[calc(100vh-4.625rem-3.5rem)] w-80 translate-x-[50%] overflow-y-auto rounded bg-white px-5 py-2 text-sm shadow md:right-0 md:top-14 md:translate-x-0"
                             >
-                                das
+                                <div class="mb-2">
+                                    <p class="text-xl font-bold">
+                                        Notifications
+                                    </p>
+                                </div>
+                                <div
+                                    :class="[
+                                        {
+                                            'mb-6': notifications.length,
+                                            'mb-3': !notifications.length,
+                                        },
+                                    ]"
+                                >
+                                    <p
+                                        class="font-bold underline underline-offset-8"
+                                    >
+                                        All
+                                    </p>
+                                </div>
+                                <div>
+                                    <div
+                                        v-for="notification in notifications"
+                                        :key="notification.id"
+                                        class="mb-3 flex flex-row gap-3"
+                                    >
+                                        <div class="h-[32px] min-w-8">
+                                            <img
+                                                class="h-full w-full rounded-full object-cover"
+                                                src="assets/images.png"
+                                                alt=""
+                                            />
+                                        </div>
+                                        <div>
+                                            <p class="font-bold">
+                                                {{ notification.data.status }}
+                                            </p>
+                                            <p class="text-[10px]">
+                                                {{ notification.data.message }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div v-if="!notifications.length">
+                                        <p class="mb-3 text-center">
+                                            No Notifications
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div
@@ -166,7 +237,7 @@ window.addEventListener("resize", () => {
 
                             <div
                                 v-show="profileDropdown"
-                                class="absolute top-10 w-40 rounded bg-white px-3 py-2 text-sm shadow md:right-0 md:top-14"
+                                class="absolute right-[50%] top-10 w-40 translate-x-[50%] rounded bg-white px-3 py-2 text-sm shadow md:right-0 md:top-14 md:translate-x-0"
                             >
                                 <Link
                                     class="flex gap-2 p-2"

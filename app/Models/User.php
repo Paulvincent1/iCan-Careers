@@ -68,9 +68,9 @@ class User extends Authenticatable
         return $this->hasOne(EmployerProfile::class, 'user_id');
     }
 
-    // public function businessInformation(){
-    //     return $this->hasOne(BusinessInformation::class, 'user_id');
-    // }
+    public function businessInformation(){
+        return $this->hasOne(BusinessInformation::class, 'user_id');
+    }
 
     public function employerJobPosts(){
         return $this->hasMany(JobPost::class,'employer_id');

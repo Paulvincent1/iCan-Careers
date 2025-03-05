@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JobPost;
 use App\Models\User;
+use App\Notifications\HiringProcessNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -79,13 +80,23 @@ class EmployerDashboardController extends Controller
                 'status' => $request->status,
             ]
         );
+
+        $application = DB::table('application')->where('id', $pivotId)->first();
+        $worker = User::find($application->worker_id);
+
         if($request->status === 'Accepted' && $update){
-            $application = DB::table('application')->where('id', $pivotId)->first();
-            $worker = User::find($application->worker_id);
 
             // dd('hi');
             $worker->myJobs()->attach($application->job_post_id);
         }
+
+        $jobPost = JobPost::where('id', $application->job_post_id)->first();
+        // dd($jobPost);
+
+        // for notif
+        $worker->notify(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
+        broadcast(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
+
 
         return redirect()->back()->with('message','Successfully updated.');
     }
@@ -115,6 +126,16 @@ class EmployerDashboardController extends Controller
                 'coordinates'=>  $fields['coordinates'],
             ]
         );
+
+        $application = DB::table('application')->where('id', $pivotId)->first();
+        $worker = User::find($application->worker_id);
+
+        $jobPost = JobPost::where('id', $application->job_post_id)->first();
+
+         // for notif
+         $worker->notify(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
+         broadcast(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
+
 
 //   dd( Carbon::parse("$request->date $request->time"));
         return redirect()->back()->with('message','Successfully updated');

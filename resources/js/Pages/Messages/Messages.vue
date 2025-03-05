@@ -481,6 +481,10 @@ onBeforeMount(() => {
         channel.unsubscribe();
         channel.stopListening(".message.event");
     }
+    if (channelChatHeads) {
+        channelChatHeads.unsubscribe();
+        channelChatHeads.stopListening(".message.event");
+    }
 });
 </script>
 <template>

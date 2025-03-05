@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('worker_basic_infos', function (Blueprint $table) {
             $table->id();
+            $table->string('address');
+            $table->string('website_link');
             $table->timestamps();
         });
     }
