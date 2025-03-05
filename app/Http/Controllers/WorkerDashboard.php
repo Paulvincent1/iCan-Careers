@@ -27,6 +27,7 @@ class WorkerDashboard extends Controller
         $this->invoiceService = $invoiceService;
         $this->payoutService = $payoutService;
     }
+    
 
     public function index(){
         $user = Auth::user();
@@ -45,12 +46,15 @@ class WorkerDashboard extends Controller
 
         $invoiceTransactions = $user->workerInvoices()->whereIn('status',['PAID','SETTLED'])->with('employer')->latest()->get();
 
-        $invoices = $user->workerInvoices()->latest()->get();
+        $invoices = $user->workerInvoices()->latest()->get(); 
         // dd($invoiceTransactions);
 
         return inertia('Worker/Dashboard', 
         [
-            'user' => $user,
+            'user' => [
+            'name' => $user->name,
+            'profile_photo_path' => $user->profile_img ?? null, // Ensure it's included
+        ],
             'isPending' => $isPending,
             'savedJobsProps' => $savedJobs,
             'jobsAppliedProps' => $appliedJobs,

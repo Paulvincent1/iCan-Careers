@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\BusinessInformation;
 use App\Models\EmployerProfile;
+use App\Models\EmployerSubscription;
 use App\Models\JobPost;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +29,7 @@ class EmployerProfileController extends Controller
             return redirect()->route('employer.dashboard');
         }
 
-        $businesses =  BusinessInformation::filter(request(['business_name']))->get();
+        $businesses =  BusinessInformation::filter(request(['business_name,business_logo']))->get();
         // dd($businesses);
         return inertia('EmployerAccountSetup/CreateProfile', ['bussinessProps' => $businesses]);
     }
@@ -49,10 +51,93 @@ class EmployerProfileController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function show(User $applicantId)
     {
-        //
+       
+        $employerProfile = $applicantId->employerProfile;
+        
+        return inertia('Employer/Profile',['userProp' => $applicantId,
+         'employerProfileProp' => $employerProfile, 
+         'messageProp' => session('message'),
+         'visitor' => true
+        ]);
     }
+
+    
+
+     public function myProfile(Request $request)
+    {
+        $user = Auth::user();
+        $employerProfile = $user->employerProfile;
+        $jobsPosted = JobPost::where('employer_id', $user->id)->get();
+        $business = BusinessInformation::findOrFail(1);
+        $subscription = EmployerSubscription::where('employer_id', $user->id)->first();
+
+        return inertia('Employer/Profile', [
+        "user" => $user,
+        'employerProfileProp' => $employerProfile,
+        'businessProps'=> $business,
+        'messageProp' => session('message'),
+        'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
+        'subscriptionProps' => $subscription,
+    ]);
+}
+
+     public function updateProfile(Request $request)
+{
+    $user = Auth::user();
+    $employerProfile = $user->employerProfile; // Fetch the employer profile of the authenticated user
+
+    // Check if employerProfile exists
+    if (!$employerProfile) {
+        return redirect()->back()->with(['message' => 'Employer profile not found.']);
+    }
+
+    // Validate input fields
+    $request->validate([
+        'full_name' => 'nullable|string|min:1',
+        'birth_year' => 'nullable|integer',
+        'gender' => 'nullable|string|in:Male,Female,Other',
+        'phone_number' => 'nullable|string|',
+    ]);
+
+    // Debugging: Check received data
+    // dd($request->all());
+
+    // Update employer profile
+    $employerProfile->update([
+        'full_name' => $request->full_name ?? $employerProfile->full_name,
+        'birth_year' => $request->birth_year ?? $employerProfile->birth_year,
+        'gender' => $request->gender ?? $employerProfile->gender,
+        'phone_number' => $request->phone_number ?? $employerProfile->phone_number,
+    ]);
+
+    // Handle profile image upload
+    if ($request->hasFile('profile_img')) {
+        $request->validate([
+            'profile_img' => 'required|image'
+        ]);
+
+        // Delete old image if exists
+        if ($user->profile_img) {
+            $relativePath = str_replace('/storage/', '', $user->profile_img);
+            if (Storage::disk('public')->exists($relativePath)) {
+                Storage::disk('public')->delete($relativePath);
+            }
+        }
+
+        // Upload new image
+        $path = Storage::disk('public')->put('images', $request->file('profile_img'));
+
+        $user->update([
+            'profile_img' => '/storage/'.$path
+        ]);
+    }
+
+    return redirect()->back()->with(['message' => 'Successfully Updated!']);
+}
+
+    
     public function storeProfile(Request $request){
         // dd($request);
         $user = Auth::user();
@@ -131,13 +216,8 @@ class EmployerProfileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(EmployerProfile $employerProfile)
-    {
-        //
-    }
-    /**
-     * Show the form for editing the specified resource.
-     */
+   
+    
     public function edit(EmployerProfile $employerProfile)
     {
         //

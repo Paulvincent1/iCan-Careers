@@ -245,8 +245,12 @@ const formatCurrency =
                 >
                     <div class="mb-3 mt-4 w-[84px]">
                         <img
-                            src="assets/profile_placeholder.jpg"
-                            alt=""
+                            :src="
+                                user.profile_photo_path
+                                    ? user.profile_photo_path
+                                    : 'assets/profile_placeholder.jpg'
+                            "
+                            alt="User Profile"
                             class="w-full rounded-[500px]"
                         />
                     </div>
@@ -273,7 +277,10 @@ const formatCurrency =
                             Click here to verify!
                         </Link>
                     </div>
-                    <div v-if="$page.props.auth.user.authenticated.verified" class="flex items-center gap-1">
+                    <div
+                        v-if="$page.props.auth.user.authenticated.verified"
+                        class="flex items-center gap-1"
+                    >
                         <p class="text-sm font-bold text-gray-600">Verified</p>
                         <i class="bi bi-patch-check-fill text-green-400"></i>
                     </div>

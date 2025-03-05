@@ -1,12 +1,20 @@
 <script setup>
 import { Link, usePage } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 
 let props = defineProps({
+    user: {
+        type: Object,
+        required: true,
+    },
     jobsProps: null,
+    subscriptionProps: {
+        type: Object,
+        required: false,
+    },
     currentWorkerProps: null,
     invoiceProps: null,
     successMessage: null,
@@ -35,6 +43,21 @@ onMounted(() => {
     jobs.value = props.jobsProps.filter((job) => {
         return job.job_status === jobTag.value;
     });
+});
+
+// Computed property for dynamic styling
+const subscriptionClass = computed(() => {
+    if (!props.subscriptionProps) return "";
+    switch (props.subscriptionProps.subscription_type) {
+        case "Free":
+            return "text-gray-500 bg-gray-100 px-2 py-1 rounded";
+        case "Pro":
+            return "text-blue-500 bg-blue-100 px-2 py-1 rounded";
+        case "Premium":
+            return "text-yellow-500 bg-yellow-100 px-2 py-1 rounded";
+        default:
+            return "";
+    }
 });
 
 // let jobTag = ref(page.props.auth.user.employer.subscription);
@@ -93,8 +116,12 @@ function switchInvoiceTag(tag) {
                     >
                         <div class="mb-3 mt-4 w-[84px]">
                             <img
-                                src="assets/profile_placeholder.jpg"
-                                alt=""
+                                :src="
+                                    user.profile_photo_path
+                                        ? user.profile_photo_path
+                                        : 'assets/profile_placeholder.jpg'
+                                "
+                                alt="User Profile"
                                 class="w-full rounded-[500px]"
                             />
                         </div>
@@ -102,24 +129,23 @@ function switchInvoiceTag(tag) {
                             {{ $page.props.auth.user.authenticated.name }}
                         </p>
                         <Link
-                            :href="route('worker.profile')"
+                            :href="route('employer.profile')"
                             as="button"
                             class="mb-3 w-full max-w-[500px] rounded-lg border px-4 py-2 font-bold"
+                            @click="debugRoute"
                         >
                             View Profile
                         </Link>
                         <div class="flex flex-col items-center">
-                            <p class="mb-3 text-center text-red-500">
-                                Your account is currently on free tier, Please
-                                upgrade to pro tier to hire workers.
-                            </p>
-                            <!-- <Link
-                            :href="route('account.verify')"
-                            as="button"
-                            class="w-full rounded-lg border bg-red-500 py-2 text-white"
-                        >
-                            See Pricing
-                        </Link> -->
+                            <div v-if="subscriptionProps">
+                                <p class="font-bold">
+                                    <span :class="subscriptionClass">{{
+                                        subscriptionProps.subscription_type
+                                    }}</span>
+                                </p>
+                            </div>
+                            <p v-else>No active subscription.</p>
+                            
                         </div>
                     </div>
 

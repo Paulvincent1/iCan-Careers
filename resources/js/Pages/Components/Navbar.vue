@@ -6,6 +6,14 @@ import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 let isActive = ref(false);
 let profileDropdown = ref(false);
 
+// Props
+const props = defineProps({
+    user: {
+        type: Object,
+        required: true,
+    },
+});
+
 const dropdownButton = useTemplateRef("drop");
 const notficationButton = useTemplateRef("dropNotification");
 onMounted(() => {
@@ -155,9 +163,12 @@ window.addEventListener("resize", () => {
                             class="flex items-center gap-1"
                         >
                             <img
-                                class="w-7 rounded-[400px] object-cover"
-                                src="/assets/profile_placeholder.jpg"
-                                alt=""
+                                :src="
+                                    $page.props.auth.user?.profile_img ||
+                                    '/assets/profile_placeholder.jpg'
+                                "
+                                alt="User Profile"
+                                class="h-8 w-8 rounded-full object-cover"
                             />
                             <div class="flex gap-1">
                                 <p class="text-[12px]">Me</p>
