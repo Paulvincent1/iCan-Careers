@@ -67,21 +67,22 @@ class EmployerProfileController extends Controller
 
      public function myProfile(Request $request)
     {
-        $user = Auth::user();
+        $user = Auth::user();   
         $employerProfile = $user->employerProfile;
         $jobsPosted = JobPost::where('employer_id', $user->id)->get();
-        $business = BusinessInformation::findOrFail(1);
+        $business = $user->employerProfile->businessInformation;
         $subscription = EmployerSubscription::where('employer_id', $user->id)->first();
 
         return inertia('Employer/Profile', [
-            "user" => $user,
-            'employerProfileProp' => $employerProfile,
-            'businessProps'=> $business,
-            'messageProp' => session('message'),
-            'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
-            'subscriptionProps' => $subscription,
-        ]);
-    }
+        "user" => $user,
+        'employerProfileProp' => $employerProfile,
+        'businessProps' => $business ?? null,
+        'messageProp' => session('message'),
+        'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
+        'subscriptionProps' => $subscription,
+    ]);
+}
+
 
      public function updateProfile(Request $request)
 {
