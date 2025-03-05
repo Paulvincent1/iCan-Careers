@@ -279,6 +279,7 @@ const formatCurrency =
                     </div>
                     <div
                         v-if="$page.props.auth.user.authenticated.verified"
+                        
                         class="flex items-center gap-1"
                     >
                         <p class="text-sm font-bold text-gray-600">Verified</p>

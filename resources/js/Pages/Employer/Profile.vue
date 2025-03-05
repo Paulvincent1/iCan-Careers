@@ -6,15 +6,30 @@ import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 
 let props = defineProps({
     user: Object,
-    employerProfileProp: Object,
-    messageProp: String,
-    jobsPostedProps: Object,
-    businessProps: Object,
+    employerProfileProp: {
+        type: Object,
+        default: () => ({}), // Ensure an empty object if null
+    },
+    messageProp: {
+        type: String,
+        default: "", // Ensure an empty string if null
+    },
+    jobsPostedProps: {
+        type: Array,
+        default: () => [], // Ensure an empty array if null
+    },
+    businessProps: {
+        type: Object,
+        default: () => null, // Explicitly handle null
+    },
     subscriptionProps: {
         type: Object,
         required: false,
+        default: () => null, // Explicitly handle null
     },
-    visitor: null,
+    visitor: {
+        default: null,
+    },
 });
 
 const memberSince = computed(() => {
@@ -273,16 +288,25 @@ function showSuccessMessage() {
                                 </button>
                             </form> -->
                         </div>
-                        <div class="mb-4 flex items-center gap-4">
+                        <div
+                            class="mb-4 flex items-center gap-4"
+                            v-if="businessProps"
+                        >
                             <div
                                 class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200"
                             >
                                 <i class="bi bi-building"></i>
                             </div>
                             <p>
-                                {{ businessProps.industry }}
+                                {{
+                                    businessProps?.industry ||
+                                    "No business information available"
+                                }}
                             </p>
                         </div>
+                        <p v-else class="mb-1 text-gray-500">
+                            No business information available
+                        </p>
                         <div class="mb-4 flex items-center gap-4">
                             <div
                                 class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200"
