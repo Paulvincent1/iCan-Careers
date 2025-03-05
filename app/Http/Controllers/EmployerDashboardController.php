@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EmployerSubscription;
 use App\Models\JobPost;
+use App\Models\Message;
 use App\Models\User;
 use App\Notifications\HiringProcessNotification;
 use Carbon\Carbon;
@@ -28,11 +29,61 @@ class EmployerDashboardController extends Controller
         $invoices =  $user->employerInvoices()->with('worker')->get();
         // dd($invoices);
 
+        // users that we interact
+        $usersId = Message::where('sender_id',$user->id)->pluck('receiver_id')
+        ->merge(Message::where('receiver_id',$user->id)->pluck('sender_id'))->unique()
+        ->filter(function ($id) use ($user) {
+            return $id != $user->id;
+        });
+
+        $users = User::whereIn('id',$usersId)->get();
+        $chatHeads = [];
+
+        foreach($users as $user){
+            $sent = $user->sentMessages()->latest()->first();
+            $received = $user->receivedMessages()->latest()->first();
+
+            $latestMessage = null;
+            if($sent && $received){
+                if($sent->created_at > $received->created_at){
+
+                    $latestMessage = $sent;
+                }else{
+
+                    $latestMessage = $received;
+                }
+
+
+            }elseif($sent){
+
+                $latestMessage = $sent;
+
+            }elseif($received){
+
+                $latestMessage = $received;
+
+            }
+
+
+            $chatHeads[] = [
+                'user' => $user,
+                'latestMessage' => $latestMessage
+            ];
+
+
+        }
+
+        usort($chatHeads, function ($a, $b){
+           return $b['latestMessage']->created_at <=> $a['latestMessage']->created_at;
+        });
+
+
+
         return inertia('Employer/Dashboard',['user' => [
             'name' => $user->name,
             
             'profile_photo_path' => $user->profile_img ?? null, // Ensure it's included
-        ],'subscriptionProps' => $subscription,'jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices, 'successMessage' => session()->get('successMessage')]);
+        ],'subscriptionProps' => $subscription,'jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices, 'successMessage' => session()->get('successMessage'), 'chatHeadsProps' => $chatHeads]);
     }
 
     public function showJobApplicants(Request $request, JobPost $jobid){

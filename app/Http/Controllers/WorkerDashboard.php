@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessInvoicePdf;
 use App\Models\Invoice;
 use App\Models\JobPost;
+use App\Models\Message;
 use App\Models\User;
 use App\Services\InvoiceService;
 use App\Services\PayoutService;
@@ -49,6 +50,55 @@ class WorkerDashboard extends Controller
         $invoices = $user->workerInvoices()->latest()->get(); 
         // dd($invoiceTransactions);
 
+        // users that we interact
+        $usersId = Message::where('sender_id',$user->id)->pluck('receiver_id')
+        ->merge(Message::where('receiver_id',$user->id)->pluck('sender_id'))->unique()
+        ->filter(function ($id) use ($user) {
+            return $id != $user->id;
+        });
+
+        $users = User::whereIn('id',$usersId)->get();
+        $chatHeads = [];
+
+        foreach($users as $user){
+            $sent = $user->sentMessages()->latest()->first();
+            $received = $user->receivedMessages()->latest()->first();
+
+            $latestMessage = null;
+            if($sent && $received){
+                if($sent->created_at > $received->created_at){
+
+                    $latestMessage = $sent;
+                }else{
+
+                    $latestMessage = $received;
+                }
+
+
+            }elseif($sent){
+
+                $latestMessage = $sent;
+
+            }elseif($received){
+
+                $latestMessage = $received;
+
+            }
+
+
+            $chatHeads[] = [
+                'user' => $user,
+                'latestMessage' => $latestMessage
+            ];
+
+
+        }
+
+        usort($chatHeads, function ($a, $b){
+           return $b['latestMessage']->created_at <=> $a['latestMessage']->created_at;
+        });
+
+
         return inertia('Worker/Dashboard', 
         [
             'user' => [
@@ -62,6 +112,7 @@ class WorkerDashboard extends Controller
             'invoiceTransactionsProps' => $invoiceTransactions,
             'invoicesProps' => $invoices->load('employer'),
             'payoutProps' => $user->payouts()->latest()->get(),
+            'chatHeadsProps' => $chatHeads
 
         ]);
     }

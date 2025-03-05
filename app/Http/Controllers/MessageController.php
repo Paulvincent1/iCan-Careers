@@ -68,7 +68,7 @@ class MessageController extends Controller
 
             $latestMessage = null;
             if($sent && $received){
-                if($sent->created_at > $received->created_at ){
+                if($sent->created_at > $received->created_at){
 
                     $latestMessage = $sent;
                 }else{
