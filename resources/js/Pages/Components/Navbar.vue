@@ -179,8 +179,8 @@ console.log(page.props.auth.user.unreadNotifications);
                                 <div
                                     :class="[
                                         {
-                                            'mb-6': notifications.length,
-                                            'mb-3': !notifications.length,
+                                            'mb-6': notifications?.length,
+                                            'mb-3': !notifications?.length,
                                         },
                                     ]"
                                 >
@@ -212,7 +212,7 @@ console.log(page.props.auth.user.unreadNotifications);
                                             </p>
                                         </div>
                                     </div>
-                                    <div v-if="!notifications.length">
+                                    <div v-if="!notifications?.length">
                                         <p class="mb-3 text-center">
                                             No Notifications
                                         </p>

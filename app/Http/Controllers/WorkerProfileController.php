@@ -60,7 +60,7 @@ class WorkerProfileController extends Controller
             'month_pay' => $fields['month_pay'],
             'birth_year' => $fields['birth_year'],
             'gender' => $fields['gender'],
-            'resume' => $resumepath ? $request->resume->getClientOriginalName() : null,
+            'resume' => $request->resume?->getClientOriginalName() ?? null,
             'resume_path' => $resumepath  ?? null ,
         ]);
 
@@ -77,11 +77,13 @@ class WorkerProfileController extends Controller
         }
         $workerSkills = $user->workerSkills;
         $workerProfile = $user->workerProfile;
+        $workerBasicInfo = $user->workerBasicInfo;
 
         return inertia('Worker/Profile',['userProp' => $user,
          'workerSkillsProp' => $workerSkills,
          'workerProfileProp' => $workerProfile,
-         'messageProp' => session('message'),
+         'workerBasicInfoProp' => $workerBasicInfo,
+         'messageProp' => session()->get('message'),
         ]);
     }
 
@@ -143,6 +145,27 @@ class WorkerProfileController extends Controller
 
             $user->update([
                 'profile_img' => '/storage/'.$path
+            ]);
+        }
+
+        if($request->hasFile('resume')){
+            $request->validate([
+                'resume' =>'nullable|file|extensions:pdf,docx,doc',
+            ]);
+
+            $existingResumePath = $user->workerProfile->resume_path;
+
+            if($existingResumePath){    
+                if(Storage::disk('local')->exists($existingResumePath)){
+                    Storage::disk('local')->delete($existingResumePath);
+                }    
+            }
+
+            $resumePath = Storage::disk('local')->put('resume', $request->resume);
+
+            $user->workerProfile->update([
+                'resume' => $request->resume?->getClientOriginalName() ?? null,
+                'resume_path' => $resumePath,
             ]);
         }
 

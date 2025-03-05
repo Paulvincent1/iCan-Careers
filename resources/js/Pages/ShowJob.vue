@@ -5,6 +5,7 @@ import { ref, watchEffect } from "vue";
 import { Link, router, usePage } from "@inertiajs/vue3";
 import ReusableModal from "./Components/Modal/ReusableModal.vue";
 import SuccessfulMessage from "./Components/Popup/SuccessfulMessage.vue";
+import InputFlashMessage from "./Components/InputFlashMessage.vue";
 
 let props = defineProps({
     jobPostProps: null,
@@ -67,7 +68,13 @@ function closeModal() {
 }
 
 let isApplied = ref(props.jobPostProps.users_who_applied?.length ?? 0);
+let inputErrorResume = ref(null);
 function submitResume() {
+    if (!props.workerProfileProps.resume_path) {
+        inputErrorResume.value = "Please add resume first.";
+        return;
+    }
+    closeModal();
     router.post(
         route("jobsearch.apply", props.jobPostProps.id),
         {},
@@ -75,6 +82,21 @@ function submitResume() {
             onSuccess: () => {
                 isApplied.value = 1;
             },
+        },
+    );
+}
+
+function addResume(e) {
+    router.post(
+        "/jobseekers/myprofile/updateprofile",
+        {
+            _method: "put",
+            resume: e.target.files[0],
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {},
         },
     );
 }
@@ -301,29 +323,44 @@ function closeJob() {
                         </button>
                     </div>
                     <p class="mb-3">This action cannot be undone!</p>
-                    <div class="mb-4 flex gap-2 border p-2">
-                        <p>Your active resume:</p>
+                    <div class="flex gap-2 border p-2">
+                        <p v-if="workerProfileProps?.resume_path">
+                            Your active resume:
+                        </p>
+                        <p v-else>No active resume</p>
                         <a
+                            v-if="workerProfileProps?.resume_path"
                             class="text-blue-500"
                             :href="
                                 route(
                                     'show.resume',
-                                    workerProfileProps.resume_path,
+                                    workerProfileProps?.resume_path,
                                 )
                             "
                             target="_blank"
-                            >{{ workerProfileProps.resume }}</a
+                            >{{ workerProfileProps?.resume }}</a
                         >
+                        <label v-else class="text-blue-500">
+                            <p class="cursor-pointer">
+                                Click here to add resume
+                            </p>
+                            <input
+                                @change="addResume"
+                                type="file"
+                                class="hidden"
+                            />
+                        </label>
                     </div>
-                    <div class="flex justify-end gap-2">
+                    <InputFlashMessage
+                        :message="inputErrorResume"
+                        type="error"
+                    ></InputFlashMessage>
+                    <div class="mt-4 flex justify-end gap-2">
                         <button @click="closeModal" class="rounded border p-2">
                             Cancel
                         </button>
                         <button
-                            @click="
-                                submitResume();
-                                closeModal();
-                            "
+                            @click="submitResume()"
                             class="rounded bg-green-500 p-2 text-white"
                         >
                             Submit

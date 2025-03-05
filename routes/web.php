@@ -10,6 +10,7 @@ use App\Http\Controllers\JobPostController;
 use App\Http\Controllers\JobSearchController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\WorkerBasicInfoController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
@@ -95,6 +96,8 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class
     Route::put('/myprofile/updateprofile',[WorkerProfileController::class, 'updateProfile'])->name('update.profile.put');
     Route::put('/myprofile/updateskill/{skillid}',[WorkerProfileController::class, 'updateSkill'])->name('update.profile.put');
     Route::delete('/myprofile/deleteskill/{skillid}',[WorkerProfileController::class, 'deleteSkill'])->name('update.profile.delete');
+
+    Route::put('/myprofile/updateBasicInfo',[WorkerBasicInfoController::class, 'update'])->name('update.basicInfo.put');
 
 
     // for job search
