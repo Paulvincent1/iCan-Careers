@@ -62,9 +62,9 @@ class MessageController extends Controller
         $users = User::whereIn('id',$usersId)->get();
         $chatHeads = [];
 
-        foreach($users as $user){
-            $sent = $user->sentMessages()->latest()->first();
-            $received = $user->receivedMessages()->latest()->first();
+        foreach($users as $userchat){
+            $sent = $userchat->sentMessages()->latest()->first();
+            $received = $userchat->receivedMessages()->latest()->first();
 
             $latestMessage = null;
             if($sent && $received){
@@ -89,7 +89,7 @@ class MessageController extends Controller
 
 
             $chatHeads[] = [
-                'user' => $user,
+                'user' => $userchat,
                 'latestMessage' => $latestMessage
             ];
 
