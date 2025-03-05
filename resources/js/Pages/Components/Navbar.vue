@@ -7,14 +7,6 @@ import { nanoid } from "nanoid";
 let isActive = ref(false);
 let profileDropdown = ref(false);
 
-// Props
-const props = defineProps({
-    user: {
-        type: Object,
-        required: true,
-    },
-});
-
 const dropdownButton = useTemplateRef("drop");
 const notficationButton = useTemplateRef("dropNotification");
 onMounted(() => {
@@ -52,7 +44,7 @@ window.addEventListener("resize", () => {
 // notfications
 let page = usePage();
 
-let notifications = ref(page.props.auth.user.unreadNotifications);
+let notifications = ref(page.props.auth?.user.unreadNotifications);
 
 function unshiftLatestNotification(notif) {
     notifications.value.unshift(notif);
@@ -141,7 +133,7 @@ console.log(page.props.auth.user.unreadNotifications);
                         </Link>
                     </li>
                     <div
-                        v-if="!$page.props.auth.user.authenticated"
+                        v-if="!$page.props.auth.user?.authenticated"
                         class="flex items-center gap-5"
                     >
                         <li>
@@ -163,7 +155,7 @@ console.log(page.props.auth.user.unreadNotifications);
                     </div>
 
                     <li
-                        v-show="$page.props.auth.user.authenticated"
+                        v-show="$page.props.auth.user?.authenticated"
                         class="relative flex items-center justify-center gap-3 hover:cursor-pointer"
                     >
                         <div

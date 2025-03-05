@@ -488,71 +488,126 @@ onBeforeMount(() => {
 });
 </script>
 <template>
-    <div
-        class="mx-auto min-h-[calc(100vh-4.625rem)] max-w-7xl p-8 px-[0.5rem] md:h-[calc(100vh-4.625rem)]"
-    >
+    <div class="bg-[#f4f4f4]">
         <div
-            class="grid h-full min-h-[650px] w-full grid-cols-1 border md:grid-cols-[300px,1fr]"
+            class="mx-auto min-h-[calc(100vh-4.625rem)] max-w-7xl p-8 px-[0.5rem]"
         >
-            <div class="flex flex-col border-b md:border-none">
-                <div>
-                    <div class="border-b p-4">
-                        <p>Paul Vincent</p>
-                    </div>
-                    <div class="px-4">
-                        <input
-                            type="text"
-                            class="my-5 w-full rounded-full border p-2 px-6"
-                            placeholder="Search Applicant Name"
-                        />
-                    </div>
-                </div>
-                <div class="flex-1 basis-1 overflow-auto">
-                    <div
-                        v-for="(chatHead, index) in chatHeads"
-                        @click="switchChat(chatHead.user.id)"
-                        :key="chatHead.latestMessage.id"
-                        :class="[
-                            'flex cursor-pointer gap-2 p-4',
-                            {
-                                'bg-slate-300':
-                                    chatHead.user.id ===
-                                    Number(route().params.user),
-                            },
-                        ]"
-                    >
-                        <div class="h-12 w-12">
-                            <img
-                                src="/assets/profile_placeholder.jpg"
-                                alt=""
-                                class="h-full w-full rounded-full"
-                            />
+            <div
+                class="grid h-full min-h-[650px] w-full grid-cols-1 rounded-xl bg-white md:grid-cols-[300px,1fr]"
+            >
+                <div class="flex flex-col border-b md:border-none">
+                    <div>
+                        <div class="flex items-center gap-2 border-b p-4">
+                            <div class="h-10 w-10">
+                                <img
+                                    class="h-full w-full"
+                                    src="/assets/images.png"
+                                    alt=""
+                                />
+                            </div>
+                            <div>
+                                <p>
+                                    {{
+                                        $page.props.auth.user?.authenticated
+                                            .name
+                                    }}
+                                </p>
+                                <p class="text-sm text-gray-500">
+                                    Info account
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p>{{ chatHead.user.email }}</p>
-                            <p class="text-sm">
-                                {{ chatHead.latestMessage?.message }}
+                        <div class="mt-5 px-4">
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    class="w-full rounded-full border p-2 px-8"
+                                    placeholder="Search Applicant Name"
+                                />
+                                <i
+                                    class="bi bi-search absolute left-3 top-[50%] translate-y-[-50%] text-[14px] text-gray-500"
+                                ></i>
+                            </div>
+                            <p class="my-3 text-gray-500">Messages</p>
+                        </div>
+                    </div>
+                    <div class="min-h-44 flex-1 basis-1 overflow-auto">
+                        <div v-if="!chatHeads.length" class="">
+                            <p class="text-center text-gray-500">
+                                No Messages Available.
                             </p>
                         </div>
+                        <div
+                            v-for="(chatHead, index) in chatHeads"
+                            @click="switchChat(chatHead.user.id)"
+                            :key="chatHead.latestMessage?.id"
+                            :class="[
+                                'flex cursor-pointer gap-2 p-4',
+                                {
+                                    'bg-orange-400 text-white':
+                                        chatHead.user.id ===
+                                        Number(route().params.user),
+                                },
+                            ]"
+                        >
+                            <div class="h-12 w-12">
+                                <img
+                                    src="/assets/profile_placeholder.jpg"
+                                    alt=""
+                                    class="h-full w-full rounded-full"
+                                />
+                            </div>
+                            <div>
+                                <p class="font-bold">
+                                    {{ chatHead.user.email }}
+                                </p>
+                                <p class="text-sm">
+                                    {{
+                                        chatHead.latestMessage?.message ??
+                                        "No Message yet"
+                                    }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="flex flex-col border-l">
-                <div class="flex flex-1 flex-col">
-                    <div class="border-b p-4">
-                        <p>Nathan</p>
-                    </div>
+                <div class="flex flex-col border-l">
                     <div class="flex flex-1 flex-col">
                         <div
-                            ref="chat-container"
-                            class="chat-container overflow-auto p-4"
+                            class="flex h-[77px] items-center justify-between border-b p-4"
                         >
-                            <MessageBox
-                                v-for="message in messages"
-                                :key="message.id"
-                                :message="message"
-                            ></MessageBox>
-                            <!-- <div
+                            <div v-if="route().params.user" class="flex gap-2">
+                                <div class="h-10 w-10">
+                                    <img
+                                        class="h-full w-full"
+                                        :src="
+                                            profile_img ?? '/assets/images.png'
+                                        "
+                                        alt=""
+                                    />
+                                </div>
+                                <div>
+                                    <p>{{ userDirectMessageProps?.name }}</p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ userDirectMessageProps?.email }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div v-if="route().params.user">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </div>
+                        </div>
+                        <div class="flex flex-1 flex-col">
+                            <div
+                                ref="chat-container"
+                                class="chat-container overflow-auto p-4"
+                            >
+                                <MessageBox
+                                    v-for="message in messages"
+                                    :key="message.id"
+                                    :message="message"
+                                ></MessageBox>
+                                <!-- <div
                                 v-for="message in messages"
                                 :class="[
                                     'mb-6 flex justify-start',
@@ -572,17 +627,24 @@ onBeforeMount(() => {
                                     </p>
                                 </div>
                             </div> -->
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div v-if="isShowMessageInput" class="p-4">
-                    <div class="flex gap-3">
-                        <input
-                            ref="messageInput"
-                            type="text"
-                            class="w-full rounded-full border p-2"
-                        />
-                        <button @click="sendMessage">Send</button>
+                    <div v-if="isShowMessageInput" class="p-4">
+                        <div class="relative">
+                            <input
+                                ref="messageInput"
+                                type="text"
+                                placeholder="Type your message..."
+                                class="w-full rounded-full bg-[#f4f4f4] p-4 outline-none"
+                            />
+                            <button
+                                @click="sendMessage"
+                                class="absolute right-5 top-[50%] translate-y-[-50%]"
+                            >
+                                <i class="bi bi-send text-lg text-gray-500"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

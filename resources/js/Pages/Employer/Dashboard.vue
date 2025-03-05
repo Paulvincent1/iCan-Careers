@@ -18,6 +18,7 @@ let props = defineProps({
     currentWorkerProps: null,
     invoiceProps: null,
     successMessage: null,
+    chatHeadsProps: null,
 });
 
 let messageShow = ref(false);
@@ -40,6 +41,7 @@ let jobTag = ref(
 );
 
 onMounted(() => {
+    listenChannelChatHeads();
     jobs.value = props.jobsProps.filter((job) => {
         return job.job_status === jobTag.value;
     });
@@ -104,6 +106,40 @@ function switchInvoiceTag(tag) {
         });
     }
 }
+
+// inbox
+let chatHeads = ref(props.chatHeadsProps ?? null);
+
+let channelChatHeads = null;
+function listenChannelChatHeads() {
+    const channelName = "chathead-" + page.props.auth.user.authenticated.id;
+
+    channelChatHeads = window.Echo.channel(channelName).listen(
+        ".message.event",
+        (e) => {
+            unshiftLatestChatHead(e.user.id, e);
+
+            console.log(chatHeads.value);
+        },
+    );
+}
+
+function unshiftLatestChatHead(userId, newChatHead) {
+    const index = chatHeads.value.find((ch) => {
+        return Number(ch?.user.id) === Number(userId);
+    });
+
+    if (index) {
+        if (index != 0) {
+            chatHeads.value.splice(index, 1);
+            chatHeads.value.unshift(newChatHead);
+        } else {
+            chatHeads.value[index] = newChatHead;
+        }
+    } else {
+        chatHeads.value.unshift(newChatHead);
+    }
+}
 </script>
 <template>
     <Head title="Dashboard | iCan Careers" />
@@ -132,7 +168,6 @@ function switchInvoiceTag(tag) {
                             :href="route('employer.profile')"
                             as="button"
                             class="mb-3 w-full max-w-[500px] rounded-lg border px-4 py-2 font-bold"
-                            @click="debugRoute"
                         >
                             View Profile
                         </Link>
@@ -145,18 +180,46 @@ function switchInvoiceTag(tag) {
                                 </p>
                             </div>
                             <p v-else>No active subscription.</p>
-                            
                         </div>
                     </div>
 
-                    <div class="rounded-lg bg-white p-4">
-                        <div class="flex justify-between">
-                            <p>Inbox</p>
+                    <div class="mb-6 h-[400px] rounded-lg bg-white p-4">
+                        <div class="flex items-center justify-between">
+                            <p class="text-lg">Inbox</p>
                             <Link
                                 :href="route('messages')"
-                                class="text-blue-500"
+                                class="text-sm text-blue-500"
                                 >See All</Link
                             >
+                        </div>
+                        <div>
+                            <div
+                                v-for="(chatHead, index) in chatHeads"
+                                @click="switchChat(chatHead.user.id)"
+                                :key="chatHead.latestMessage.id"
+                                :class="[
+                                    'flex cursor-pointer gap-2 p-4',
+                                    {
+                                        'bg-slate-300':
+                                            chatHead.user.id ===
+                                            Number(route().params.user),
+                                    },
+                                ]"
+                            >
+                                <div class="h-12 w-12">
+                                    <img
+                                        src="/assets/profile_placeholder.jpg"
+                                        alt=""
+                                        class="h-full w-full rounded-full"
+                                    />
+                                </div>
+                                <div>
+                                    <p>{{ chatHead.user.email }}</p>
+                                    <p class="text-sm">
+                                        {{ chatHead.latestMessage?.message }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

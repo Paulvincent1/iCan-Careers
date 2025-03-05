@@ -74,14 +74,14 @@ class EmployerProfileController extends Controller
         $subscription = EmployerSubscription::where('employer_id', $user->id)->first();
 
         return inertia('Employer/Profile', [
-        "user" => $user,
-        'employerProfileProp' => $employerProfile,
-        'businessProps'=> $business,
-        'messageProp' => session('message'),
-        'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
-        'subscriptionProps' => $subscription,
-    ]);
-}
+            "user" => $user,
+            'employerProfileProp' => $employerProfile,
+            'businessProps'=> $business,
+            'messageProp' => session('message'),
+            'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
+            'subscriptionProps' => $subscription,
+        ]);
+    }
 
      public function updateProfile(Request $request)
 {
