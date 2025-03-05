@@ -10,4 +10,9 @@ class WorkerBasicInfo extends Model
         'link',
         'address',
     ];
+
+    public function worker()
+    {
+        return $this->belongsTo(User::class, 'worker_id');
+    }
 }

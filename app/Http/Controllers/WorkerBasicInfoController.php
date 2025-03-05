@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\WorkerBasicInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class WorkerBasicInfoController extends Controller
 {
@@ -52,7 +53,25 @@ class WorkerBasicInfoController extends Controller
      */
     public function update(Request $request, WorkerBasicInfo $workerBasicInfo)
     {
-        //
+
+        // dd($request);
+        $user = Auth::user();
+        if($request->input('address')){
+
+            $user->workerBasicInfo()->update([
+                'address' => $request->address
+            ]);
+        }
+        
+        if($request->input('website_link')){
+
+            $user->workerBasicInfo()->update([
+                'website_link' => $request->website_link
+            ]);
+        }
+
+        return redirect()->back()->with('message', 'Sucessfully updated!');
+
     }
 
     /**

@@ -4,32 +4,44 @@ namespace App\Notifications;
 
 use App\Models\JobPost;
 use App\Models\User;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class HiringProcessNotification extends Notification
+class HiringProcessNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 
     public string $status;
     public string $message;
+    public string $businessLogo;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(public JobPost $jobPost, public User $applicant, public User $employer)
+    public function __construct(public JobPost $jobPost, public User $applicant)
     {
-       $this->status = $this->jobPost->usersWhoApplied()
-                        ->where('id', $this->applicant->id)
-                        ->first()->pivot->status;
+        $this->status = $this->jobPost->usersWhoApplied()
+            ->where('users.id', $this->applicant->id)  // Qualify the 'id' column to avoid ambiguity
+            ->first()
+            ->pivot
+            ->status;
 
         if($this->status === 'Rejected'){
             $this->message = 'Your application for the' . $jobPost->job_title . 'position has been declined. Thank you for applying.';
         }else{
-            $this->message = 'Congratulations! Your application for the ' . $jobPost->job_title . ' position is currently ' . $this->status . '. We will keep you updated.';
+            $this->message =  'Congrats! Your application for
+            the ' . $jobPost->job_title .
+           ' position is currently '
+            . $this->status . ', ' . 'We\'ll keep you
+            updated.';
         }
+
+        $this->businessLogo = $this->jobPost->load('employer.employerProfile.businessInformation')->employer->employerProfile?->businessInformation
 
     }
 
@@ -57,10 +69,41 @@ class HiringProcessNotification extends Notification
     public function toDatabase(object $notifiable)
     {
         return [
-            'status' => $this->jobPost->usersWhoApplied()->with('')->where('id', $this->applicant->id)->first()->pivot->status,
+            'status' => $this->jobPost->usersWhoApplied()
+            ->where('users.id', $this->applicant->id)
+            ->first()
+            ->pivot
+            ->status,
             'message' => $this->message,
+            'business_logo' => $this->businessLogo
         ];
     }
+
+    public function toBroadcast()
+    {
+        return new BroadcastMessage([
+            'status' => $this->jobPost->usersWhoApplied()
+            ->where('users.id', $this->applicant->id)
+            ->first()
+            ->pivot
+            ->status,
+            'message' => $this->message,
+            'business_logo' => $this->businessLogo
+        ]);
+    }
+
+    public function broadcastOn()
+    {
+
+        return new Channel('notification-' . $this->applicant->id);
+
+    }
+
+    public function broadcastAs()
+    {
+        return 'notification.event';
+    }
+
 
     /**
      * Get the array representation of the notification.

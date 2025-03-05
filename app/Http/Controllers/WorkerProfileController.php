@@ -22,10 +22,10 @@ class WorkerProfileController extends Controller
     {
         $user = Auth::user();
         if($user->workerProfile){
-     
+
             return redirect()->route('add.skills');
         }
-        
+
         return inertia('WorkerAccountSetup/CreateProfile');
     }
 
@@ -42,7 +42,7 @@ class WorkerProfileController extends Controller
             'birth_year' =>'required|numeric|min:1900',
             'gender' =>'required',
             'resume' =>'nullable|file|extensions:pdf,docx,doc',
-          
+
         ]);
 
         if($fields['resume']){
@@ -60,10 +60,10 @@ class WorkerProfileController extends Controller
             'month_pay' => $fields['month_pay'],
             'birth_year' => $fields['birth_year'],
             'gender' => $fields['gender'],
-            'resume' => $resumepath ? $request->resume->getClientOriginalName() : null,
+            'resume' => $request->resume?->getClientOriginalName() ?? null,
             'resume_path' => $resumepath  ?? null ,
         ]);
-      
+
         Inertia::clearHistory();
 
         return redirect()->route('add.skills');
@@ -86,12 +86,19 @@ class WorkerProfileController extends Controller
         }
         $workerSkills = $user->workerSkills;
         $workerProfile = $user->workerProfile;
+
         
         return inertia('Worker/Profile',['userProp' => $user, 
         'isPending' => $isPending,
+
+        $workerBasicInfo = $user->workerBasicInfo;
+
+        return inertia('Worker/Profile',['userProp' => $user,
+
          'workerSkillsProp' => $workerSkills,
-         'workerProfileProp' => $workerProfile, 
-         'messageProp' => session('message'),
+         'workerProfileProp' => $workerProfile,
+         'workerBasicInfoProp' => $workerBasicInfo,
+         'messageProp' => session()->get('message'),
         ]);
     }
 
@@ -105,8 +112,8 @@ class WorkerProfileController extends Controller
                 'job_title' => $request->job_title
             ]);
         }
- 
-       
+
+
         if($request->job_type && $request->work_hour_per_day && $request->hour_pay && $request->month_pay){
             $request->validate([
                 'job_type' => 'required',
@@ -122,9 +129,9 @@ class WorkerProfileController extends Controller
                 'month_pay' => $request->month_pay,
             ]);
         }
-        
+
         if($request->profile_description){
-            
+
           $request->validate([
             'profile_description' => 'required'
           ]);
@@ -132,15 +139,15 @@ class WorkerProfileController extends Controller
             'profile_description'=>$request->profile_description
           ]);
         }
-        
 
-        
+
+
         if($request->hasFile('profile_img')){
 
             $request->validate([
                 'profile_img' => 'required|image'
             ]);
-            
+
 
             if($user->profile_img){
                 $relativePath = str_replace('/storage/','',$user->profile_img);
@@ -156,13 +163,34 @@ class WorkerProfileController extends Controller
             ]);
         }
 
+        if($request->hasFile('resume')){
+            $request->validate([
+                'resume' =>'nullable|file|extensions:pdf,docx,doc',
+            ]);
+
+            $existingResumePath = $user->workerProfile->resume_path;
+
+            if($existingResumePath){    
+                if(Storage::disk('local')->exists($existingResumePath)){
+                    Storage::disk('local')->delete($existingResumePath);
+                }    
+            }
+
+            $resumePath = Storage::disk('local')->put('resume', $request->resume);
+
+            $user->workerProfile->update([
+                'resume' => $request->resume?->getClientOriginalName() ?? null,
+                'resume_path' => $resumePath,
+            ]);
+        }
+
 
         return redirect()->back()->with(['message' => 'Successfuly updated!']);
     }
 
     public function updateSkill(Request $request, WorkerSkills $skillid){
        $user = Auth::user();
-       
+
         if($request->skill_name){
 
             $request->validate(
@@ -176,14 +204,14 @@ class WorkerProfileController extends Controller
                 'skill_name' => $request->skill_name
             ]);
         }
-    
-       
+
+
 
         if($request->experience){
             $request->validate([
                 'experience' => 'max:255'
             ]);
-         
+
 
             $user->workerSkills()->find($skillid->id)->update(
                 [
@@ -236,13 +264,13 @@ class WorkerProfileController extends Controller
      */
     public function show(User $applicantId)
     {
-       
+
         $workerSkills = $applicantId->workerSkills;
         $workerProfile = $applicantId->workerProfile;
-        
-        return inertia('Worker/Profile',['userProp' => $applicantId, 
+
+        return inertia('Worker/Profile',['userProp' => $applicantId,
          'workerSkillsProp' => $workerSkills,
-         'workerProfileProp' => $workerProfile, 
+         'workerProfileProp' => $workerProfile,
          'messageProp' => session('message'),
          'visitor' => true
         ]);
@@ -260,7 +288,7 @@ class WorkerProfileController extends Controller
 
        if($user->workerProfile?->resume_path === $path || $user->employerJobPosts()->whereHas('usersWhoApplied', function ($query) use ($workerId){
         $query->where('worker_id',$workerId->id);
-       })->first()) { 
+       })->first()) {
            return Storage::disk('local')->response($path);
         }
 
