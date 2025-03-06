@@ -1,7 +1,7 @@
 <script setup>
 import { Link, usePage } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, onBeforeUnmount } from "vue";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 
@@ -114,6 +114,12 @@ let channelChatHeads = null;
 function listenChannelChatHeads() {
     const channelName = "chathead-" + page.props.auth.user.authenticated.id;
 
+    if (channelChatHeads) {
+        console.log("unsub");
+
+        channelChatHeads.unsubscribe();
+    }
+
     channelChatHeads = window.Echo.channel(channelName).listen(
         ".message.event",
         (e) => {
@@ -140,6 +146,22 @@ function unshiftLatestChatHead(userId, newChatHead) {
         chatHeads.value.unshift(newChatHead);
     }
 }
+
+function goToChat(userId) {
+    console.log("hi");
+
+    router.get("/messages/", {
+        user: userId,
+    });
+}
+
+onBeforeUnmount(() => {
+    if (channelChatHeads) {
+        channelChatHeads.unsubscribe();
+        // Stop listening to the '.message.event' event on the channel
+        channelChatHeads.stopListening(".message.event");
+    }
+});
 </script>
 <template>
     <Head title="Dashboard | iCan Careers" />
@@ -195,7 +217,7 @@ function unshiftLatestChatHead(userId, newChatHead) {
                         <div>
                             <div
                                 v-for="(chatHead, index) in chatHeads"
-                                @click="switchChat(chatHead.user.id)"
+                                @click="goToChat(chatHead.user.id)"
                                 :key="chatHead.latestMessage.id"
                                 :class="[
                                     'flex cursor-pointer gap-2 p-4',
