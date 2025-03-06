@@ -4,6 +4,7 @@ import {
     computed,
     nextTick,
     onBeforeMount,
+    onBeforeUnmount,
     onMounted,
     onUpdated,
     ref,
@@ -282,6 +283,7 @@ console.log(props.userDirectMessageProps);
 let messages = ref(props.messageProps?.data.reverse() ?? null);
 
 onMounted(() => {
+    chatHeadVisibleToScreen();
     listenChannelChatHeads();
 
     if (props.messageProps?.current_page) {
@@ -449,6 +451,12 @@ let channelChatHeads = null;
 function listenChannelChatHeads() {
     const channelName = "chathead-" + page.props.auth.user.authenticated.id;
 
+    if (channelChatHeads) {
+        console.log("unsub");
+
+        channelChatHeads.unsubscribe();
+    }
+
     channelChatHeads = window.Echo.channel(channelName).listen(
         ".message.event",
         (e) => {
@@ -476,7 +484,23 @@ function unshiftLatestChatHead(userId, newChatHead) {
     }
 }
 
-onBeforeMount(() => {
+let chatHeadContainer = useTemplateRef("chathead-container");
+let refId;
+let chatHeadActive;
+function chatHeadVisibleToScreen() {
+    if (route().params.user) {
+        refId = "chat-head-" + route().params.user;
+        chatHeadActive = useTemplateRef(refId);
+        nextTick(() => {
+            chatHeadContainer.value.scrollTo({
+                top: chatHeadActive.value[0].offsetTop,
+                behavior: "smooth",
+            });
+        });
+    }
+}
+
+onBeforeUnmount(() => {
     if (channel) {
         channel.unsubscribe();
         channel.stopListening(".message.event");
@@ -531,7 +555,10 @@ onBeforeMount(() => {
                             <p class="my-3 text-gray-500">Messages</p>
                         </div>
                     </div>
-                    <div class="min-h-44 flex-1 basis-1 overflow-auto">
+                    <div
+                        ref="chathead-container"
+                        class="relative min-h-44 flex-1 basis-1 overflow-auto"
+                    >
                         <div v-if="!chatHeads.length" class="">
                             <p class="text-center text-gray-500">
                                 No Messages Available.
@@ -549,6 +576,7 @@ onBeforeMount(() => {
                                         Number(route().params.user),
                                 },
                             ]"
+                            :ref="`chat-head-${chatHead.user.id}`"
                         >
                             <div class="h-12 w-12">
                                 <img
@@ -581,7 +609,8 @@ onBeforeMount(() => {
                                     <img
                                         class="h-full w-full"
                                         :src="
-                                            profile_img ?? '/assets/images.png'
+                                            userDirectMessageProps.profile_img ??
+                                            '/assets/images.png'
                                         "
                                         alt=""
                                     />
