@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobPost;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -24,11 +25,12 @@ class JobPostController extends Controller
     public function create()
     {
         $user = Auth::user();
+        // dd($user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->count());
         $location = null;
-        if($user->employerProfile->employer_type === 'business'){
+        if ($user->employerProfile->employer_type === 'business') {
             $location = $user->employerProfile->businessInformation->business_location;
         }
-        return inertia('Employer/CreateJob',['locationProps' => $location]);
+        return inertia('Employer/CreateJob', ['locationProps' => $location]);
     }
 
     /**
@@ -58,39 +60,54 @@ class JobPostController extends Controller
 
 
 
-        if($fields['work_arrangement'] === 'On site' || $fields['work_arrangement'] === 'Hybrid'){
+        if ($fields['work_arrangement'] === 'On site' || $fields['work_arrangement'] === 'Hybrid') {
             $request->validate([
                 'location' => 'required'
             ]);
         }
 
         $skills = [];
-        foreach($fields['skills'] as $skill){
+        foreach ($fields['skills'] as $skill) {
             $skills[] = $skill['name'];
         }
         // dd($user->employerSubscription->subscription_type);
 
         $jobImage;
-        if($request->hasFile('job_image')){
-            $jobImage = Storage::disk('public')->put('images',$request->job_image);
+        if ($request->hasFile('job_image')) {
+            $jobImage = Storage::disk('public')->put('images', $request->job_image);
         }
 
-        $user->employerJobPosts()->create([
-            'job_title' =>  $fields['job_title'],
-            'job_type' =>  $fields['job_type'],
-            'work_arrangement' =>  $fields['work_arrangement'],
-            'location' =>  $fields['location'],
-            'experience' =>  $fields['experience'],
-            'hour_per_day' =>  $fields['hour_per_day'],
-            'hourly_rate' =>  $fields['hourly_rate'],
-            'salary' =>  $fields['salary'],
-            'description' =>  $fields['description'],
-            'preferred_educational_attainment' =>  $fields['preferred_educational_attainment'],
-            'skills' =>  $skills,
-            'preferred_worker_types' =>  $fields['preferred_worker_types'],
-            'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open',
-            // 'job_image' => $
-        ]);
+        if ($user->employerSubscription->subscription_type === 'Free') {
+
+            if (
+                $user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
+                ->count() > 3
+            ) {
+                return redirect()->back()->withErrors(['error' => 'post limit']);
+            }
+        } else {
+
+            if ($user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
+                ->count() > 5
+            ) {
+                $user->employerJobPosts()->create([
+                    'job_title' =>  $fields['job_title'],
+                    'job_type' =>  $fields['job_type'],
+                    'work_arrangement' =>  $fields['work_arrangement'],
+                    'location' =>  $fields['location'],
+                    'experience' =>  $fields['experience'],
+                    'hour_per_day' =>  $fields['hour_per_day'],
+                    'hourly_rate' =>  $fields['hourly_rate'],
+                    'salary' =>  $fields['salary'],
+                    'description' =>  $fields['description'],
+                    'preferred_educational_attainment' =>  $fields['preferred_educational_attainment'],
+                    'skills' =>  $skills,
+                    'preferred_worker_types' =>  $fields['preferred_worker_types'],
+                    'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open',
+                    // 'job_image' => $
+                ]);
+            }
+        }
 
         return redirect()->route('employer.dashboard');
     }
@@ -105,13 +122,12 @@ class JobPostController extends Controller
 
         $jobid->load('employer.employerProfile.businessInformation');
 
-        if($jobid->employer_id != $user->id){
-            abort(403,'Your not authorize to see this');
+        if ($jobid->employer_id != $user->id) {
+            abort(403, 'Your not authorize to see this');
         }
         // dd($job);
 
-        return inertia('ShowJob', ['jobPostProps' =>  $jobid,'messageProp' => session()->get('messageProp')]);
-
+        return inertia('ShowJob', ['jobPostProps' =>  $jobid, 'messageProp' => session()->get('messageProp')]);
     }
 
     /**
@@ -149,14 +165,14 @@ class JobPostController extends Controller
 
 
 
-        if($fields['work_arrangement'] === 'On site' || $fields['work_arrangement'] === 'Hybrid'){
+        if ($fields['work_arrangement'] === 'On site' || $fields['work_arrangement'] === 'Hybrid') {
             $request->validate([
                 'location' => 'required'
             ]);
         }
 
         $skills = [];
-        foreach($fields['skills'] as $skill){
+        foreach ($fields['skills'] as $skill) {
             $skills[] = $skill['name'];
         }
         // dd($user->employerSubscription->subscription_type);
@@ -181,34 +197,35 @@ class JobPostController extends Controller
         return redirect()->route('employer.dashboard')->with('successMessage', 'Sucessfully updated!');
     }
 
-   public function updateJobStatus(Request $request, $id)
-{
-    $jobPost = JobPost::findOrFail($id);
-    $jobPost->update(['job_status' => $request->status]);
+    public function updateJobStatus(Request $request, $id)
+    {
+        $jobPost = JobPost::findOrFail($id);
+        $jobPost->update(['job_status' => $request->status]);
 
-    return redirect()->route('admin.job.approvals')->with('success', 'Job status updated successfully.');
-}
-
-public function showJob($id)
-{
-    $job = JobPost::with('employer')->findOrFail($id);
-
-    // Ensure location is properly formatted
-    if (is_string($job->location)) {
-        $job->location = json_decode($job->location, true); // Decode only if it's a string
+        return redirect()->route('admin.job.approvals')->with('success', 'Job status updated successfully.');
     }
 
-    return Inertia::render('Admin/JobPostDetails', [
-        'job' => $job
-    ]);
-}
+    public function showJob($id)
+    {
+        $job = JobPost::with('employer')->findOrFail($id);
+
+        // Ensure location is properly formatted
+        if (is_string($job->location)) {
+            $job->location = json_decode($job->location, true); // Decode only if it's a string
+        }
+
+        return Inertia::render('Admin/JobPostDetails', [
+            'job' => $job
+        ]);
+    }
 
 
 
-    public function closeJob(JobPost $jobid){
+    public function closeJob(JobPost $jobid)
+    {
         $user = Auth::user();
 
-        if($jobid->employer_id != $user->id){
+        if ($jobid->employer_id != $user->id) {
 
             abort(403, 'Your not authorize to see this.');
         }
@@ -216,10 +233,10 @@ public function showJob($id)
             'job_status' => 'Closed'
         ]);
 
-        $jobid->usersWhoApplied()->wherePivotNotIn('status',['Accepted','Rejected'])
-        ->update([
-            'status' => 'Rejected'
-        ]);
+        $jobid->usersWhoApplied()->wherePivotNotIn('status', ['Accepted', 'Rejected'])
+            ->update([
+                'status' => 'Rejected'
+            ]);
 
         Inertia::clearHistory();
         return redirect()->route('employer.dashboard');
