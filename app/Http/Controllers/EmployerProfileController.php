@@ -68,7 +68,7 @@ class EmployerProfileController extends Controller
      public function myProfile(Request $request)
     {
         if(!Gate::allows('employer-profile-check')) {
-            return redirect()->back();
+            return redirect()->route('create.profile.employer');
         }
 
         $user = Auth::user();          

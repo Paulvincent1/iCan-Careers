@@ -75,7 +75,7 @@ class JobPostController extends Controller
         }
         // dd($user->employerSubscription->subscription_type);
 
-        $jobImage;
+        $jobImage = null;
         if ($request->hasFile('job_image')) {
             $jobImage = Storage::disk('public')->put('images', $request->job_image);
         }
