@@ -11,9 +11,7 @@ import Layout from "../Layouts/Layout.vue";
 import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
 import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 
-defineOptions({
-    layout: [Layout, SetupProfileLayout],
-});
+defineOptions({});
 
 let props = defineProps({
     locationProps: null,
@@ -170,43 +168,53 @@ const submit = () => {
                     Fill out the form below to post a new job opportunity.
                 </p>
 
+                <hr class="my-4 border-gray-300" />
+
                 <form @submit.prevent="submit">
                     <div class="space-y-6">
                         <!-- Job Title -->
-                        <div class="flex flex-col">
-                            <label class="mb-2 font-semibold">Job Title</label>
-                            <input
-                                v-model="form.job_title"
-                                type="text"
-                                class="rounded border px-3 py-2 outline-blue-400"
-                                placeholder="Enter job title"
-                                required
-                            />
-                            <InputFlashMessage
-                                type="error"
-                                :message="form.errors.job_title"
-                            />
+                        <div class="grid grid-cols-2 gap-5">
+                            <div class="flex flex-col">
+                                <label class="mb-2 font-semibold"
+                                    >Job Title</label
+                                >
+                                <input
+                                    v-model="form.job_title"
+                                    type="text"
+                                    class="rounded border px-3 py-2 outline-blue-400"
+                                    placeholder="Enter job title"
+                                    required
+                                />
+                                <InputFlashMessage
+                                    type="error"
+                                    :message="form.errors.job_title"
+                                />
+                            </div>
+
+                            <!-- Job Type -->
+                            <div class="flex flex-col">
+                                <label class="mb-2 font-semibold"
+                                    >Job Type</label
+                                >
+                                <select
+                                    v-model="form.job_type"
+                                    class="rounded border px-3 py-2 outline-blue-400"
+                                >
+                                    <option value="Full time">Full time</option>
+                                    <option value="Part time">Part time</option>
+                                    <option value="Contract">Contract</option>
+                                </select>
+                                <InputFlashMessage
+                                    type="error"
+                                    :message="form.errors.job_type"
+                                />
+                            </div>
                         </div>
 
-                        <!-- Job Type -->
-                        <div class="flex flex-col">
-                            <label class="mb-2 font-semibold">Job Type</label>
-                            <select
-                                v-model="form.job_type"
-                                class="rounded border px-3 py-2 outline-blue-400"
-                            >
-                                <option value="Full time">Full time</option>
-                                <option value="Part time">Part time</option>
-                                <option value="Contract">Contract</option>
-                            </select>
-                            <InputFlashMessage
-                                type="error"
-                                :message="form.errors.job_type"
-                            />
-                        </div>
+                        <hr class="my-4 border-gray-300" />
 
                         <!-- Work Arrangement -->
-                        <div class="flex flex-col">
+                        <div class="flex w-full flex-col">
                             <label class="mb-2 font-semibold"
                                 >Work Arrangement</label
                             >
@@ -230,27 +238,47 @@ const submit = () => {
                             />
                         </div>
 
-                        <!-- Preferred Experience -->
-                        <div class="flex flex-col">
-                            <label class="mb-2 font-semibold"
-                                >Preferred Experience</label
-                            >
-                            <select
-                                v-model="form.experience"
-                                class="rounded border px-3 py-2 outline-blue-400"
-                            >
-                                <option value="Fresher">Fresher</option>
-                                <option value="0-2 years">0-2 years</option>
-                                <option value="2-4 years">2-4 years</option>
-                                <option value="5+ years">5+ years</option>
-                            </select>
-                            <InputFlashMessage
-                                type="error"
-                                :message="form.errors.experience"
-                            />
+                        <div class="flex flex-col gap-4">
+                            <!-- Preferred Experience -->
+                            <div class="flex flex-col">
+                                <label class="mb-2 font-semibold"
+                                    >Preferred Experience</label
+                                >
+                                <select
+                                    v-model="form.experience"
+                                    class="w-full max-w-[350px] rounded border px-3 py-2 outline-blue-400 md:w-[350px]"
+                                >
+                                    <option value="Fresher">Fresher</option>
+                                    <option value="0-2 years">0-2 years</option>
+                                    <option value="2-4 years">2-4 years</option>
+                                    <option value="5+ years">5+ years</option>
+                                </select>
+                                <InputFlashMessage
+                                    type="error"
+                                    :message="form.errors.experience"
+                                />
+                            </div>
+
+                            <!-- Preferred Educational Attainment -->
+                            <div class="flex flex-col">
+                                <label class="mb-2 font-semibold"
+                                    >Preferred Educational Attainment</label
+                                >
+                                <EducationalAttainment
+                                    v-model="
+                                        form.preferred_educational_attainment
+                                    "
+                                    :error="
+                                        form.errors
+                                            .preferred_educational_attainment
+                                    "
+                                    :openToAll="true"
+                                    class="w-full max-w-[350px] md:w-[350px]"
+                                />
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-3">
+                        <div class="grid grid-cols-3 gap-5">
                             <!-- Hour Per Day -->
                             <div class="flex flex-col">
                                 <label class="mb-2 font-semibold"
@@ -309,6 +337,8 @@ const submit = () => {
                             </div>
                         </div>
 
+                        <hr class="my-4 border-gray-300" />
+
                         <!-- Description -->
                         <div class="flex flex-col">
                             <label class="mb-2 font-semibold"
@@ -326,24 +356,11 @@ const submit = () => {
                             />
                         </div>
 
-                        <!-- Preferred Educational Attainment -->
-                        <div class="flex flex-col">
-                            <label class="mb-2 font-semibold"
-                                >Preferred Educational Attainment</label
-                            >
-                            <EducationalAttainment
-                                v-model="form.preferred_educational_attainment"
-                                :error="
-                                    form.errors.preferred_educational_attainment
-                                "
-                                :openToAll="true"
-                            />
-                        </div>
-
                         <!-- Required Skills -->
                         <div class="flex flex-col">
-                            <label class="mb-2 font-semibold"
-                                >Required Skills</label
+                            <label class="font-semibold">Required Skills</label>
+                            <label class="mb-2 text-xs"
+                                >Add the skills required for this job.</label
                             >
                             <div class="mb-3">
                                 <input
@@ -354,7 +371,7 @@ const submit = () => {
                                 />
                                 <input
                                     @click="addSkill"
-                                    class="cursor-pointer rounded bg-green-500 p-2 text-white"
+                                    class="cursor-pointer rounded bg-[#fa8334] p-1 text-white"
                                     type="button"
                                     value="Add"
                                 />
@@ -380,10 +397,14 @@ const submit = () => {
                             />
                         </div>
 
+                        <hr class="my-4 border-gray-300" />
                         <!-- Candidate Type Options -->
                         <div class="flex flex-col">
-                            <label class="mb-2 font-semibold"
+                            <label class="font-semibold"
                                 >Candidate Type Options:</label
+                            >
+                            <label class="mb-2 text-xs"
+                                >Select all that apply.</label
                             >
                             <div class="space-y-2">
                                 <div>
@@ -502,12 +523,31 @@ const submit = () => {
                             />
                         </div>
 
-                        <!-- Submit Button -->
-                        <button
-                            class="w-full rounded-lg bg-blue-500 px-6 py-4 text-xl font-bold text-white shadow-md transition hover:bg-blue-600 disabled:opacity-50"
-                        >
-                            Post Job
-                        </button>
+                        <div class="mt-4 flex justify-end gap-3">
+                            <!-- Submit Button -->
+                            <div
+                                type="button"
+                                @click="
+                                    $inertia.visit(route('employer.dashboard'))
+                                "
+                                class="mt-4 flex justify-end"
+                            >
+                                <button
+                                    class="cursor-pointer rounded p-2 text-black"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="mt-4 flex justify-end">
+                                <button
+                                    class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
+                                >
+                                    Post Job
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

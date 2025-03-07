@@ -258,7 +258,7 @@ onBeforeUnmount(() => {
                                 </p>
                                 <Link
                                     :href="route('create.job')"
-                                    class="flex items-center gap-2 rounded-lg bg-[#fa8334] px-4 py-2 font-semibold text-white shadow-md transition duration-300 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300"
+                                    class="flex items-center gap-2 rounded-lg bg-[#fa8334] px-4 py-2 font-semibold text-white shadow-md "
                                     title="Click to post a new job"
                                 >
                                     <i class="bi bi-plus-lg text-xl"></i>

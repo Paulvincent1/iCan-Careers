@@ -75,7 +75,7 @@ console.log(page.props.auth.user.unreadNotifications);
             <p class="">
                 <Link :href="route('home')"
                     ><img
-                        src=""
+                        src="/assets/iCanCareersLogofinal.png"
                         alt=""
                         class="h-10 w-auto object-contain md:h-14 lg:h-16"
                 /></Link>
