@@ -399,7 +399,7 @@ function updateResume(e) {
                     </form>
                 </div>
                 <div
-                    v-if="!$page.props.auth.worker_verified"
+                    v-if="!$page.props.auth.worker_verified && !visitor" 
                     class="flex flex-col items-center"
                 >
                     <p class="mb-3 text-center text-red-500">

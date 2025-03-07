@@ -15,9 +15,9 @@ class EmployerProfile extends Model
         'business_id',
     ];
 
-    // public function user(){
-    //     return $this->belongsTo(User::class,'user_id');
-    // }
+    public function user(){
+        return $this->belongsTo(User::class,'user_id');
+    }
 
     public function businessInformation(){
         return $this->belongsTo(BusinessInformation::class, 'business_id');

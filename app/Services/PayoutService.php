@@ -23,7 +23,7 @@ class PayoutService {
         // $payoutUniqueId =  'DISB-' . uniqid();
 
         $idempotency_key =  $payoutUniqueId ; // string | A unique key to prevent duplicate requests from pushing through our system. No expiration.
-        $for_user_id = "679097a12e753bd42605ae99"; // string | The sub-account user-id that you want to make this transaction for. This header is only used if you have access to xenPlatform. See xenPlatform for more information.
+        $for_user_id = "67bdcfb25e9bb8a85784b27b"; // string | The sub-account user-id that you want to make this transaction for. This header is only used if you have access to xenPlatform. See xenPlatform for more information.
         //67bdcfb25e9bb8a85784b27b-nath
         // 679097a12e753bd42605ae99-paul
         $create_payout_request = new CreatePayoutRequest([

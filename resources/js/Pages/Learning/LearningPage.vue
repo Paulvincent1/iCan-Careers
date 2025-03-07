@@ -5,16 +5,19 @@ import CourseCard from "../Components/Learning/CourseCard.vue";
 import Footer from "../Components/Admin/Footer.vue";
 
 export default {
-  components: { SearchBar, CourseCard, Footer },
+  components: { SearchBar, CourseCard, Footer},
   setup() {
     const searchQuery = ref("");
+    
     const courses = ref([
       { id: 1, title: "Basic Computer Skills", description: "Learn the basics of using a computer.", image: "/assets/hero.jpg" },
       { id: 2, title: "Resume Writing 101", description: "Create a professional resume to get noticed.", image: "/assets/hero.jpg" },
       { id: 3, title: "Interview Preparation", description: "Tips and tricks to ace your job interview.", image: "/assets/hero.jpg" }
     ]);
 
-    return { searchQuery, courses };
+  
+
+    return {  searchQuery, courses};
   },
 };
 </script>
@@ -27,6 +30,8 @@ export default {
 
       <!-- Search Bar Component -->
       <SearchBar v-model="searchQuery" />
+
+      <Carousel :slides="carouselSlides" class="mb-8" />
 
       <!-- Course Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
