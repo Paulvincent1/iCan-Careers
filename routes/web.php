@@ -147,6 +147,8 @@ Route::prefix('admin')->middleware([isAdmin::class])->group(function (){
     Route::put('/workers/{id}/verify', [AdminDashboardController::class, 'toggleVerification'])->name('admin.workers.verify');
     Route::get('/workers/{id}/verification', [AdminDashboardController::class, 'workerVerificationDetails'])
     ->name('admin.workers.verification'); 
+    Route::delete('/workers/{id}/delete', [AdminDashboardController::class, 'deleteVerification'])
+    ->name('admin.workers.delete');
     Route::get('/employers',[AdminDashboardController::class, 'employers'])->name('admin.employers');
     Route::get('/reported-users',[AdminDashboardController::class, 'reportedUsers'])->name('admin.reported.users');
     Route::get('/job-approvals', [AdminDashboardController::class, 'jobApprovals'])->name('admin.job.approvals');
