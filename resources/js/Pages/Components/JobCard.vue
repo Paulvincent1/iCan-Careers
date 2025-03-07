@@ -65,7 +65,7 @@ let datePosted = computed(() => {
             </Link>
         </div>
         <div class="mb-4 flex gap-3">
-            <div class="h-14 w-14">
+            <div class="h-14 min-h-14 w-14 min-w-14">
                 <img
                     :src="
                         job.employer.employer_profile.business_information
@@ -78,7 +78,11 @@ let datePosted = computed(() => {
                 />
             </div>
             <div>
-                <p class="text-lg font-bold">{{ job.job_title }}</p>
+                <p
+                    class="h-[28px] w-full overflow-hidden text-ellipsis text-lg font-bold"
+                >
+                    {{ job.job_title }}
+                </p>
                 <p>
                     {{
                         job.employer.employer_profile.business_information
@@ -101,6 +105,7 @@ let datePosted = computed(() => {
                 {{ job.description }}
             </p>
         </div>
+
         <div
             class="mb-3 flex max-h-[64px] flex-wrap gap-2 overflow-hidden text-sm"
         >
@@ -111,7 +116,7 @@ let datePosted = computed(() => {
                 {{ skill }}
             </p>
         </div>
-        <div class="flex justify-center gap-3">
+        <div class="mt-auto flex justify-center gap-3">
             <Link
                 :href="route('jobsearch.show', job.id)"
                 as="button"
