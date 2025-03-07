@@ -30,11 +30,11 @@ class InvoiceService {
         // dd($items);
 
         foreach($items as $item){
-       
+
             $invoicesItems[] = new InvoiceItem(
             [
-                'name' => $item['description'], 
-                'price' => $item['rate'], 
+                'name' => $item['description'],
+                'price' => $item['rate'],
                 'quantity' => $item['hours'],
             ]);
 
@@ -53,10 +53,10 @@ class InvoiceService {
             'reminder_time' => 1,
             'items' => $invoicesItems,
         ]);
-        $for_user_id = "679097a12e753bd42605ae99";
+        $for_user_id = "67bdcfb25e9bb8a85784b27b";
         //67bdcfb25e9bb8a85784b27b-nath
         // 679097a12e753bd42605ae99-paul
-          
+
         try {
             $result = $this->apiInstance->createInvoice($create_invoice_request, $for_user_id);
             return $result;
@@ -76,12 +76,12 @@ class InvoiceService {
 
 
             DB::beginTransaction();
-        
+
             $invoice_id = $invoice->invoice_id; // string | Invoice ID
-            $for_user_id = "679097a12e753bd42605ae99"; // string | Business ID of the sub-account merchant (XP feature)
+            $for_user_id = "67bdcfb25e9bb8a85784b27b"; // string | Business ID of the sub-account merchant (XP feature)
             //67bdcfb25e9bb8a85784b27b-nath
         // 679097a12e753bd42605ae99-paul
-    
+
             try {
                 $result = $this->apiInstance->getInvoiceById($invoice_id, $for_user_id);
                 $status = $result->getStatus();
@@ -93,7 +93,7 @@ class InvoiceService {
 
                     $invoice->worker->balance()->decrement('unsettlement', $invoice->amount);
                     $invoice->worker->balance()->increment('balance', $invoice->amount);
-                    
+
                 }
 
                 DB::commit();
@@ -105,13 +105,13 @@ class InvoiceService {
                 DB::rollBack();
             }
         }
-    
+
     }
 
     public function renewEmployerSubscriptionInvoices(){
         $employerSubscriptionInvoices = EmployerSubscriptionInvoice::all();
 
-        $for_user_id = "679097a12e753bd42605ae99";
+        $for_user_id = "67bdcfb25e9bb8a85784b27b";
         //67bdcfb25e9bb8a85784b27b-nath
         // 679097a12e753bd42605ae99-paul
 
@@ -126,7 +126,7 @@ class InvoiceService {
                 $status = $result->getStatus();
 
                 if($status === 'EXPIRED'){
-                    
+
 
                     $externalId = 'INV-' . uniqid();
 
@@ -137,7 +137,7 @@ class InvoiceService {
                         $price = 3999;
                     }
                     if($subscriptionInvoice->subscription_type === 'Premium'){
-                        $price = 5699;                     
+                        $price = 5699;
                     }
 
                     $newInvoice = $this->createInvoice(
@@ -145,14 +145,14 @@ class InvoiceService {
                         description:$subscriptionInvoice->description,
                         items:[
                             [
-                               'description' => $subscriptionInvoice->description, 
-                               'rate' => $price, 
+                               'description' => $subscriptionInvoice->description,
+                               'rate' => $price,
                                'hours'=> 1,
                             ]
                         ],
                         duration: $duration,
                     );
-                    
+
 
                     EmployerSubscriptionInvoice::create([
                         'external_id' => $externalId,
@@ -167,7 +167,7 @@ class InvoiceService {
 
                     DB::commit();
                 }
-                
+
             }catch (\Xendit\XenditSdkException $e) {
                 echo 'Exception when calling InvoiceApi->getInvoiceById: ', $e->getMessage(), PHP_EOL;
                 echo 'Full Error: ', json_encode($e->getFullError()), PHP_EOL;
@@ -177,5 +177,4 @@ class InvoiceService {
 
         }
     }
-    
 }

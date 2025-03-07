@@ -1,6 +1,12 @@
 <script setup>
 import { Link, router, usePage } from "@inertiajs/vue3";
-import { getCurrentInstance, onMounted, ref } from "vue";
+import {
+    getCurrentInstance,
+    onBeforeUnmount,
+    onMounted,
+    onUnmounted,
+    ref,
+} from "vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
@@ -244,6 +250,12 @@ let channelChatHeads = null;
 function listenChannelChatHeads() {
     const channelName = "chathead-" + page.props.auth.user.authenticated.id;
 
+    if (channelChatHeads) {
+        console.log("unsub");
+
+        channelChatHeads.unsubscribe();
+    }
+
     channelChatHeads = window.Echo.channel(channelName).listen(
         ".message.event",
         (e) => {
@@ -270,6 +282,22 @@ function unshiftLatestChatHead(userId, newChatHead) {
         chatHeads.value.unshift(newChatHead);
     }
 }
+
+function goToChat(userId) {
+    console.log("hi");
+
+    router.get("/messages/", {
+        user: userId,
+    });
+}
+
+onBeforeUnmount(() => {
+    if (channelChatHeads) {
+        channelChatHeads.unsubscribe();
+        // Stop listening to the '.message.event' event on the channel
+        channelChatHeads.stopListening(".message.event");
+    }
+});
 
 const formatCurrency =
     getCurrentInstance().appContext.config.globalProperties.formatCurrency;
@@ -346,7 +374,7 @@ const formatCurrency =
                         <div>
                             <div
                                 v-for="(chatHead, index) in chatHeads"
-                                @click="switchChat(chatHead.user.id)"
+                                @click="goToChat(chatHead.user.id)"
                                 :key="chatHead.latestMessage.id"
                                 :class="[
                                     'flex cursor-pointer gap-2 p-4',

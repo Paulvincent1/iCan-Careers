@@ -27,5 +27,6 @@ class InvoiceUpdateStatus extends Command
     public function handle(InvoiceService $invoiceService)
     {
         $invoiceService->updateInvoiceStatus();
+        $invoiceService->renewEmployerSubscriptionInvoices();
     }
 }
