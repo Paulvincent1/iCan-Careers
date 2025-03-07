@@ -19,7 +19,7 @@ class MessageController extends Controller
      */
     public function index(Request $request)
     {
-        
+
         if($request->user()->roles()->first()->name === 'Employer'){
             if(!Gate::allows('employer-profile-check')) {
                 return redirect()->back();
@@ -59,13 +59,26 @@ class MessageController extends Controller
             $firstMessageChatHead = null;
         }
 
+        if($request->get('q')){
+            $usersId = Message::where('sender_id',$user->id)->whereHas('receiver', function ($query) use($request) {
+                $query->where('name', 'like', '%'. $request->get('q') . '%');
+            })->pluck('receiver_id')
+            ->merge(Message::where('receiver_id',$user->id)->whereHas('sender', function ($query) use($request){
+                $query->where('name', 'like', '%'. $request->get('q') . '%');
+            })->pluck('sender_id'))->unique()
+            ->filter(function ($id) use ($user) {
+                return $id != $user->id;
+            });
+        }else {
 
-        // users that we interact
-        $usersId = Message::where('sender_id',$user->id)->pluck('receiver_id')
-        ->merge(Message::where('receiver_id',$user->id)->pluck('sender_id'))->unique()
-        ->filter(function ($id) use ($user) {
-            return $id != $user->id;
-        });
+            // users that we interact
+            $usersId = Message::where('sender_id',$user->id)->pluck('receiver_id')
+            ->merge(Message::where('receiver_id',$user->id)->pluck('sender_id'))->unique()
+            ->filter(function ($id) use ($user) {
+                return $id != $user->id;
+            });
+        }
+
 
         $users = User::whereIn('id',$usersId)->get();
         $chatHeads = [];

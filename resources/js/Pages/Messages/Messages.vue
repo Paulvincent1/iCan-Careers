@@ -510,6 +510,23 @@ onBeforeUnmount(() => {
         channelChatHeads.stopListening(".message.event");
     }
 });
+
+let search = ref("");
+watch(
+    search,
+    debounce(() => {
+        router.get(
+            route("messages"),
+            {
+                q: search.value,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    }, 500),
+);
 </script>
 <template>
     <div class="bg-[#f4f4f4]">
@@ -545,8 +562,9 @@ onBeforeUnmount(() => {
                             <div class="relative">
                                 <input
                                     type="text"
+                                    v-model="search"
                                     class="w-full rounded-full border p-2 px-8"
-                                    placeholder="Search Applicant Name"
+                                    placeholder="Search a username"
                                 />
                                 <i
                                     class="bi bi-search absolute left-3 top-[50%] translate-y-[-50%] text-[14px] text-gray-500"
