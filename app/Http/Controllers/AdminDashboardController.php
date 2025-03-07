@@ -8,6 +8,7 @@ use App\Models\JobPost;
 use App\Models\User;
 use App\Models\Salary;
 use App\Models\SubscriptionPaymentHistory;
+use App\Models\WorkerVerification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -97,6 +98,19 @@ class AdminDashboardController extends Controller
          return back()->with('success', 'Worker verification status updated.');
     }
 
+   
+
+public function deleteVerification($id)
+{
+    $worker = WorkerVerification::where('user_id', $id)->first();
+
+    if (!$worker) {
+        return response()->json(['error' => 'Worker verification not found'], 404);
+    }   
+        $worker->delete();  // Try deleting the record
+        return redirect()->back()->with(['message' => 'Successfuly updated!']);
+    
+}
    public function employers()
 {
     $employers = EmployerProfile::with(['user', 'businessInformation'])->whereHas('user.roles', function($query){
