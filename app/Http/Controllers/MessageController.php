@@ -8,6 +8,7 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 use function Illuminate\Log\log;
 
@@ -18,6 +19,13 @@ class MessageController extends Controller
      */
     public function index(Request $request)
     {
+        
+        if($request->user()->roles()->first()->name === 'Employer'){
+            if(!Gate::allows('employer-profile-check')) {
+                return redirect()->back();
+            }
+        }
+
         // this code is used when theres a query params user in the url.
         $userDirectMessage = User::where('id', $request->get('user'))->with('sentMessages', 'receivedMessages')->first();
 

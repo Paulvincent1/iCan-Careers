@@ -67,10 +67,14 @@ class EmployerProfileController extends Controller
 
      public function myProfile(Request $request)
     {
-        $user = Auth::user();   
+        if(!Gate::allows('employer-profile-check')) {
+            return redirect()->back();
+        }
+
+        $user = Auth::user();          
         $employerProfile = $user->employerProfile;
         $jobsPosted = JobPost::where('employer_id', $user->id)->get();
-        $business = $user->employerProfile->businessInformation;
+        $business = $user->employerProfile?->businessInformation;
         $subscription = EmployerSubscription::where('employer_id', $user->id)->first();
 
         return inertia('Employer/Profile', [

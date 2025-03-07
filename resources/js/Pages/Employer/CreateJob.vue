@@ -9,6 +9,7 @@ import Maps from "../Components/Maps.vue";
 import Breadcrumbs from "../Components/Breadcrumbs.vue";
 import Layout from "../Layouts/Layout.vue";
 import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
+import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 
 defineOptions({
     layout: [Layout, SetupProfileLayout],
@@ -315,7 +316,7 @@ const submit = () => {
                             >
                             <textarea
                                 v-model="form.description"
-                                class="rounded border px-3 py-2 outline-blue-400 resize-none"
+                                class="resize-none rounded border px-3 py-2 outline-blue-400"
                                 placeholder="Enter job description"
                                 required
                             ></textarea>
@@ -512,6 +513,11 @@ const submit = () => {
             </div>
         </div>
     </div>
+    <SuccessfulMessage
+        :messageProp="$page.props.errors.message"
+        :messageShow="$page.props.errors.message"
+        type="Error"
+    ></SuccessfulMessage>
 </template>
 
 <style>

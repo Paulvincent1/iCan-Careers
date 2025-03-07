@@ -372,6 +372,7 @@ function closeJob() {
         <SuccessfulMessage
             :messageProp="messageProp"
             :messageShow="messageShow"
+            type="Success"
         ></SuccessfulMessage>
     </div>
 </template>

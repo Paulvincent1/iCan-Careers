@@ -54,6 +54,16 @@ class HandleInertiaRequests extends Middleware
             'auth.worker_verified' => function () use($request){
                 return $request->user() ? ($request->user()->workerVerification ? $request->user()->workerVerification : null) : null;
             },
+            'auth.employer_profile' => function () use($request) {
+                if($request->user()){
+                    if($request->user()->roles()->where('name','Employer')->exists()){
+                        if(!$request->user()->employerProfile) {          
+                            return ['message' => 'Complete your profile now to post jobs.', 'route' => 'create.profile.employer'];
+                        }
+                    }
+
+                }
+            },
             'auth.user.employer.subscription' => fn () => $request->user()?->employerSubscription,
             'auth.user.role' => fn () => $request->user()?->roles()->first(),
             'auth.user.unreadNotifications' => fn () => $request->user()?->unreadNotifications,

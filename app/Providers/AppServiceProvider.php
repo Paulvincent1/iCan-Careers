@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\EmployerProfile;
 use App\Models\JobPost;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -39,19 +40,26 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('view-applicants', function (User $user, JobPost $jobPost){
             return $user->id === $jobPost->employer_id;
         });
-        // Share authenticated user globally with Inertia
-    Inertia::share([
-        'auth' => [
-            'user' => function () {
-                $user = Auth::user();
-                return $user ? [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'profile_img' => $user->profile_img ?? '/assets/profile_placeholder.jpg', // Provide default image
-                ] : null;
+        Gate::define('employer-profile-check', function (User $user){
+            if(!$user->employerProfile) {
+                return false;
             }
-        ]
-    ]);
+
+            return true;
+        });
+            // Share authenticated user globally with Inertia
+        Inertia::share([
+            'auth' => [
+                'user' => function () {
+                    $user = Auth::user();
+                    return $user ? [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'profile_img' => $user->profile_img ?? '/assets/profile_placeholder.jpg', // Provide default image
+                    ] : null;
+                }
+            ]
+        ]);
     }
     
 }
