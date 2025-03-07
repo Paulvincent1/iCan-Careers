@@ -6,6 +6,7 @@ use App\Models\JobPost;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -24,6 +25,9 @@ class JobPostController extends Controller
      */
     public function create()
     {
+        if(!Gate::allows('employer-profile-check')) {
+            return redirect()->back();
+        }
         $user = Auth::user();
         // dd($user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->count());
         $location = null;
@@ -55,7 +59,6 @@ class JobPostController extends Controller
             'preferred_educational_attainment' => 'required|max:255',
             'skills' => 'required',
             'preferred_worker_types' => 'required',
-            'job_image' => 'nullable|image'
         ]);
 
 
@@ -81,14 +84,7 @@ class JobPostController extends Controller
 
             if (
                 $user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
-                ->count() > 3
-            ) {
-                return redirect()->back()->withErrors(['error' => 'post limit']);
-            }
-        } else {
-
-            if ($user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
-                ->count() > 5
+                ->count() < 3
             ) {
                 $user->employerJobPosts()->create([
                     'job_title' =>  $fields['job_title'],
@@ -106,6 +102,39 @@ class JobPostController extends Controller
                     'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open',
                     // 'job_image' => $
                 ]);
+               
+               
+            }else{
+
+                return redirect()->back()->withErrors(['message' => 'You can post up to 3 jobs per month(Free tier)']);
+              
+            }
+
+        } else {
+
+            if ($user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
+                ->count() < 5
+            ) {
+
+                $user->employerJobPosts()->create([
+                    'job_title' =>  $fields['job_title'],
+                    'job_type' =>  $fields['job_type'],
+                    'work_arrangement' =>  $fields['work_arrangement'],
+                    'location' =>  $fields['location'],
+                    'experience' =>  $fields['experience'],
+                    'hour_per_day' =>  $fields['hour_per_day'],
+                    'hourly_rate' =>  $fields['hourly_rate'],
+                    'salary' =>  $fields['salary'],
+                    'description' =>  $fields['description'],
+                    'preferred_educational_attainment' =>  $fields['preferred_educational_attainment'],
+                    'skills' =>  $skills,
+                    'preferred_worker_types' =>  $fields['preferred_worker_types'],
+                    'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open',
+                    // 'job_image' => $
+                ]);
+            }else {
+           
+                return redirect()->back()->withErrors(['message' => 'You can post up to 5 jobs per month(Pro and Premium tier)']);
             }
         }
 

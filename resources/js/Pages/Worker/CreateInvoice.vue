@@ -70,6 +70,7 @@ let errorMessage = ref({
     billTo: null,
     description: null,
     items: null,
+    totalAmount: null,
 });
 
 function validateFields() {
@@ -98,6 +99,20 @@ function validateFields() {
         form.items.rate === 0
     ) {
         errorMessage.value.items = "Please complete this field";
+        return false;
+    }
+
+    if (
+        Number(
+            form.totalAmount / 0.955 -
+                form.totalAmount +
+                (form.totalAmount / 0.955 - form.totalAmount) * 0.12 +
+                form.totalAmount,
+        ) > 50000
+    ) {
+        errorMessage.value.totalAmount =
+            "Total amount should not exceed to ₱50,000";
+
         return false;
     }
 
@@ -388,6 +403,11 @@ console.log(getCurrentInstance());
                                         )
                                     }}
                                 </p>
+                                <InputFlashMessage
+                                    class="text-end"
+                                    :message="errorMessage.totalAmount"
+                                    type="error"
+                                ></InputFlashMessage>
                             </div>
                         </div>
                     </div>

@@ -18,7 +18,7 @@ class HiringProcessNotification extends Notification implements ShouldBroadcastN
 
     public string $status;
     public string $message;
-    public string $businessLogo;
+    public ?string $businessLogo;
 
     /**
      * Create a new notification instance.
@@ -41,7 +41,8 @@ class HiringProcessNotification extends Notification implements ShouldBroadcastN
             updated.';
         }
 
-        $this->businessLogo = $this->jobPost->load('employer.employerProfile.businessInformation')->employer->employerProfile?->businessInformation
+        $this->businessLogo = $this->jobPost->load('employer.employerProfile.businessInformation')
+        ->employer->employerProfile?->businessInformation->business_logo ?? null;
 
     }
 

@@ -11,7 +11,7 @@ defineProps({
 let emit = defineEmits(["close"]);
 </script>
 <template>
-    <div class="font-semibold text-[#42423c]">
+    <div class="z-50 font-semibold text-[#42423c]">
         <div
             class="xs container mx-auto flex items-center justify-between gap-2 rounded-xl border border-[#edf75a] bg-[#edf75a] p-4 px-8 xl:max-w-7xl"
         >
