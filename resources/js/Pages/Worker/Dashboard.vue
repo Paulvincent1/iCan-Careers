@@ -371,8 +371,12 @@ const formatCurrency =
                             ></i>
                         </div>
 
-                        <div v-if="isPending">
-                            <p class="text-yellow-400">{{ isPending }}</p>
+                        <div
+                            v-if="isPending"
+                            class="flex gap-2 rounded-lg text-orange-400"
+                        >
+                            <p class="font-bold">{{ isPending }}</p>
+                            <i class="bi bi-hourglass-split"></i>
                         </div>
                     </div>
 

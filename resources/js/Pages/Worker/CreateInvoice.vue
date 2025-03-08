@@ -193,240 +193,266 @@ console.log(getCurrentInstance());
 </script>
 <template>
     <Head title="Create Invoice | iCan Careers" />
-    <div class="mx-auto px-[0.5rem] pt-3 xl:max-w-7xl">
-        <div class="mx-auto sm:w-[90%]">
-            <div class="my-3">
-                <h2 class="text-[26px]">Create Invoice</h2>
-            </div>
-            <div>
-                <h3 class="mb-1 text-[20px]">Billing Information</h3>
+    <div>
+        <div class="min-h-[calc(100vh-4.65rem)] bg-[#eff2f6] sm:p-5 sm:py-8">
+            <div
+                class="mx-auto rounded-lg bg-white p-2 px-[0.5rem] text-[#171816] xl:max-w-7xl"
+            >
+                <div class="sm:px-5 sm:py-2">
+                    <div class="mb-5">
+                        <h2 class="text-[26px] font-bold text-[#171816]">
+                            Create Invoice
+                        </h2>
+                    </div>
+                    <div class="mb-10">
+                        <h3 class="mb-2 font-bold">Billing Information</h3>
 
-                <div class="mb-3 flex gap-3">
-                    <div class="flex flex-col">
-                        <label for="">Invoice date</label>
-                        <input
-                            type="text"
-                            class="border"
-                            disabled
-                            :value="dayjs().format('YYYY/MM/DD')"
-                        />
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="">Due Date</label>
-                        <input
-                            v-model="form.dueDate"
-                            type="date"
-                            class="border"
-                            :min="dayjs().format('YYYY-MM-DD')"
-                        />
-                        <InputFlashMessage
-                            :message="errorMessage.dueDate"
-                            type="error"
-                        ></InputFlashMessage>
-                    </div>
-                </div>
-                <div>
-                    <div class="mb-3 flex w-40 flex-col">
-                        <label for="">Bill to</label>
-                        <select
-                            v-model="form.billTo"
-                            name=""
-                            id=""
-                            class="rounded border"
-                        >
-                            <option value=""></option>
-                            <option
-                                :value="employer.email"
-                                v-for="(employer, index) in employersProps"
-                                :key="index"
-                            >
-                                {{ employer.email }}
-                            </option>
-                        </select>
-                        <InputFlashMessage
-                            :message="errorMessage.billTo"
-                            type="error"
-                        ></InputFlashMessage>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <h3 class="mb-2 text-[20px]">Service</h3>
-
-                <div class="mb-7">
-                    <table class="w-full border-b">
-                        <thead class="bg-[#fa8334]">
-                            <tr class="">
-                                <th class="w-[40px] rounded-tl-lg p-3">
-                                    <p class=""></p>
-                                </th>
-                                <th
-                                    class="w-[30%] p-3 text-start font-sans text-white"
-                                >
-                                    Description
-                                </th>
-                                <th
-                                    class="w-[15%] p-3 text-start font-sans text-white"
-                                >
-                                    Hours
-                                </th>
-                                <th
-                                    class="w-[15%] p-3 text-start font-sans text-white"
-                                >
-                                    Rate (PHP)
-                                </th>
-                                <th
-                                    class="rounded-tr-lg p-3 text-end font-sans text-white"
-                                >
-                                    Total
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="(item, index) in form.items"
-                                :key="item.id"
-                            >
-                                <td class="p-2">
-                                    <i
-                                        @click="removeRow(index)"
-                                        class="bi bi-x-circle cursor-pointer text-sm"
-                                    ></i>
-                                </td>
-                                <td class="p-2">
-                                    <input
-                                        v-model="item.description"
-                                        type="text"
-                                        class="w-full border p-2"
-                                        placeholder="Enter a detailed decription"
-                                    />
-                                </td>
-                                <td class="p-2">
-                                    <input
-                                        v-model="item.hours"
-                                        @input="calculateTotalAmount(item)"
-                                        type="number"
-                                        class="w-full border p-2"
-                                    />
-                                </td>
-                                <td class="p-2">
-                                    <input
-                                        v-model="item.rate"
-                                        @input="calculateTotalAmount(item)"
-                                        type="number"
-                                        class="w-full border p-2"
-                                        placeholder="0.00"
-                                    />
-                                </td>
-                                <td class="p-2">
-                                    <p
-                                        :id="`amount-${item.id}`"
-                                        class="p-2 text-end"
-                                    >
-                                        {{
-                                            formatCurrency(
-                                                item.hours * item.rate,
-                                            )
-                                        }}
-                                    </p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <InputFlashMessage
-                        :message="errorMessage.items"
-                        type="error"
-                    ></InputFlashMessage>
-                    <div class="mb-3 border-b p-2">
                         <div
-                            @click="addRow"
-                            class="flex cursor-pointer items-center gap-2 text-blue-500"
+                            class="mb-3 flex flex-col items-center gap-3 sm:flex-row"
                         >
-                            <i class="bi bi-plus-circle text-sm"></i>
-                            <p>Add another item</p>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-3">
-                        <div class="flex-1">
-                            <p>Description</p>
-                            <textarea
-                                v-model="form.description"
-                                class="w-full rounded bg-slate-100 p-5 pb-32"
-                                name=""
-                                id=""
-                                placeholder="Note or description to recipient"
-                            ></textarea>
-                            <InputFlashMessage
-                                :message="errorMessage.description"
-                                type="error"
-                            ></InputFlashMessage>
-                        </div>
-                        <div class="md:basis-[300px]">
-                            <div>
-                                <h3 class="text-md text-end">
-                                    Xendit Transaction Fee (4.5%)
-                                </h3>
-                                <p class="text-md text-end">
-                                    {{
-                                        formatCurrency(
-                                            totalAmount / 0.955 - totalAmount,
-                                        )
-                                    }}
-                                </p>
+                            <div class="flex w-full flex-col">
+                                <label for="" class="text-gray-500"
+                                    >Invoice date</label
+                                >
+                                <input
+                                    type="text"
+                                    class="rounded-lg border p-2"
+                                    disabled
+                                    :value="dayjs().format('YYYY/MM/DD')"
+                                />
                             </div>
-                            <div>
-                                <h3 class="text-md text-end">
-                                    Vat Transaction Fee (12%)
-                                </h3>
-                                <p class="text-md text-end">
-                                    {{
-                                        formatCurrency(
-                                            (totalAmount / 0.955 -
-                                                totalAmount) *
-                                                0.12,
-                                        )
-                                    }}
-                                </p>
-                            </div>
-                            <div>
-                                <h3 class="text-md text-end">Total Amount:</h3>
-                                <p class="text-md text-end">
-                                    {{
-                                        formatCurrency(
-                                            totalAmount / 0.955 -
-                                                totalAmount +
-                                                (totalAmount / 0.955 -
-                                                    totalAmount) *
-                                                    0.12 +
-                                                totalAmount,
-                                        )
-                                    }}
-                                </p>
+                            <div class="flex w-full flex-col">
+                                <label for="" class="text-gray-500"
+                                    >Due Date</label
+                                >
+                                <input
+                                    v-model="form.dueDate"
+                                    type="date"
+                                    class="rounded-lg border p-2 focus:outline-orange-200"
+                                    :min="dayjs().format('YYYY-MM-DD')"
+                                />
                                 <InputFlashMessage
-                                    class="text-end"
-                                    :message="errorMessage.totalAmount"
+                                    :message="errorMessage.dueDate"
+                                    type="error"
+                                ></InputFlashMessage>
+                            </div>
+
+                            <div class="flex w-full flex-col">
+                                <label for="" class="text-gray-500"
+                                    >Bill to</label
+                                >
+                                <select
+                                    v-model="form.billTo"
+                                    name=""
+                                    id=""
+                                    class="w-full rounded-lg border p-2 focus:outline-orange-200"
+                                >
+                                    <option value=""></option>
+                                    <option
+                                        :value="employer.email"
+                                        v-for="(
+                                            employer, index
+                                        ) in employersProps"
+                                        :key="index"
+                                    >
+                                        {{ employer.email }}
+                                    </option>
+                                </select>
+                                <InputFlashMessage
+                                    :message="errorMessage.billTo"
                                     type="error"
                                 ></InputFlashMessage>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                    <div class="mb-10">
+                        <h3 class="mb-2 font-bold">Service</h3>
 
-            <div class="mb-3 flex justify-end gap-3">
-                <button
-                    @click="previewPdf"
-                    class="cursor-pointer rounded-full border border-[#024570] px-4 py-1 text-[#024570]"
-                >
-                    Preview PDF
-                </button>
-                <button
-                    @click="sendInvoice"
-                    class="rounded-full bg-[#fa8334] px-4 py-1 text-white"
-                >
-                    Send Invoice
-                </button>
+                        <div class="mb-7">
+                            <table class="w-full border-b">
+                                <thead class="bg-[#171816]">
+                                    <tr class="">
+                                        <th class="w-[40px] rounded-tl-lg p-3">
+                                            <p class=""></p>
+                                        </th>
+                                        <th
+                                            class="w-[30%] p-3 text-start font-sans text-white"
+                                        >
+                                            Description
+                                        </th>
+                                        <th
+                                            class="w-[15%] p-3 text-start font-sans text-white"
+                                        >
+                                            Hours
+                                        </th>
+                                        <th
+                                            class="w-[15%] p-3 text-start font-sans text-white"
+                                        >
+                                            Rate (PHP)
+                                        </th>
+                                        <th
+                                            class="rounded-tr-lg p-3 text-end font-sans text-white"
+                                        >
+                                            Total
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="(item, index) in form.items"
+                                        :key="item.id"
+                                    >
+                                        <td class="p-2">
+                                            <i
+                                                @click="removeRow(index)"
+                                                class="bi bi-x-circle cursor-pointer font-bold text-[#171816]"
+                                            ></i>
+                                        </td>
+                                        <td class="p-2">
+                                            <input
+                                                v-model="item.description"
+                                                type="text"
+                                                class="w-full rounded-full border p-2 focus:outline-orange-200"
+                                                placeholder="Enter a detailed decription"
+                                            />
+                                        </td>
+                                        <td class="p-2">
+                                            <input
+                                                v-model="item.hours"
+                                                @input="
+                                                    calculateTotalAmount(item)
+                                                "
+                                                type="number"
+                                                class="w-full rounded-full border p-2 focus:outline-orange-200"
+                                            />
+                                        </td>
+                                        <td class="p-2">
+                                            <input
+                                                v-model="item.rate"
+                                                @input="
+                                                    calculateTotalAmount(item)
+                                                "
+                                                type="number"
+                                                class="w-full rounded-full border p-2 focus:outline-orange-200"
+                                                placeholder="0.00"
+                                            />
+                                        </td>
+                                        <td class="p-2">
+                                            <p
+                                                :id="`amount-${item.id}`"
+                                                class="p-2 text-end"
+                                            >
+                                                {{
+                                                    formatCurrency(
+                                                        item.hours * item.rate,
+                                                    )
+                                                }}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <InputFlashMessage
+                                :message="errorMessage.items"
+                                type="error"
+                            ></InputFlashMessage>
+                            <div class="mb-10 border-b p-2">
+                                <div
+                                    @click="addRow"
+                                    class="flex cursor-pointer items-center gap-2 text-orange-500"
+                                >
+                                    <i class="bi bi-plus-circle text-sm"></i>
+                                    <p>Add another item</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <div class="flex-1">
+                                    <p class="mb-2 text-gray-500">
+                                        Description
+                                    </p>
+                                    <textarea
+                                        v-model="form.description"
+                                        class="w-full rounded bg-slate-100 p-5 pb-32"
+                                        name=""
+                                        id=""
+                                        placeholder="Note or description to recipient"
+                                    ></textarea>
+                                    <InputFlashMessage
+                                        :message="errorMessage.description"
+                                        type="error"
+                                    ></InputFlashMessage>
+                                </div>
+                                <div class="md:basis-[300px]">
+                                    <div>
+                                        <h3 class="text-md text-end">
+                                            Xendit Transaction Fee (4.5%)
+                                        </h3>
+                                        <p class="text-md text-end">
+                                            {{
+                                                formatCurrency(
+                                                    totalAmount / 0.955 -
+                                                        totalAmount,
+                                                )
+                                            }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-md text-end">
+                                            Vat Transaction Fee (12%)
+                                        </h3>
+                                        <p class="text-md text-end">
+                                            {{
+                                                formatCurrency(
+                                                    (totalAmount / 0.955 -
+                                                        totalAmount) *
+                                                        0.12,
+                                                )
+                                            }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-md text-end font-bold">
+                                            Total Amount:
+                                        </h3>
+                                        <p class="text-md text-end font-bold">
+                                            {{
+                                                formatCurrency(
+                                                    totalAmount / 0.955 -
+                                                        totalAmount +
+                                                        (totalAmount / 0.955 -
+                                                            totalAmount) *
+                                                            0.12 +
+                                                        totalAmount,
+                                                )
+                                            }}
+                                        </p>
+                                        <InputFlashMessage
+                                            class="text-end"
+                                            :message="errorMessage.totalAmount"
+                                            type="error"
+                                        ></InputFlashMessage>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-12 flex justify-end gap-3">
+                        <button
+                            @click="previewPdf"
+                            class="cursor-pointer rounded-full border border-[#171816] px-4 py-1"
+                        >
+                            Preview PDF
+                        </button>
+                        <button
+                            @click="sendInvoice"
+                            class="rounded-full bg-orange-500 px-4 py-1 text-white"
+                        >
+                            Send Invoice
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
