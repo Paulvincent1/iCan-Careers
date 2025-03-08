@@ -1,6 +1,6 @@
 <script setup>
 import { Link, usePage } from "@inertiajs/vue3";
-import { onMounted, ref, useTemplateRef, watch } from "vue";
+import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import { nanoid } from "nanoid";
 
@@ -44,7 +44,7 @@ window.addEventListener("resize", () => {
 // notfications
 let page = usePage();
 
-let notifications = ref(page.props.auth?.user.unreadNotifications);
+let notifications = computed(() => page.props.auth?.user.unreadNotifications);
 
 function unshiftLatestNotification(notif) {
     notifications.value.unshift(notif);
@@ -166,7 +166,13 @@ console.log(page.props.auth.user.unreadNotifications);
                             "
                             class="flex flex-col"
                         >
-                            <i class="bi bi-bell text-lg"></i>
+                            <div class="relative">
+                                <i class="bi bi-bell text-lg"></i>
+                                <i
+                                    v-if="notifications?.length"
+                                    class="bi bi-circle-fill absolute right-0 top-0 text-[8px] text-red-500"
+                                ></i>
+                            </div>
                             <div
                                 v-show="showNotificationDropDown"
                                 class="absolute right-[50%] top-10 h-fit max-h-[calc(100vh-4.625rem-3.5rem)] w-80 translate-x-[50%] overflow-y-auto rounded bg-white px-5 py-2 text-sm shadow md:right-0 md:top-14 md:translate-x-0"
@@ -178,6 +184,7 @@ console.log(page.props.auth.user.unreadNotifications);
                                 </div>
                                 <div
                                     :class="[
+                                        'flex justify-between',
                                         {
                                             'mb-6': notifications?.length,
                                             'mb-3': !notifications?.length,
@@ -189,6 +196,16 @@ console.log(page.props.auth.user.unreadNotifications);
                                     >
                                         All
                                     </p>
+                                    <Link
+                                        method="put"
+                                        :href="
+                                            route(
+                                                'user.mark-all-notification-as-read',
+                                            )
+                                        "
+                                        as="button"
+                                        >Mark all as read</Link
+                                    >
                                 </div>
                                 <div>
                                     <div

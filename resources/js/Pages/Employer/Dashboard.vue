@@ -172,7 +172,9 @@ onBeforeUnmount(() => {
                     <div
                         class="mb-6 flex flex-col items-center justify-center rounded-lg bg-white p-4"
                     >
-                        <div class="mb-3 mt-4 w-[84px]">
+                        <div
+                            class="mb-3 mt-4 h-[84px] min-h-[84px] w-[84px] min-w-[84px]"
+                        >
                             <img
                                 :src="
                                     user.profile_photo_path
@@ -258,7 +260,7 @@ onBeforeUnmount(() => {
                                 </p>
                                 <Link
                                     :href="route('create.job')"
-                                    class="flex items-center gap-2 rounded-lg bg-[#fa8334] px-4 py-2 font-semibold text-white shadow-md "
+                                    class="flex items-center gap-2 rounded-lg bg-[#fa8334] px-4 py-2 font-semibold text-white shadow-md"
                                     title="Click to post a new job"
                                 >
                                     <i class="bi bi-plus-lg text-xl"></i>

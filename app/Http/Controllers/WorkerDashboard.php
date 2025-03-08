@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\JobPost;
 use App\Models\Message;
 use App\Models\User;
+use App\Notifications\WorkerSendAnInvoiceToEmployerNotification;
 use App\Services\InvoiceService;
 use App\Services\PayoutService;
 use Carbon\Carbon;
@@ -255,6 +256,8 @@ class WorkerDashboard extends Controller
 
 
             DB::commit();
+
+            $employer->notify(new WorkerSendAnInvoiceToEmployerNotification(worker:$user,employer:$employer));
 
             return redirect()->route('worker.dashboard');
 
