@@ -330,7 +330,7 @@ const formatCurrency =
                             as="button"
                             class="mb-3 flex cursor-pointer items-center gap-2 font-bold text-gray-500 hover:underline"
                         >
-                            <p class="font-bol">{{ user.name }}</p>
+                            <p class="">{{ user.name }}</p>
                             <i class="bi bi-arrow-right"></i>
                         </Link>
                         <!-- <Link
@@ -497,7 +497,7 @@ const formatCurrency =
                                 >
                             </swiper-container>
                             <div class="overflow-auto">
-                                <table class="w-full table-fixed">
+                                <table class="w-full min-w-[500px] table-fixed">
                                     <thead class="text-sm">
                                         <tr>
                                             <th
@@ -549,7 +549,7 @@ const formatCurrency =
                                             <td class="py-5">
                                                 <p
                                                     :class="[
-                                                        'rounded-full p-1 text-white',
+                                                        'mx-auto w-fit rounded-full px-4 py-1 font-bold text-white',
                                                         ,
                                                         {
                                                             'bg-orange-400':
@@ -571,7 +571,7 @@ const formatCurrency =
                                             </td>
                                             <td class="py-5">
                                                 <a
-                                                    class="rounded p-2 text-lg text-[#171816]"
+                                                    class="text-lg text-[#171816]"
                                                     :href="`/storage/invoices/${invoice.external_id}.pdf`"
                                                     target="_blank"
                                                 >
@@ -724,7 +724,7 @@ const formatCurrency =
                                                 </p>
                                                 <p
                                                     :class="{
-                                                        'text-orange-500':
+                                                        'rounded-full bg-orange-500 px-2 text-white':
                                                             transaction.status ===
                                                             'PAID',
                                                         'text-green-500':
@@ -732,9 +732,7 @@ const formatCurrency =
                                                             'SETTLED',
                                                     }"
                                                 >
-                                                    {{
-                                                        `(${transaction.status})`
-                                                    }}
+                                                    {{ transaction.status }}
                                                 </p>
                                             </div>
                                         </div>

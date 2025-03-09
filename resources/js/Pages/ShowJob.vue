@@ -109,7 +109,7 @@ function closeJob() {
 </script>
 <template>
     <Head title="Show Job | iCan Careers" />
-    <div class="flex min-h-[calc(100vh-4.625rem)] flex-col">
+    <div class="flex min-h-[calc(100vh-4.625rem)] flex-col text-[#171816]">
         <div class="relative h-32 bg-[#FAFAFA]">
             <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
                 <div
@@ -126,21 +126,45 @@ function closeJob() {
                         "
                         alt=""
                     />
+                    <Link
+                        @click="saveJob"
+                        as="button"
+                        method="post"
+                        preserve-scroll
+                        :href="route('jobsearch.save.job', jobPostProps.id)"
+                        class=""
+                    >
+                        <i
+                            :class="[
+                                'bi absolute bottom-[-5px] right-[-10px] text-lg text-orange-500',
+                                {
+                                    'bi-bookmark-dash': !isSaved,
+                                    'bi-bookmark-dash-fill': isSaved,
+                                },
+                            ]"
+                        ></i>
+                    </Link>
                 </div>
             </div>
         </div>
         <div class="xs container mx-auto mt-12 px-[0.5rem] xl:max-w-7xl">
-            <p class="break-words text-center text-[24px] md:text-[32px]">
+            <p
+                class="my-2 break-words text-center text-[20px] font-medium md:text-[26px]"
+            >
                 {{ jobPostProps.job_title }}
             </p>
-            <p class="text-center">
-                {{
-                    jobPostProps.employer.employer_profile.business_information
-                        ? jobPostProps.employer.employer_profile
-                              .business_information.business_name
-                        : jobPostProps.employer.name
-                }}
-            </p>
+            <Link class="flex items-center justify-center gap-2">
+                <p class="text-center text-gray-500">
+                    {{
+                        jobPostProps.employer.employer_profile
+                            .business_information
+                            ? jobPostProps.employer.employer_profile
+                                  .business_information.business_name
+                            : jobPostProps.employer.name
+                    }}
+                </p>
+                <i class="bi bi-arrow-right"></i>
+            </Link>
             <div
                 v-if="
                     page.props.auth.user.role.name === 'Senior' ||
@@ -151,27 +175,19 @@ function closeJob() {
                     class="mb-3 mt-3 flex justify-center gap-2"
                     v-if="jobPostProps.job_status === 'Open'"
                 >
-                    <Link
-                        @click="saveJob"
-                        as="button"
-                        method="post"
-                        preserve-scroll
-                        :href="route('jobsearch.save.job', jobPostProps.id)"
-                        class="w-44 rounded bg-green-400 p-2 px-8 text-white"
-                    >
-                        {{ isSaved ? "Saved" : "Save for later" }}
-                    </Link>
                     <button
                         @click="showModal = true"
                         :class="[
-                            'w-44 rounded border border-green-400 p-2 px-8 text-green-400',
+                            'job w-fit rounded-full border border-[#171816] p-2 px-8 font-bold text-[#171816]',
                             {
-                                'pointer-events-none bg-green-400 text-white':
+                                'pointer-events-none bg-[#171816] text-white':
                                     isApplied,
                             },
                         ]"
                     >
                         {{ isApplied ? "Applied!" : "Apply" }}
+                        <!-- <i class="bi bi-patch-check-fill"></i> -->
+                        <i class="bi bi-file-person"></i>
                     </button>
                 </div>
                 <div v-else class="mb-3 mt-3">
@@ -212,10 +228,10 @@ function closeJob() {
         <div class="flex-1 bg-[#f3f7fa]">
             <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
                 <div class="grid gap-5 pt-5 lg:grid-cols-[1fr,300px]">
-                    <div class="rounded bg-white p-8 shadow">
+                    <div class="rounded-lg bg-white px-8 py-5">
                         <div class="mb-3">
                             <p class="text-[20px] font-bold">Description</p>
-                            <p class="whitespace-pre-wrap break-words">
+                            <p class="whitespace-pre-wrap break-words text-sm">
                                 {{ jobPostProps.description }}
                             </p>
                         </div>
@@ -227,11 +243,14 @@ function closeJob() {
                                 :key="index"
                             >
                                 <p
-                                    :class="{
-                                        'ml-5 list-item list-inside':
-                                            worker !== 'PWD' &&
-                                            worker !== 'Seniors Citizens',
-                                    }"
+                                    :class="[
+                                        'text-sm',
+                                        {
+                                            'ml-5 list-item list-inside':
+                                                worker !== 'PWD' &&
+                                                worker !== 'Seniors Citizens',
+                                        },
+                                    ]"
                                 >
                                     {{ worker }}
                                 </p>
@@ -241,7 +260,7 @@ function closeJob() {
                             <p class="text-lg font-bold">
                                 Preferred educational attainment
                             </p>
-                            <p>
+                            <p class="text-sm">
                                 {{
                                     jobPostProps.preferred_educational_attainment
                                 }}
@@ -251,7 +270,7 @@ function closeJob() {
                             <p class="text-lg font-bold">Required Skills</p>
                             <div>
                                 <p
-                                    class="mb-1 w-fit rounded bg-slate-300 px-2 font-bold"
+                                    class="mb-1 w-fit rounded bg-slate-300 px-2 text-sm font-bold"
                                     v-for="(
                                         skill, index
                                     ) in jobPostProps.skills"
@@ -273,33 +292,45 @@ function closeJob() {
                         </div>
                     </div>
                     <div
-                        class="row-start-1 self-start rounded bg-white p-8 shadow lg:row-start-auto"
+                        class="row-start-1 self-start rounded-lg bg-white px-8 py-5 lg:row-start-auto"
                     >
-                        <p class="mb-3 text-[20px] font-bold">Overview</p>
+                        <p class="mb-1 text-[20px] font-bold">Overview</p>
                         <div class="text-[16px]">
                             <div class="mb-2">
-                                <p>Job type</p>
-                                <p>{{ jobPostProps.job_type }}</p>
+                                <p class="">Job type</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ jobPostProps.job_type }}
+                                </p>
                             </div>
                             <div class="mb-2">
-                                <p>Working Mode</p>
-                                <p>{{ jobPostProps.work_arrangement }}</p>
+                                <p class="">Working Mode</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ jobPostProps.work_arrangement }}
+                                </p>
                             </div>
                             <div class="mb-2">
-                                <p>Hour per day</p>
-                                <p>{{ jobPostProps.hour_per_day }}</p>
+                                <p class="">Hour per day</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ jobPostProps.hour_per_day }}
+                                </p>
                             </div>
                             <div class="mb-2">
-                                <p>Hourly rate</p>
-                                <p>{{ jobPostProps.hourly_rate }}</p>
+                                <p class="">Hourly rate</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ jobPostProps.hourly_rate }}
+                                </p>
                             </div>
                             <div class="mb-2">
-                                <p>Salary</p>
-                                <p>{{ jobPostProps.salary }}</p>
+                                <p class="">Salary</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ jobPostProps.salary }}
+                                </p>
                             </div>
                             <div class="mb-2">
-                                <p>Experience required</p>
-                                <p>{{ jobPostProps.experience }}</p>
+                                <p class="">Experience required</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ jobPostProps.experience }}
+                                </p>
                             </div>
                         </div>
                     </div>
