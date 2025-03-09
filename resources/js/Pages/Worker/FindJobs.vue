@@ -166,7 +166,7 @@ function filterTag(tag, event) {
 
     tagbuttons.forEach((e) => {
         console.log(e);
-        e.classList.remove("bg-blue-300", "text-white");
+        e.classList.remove("bg-[#171816]", "text-white");
     });
 
     if (lastTagValueClicked.value != tag) {
@@ -175,7 +175,7 @@ function filterTag(tag, event) {
             jobs.value = jobs.value.filter((value, index) => {
                 return value.job_title === tag;
             });
-            tagbutton.classList.add("bg-blue-300", "text-white");
+            tagbutton.classList.add("bg-[#171816]", "text-white");
             lastTagValueClicked.value = tag;
             console.log("if-if");
             return;
@@ -184,7 +184,7 @@ function filterTag(tag, event) {
         jobs.value = jobs.value.filter((value, index) => {
             return value.job_title === tag;
         });
-        tagbutton.classList.add("bg-blue-300", "text-white");
+        tagbutton.classList.add("bg-[#171816]", "text-white");
         tagActive.value = true;
         lastTagValueClicked.value = tag;
         console.log("if");
@@ -200,7 +200,7 @@ function resetFilter() {
 
     tagbuttons.forEach((e) => {
         console.log(e);
-        e.classList.remove("bg-blue-300", "text-white");
+        e.classList.remove("bg-[#171816]", "text-white");
     });
     lastTagValueClicked.value = null;
     tagActive.value = false;
@@ -417,15 +417,20 @@ watch(search, debounce(submit, 500));
             </div>
             <div class="overflow-hidden p-3">
                 <header class="mb-4 flex justify-end">
-                    <input
-                        v-model="search"
-                        type="text"
-                        class="w-96 rounded-full border p-2 px-5"
-                        placeholder="Search job title"
-                    />
+                    <div class="relative">
+                        <input
+                            v-model="search"
+                            type="text"
+                            class="w-96 rounded-full border p-2 px-5 pl-10"
+                            placeholder="Search job title"
+                        />
+                        <i
+                            class="bi bi-search absolute left-4 top-2 text-gray-500"
+                        ></i>
+                    </div>
                 </header>
 
-                <div class="h-16">
+                <div class="mb-3 h-16">
                     <swiper-container
                         ref="swiper-container"
                         class="h-full"
@@ -433,7 +438,6 @@ watch(search, debounce(submit, 500));
                         slides-per-view="auto"
                         :free-mode="true"
                         :free-mode-sticky="false"
-                        :navigation="true"
                     >
                         <TransitionGroup name="list">
                             <swiper-slide
@@ -445,7 +449,7 @@ watch(search, debounce(submit, 500));
                                     @click="filterTag(jobTitle, $event)"
                                     href="/"
                                     :class="[
-                                        'tag-buttons rounded-full border border-blue-500 px-5 py-2 text-[12px] text-blue-500 hover:cursor-pointer',
+                                        'tag-buttons rounded border border-[#9f9f9f] px-5 py-2 text-[12px] font-bold text-[#9f9f9f] hover:cursor-pointer',
                                     ]"
                                 >
                                     {{ jobTitle }}
