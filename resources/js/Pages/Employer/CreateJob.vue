@@ -153,9 +153,9 @@ const submit = () => {
 
 <template>
     <Head title="Create Job | iCan Careers" />
-    <div class="flex justify-center">
+    <div class="flex justify-center bg-[#eff2f6] text-[#171816]">
         <div
-            class="mt-8 flex w-full max-w-5xl flex-col rounded-lg border border-gray-300 bg-white p-8 shadow-md md:flex-row"
+            class="mt-8 flex w-full max-w-5xl flex-col rounded-lg bg-white p-8 md:flex-row"
         >
             <!-- Left Side: Job Post Form -->
             <div class="w-full pr-6">

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Salary;
+use App\Notifications\EmployerPaysTheWorkerInvoiceNotification;
 
 use function Illuminate\Log\log;
 
@@ -255,7 +256,11 @@ class InvoiceController extends Controller
                 'status' => $request['status']
             ]);
 
-            $invoice->worker->balance()->increment('unsettlement', $invoice->amount);
+            $worker = $invoice->worker;
+
+            $worker->balance()->increment('unsettlement', $invoice->amount);
+
+            $worker->notify(new EmployerPaysTheWorkerInvoiceNotification(employer:$invoice->employer,worker:$invoice->worker));
 
         }
 

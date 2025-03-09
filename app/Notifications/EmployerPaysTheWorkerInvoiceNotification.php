@@ -2,19 +2,22 @@
 
 namespace App\Notifications;
 
+use App\Models\Invoice;
+use App\Models\User;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WorkerEmployerInvoiceNotification extends Notification
+class EmployerPaysTheWorkerInvoiceNotification extends Notification
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(public User $employer, public User $worker)
     {
         //
     }
@@ -26,7 +29,7 @@ class WorkerEmployerInvoiceNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['broadcast','database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -38,6 +41,36 @@ class WorkerEmployerInvoiceNotification extends Notification
                     ->line('The introduction to the notification.')
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
+    }
+
+    public function toDatabase()
+    {
+        return [
+            'status' => $this->employer->name,
+            'message' => $this->employer->name . 'pays the requested invoice.',
+            'image' => $this->employer->profile_img,
+        ];
+    }
+
+    public function toBroadcast()
+    {
+        return [
+            'status' => $this->employer->name,
+            'message' => $this->employer->name . 'pays the requested invoice.',
+            'image' => $this->employer->profile_img,
+        ];
+    }
+    
+    public function broadcastOn()
+    {
+
+        return new Channel('notification-' . $this->worker->id);
+
+    }
+
+    public function broadcastAs()
+    {
+        return 'notification.event';
     }
 
     /**

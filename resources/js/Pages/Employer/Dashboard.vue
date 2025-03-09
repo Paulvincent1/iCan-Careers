@@ -165,14 +165,16 @@ onBeforeUnmount(() => {
 </script>
 <template>
     <Head title="Dashboard | iCan Careers" />
-    <div class="bg-[#f4f4f4]">
+    <div class="bg-[#eff2f6] text-[#171816]">
         <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
             <div class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-6">
                 <div>
                     <div
                         class="mb-6 flex flex-col items-center justify-center rounded-lg bg-white p-4"
                     >
-                        <div class="mb-3 mt-4 w-[84px]">
+                        <div
+                            class="mb-3 mt-4 h-[84px] min-h-[84px] w-[84px] min-w-[84px]"
+                        >
                             <img
                                 :src="
                                     user.profile_photo_path
@@ -180,18 +182,18 @@ onBeforeUnmount(() => {
                                         : 'assets/profile_placeholder.jpg'
                                 "
                                 alt="User Profile"
-                                class="w-full rounded-[500px]"
+                                class="h-full w-full rounded-[500px]"
                             />
                         </div>
-                        <p class="font-bol mb-3">
-                            {{ $page.props.auth.user.authenticated.name }}
-                        </p>
                         <Link
                             :href="route('employer.profile')"
                             as="button"
-                            class="mb-3 w-full max-w-[500px] rounded-lg border px-4 py-2 font-bold"
+                            class="mb-3 flex cursor-pointer items-center gap-2 font-bold text-gray-500 hover:underline"
                         >
-                            View Profile
+                            <p class="">
+                                {{ $page.props.auth.user.authenticated.name }}
+                            </p>
+                            <i class="bi bi-arrow-right"></i>
                         </Link>
                         <div class="flex flex-col items-center">
                             <div v-if="subscriptionProps">
@@ -207,12 +209,15 @@ onBeforeUnmount(() => {
 
                     <div class="mb-6 h-[400px] rounded-lg bg-white p-4">
                         <div class="flex items-center justify-between">
-                            <p class="text-lg">Inbox</p>
+                            <p class="text-lg font-bold text-[#171816]">
+                                Inbox
+                            </p>
                             <Link
                                 :href="route('messages')"
-                                class="text-sm text-blue-500"
-                                >See All</Link
-                            >
+                                class="text-sm text-[#171816] underline"
+                                >See All
+                                <i class="bi bi-caret-right"></i>
+                            </Link>
                         </div>
                         <div>
                             <div
@@ -252,25 +257,24 @@ onBeforeUnmount(() => {
                         class="col-span-2 h-[424px] rounded-lg bg-white p-3 lg:col-span-1"
                     >
                         <div>
-                            <div class="mb-4 flex items-center justify-between">
-                                <p class="p-1 text-lg font-normal">
+                            <div class="mb-2 flex items-center justify-between">
+                                <p class="p-1 text-lg font-bold text-[#171816]">
                                     Job Status
                                 </p>
                                 <Link
                                     :href="route('create.job')"
-                                    class="flex items-center gap-2 rounded-lg bg-[#fa8334] px-4 py-2 font-semibold text-white shadow-md "
-                                    title="Click to post a new job"
+                                    class="flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
                                 >
-                                    <i class="bi bi-plus-lg text-xl"></i>
-                                    <!-- Add Plus Icon -->
                                     <span>Post Job</span>
+                                    <i class="bi bi-plus-lg"></i>
+                                    <!-- Add Plus Icon -->
                                 </Link>
                             </div>
 
                             <swiper-container
                                 class="mb-3 text-[12px]"
                                 slides-per-view="auto"
-                                :space-between="10"
+                                :space-between="5"
                             >
                                 <swiper-slide
                                     v-if="
@@ -283,11 +287,11 @@ onBeforeUnmount(() => {
                                     <li
                                         @click="switchJobTag('Pending')"
                                         :class="[
-                                            'cursor-pointer rounded border border-yellow-500 p-1',
+                                            'cursor-pointer rounded-full border border-[#F1F1F1] px-2 py-1 text-center',
                                             {
-                                                'bg-yellow-500 text-white':
+                                                'bg-[#171816] text-white':
                                                     jobTag === 'Pending',
-                                                'text-yellow-500':
+                                                'text-[#9f9f9f]':
                                                     jobTag != 'Pending',
                                             },
                                         ]"
@@ -299,9 +303,9 @@ onBeforeUnmount(() => {
                                     <li
                                         @click="switchJobTag('Open')"
                                         :class="[
-                                            'cursor-pointer rounded border border-green-400 p-1 text-green-400',
+                                            'cursor-pointer rounded-full border border-[#F1F1F1] px-2 py-1 text-center text-[#9f9f9f]',
                                             {
-                                                'bg-green-400 text-white':
+                                                'bg-[#171816] text-white':
                                                     jobTag === 'Open',
                                             },
                                         ]"
@@ -313,9 +317,9 @@ onBeforeUnmount(() => {
                                     <li
                                         @click="switchJobTag('Closed')"
                                         :class="[
-                                            'cursor-pointer rounded border border-red-400 p-1 text-red-400',
+                                            'cursor-pointer rounded-full border border-[#F1F1F1] px-2 py-1 text-center text-[#9f9f9f]',
                                             {
-                                                'bg-red-400 text-white':
+                                                'bg-[#171816] text-white':
                                                     jobTag === 'Closed',
                                             },
                                         ]"
@@ -326,44 +330,36 @@ onBeforeUnmount(() => {
                             </swiper-container>
                         </div>
 
-                        <div class="h-[300px] overflow-y-auto">
-                            <table class="w-full min-w-[500px] border-collapse">
-                                <thead class="bg-slate-200 text-slate-500">
+                        <div class="h-[300px] overflow-auto">
+                            <table class="w-full min-w-[500px] table-fixed">
+                                <thead class="text-sm text-slate-500">
                                     <tr>
-                                        <th class="p-2 text-start font-normal">
-                                            Job Title
-                                        </th>
-                                        <th class="p-2 text-start font-normal">
-                                            Job Type
-                                        </th>
-                                        <th class="p-2 text-start font-normal">
-                                            Salary
-                                        </th>
-                                        <th class="p-2 text-start font-normal">
+                                        <th class="font-normal">Job Title</th>
+                                        <th class="font-normal">Job Type</th>
+                                        <th class="font-normal">Salary</th>
+                                        <th class="font-normal">
                                             Applications
                                         </th>
-                                        <th class="p-2 text-start font-normal">
-                                            Details
-                                        </th>
+                                        <th class="font-normal">Details</th>
                                     </tr>
                                 </thead>
-                                <tbody class="text-sm">
+                                <tbody class="text-[12px]">
                                     <tr
                                         v-for="(job, index) in jobs"
                                         :key="job.id"
                                     >
-                                        <td class="p-2 text-start">
+                                        <td class="py-5 text-center">
                                             {{ job.job_title }}
                                         </td>
-                                        <td class="p-2 text-start">
+                                        <td class="py-5 text-center">
                                             {{ job.job_type }}
                                         </td>
-                                        <td class="p-2 text-start">
+                                        <td class="py-5 text-center">
                                             {{ job.salary }}
                                         </td>
                                         <td
                                             :class="[
-                                                'p-2 text-start underline',
+                                                'py-5 text-center underline',
                                                 {
                                                     'pointer-events-none text-black no-underline':
                                                         jobTag === 'Pending',
@@ -386,7 +382,7 @@ onBeforeUnmount(() => {
                                                 }}
                                             </Link>
                                         </td>
-                                        <td class="p-2 text-start">
+                                        <td class="py-5 text-center">
                                             <Link
                                                 :href="
                                                     route(
@@ -395,10 +391,10 @@ onBeforeUnmount(() => {
                                                     )
                                                 "
                                                 as="button"
-                                                class="rounded bg-green-500 px-2 py-1 text-white"
+                                                class="text-lg text-[#171816]"
                                             >
                                                 <i
-                                                    class="bi bi-box-arrow-up-right"
+                                                    class="bi bi-arrow-right"
                                                 ></i>
                                             </Link>
                                         </td>
@@ -408,24 +404,26 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
                     <div
-                        class="col-span-1 flex h-[424px] flex-col overflow-hidden rounded-lg bg-white p-3"
+                        class="col-span-2 flex h-[424px] flex-col overflow-hidden rounded-lg bg-white p-3 md:col-span-1"
                     >
                         <div>
-                            <p class="p-1 text-lg">Invoices</p>
+                            <p class="mb-2 text-lg font-bold text-[#171816]">
+                                Invoices
+                            </p>
                             <swiper-container
                                 class="mb-3 text-[12px]"
                                 slides-per-view="auto"
-                                :space-between="10"
+                                :space-between="5"
                             >
-                                <swiper-slide class="w-fit">
+                                <swiper-slide class="w-fit text-[12px]">
                                     <li
                                         @click="switchInvoiceTag('PENDING')"
                                         :class="[
-                                            'cursor-pointer rounded border border-green-400 p-1',
+                                            'cursor-pointer rounded-full border border-[#F1F1F1] px-2 py-1',
                                             {
-                                                'bg-green-400 text-white':
+                                                'bg-[#171816] text-white':
                                                     invoiceTag === 'PENDING',
-                                                'text-green-400':
+                                                'text-[#9f9f9f]':
                                                     invoiceTag != 'PENDING',
                                             },
                                         ]"
@@ -437,9 +435,9 @@ onBeforeUnmount(() => {
                                     <li
                                         @click="switchInvoiceTag('HISTORY')"
                                         :class="[
-                                            'cursor-pointer rounded border border-green-400 p-1 text-green-400',
+                                            'cursor-pointer rounded-full border border-[#F1F1F1] px-2 py-1 text-[#9f9f9f]',
                                             {
-                                                'bg-green-400 text-white':
+                                                'bg-[#171816] text-white':
                                                     invoiceTag === 'HISTORY',
                                             },
                                         ]"
@@ -454,7 +452,7 @@ onBeforeUnmount(() => {
                             <div
                                 v-for="(invoice, index) in invoices"
                                 :key="invoice.id"
-                                class="mx-2 mb-2 flex items-center gap-4 rounded-full border p-3 shadow-lg"
+                                class="mx-2 mb-2 flex items-center gap-2 border-b p-3"
                             >
                                 <div class="h-11 w-11">
                                     <img
@@ -463,82 +461,91 @@ onBeforeUnmount(() => {
                                             '/assets/profile_placeholder.jpg'
                                         "
                                         alt=""
-                                        class="w-full rounded-full"
+                                        class="h-full w-full rounded-full"
                                     />
                                 </div>
                                 <div>
-                                    <p class="text-sm">
+                                    <p class="text-sm font-bold">
                                         {{ invoice.worker.name }}
                                     </p>
-                                    <p class="text-[12px]">
-                                        {{ invoice.worker.email }}
-                                    </p>
-                                    <div
-                                        v-if="invoice.status === 'PENDING'"
-                                        class="flex gap-2 text-blue-500"
-                                    >
-                                        <a
-                                            :href="
-                                                '/storage/invoices/' +
-                                                invoice.external_id +
-                                                '.pdf'
-                                            "
-                                            target="_blank"
-                                            class="inline-block text-[12px]"
-                                            >See details</a
+                                    <div class="flex gap-1">
+                                        <p class="text-[12px]">
+                                            {{ invoice.worker.email }}
+                                        </p>
+                                        <div
+                                            v-if="invoice.status === 'PENDING'"
+                                            class="flex gap-2 text-blue-500"
                                         >
-                                        <button
-                                            @click="
-                                                showPaymentModal(
-                                                    invoice.invoice_url,
-                                                )
+                                            <a
+                                                :href="
+                                                    '/storage/invoices/' +
+                                                    invoice.external_id +
+                                                    '.pdf'
+                                                "
+                                                target="_blank"
+                                                class="inline-block text-[12px]"
+                                                >See details</a
+                                            >
+                                            <button
+                                                @click="
+                                                    showPaymentModal(
+                                                        invoice.invoice_url,
+                                                    )
+                                                "
+                                                class="text-[12px]"
+                                            >
+                                                Pay Now
+                                                <i
+                                                    class="bi bi-arrow-up-right text-[12px]"
+                                                ></i>
+                                            </button>
+                                        </div>
+                                        <p
+                                            v-else-if="
+                                                invoice.status === 'PAID'
                                             "
-                                            class="text-[12px]"
+                                            :class="[
+                                                'text-[12px]',
+                                                {
+                                                    'w-fit rounded-full bg-orange-500 px-2 text-center text-white':
+                                                        invoice.status ===
+                                                        'PAID',
+                                                },
+                                            ]"
                                         >
-                                            Pay Now
-                                            <i
-                                                class="bi bi-arrow-up-right text-[12px]"
-                                            ></i>
-                                        </button>
+                                            {{ invoice.status }}
+                                        </p>
+                                        <p
+                                            v-else-if="
+                                                invoice.status === 'SETTLED'
+                                            "
+                                            :class="[
+                                                'text-[12px]',
+                                                {
+                                                    'w-fit rounded-full bg-orange-500 px-2 text-center text-white':
+                                                        invoice.status ===
+                                                        'SETTLED',
+                                                },
+                                            ]"
+                                        >
+                                            {{ invoice.status }}
+                                        </p>
+                                        <p
+                                            v-else-if="
+                                                invoice.status === 'EXPIRED'
+                                            "
+                                            :class="[
+                                                'text-[12px]',
+                                                {
+                                                    'w-fit rounded-full bg-red-600 px-2 text-center text-white':
+                                                        invoice.status ===
+                                                        'EXPIRED',
+                                                },
+                                            ]"
+                                        >
+                                            {{ invoice.status }}
+                                        </p>
                                     </div>
-                                    <p
-                                        v-else-if="invoice.status === 'PAID'"
-                                        :class="[
-                                            'text-[12px]',
-                                            {
-                                                'text-green-500':
-                                                    invoice.status === 'PAID',
-                                            },
-                                        ]"
-                                    >
-                                        {{ invoice.status }}
-                                    </p>
-                                    <p
-                                        v-else-if="invoice.status === 'SETTLED'"
-                                        :class="[
-                                            'text-[12px]',
-                                            {
-                                                'text-green-500':
-                                                    invoice.status ===
-                                                    'SETTLED',
-                                            },
-                                        ]"
-                                    >
-                                        {{ invoice.status }}
-                                    </p>
-                                    <p
-                                        v-else-if="invoice.status === 'EXPIRED'"
-                                        :class="[
-                                            'text-[12px]',
-                                            {
-                                                'text-red-500':
-                                                    invoice.status ===
-                                                    'EXPIRED',
-                                            },
-                                        ]"
-                                    >
-                                        {{ invoice.status }}
-                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -547,16 +554,26 @@ onBeforeUnmount(() => {
                         class="col-span-2 mb-8 flex h-[400px] flex-col rounded-lg bg-white p-3"
                     >
                         <div>
-                            <p class="p-1 text-lg">Currently hired workers</p>
+                            <p class="p-1 text-lg font-bold text-[#171816]">
+                                Currently hired workers
+                            </p>
                         </div>
                         <div class="flex-1 overflow-auto">
                             <table class="w-full min-w-[500px] table-fixed">
-                                <thead>
+                                <thead class="text-slate-500">
                                     <tr>
-                                        <th class="p-2 font-normal">Image</th>
-                                        <th class="p-2 font-normal">Name</th>
-                                        <th class="p-2 font-normal">Email</th>
-                                        <th class="p-2 font-normal">Profile</th>
+                                        <th class="p-2 text-center font-normal">
+                                            Image
+                                        </th>
+                                        <th class="p-2 text-center font-normal">
+                                            Name
+                                        </th>
+                                        <th class="p-2 text-center font-normal">
+                                            Email
+                                        </th>
+                                        <th class="p-2 text-center font-normal">
+                                            Profile
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm">
@@ -592,10 +609,12 @@ onBeforeUnmount(() => {
                                                         worker.id,
                                                     )
                                                 "
-                                                class="text-blue-500"
+                                                class=""
                                             >
-                                                View Profile</Link
-                                            >
+                                                <i
+                                                    class="bi bi-arrow-right text-lg"
+                                                ></i
+                                            ></Link>
                                         </td>
                                     </tr>
                                 </tbody>
