@@ -304,14 +304,17 @@ const formatCurrency =
 </script>
 <template>
     <Head title="Profile | iCan Careers" />
-    <div class="bg-[#f4f4f4]">
+    <div class="bg-[#eff2f6]">
+        <!-- #f4f4f4  -->
         <div class="container mx-auto px-[0.5rem] xl:max-w-7xl">
             <div class="grid gap-0 pt-8 lg:grid-cols-[300px,1fr] lg:gap-6">
                 <div>
                     <div
                         class="mb-6 flex flex-col items-center justify-start rounded-lg bg-white p-4"
                     >
-                        <div class="mb-3 mt-4 w-[84px]">
+                        <div
+                            class="mb-3 mt-4 h-[84px] min-h-[84px] w-[84px] min-w-[84px]"
+                        >
                             <img
                                 :src="
                                     user.profile_photo_path
@@ -319,30 +322,41 @@ const formatCurrency =
                                         : 'assets/profile_placeholder.jpg'
                                 "
                                 alt="User Profile"
-                                class="w-full rounded-[500px]"
+                                class="h-full w-full rounded-full object-cover"
                             />
                         </div>
-                        <p class="font-bol mb-3">{{ user.name }}</p>
                         <Link
                             :href="route('worker.profile')"
                             as="button"
-                            class="mb-3 w-full max-w-[500px] rounded-lg border px-4 py-2 font-bold"
+                            class="mb-3 flex cursor-pointer items-center gap-2 font-bold text-gray-500 hover:underline"
+                        >
+                            <p class="">{{ user.name }}</p>
+                            <i class="bi bi-arrow-right"></i>
+                        </Link>
+                        <!-- <Link
+                            :href="route('worker.profile')"
+                            as="button"
+                            class="mb-3 w-full max-w-[500px] rounded-lg border px-4 py-2 font-bold text-gray-500"
                         >
                             View Profile
-                        </Link>
+                        </Link> -->
                         <div
                             v-if="!$page.props.auth.worker_verified"
-                            class="flex flex-col items-center"
+                            class="flex flex-col items-center rounded-lg border bg-orange-400 p-3"
                         >
-                            <p class="mb-3 text-center text-red-500">
+                            <h2 class="font-bold text-white">
+                                Your account is not yet verified
+                            </h2>
+                            <p class="mb-3 text-center text-sm text-white">
                                 Please verify your account to apply for jobs!
                             </p>
                             <Link
                                 :href="route('account.verify')"
                                 as="button"
-                                class="w-full rounded-lg border bg-red-500 py-2 text-white"
+                                class="w-full rounded-lg bg-white py-2 font-bold text-orange-500"
                             >
-                                Click here to verify!
+                                Verify now
+                                <i class="bi bi-exclamation-triangle-fill"></i>
                             </Link>
                         </div>
                         <div
@@ -357,19 +371,26 @@ const formatCurrency =
                             ></i>
                         </div>
 
-                        <div v-if="isPending">
-                            <p class="text-yellow-400">{{ isPending }}</p>
+                        <div
+                            v-if="isPending"
+                            class="flex gap-2 rounded-lg text-orange-400"
+                        >
+                            <p class="font-bold">{{ isPending }}</p>
+                            <i class="bi bi-hourglass-split"></i>
                         </div>
                     </div>
 
                     <div class="mb-6 h-[400px] rounded-lg bg-white p-4">
                         <div class="flex items-center justify-between">
-                            <p class="text-lg">Inbox</p>
+                            <p class="text-lg font-bold text-[#171816]">
+                                Inbox
+                            </p>
                             <Link
                                 :href="route('messages')"
-                                class="text-sm text-blue-500"
-                                >See All</Link
-                            >
+                                class="text-sm text-[#171816] underline"
+                                >See All
+                                <i class="bi bi-caret-right"></i>
+                            </Link>
                         </div>
                         <div>
                             <div
@@ -404,37 +425,37 @@ const formatCurrency =
                 </div>
                 <div>
                     <div
-                        class="mb-6 grid grid-cols-1 gap-6 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
+                        class="mb-6 grid grid-cols-1 gap-6 rounded-lg lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
                     >
                         <div
-                            class="col-span-2 h-[424px] rounded bg-white p-3 lg:col-span-1"
+                            class="col-span-2 h-[424px] rounded-lg bg-white p-3 lg:col-span-1"
                         >
-                            <div class="mb-4 flex items-center justify-between">
-                                <p class="p-1 text-lg">Invoice Status</p>
+                            <div class="mb-2 flex items-center justify-between">
+                                <p class="p-1 text-lg font-bold text-[#171816]">
+                                    Invoice Status
+                                </p>
                                 <Link
                                     :href="route('worker.create.invoice')"
-                                    class="flex items-center gap-2 rounded-lg bg-[#fa8334] px-4 py-2 font-semibold text-white shadow-md "
-                                    title="Click to Create Invoice"
+                                    class="flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
                                 >
-                                    <i class="bi bi-plus-lg text-xl"></i>
-                                    <!-- Add Plus Icon -->
                                     <span>Create Invoice</span>
+                                    <i class="bi bi-plus-lg"></i>
                                 </Link>
                             </div>
                             <swiper-container
                                 class="mb-3 text-[12px]"
                                 slides-per-view="auto"
-                                :space-between="10"
+                                :space-between="5"
                             >
                                 <swiper-slide class="w-fit">
                                     <li
                                         @click="switchInvoiceTag('PENDING')"
                                         :class="[
-                                            'cursor-pointer rounded border border-yellow-400 p-1',
+                                            'w-16 cursor-pointer rounded-full border border-[#F1F1F1] p-1 text-center',
                                             {
-                                                'bg-yellow-400 text-white':
+                                                'bg-[#171816] text-white':
                                                     invoiceTag === 'PENDING',
-                                                'text-yellow-400':
+                                                'text-[#9f9f9f]':
                                                     invoiceTag != 'PENDING',
                                             },
                                         ]"
@@ -446,10 +467,12 @@ const formatCurrency =
                                     <li
                                         @click="switchInvoiceTag('PAID')"
                                         :class="[
-                                            'cursor-pointer rounded border border-green-400 p-1 text-green-400',
+                                            'w-14 cursor-pointer rounded-full border border-[#F1F1F1] p-1 text-center',
                                             {
-                                                'bg-green-400 text-white':
+                                                'bg-[#171816] text-white':
                                                     invoiceTag === 'PAID',
+                                                'text-[#9f9f9f]':
+                                                    invoiceTag != 'PAID',
                                             },
                                         ]"
                                     >
@@ -460,10 +483,12 @@ const formatCurrency =
                                     <li
                                         @click="switchInvoiceTag('EXPIRED')"
                                         :class="[
-                                            'cursor-pointer rounded border border-red-400 p-1 text-red-400',
+                                            'w-16 cursor-pointer rounded-full border border-[#F1F1F1] p-1 text-center',
                                             {
-                                                'bg-red-400 text-white':
+                                                'bg-[#171816] text-white':
                                                     invoiceTag === 'EXPIRED',
+                                                'text-[#9f9f9f]':
+                                                    invoiceTag != 'EXPIRED',
                                             },
                                         ]"
                                     >
@@ -472,8 +497,8 @@ const formatCurrency =
                                 >
                             </swiper-container>
                             <div class="overflow-auto">
-                                <table class="w-full table-fixed">
-                                    <thead class="bg-slate-300">
+                                <table class="w-full min-w-[500px] table-fixed">
+                                    <thead class="text-sm">
                                         <tr>
                                             <th
                                                 class="font-normal text-slate-500"
@@ -502,55 +527,58 @@ const formatCurrency =
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="text-sm">
+                                    <tbody class="text-[12px] text-[#171816]">
                                         <tr
                                             v-for="(invoice, index) in invoices"
                                             :key="invoice.id"
-                                            class="break-words text-center"
+                                            class="break-words border-b text-center"
                                         >
-                                            <td class="p-1">
+                                            <td class="py-5">
                                                 {{ invoice.external_id }}
                                             </td>
-                                            <td class="p-1">
+                                            <td class="py-5">
                                                 {{ invoice.employer.email }}
                                             </td>
-                                            <td class="p-1">
+                                            <td class="py-5">
                                                 {{
                                                     formatCurrency(
                                                         invoice.amount,
                                                     )
                                                 }}
                                             </td>
-                                            <td
-                                                :class="[
-                                                    'p-1',
-                                                    {
-                                                        'text-yellow-500':
-                                                            invoice.status ===
-                                                            'PENDING',
-                                                        'text-green-500':
-                                                            invoice.status ===
-                                                                'PAID' ||
-                                                            invoice.status ===
-                                                                'SETTLED',
-                                                        'text-red-500':
-                                                            invoice.status ===
-                                                            'EXPIRED',
-                                                    },
-                                                ]"
-                                            >
-                                                {{ invoice.status }}
+                                            <td class="py-5">
+                                                <p
+                                                    :class="[
+                                                        'mx-auto w-fit rounded-full px-4 py-1 font-bold text-white',
+                                                        ,
+                                                        {
+                                                            'bg-orange-400':
+                                                                invoice.status ===
+                                                                'PENDING',
+                                                            'bg-green-600':
+                                                                invoice.status ===
+                                                                    'PAID' ||
+                                                                invoice.status ===
+                                                                    'SETTLED',
+                                                            'bg-red-500':
+                                                                invoice.status ===
+                                                                'EXPIRED',
+                                                        },
+                                                    ]"
+                                                >
+                                                    {{ invoice.status }}
+                                                </p>
                                             </td>
-                                            <td class="p-1">
+                                            <td class="py-5">
                                                 <a
-                                                    class="rounded bg-blue-500 p-2 text-white"
+                                                    class="text-lg text-[#171816]"
                                                     :href="`/storage/invoices/${invoice.external_id}.pdf`"
                                                     target="_blank"
                                                 >
                                                     <i
-                                                        class="bi bi-box-arrow-up-right"
-                                                    ></i
-                                                ></a>
+                                                        class="bi bi-arrow-right"
+                                                    ></i>
+                                                </a>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -558,12 +586,14 @@ const formatCurrency =
                             </div>
                         </div>
                         <div
-                            class="col-span-2 flex h-[424px] flex-col rounded bg-white p-3 lg:col-span-1"
+                            class="col-span-2 flex h-[424px] flex-col rounded-lg bg-white p-3 lg:col-span-1"
                         >
-                            <p class="text-lg">Balance</p>
+                            <p class="text-lg font-bold text-[#171816]">
+                                Balance
+                            </p>
                             <div class="mb-2">
                                 <div class="mb-1">
-                                    <h2 class="text-[32px]">
+                                    <h2 class="text-[32px] text-[#171816]">
                                         {{ formatCurrency(balance.balance) }}
                                     </h2>
                                     <div class="flex gap-1 text-[12px]">
@@ -574,7 +604,7 @@ const formatCurrency =
                                                 )
                                             }}
                                         </p>
-                                        <p class="text-yellow-500">
+                                        <p class="text-orange-400">
                                             (Waiting for settlement)
                                         </p>
                                     </div>
@@ -585,31 +615,35 @@ const formatCurrency =
                                         class="flex cursor-pointer flex-col items-center justify-center"
                                     >
                                         <div
-                                            class="flex h-10 w-10 items-center justify-center rounded bg-blue-500 p-2"
+                                            class="flex h-10 w-10 items-center justify-center rounded-full bg-orange-400 p-2"
                                         >
                                             <i
                                                 class="bi bi-send-arrow-up-fill text-white"
                                             ></i>
                                         </div>
-                                        <p class="text-[12px]">Payout</p>
+                                        <p class="text-[12px] text-[#171816]">
+                                            Payout
+                                        </p>
                                     </div>
                                     <div
                                         class="flex flex-col items-center justify-center"
                                     >
                                         <div
-                                            class="flex h-10 w-10 cursor-pointer items-center justify-center rounded bg-blue-500 p-2"
+                                            class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-orange-400 p-2"
                                         >
                                             <i
                                                 class="bi bi-info-circle-fill text-white"
                                             ></i>
                                         </div>
-                                        <p class="text-[12px]">Info</p>
+                                        <p class="text-[12px] text-[#171816]">
+                                            Info
+                                        </p>
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <p>Transactions</p>
+                                <p class="mb-1 text-gray-500">Transactions</p>
                                 <swiper-container
                                     class="mb-3 text-[12px]"
                                     slides-per-view="auto"
@@ -621,12 +655,12 @@ const formatCurrency =
                                                 switchTransactionTag('INVOICES')
                                             "
                                             :class="[
-                                                'cursor-pointer rounded border border-blue-500 p-1',
+                                                'w-16 cursor-pointer rounded-full border border-[#F1F1F1] p-1 text-center',
                                                 {
-                                                    'bg-blue-500 text-white':
+                                                    'bg-[#171816] text-white':
                                                         transactionTag ===
                                                         'INVOICES',
-                                                    'text-blue-500':
+                                                    'text-[#9f9f9f]':
                                                         transactionTag !=
                                                         'INVOICES',
                                                 },
@@ -641,10 +675,13 @@ const formatCurrency =
                                                 switchTransactionTag('PAYOUT')
                                             "
                                             :class="[
-                                                'cursor-pointer rounded border border-blue-500 p-1 text-blue-500',
+                                                'w-16 cursor-pointer rounded-full border border-[#F1F1F1] p-1 text-center',
                                                 {
-                                                    'bg-blue-500 text-white':
+                                                    'bg-[#171816] text-white':
                                                         transactionTag ===
+                                                        'PAYOUT',
+                                                    'text-[#9f9f9f]':
+                                                        transactionTag !=
                                                         'PAYOUT',
                                                 },
                                             ]"
@@ -659,7 +696,7 @@ const formatCurrency =
                                 <div
                                     v-if="showInvoices"
                                     v-for="transaction in invoiceTransactions"
-                                    class="mb-3 rounded-lg p-4 shadow"
+                                    class="mb-3 border-b p-4"
                                 >
                                     <div class="flex gap-2">
                                         <div class="h-10 w-10">
@@ -670,20 +707,24 @@ const formatCurrency =
                                             />
                                         </div>
                                         <div>
-                                            <p class="text-sm">
+                                            <p
+                                                class="text-sm font-bold text-[#171816]"
+                                            >
                                                 {{
                                                     `${transaction.employer.name}`
                                                 }}
                                             </p>
                                             <div class="flex gap-1 text-[12px]">
-                                                <p>
+                                                <p class="text-gray-500">
                                                     {{
-                                                        `PAID ${formatCurrency(transaction.amount)} `
+                                                        formatCurrency(
+                                                            transaction.amount,
+                                                        )
                                                     }}
                                                 </p>
                                                 <p
                                                     :class="{
-                                                        'text-yellow-500':
+                                                        'rounded-full bg-orange-500 px-2 text-white':
                                                             transaction.status ===
                                                             'PAID',
                                                         'text-green-500':
@@ -691,9 +732,7 @@ const formatCurrency =
                                                             'SETTLED',
                                                     }"
                                                 >
-                                                    {{
-                                                        `(${transaction.status})`
-                                                    }}
+                                                    {{ transaction.status }}
                                                 </p>
                                             </div>
                                         </div>
@@ -746,7 +785,7 @@ const formatCurrency =
                     >
                         <div class="col-span-1 rounded-lg bg-white p-2">
                             <p
-                                class="mb-3 border-b-[1px] border-gray-100 p-2 text-lg"
+                                class="mb-3 border-b-[1px] border-gray-100 p-2 text-lg font-bold text-[#171816]"
                             >
                                 Saved Jobs
                             </p>
@@ -756,7 +795,7 @@ const formatCurrency =
                                     border="1"
                                     class="w-full border-collapse"
                                 >
-                                    <thead>
+                                    <thead class="text-sm">
                                         <tr class="text-gray-500">
                                             <th class="px-7 py-2 font-normal">
                                                 Logo
@@ -769,7 +808,7 @@ const formatCurrency =
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody class="text-sm">
                                         <tr
                                             v-for="job in savedJobsProps"
                                             class="text-center"
@@ -802,10 +841,10 @@ const formatCurrency =
                                                         )
                                                     "
                                                     as="button"
-                                                    class="rounded bg-green-500 px-2 py-1 text-white"
+                                                    class="rounded px-2 py-1 text-lg text-[#171816]"
                                                 >
                                                     <i
-                                                        class="bi bi-box-arrow-up-right"
+                                                        class="bi bi-arrow-right"
                                                     ></i>
                                                 </Link>
                                             </td>
@@ -830,7 +869,7 @@ const formatCurrency =
                         </div>
                         <div class="col-span-1 rounded-lg bg-white p-2">
                             <p
-                                class="mb-3 border-b-[1px] border-gray-100 p-2 text-lg"
+                                class="mb-3 border-b-[1px] border-gray-100 p-2 text-lg font-bold text-[#171816]"
                             >
                                 Applied Jobs
                             </p>
@@ -840,7 +879,7 @@ const formatCurrency =
                                     border="1"
                                     class="w-full border-collapse"
                                 >
-                                    <thead>
+                                    <thead class="text-sm">
                                         <tr class="text-gray-500">
                                             <th class="px-7 py-2 font-normal">
                                                 Logo
@@ -856,7 +895,7 @@ const formatCurrency =
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody class="text-sm">
                                         <tr
                                             v-for="job in jobsAppliedProps"
                                             class="text-center"
@@ -885,7 +924,7 @@ const formatCurrency =
                                                     :class="[
                                                         'p-1 text-sm font-bold',
                                                         {
-                                                            'rounded-full bg-yellow-400 text-white':
+                                                            'rounded-full bg-orange-500 text-white':
                                                                 job.pivot
                                                                     .status ===
                                                                 'Pending',
@@ -897,7 +936,7 @@ const formatCurrency =
                                                                 job.pivot
                                                                     .status ===
                                                                 'Interview Scheduled',
-                                                            'rounded-full bg-green-400 text-white':
+                                                            'rounded-full bg-green-600 text-white':
                                                                 job.pivot
                                                                     .status ===
                                                                 'Accepted',
@@ -920,10 +959,10 @@ const formatCurrency =
                                                         )
                                                     "
                                                     as="button"
-                                                    class="rounded bg-green-500 px-2 py-1 text-white"
+                                                    class="rounded px-2 py-1 text-lg text-[#171816]"
                                                 >
                                                     <i
-                                                        class="bi bi-box-arrow-up-right"
+                                                        class="bi bi-arrow-right"
                                                     ></i>
                                                 </Link>
                                             </td>

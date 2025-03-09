@@ -10,6 +10,7 @@ use App\Http\Controllers\JobPostController;
 use App\Http\Controllers\JobSearchController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\WorkerBasicInfoController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
@@ -177,6 +178,8 @@ Route::middleware([ForceGetRedirect::class])->group(function() {
     });
 
 
+    //notification
+    Route::put('/mark-as-read-notifications', [NotificationController::class, 'markAllNotificationRead'])->name('user.mark-all-notification-as-read');
 
 
 

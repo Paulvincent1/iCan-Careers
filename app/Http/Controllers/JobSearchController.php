@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobPost;
+use App\Notifications\WokerAppliesToJobPostNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -99,6 +100,9 @@ class JobSearchController extends Controller
 
         if(!$id->usersWhoApplied()->where('worker_id',$user->id)->first() && $id->job_status != 'Closed'){
             $user->appliedJobs()->attach($id->id);
+            
+            $id->employer->notify(new WokerAppliesToJobPostNotification(applicant:$user,employer:$id->employer,jobPost:$id));
+
             return redirect()->back()->with(['messageProp' => 'Successfuly applied!']);
         }
         // else{
