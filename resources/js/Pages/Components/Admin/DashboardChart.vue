@@ -1,89 +1,125 @@
 <script setup>
-import { ref, onMounted, watch, defineProps } from "vue";
-import Chart from "chart.js/auto";
+import { ref, defineProps, watch, computed } from "vue";
+import VueApexCharts from "vue3-apexcharts";
+import { use } from "echarts/core";
+import * as echarts from "echarts";
+import { CanvasRenderer } from "echarts/renderers";
+import { BarChart } from "echarts/charts";
+import { GridComponent, TooltipComponent } from "echarts/components";
+import VChart from "vue-echarts";
+
+use([CanvasRenderer, BarChart, GridComponent, TooltipComponent]);
 
 const props = defineProps({
-    chartData: Object,  
+    chartData: Object,
     earningsData: Object,
-    type: String,       
+    type: String,
 });
 
-const chartCanvas = ref(null);
-let chartInstance = null;
+// Check if it's the earnings chart
+const isEarningsChart = computed(() => props.type === "earnings");
 
-const createChart = () => {
-    if (!chartCanvas.value) return;
+// 📊 ApexCharts (For Earnings Chart) - Unchanged
+const earningsChartOptions = ref({
+    chart: { type: "line", height: 350 },
+    stroke: { curve: "smooth" },
+    colors: ["#34D399"],
+    xaxis: { categories: props.earningsData?.months || [] },
+    title: { text: "Earnings Over Time", align: "center" },
+});
+const earningsSeries = ref([
+    { name: "Earnings", data: props.earningsData?.earnings || [] },
+]);
 
-    if (chartInstance) chartInstance.destroy();
-
-    const isEarningsChart = props.type === "earnings";
-
-    chartInstance = new Chart(chartCanvas.value, {
-        type: isEarningsChart ? "line" : "bar",
-        data: {
-            labels: isEarningsChart
-                ? props.earningsData.months 
-                : ["Users", "Jobs", "Applications"],
-            datasets: [
-                {
-                    label: isEarningsChart ? "Earnings Over Time" : "Count",
-                    data: isEarningsChart
-                        ? props.earningsData.earnings 
-                        : [props.chartData.users, props.chartData.jobs, props.chartData.applications],
-                    backgroundColor: isEarningsChart
-                        ? "rgba(34, 197, 94, 0.2)"
-                        : ["rgba(59, 130, 246, 0.8)", "rgba(239, 68, 68, 0.8)", "rgba(16, 185, 129, 0.8)"],
-                    borderColor: isEarningsChart
-                        ? "rgba(34, 197, 94, 1)"
-                        : ["rgba(59, 130, 246, 1)", "rgba(239, 68, 68, 1)", "rgba(16, 185, 129, 1)"],
-                    borderWidth: 2,
-                    hoverBackgroundColor: isEarningsChart
-                        ? "rgba(34, 197, 94, 0.8)"
-                        : ["rgba(59, 130, 246, 1)", "rgba(239, 68, 68, 1)", "rgba(16, 185, 129, 1)"],
-                    fill: isEarningsChart,
-                    tension: 0.4,
-                },
+// 🎨 Improved Aesthetic Design for General Stats Chart
+const statsChartOptions = ref({
+    tooltip: {
+        trigger: "axis",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        textStyle: { color: "#fff" },
+        borderRadius: 8,
+        padding: 10,
+    },
+    grid: {
+        left: "5%",
+        right: "5%",
+        bottom: "5%",
+        containLabel: true,
+    },
+    xAxis: {
+        type: "category",
+        data: ["Users", "Jobs", "Applications"],
+        axisLine: { lineStyle: { color: "#ddd" } },
+        axisLabel: { fontSize: 14, color: "#333" },
+    },
+    yAxis: {
+        type: "value",
+        axisLine: { show: false },
+        splitLine: { lineStyle: { color: "#eee" } },
+    },
+    series: [
+        {
+            name: "Total Count",
+            data: [
+                props.chartData?.users || 0,
+                props.chartData?.jobs || 0,
+                props.chartData?.applications || 0
             ],
+            type: "bar",
+            barWidth: "50%",
+            itemStyle: {
+                color: (params) => {
+    const gradients = [
+        new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: "red" }, // Bright Red
+            { offset: 1, color: "orange" }, // Dark Red
+        ]),
+        new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: "#00308F" }, // Orange
+            { offset: 1, color: "#007FFF" }, // Darker Orange
+        ]),
+        new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: "#10B981" }, // Green
+            { offset: 1, color: "teal" }, // Dark Green
+        ]),
+    ];
+    return gradients[params.dataIndex]; // Assign different gradients to each bar
+},
+                borderRadius: [8, 8, 0, 0], // Rounded top edges
+                shadowColor: "rgba(0,0,0,0.2)",
+                shadowBlur: 5,
+            },
+            animationEasing: "elasticOut",
+            animationDelay: (idx) => idx * 100,
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: "rgba(255, 255, 255, 0.1)" },
-                    ticks: { color: "#9ca3af" },
-                },
-                x: {
-                    grid: { color: "rgba(255, 255, 255, 0.1)" },
-                    ticks: { color: "#9ca3af" },
-                },
-            },
-            plugins: {
-                legend: {
-                    labels: { color: "#9ca3af" },
-                },
-            },
-            animation: {
-                duration: 1000,
-                easing: "easeInOutQuart",
-            },
-        },
-    });
-};
-
-watch(() => props.chartData, createChart, { deep: true });
-watch(() => props.earningsData, createChart, { deep: true });
-
-onMounted(() => {
-    setTimeout(createChart, 500);
+    ],
 });
+
+// 🔄 Watch for data changes and update charts
+watch(() => props.earningsData, (newData) => {
+    earningsSeries.value = [{ name: "Earnings", data: newData?.earnings || [] }];
+    earningsChartOptions.value.xaxis.categories = newData?.months || [];
+}, { deep: true });
+
+watch(() => props.chartData, (newData) => {
+    statsChartOptions.value.series[0].data = [
+        newData?.users || 0,
+        newData?.jobs || 0,
+        newData?.applications || 0
+    ];
+}, { deep: true });
 </script>
 
 <template>
     <div class="w-full">
-        <div class="relative h-[100px] sm:h-[100px] md:h-[350px] w-full">
-            <canvas ref="chartCanvas"></canvas>
+        <!-- Earnings Chart -->
+        <div v-if="isEarningsChart" class="relative h-[350px] w-full">
+            <VueApexCharts :options="earningsChartOptions" :series="earningsSeries" height="350" />
+        </div>
+
+        <!-- General Stats Chart (Improved) -->
+        <div v-else class="relative h-[350px] w-full">
+            <VChart class="w-full h-64" :option="statsChartOptions" />
         </div>
     </div>
 </template>

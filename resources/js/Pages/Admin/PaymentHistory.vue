@@ -47,7 +47,7 @@ let formatCurrency =
 
 <template>
     <Head title="Payment History | iCan Careers" />
-    <div class="p-4">
+    <div class="p-4 bg-white">
         <h1 class="mb-4 text-xl font-bold flex items-center gap-2">
             <font-awesome-icon :icon="['fas', 'calendar']" class="text-[#fa8334]" />
             Payment History

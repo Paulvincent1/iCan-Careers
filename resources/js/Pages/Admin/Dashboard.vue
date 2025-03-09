@@ -3,6 +3,11 @@ import { computed, getCurrentInstance } from "vue";
 import { Link } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
 import DashboardChart from "../Components/Admin/DashboardChart.vue";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faUsers, faBriefcase, faFileAlt } from "@fortawesome/free-solid-svg-icons";
+
+library.add(faUsers, faBriefcase, faFileAlt);
 
 // Props
 const props = defineProps({
@@ -43,13 +48,46 @@ const earningsData = computed(() => ({
 <template>
     <Head title="Dashboard | iCan Careers" />
 
-    <div class="p-4">
+    <div class="p-4 bg-white">
         <!-- Title -->
         <h1
             class="text-center text-3xl font-bold text-gray-800 sm:text-4xl md:text-left"
         >
             Admin Dashboard
         </h1>
+         <!-- Key Statistics Cards (Users, Jobs, Applications) -->
+<div class="grid grid-cols-1 gap-5 md:grid-cols-3">
+    <!-- Total Users Card -->
+    <div class="flex items-center justify-between rounded-lg border border-gray-200 bg-gradient-to-b from-red-500 to-orange-500 p-10 shadow-lg">
+
+        <div>
+            <h2 class="text-md font-semibold text-black">Total Users</h2>
+            <p class="text-4xl font-bold text-gray-800">{{ userCountProps ?? 0 }}</p>
+        </div>
+        <font-awesome-icon :icon="['fas', 'users']" class="text-black text-5xl mr-4" />
+    </div>
+
+    <!-- Total Jobs Card -->
+    <div class="flex items-center justify-between rounded-lg border border-gray-200 bg-gradient-to-b from-blue-400 to-blue-900 p-10 shadow-lg">
+
+        <div>
+            <h2 class="text-md font-semibold text-gray-100">Total Jobs</h2>
+            <p class="text-4xl font-bold text-gray-100">{{ jobProps?.id ?? 0 }}</p>
+        </div>
+        <font-awesome-icon :icon="['fas', 'briefcase']" class="text-white text-5xl mr-4" />
+    </div>
+
+    <!-- New Applications Card -->
+    <div class="flex items-center justify-between rounded-lg border border-gray-200 bg-gradient-to-r from-green-700 to-teal-500 p-10 shadow-lg">
+
+        <div>
+            <h2 class="text-md font-semibold text-white">New Applications</h2>
+            <p class="text-4xl font-bold text-white">{{ applicationProps ? applicationProps.length : 0 }}</p>
+        </div>
+        <font-awesome-icon :icon="['fas', 'file-alt']" class="text-white text-5xl mr-4" />
+    </div>
+</div>
+
 
         <!-- Total Earnings Card (Standalone at the Top) -->
         <div
@@ -76,7 +114,7 @@ const earningsData = computed(() => ({
 
         <!-- Grouped Main Chart & Key Statistics at the Bottom -->
         <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
-           
+
              <!-- Main Chart (Users, Jobs, Applications) -->
             <div class="col-span-1 md:col-span-2 bg-white p-4 rounded-lg shadow w-full">
                 <h2 class="mb-4 text-lg md:text-xl font-bold text-center md:text-left">
@@ -87,39 +125,6 @@ const earningsData = computed(() => ({
                 </div>
             </div>
 
-             <!-- Key Statistics Cards (Users, Jobs, Applications) -->
-            <div class="grid space-y-5">
-                <div
-                    class="flex hidden flex-col items-center rounded-lg border border-gray-200 bg-white p-6 shadow-lg md:block"
-                >
-                    <h2 class="text-md font-semibold text-gray-600">
-                        Total Users
-                    </h2>
-                    <p class="text-4xl font-bold text-blue-600">
-                        {{ userCountProps ?? 0 }}
-                    </p>
-                </div>
-                <div
-                    class="flex hidden flex-col items-center rounded-lg border border-gray-200 bg-white p-6 shadow-lg md:block"
-                >
-                    <h2 class="text-md font-semibold text-gray-600">
-                        Total Jobs
-                    </h2>
-                    <p class="text-4xl font-bold text-red-500">
-                        {{ jobProps?.id ?? 0 }}
-                    </p>
-                </div>
-                <div
-                    class="flex hidden md:block flex-col items-center rounded-lg border border-gray-200 bg-white p-6 shadow-lg"
-                >
-                    <h2 class="text-md font-semibold text-gray-600">
-                        New Applications
-                    </h2>
-                    <p class="text-4xl font-bold text-green-600">
-                        {{ applicationProps ? applicationProps.length : 0 }}
-                    </p>
-                </div>
-            </div>
 
         </div>
     </div>

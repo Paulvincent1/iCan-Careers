@@ -64,7 +64,7 @@ const headers = [
 
 <template>
     <Head title="Subscribed Users | iCan Careers" />
-    <div class="p-4">
+    <div class="p-4 bg-white">
         <!-- Tabs for Subscription Filters -->
         <nav class="mb-6">
             <ul class="flex space-x-4 border-b overflow-x-auto">

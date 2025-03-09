@@ -77,7 +77,7 @@ console.log(page.props.auth.user.unreadNotifications);
                     ><img
                         src="/assets/iCanCareersLogofinal.png"
                         alt=""
-                        class="h-10 w-auto object-contain md:h-14 lg:h-16"
+                        class="h-10 object-contain md:h-14 lg:h-16"
                 /></Link>
             </p>
             <nav
@@ -167,6 +167,7 @@ console.log(page.props.auth.user.unreadNotifications);
                             class="flex flex-col"
                         >
                             <i class="bi bi-bell text-lg"></i>
+
                             <div
                                 v-show="showNotificationDropDown"
                                 class="absolute right-[50%] top-10 h-fit max-h-[calc(100vh-4.625rem-3.5rem)] w-80 translate-x-[50%] overflow-y-auto rounded bg-white px-5 py-2 text-sm shadow md:right-0 md:top-14 md:translate-x-0"
