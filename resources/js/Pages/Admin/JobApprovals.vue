@@ -80,11 +80,11 @@ const toggleApproval = (id, newStatus) => {
 
 <template>
     <Head title="Job Approvals | iCan Careers" />
-    <div class="p-4">
+    <div class="p-4 bg-white">
         <!-- Tab Navigation -->
         <nav class="mb-6">
             <ul class="flex space-x-4 border-b overflow-x-auto">
-                <li v-for="tab in tabs" :key="tab.id" 
+                <li v-for="tab in tabs" :key="tab.id"
                     @click="activeTab = tab.id"
                     :class="{
                         'border-b-2 border-blue-500 font-semibold': activeTab === tab.id,
@@ -104,9 +104,9 @@ const toggleApproval = (id, newStatus) => {
         <!-- Search Bar -->
         <div class="mb-4 flex items-center gap-2 bg-gray-100 p-3 rounded-md">
             <font-awesome-icon :icon="['fas', 'search']" class="text-gray-500" />
-            <input 
-                v-model="searchQuery" 
-                type="text" 
+            <input
+                v-model="searchQuery"
+                type="text"
                 placeholder="Search job title, employer, or status..."
                 class="w-full bg-transparent outline-none"
             />
@@ -123,7 +123,7 @@ const toggleApproval = (id, newStatus) => {
             >
                 <!-- Custom slot for Profile (View Post) -->
                 <template #item-profile="{ id }">
-                    <a :href="`/admin/job-posts/${id}`" 
+                    <a :href="`/admin/job-posts/${id}`"
                        class="text-blue-500 hover:underline">
                         View Post
                     </a>
@@ -156,12 +156,12 @@ const toggleApproval = (id, newStatus) => {
 
         <!-- Card layout for mobile screens -->
         <div class="sm:hidden space-y-4">
-            <div v-for="job in filteredJobs" :key="job.id" 
+            <div v-for="job in filteredJobs" :key="job.id"
                 class="bg-white p-4 rounded-lg shadow-md">
                 <h2 class="text-lg font-semibold">{{ job.job_title }}</h2>
                 <p class="text-gray-600">Email: {{ job.employer?.email}}</p>
                 <p class="text-gray-600">
-                    Status: 
+                    Status:
                     <span :class="job.job_status === 'Open' ? 'text-green-600' : 'text-red-600'">
                         {{ job.job_status }}
                     </span>

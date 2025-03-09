@@ -19,10 +19,9 @@ const workers = ref(usePage().props.workers || []);
 // Tabs for filtering verification status
 const tabs = [
     { id: "all", label: "All" },
-    { id: "verified", label: "Verified" },
-    { id: "not_verified", label: "Not Verified" },
+    { id: "pending", label: "Pending" }, // New Pending Tab
+    { id: "not verified", label: "Not Verified" },
 ];
-
 // Active tab state
 const activeTab = ref("all");
 
@@ -38,6 +37,8 @@ const filteredWorkers = computed(() => {
         filtered = filtered.filter(worker => worker.verified);
     } else if (activeTab.value === "not_verified") {
         filtered = filtered.filter(worker => !worker.verified);
+    } else if (activeTab.value === "pending") {
+        filtered = filtered.filter(worker => worker.verification_id); // Filter for Pending
     }
 
     // Apply search filtering
@@ -46,7 +47,8 @@ const filteredWorkers = computed(() => {
         filtered = filtered.filter(worker =>
             worker.name.toLowerCase().includes(query) ||
             worker.email.toLowerCase().includes(query) ||
-            (worker.verified ? "verified" : "not verified").includes(query)
+            (worker.verified ? "verified" : "not verified").includes(query) ||
+            (worker.verification_id ? "pending" : "none").includes(query)
         );
     }
 
@@ -60,6 +62,7 @@ const headers = [
     { text: "Email", value: "email", sortable: false },
     { text: "Profile", value: "profile", sortable: false },
     { text: "Verified", value: "verified", sortable: false },
+    { text: "Verification ID", value: "verification_id", sortable: false },
     { text: "Action", value: "actions", sortable: false },
 ];
 
@@ -82,7 +85,7 @@ const toggleVerification = (id) => {
 
 <template>
     <Head title="Workers | iCan Careers" />
-    <div class="p-4">
+    <div class="p-4 bg-white">
         <!-- Tabs for Filtering Workers -->
         <nav class="mb-6">
             <ul class="flex space-x-4 border-b overflow-x-auto">
@@ -120,7 +123,7 @@ const toggleVerification = (id) => {
                 :headers="headers"
                 :items="filteredWorkers"
                 :rows-per-page="10"
-                :sort-by="'name'"
+                :sort-by="'id'"
                 :sort-type="'asc'"
             >
                 <!-- Custom slot for Profile -->
@@ -140,6 +143,11 @@ const toggleVerification = (id) => {
                     </span>
                 </template>
 
+                <!-- Custom slot for Verification ID -->
+                <template #item-verification_id="{ verification_id }">
+                    <span :class="verification_id ? 'text-green-500' : 'text-red-500'">{{ verification_id ? "Pending" : 'None' }}</span>
+                </template>
+
                 <!-- Custom slot for Actions -->
                 <template #item-actions="{ id, verified }">
                     <button
@@ -154,7 +162,7 @@ const toggleVerification = (id) => {
         </div>
 
         <!-- Mobile Card Layout -->
-        <div class="sm:hidden space-y-4 mt-4">
+        <div class="sm:hidden space-y-4">
             <div v-for="worker in filteredWorkers" :key="worker.id"
                 class="bg-white p-4 rounded-lg shadow-md">
                 <h2 class="text-lg font-semibold">{{ worker.name }}</h2>
@@ -169,9 +177,15 @@ const toggleVerification = (id) => {
                     </Link>
                 </p>
                 <p class="text-gray-600">
-                    <strong>Status:</strong>
+                    <strong>Verified:</strong>
                     <span :class="worker.verified ? 'text-green-500' : 'text-red-500'">
                         {{ worker.verified ? "Verified" : "Not Verified" }}
+                    </span>
+                </p>
+                <p class="text-gray-600">
+                    <strong>Verification ID:</strong>
+                    <span :class="worker.verification_id ? 'text-green-500' : 'text-red-500'">
+                        {{ worker.verification_id ? "Pending" : "None" }}
                     </span>
                 </p>
                 <button

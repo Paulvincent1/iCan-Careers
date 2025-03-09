@@ -1,6 +1,6 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
@@ -27,6 +27,20 @@ library.add(
     faTimes,
 );
 
+const isMobile = ref(window.innerWidth < 768);
+
+const updateScreenSize = () => {
+    isMobile.value = window.innerWidth < 768;
+};
+
+onMounted(() => {
+    window.addEventListener("resize", updateScreenSize);
+});
+
+onUnmounted(() => {
+    window.removeEventListener("resize", updateScreenSize);
+});
+
 defineProps({
     isSidebarOpen: Boolean,
 });
@@ -39,32 +53,42 @@ const togglePaymentDropdown = () => {
     isPaymentOpen.value = !isPaymentOpen.value;
 };
 
-// Close sidebar on mobile after clicking a link
+// Close sidebar on mobile after clicking a link or X button
 const closeSidebarOnMobile = () => {
-    if (window.innerWidth < 1800) {
+    if (isMobile.value) {
         emit("toggleSidebar");
     }
 };
 </script>
 
 <template>
-    <aside
-        :class="[ 
-            'fixed left-0 top-0 z-50 h-full w-64 transform border-r bg-white shadow-xl transition-all duration-500 ease-in-out',
-            isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
-            'md:block md:translate-x-0' // Always visible on desktop
+    <div
+        :class="[
+            'fixed left-0 top-0 z-50 h-full w-64 transform border-r bg-white transition-all duration-500 ease-in-out',
+            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         ]"
     >
-        <!-- Sidebar Header with Logo -->
-        <div class="hidden md:flex items-center justify-center p-1 border-b">
-            <Link href="/admin"><img src="/assets/iCanCareersLogofinal.png" alt="Logo" class="h-14"></Link>
-            <!-- Close Button (Visible on Mobile) -->
-            <button @click="closeSidebarOnMobile" class="md:hidden text-gray-500 hover:text-gray-700">
-                <font-awesome-icon :icon="['fas', 'times']" class="text-lg" />
-            </button>
-        </div>
+        <!-- Sidebar Header with Logo & Close Button -->
+            <div v-if="!isMobile" class="flex items-center justify-center p-1 border-b">
+                <!-- Logo (Hidden on Mobile, Centered on Larger Screens) -->
+                 <div class="w-full flex justify-center">
+                     <Link href="/admin">
+                 <img src="/assets/iCanCareersLogofinal.png" alt="Logo" class="h-14" />
+                     </Link>
+                 </div>
+</div>
 
-        <nav class="my-1 p-5 space-y-2 mt-10">
+<!-- X Button (Only for Mobile, Positioned in Right Corner) -->
+<button
+    v-if="isMobile"
+    @click="closeSidebarOnMobile"
+    class="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+>
+    <font-awesome-icon :icon="['fas', 'times']" class="text-5xl" />
+</button>
+
+       <div>
+            <nav class=" p-5 space-y-0">
             <Link @click="closeSidebarOnMobile" href="/admin" class="nav-link">
                 <font-awesome-icon :icon="['fas', 'chart-bar']" class="nav-icon" />
                 Dashboard
@@ -107,7 +131,8 @@ const closeSidebarOnMobile = () => {
                 </div>
             </div>
         </nav>
-    </aside>
+       </div>
+    </div>
 </template>
 
 <style scoped>
@@ -127,13 +152,14 @@ const closeSidebarOnMobile = () => {
 .nav-link:hover {
     background-color: rgba(0, 123, 255, 0.1);
     color: #fa8334;
-    box-shadow: inset 3px 0px 0px #fa8334;
+    border-left: 3px solid #fa8334;
+    box-shadow: none;
     transform: scale(1.05);
 }
 
 /* Icon Styling */
 .nav-icon {
-    margin-right: 12px;
+    margin-right: 20px;
     font-size: 1.2rem;
     color: #fa8334;
 }
@@ -142,4 +168,6 @@ const closeSidebarOnMobile = () => {
 .rotate-90 {
     transform: rotate(90deg);
 }
+
+
 </style>

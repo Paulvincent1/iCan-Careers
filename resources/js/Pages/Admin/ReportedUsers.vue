@@ -58,7 +58,7 @@ const banUser = (id) => {
 
 <template>
     <Head title="ReportedUser | iCan Careers" />
-    <div class="p-4">
+    <div class="p-4 bg-white">
         <!-- Tabs Navigation -->
         <nav class="mb-6">
             <ul class="flex w-full flex-wrap gap-2 border-b overflow-x-auto">
@@ -130,7 +130,7 @@ const banUser = (id) => {
                 <p class="text-lg font-semibold text-gray-800">{{ user.name }}</p>
                 <p class="text-sm text-gray-600"><strong>Reason:</strong> {{ user.reason }}</p>
                 <p class="text-sm text-gray-600 flex items-center gap-1">
-                    <strong>Status:</strong> 
+                    <strong>Status:</strong>
                     <span :class="statusClass(user.status)">{{ user.status }}</span>
                 </p>
                 <div class="mt-3 flex flex-col sm:flex-row sm:gap-2">

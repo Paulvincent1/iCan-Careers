@@ -44,7 +44,7 @@ onUnmounted(() => window.removeEventListener("resize", handleResize));
             />
 
             <!-- Content Area -->
-            <main class="flex-grow p-6">
+            <main class="flex-grow bg-gray p-6 ">
                 <slot></slot>
             </main>
 
