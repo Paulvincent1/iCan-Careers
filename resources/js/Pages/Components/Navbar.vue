@@ -50,19 +50,40 @@ function unshiftLatestNotification(notif) {
     notifications.value.unshift(notif);
 }
 
-onMounted(() => {
-    window.Echo.channel(
-        "notification-" + page.props.auth.user.authenticated?.id,
-    ).listen(".notification.event", (notif) => {
-        console.log(notif);
-        unshiftLatestNotification({
-            id: nanoid(),
-            data: {
-                status: notif.status,
-                message: notif.message,
-            },
+let channelNotif = null;
+watch(
+    () => page.props.auth.user.authenticated?.id,
+    () => {
+        channelNotif = window.Echo.channel(
+            "notification-" + page.props.auth.user.authenticated?.id,
+        ).listen(".notification.event", (notif) => {
+            console.log(notif);
+            unshiftLatestNotification({
+                id: nanoid(),
+                data: {
+                    status: notif.status,
+                    message: notif.message,
+                },
+            });
         });
-    });
+    },
+);
+
+onMounted(() => {
+    if (page.props.auth.user.authenticated?.id) {
+        channelNotif = window.Echo.channel(
+            "notification-" + page.props.auth.user.authenticated?.id,
+        ).listen(".notification.event", (notif) => {
+            console.log(notif);
+            unshiftLatestNotification({
+                id: nanoid(),
+                data: {
+                    status: notif.status,
+                    message: notif.message,
+                },
+            });
+        });
+    }
 });
 
 console.log(page.props.auth.user.unreadNotifications);
@@ -216,13 +237,13 @@ console.log(page.props.auth.user.unreadNotifications);
                                         <div class="h-[32px] min-w-8">
                                             <img
                                                 class="h-full w-full rounded-full object-cover"
-                                                src="assets/images.png"
+                                                src="/assets/images.png"
                                                 alt=""
                                             />
                                         </div>
                                         <div>
                                             <p class="font-bold">
-                                                {{ notification.data.status }}
+                                                {{ notification.data.message }}
                                             </p>
                                             <p class="text-[10px]">
                                                 {{ notification.data.message }}

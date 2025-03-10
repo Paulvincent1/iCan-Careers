@@ -48,7 +48,7 @@ class WokerAppliesToJobPostNotification extends Notification implements ShouldBr
     {
         return [
             'status' => $this->applicant->name,
-            'message' => $this->applicant->name . 'applies to your job post ' .$this->jobPost . '.',
+            'message' => $this->applicant->name . 'applies to your job post ' . $this->jobPost->job_title . '.',
             'image' => $this->applicant->profile_img,
         ];
     }
@@ -57,7 +57,7 @@ class WokerAppliesToJobPostNotification extends Notification implements ShouldBr
     {
         return [
             'status' => $this->applicant->name,
-            'message' => $this->applicant->name . 'applies to your job post ' . $this->jobPost . '.',
+            'message' => $this->applicant->name . 'applies to your job post ' . $this->jobPost->job_title . '.',
             'image' => $this->applicant->profile_img,
         ];
     }

@@ -428,10 +428,14 @@ function listenToChannelMessage(senderId) {
         "message-" + page.props.auth.user.authenticated.id + "-" + senderId;
     console.log("listen");
 
-    if (channel) {
-        console.log("unsub");
-
-        channel.unsubscribe();
+    if (window.Echo.connector.channels[channelName]?.subscription) {
+        if (
+            !window.Echo.connector.channels[channelName]?.subscription
+                .subscribed
+        ) {
+            window.Echo.connector.channels[channelName].subscribe();
+            return;
+        }
     }
 
     channel = window.Echo.channel(channelName).listen(".message.event", (e) => {
@@ -451,10 +455,20 @@ let channelChatHeads = null;
 function listenChannelChatHeads() {
     const channelName = "chathead-" + page.props.auth.user.authenticated.id;
 
-    if (channelChatHeads) {
-        console.log("unsub");
+    console.log(
+        window.Echo.connector.channels[channelName]?.subscription.subscribed,
+    );
 
-        channelChatHeads.unsubscribe();
+    if (window.Echo.connector.channels[channelName]?.subscription) {
+        if (
+            !window.Echo.connector.channels[channelName]?.subscription
+                .subscribed
+        ) {
+            console.log("pumasok");
+
+            window.Echo.connector.channels[channelName].subscribe();
+            return;
+        }
     }
 
     channelChatHeads = window.Echo.channel(channelName).listen(
@@ -465,6 +479,11 @@ function listenChannelChatHeads() {
             console.log(chatHeads.value);
         },
     );
+
+    console.log(
+        window.Echo.connector.channels[channelName] === channelChatHeads,
+    );
+    console.log(channelChatHeads);
 }
 
 function unshiftLatestChatHead(userId, newChatHead) {
@@ -501,14 +520,8 @@ function chatHeadVisibleToScreen() {
 }
 
 onBeforeUnmount(() => {
-    if (channel) {
-        channel.unsubscribe();
-        channel.stopListening(".message.event");
-    }
-    if (channelChatHeads) {
-        channelChatHeads.unsubscribe();
-        channelChatHeads.stopListening(".message.event");
-    }
+    channel?.stopListening(".message.event");
+    channelChatHeads?.stopListening(".message.event");
 });
 
 let search = ref("");

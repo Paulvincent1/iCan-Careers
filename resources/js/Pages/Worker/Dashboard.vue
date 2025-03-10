@@ -250,10 +250,14 @@ let channelChatHeads = null;
 function listenChannelChatHeads() {
     const channelName = "chathead-" + page.props.auth.user.authenticated.id;
 
-    if (channelChatHeads) {
-        console.log("unsub");
-
-        channelChatHeads.unsubscribe();
+    if (window.Echo.connector.channels[channelName]?.subscription) {
+        if (
+            !window.Echo.connector.channels[channelName]?.subscription
+                .subscribed
+        ) {
+            window.Echo.connector.channels[channelName].subscribe();
+            return;
+        }
     }
 
     channelChatHeads = window.Echo.channel(channelName).listen(
@@ -264,6 +268,7 @@ function listenChannelChatHeads() {
             console.log(chatHeads.value);
         },
     );
+    console.log(channelChatHeads);
 }
 
 function unshiftLatestChatHead(userId, newChatHead) {
@@ -292,11 +297,7 @@ function goToChat(userId) {
 }
 
 onBeforeUnmount(() => {
-    if (channelChatHeads) {
-        channelChatHeads.unsubscribe();
-        // Stop listening to the '.message.event' event on the channel
-        channelChatHeads.stopListening(".message.event");
-    }
+    channelChatHeads.stopListening(".message.event");
 });
 
 const formatCurrency =
@@ -922,7 +923,7 @@ const formatCurrency =
                                             <td class="p-2">
                                                 <p
                                                     :class="[
-                                                        'p-1 text-sm font-bold',
+                                                        'p-1 text-[12px] font-bold',
                                                         {
                                                             'rounded-full bg-orange-500 text-white':
                                                                 job.pivot
