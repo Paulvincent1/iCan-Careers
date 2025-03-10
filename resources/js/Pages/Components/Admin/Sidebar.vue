@@ -73,7 +73,7 @@ const closeSidebarOnMobile = () => {
                 <!-- Logo (Hidden on Mobile, Centered on Larger Screens) -->
                  <div class="w-full flex justify-center">
                      <Link href="/admin">
-                 <img src="/assets/iCanCareersLogofinal.png" alt="Logo" class="h-14" />
+                 <img src="/assets/iCanCareersincognito.png" alt="Logo" class="h-14" />
                      </Link>
                  </div>
 </div>
