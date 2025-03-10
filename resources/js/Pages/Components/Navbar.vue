@@ -243,7 +243,7 @@ console.log(page.props.auth.user.unreadNotifications);
                                         </div>
                                         <div>
                                             <p class="font-bold">
-                                                {{ notification.data.message }}
+                                                {{ notification.data.status }}
                                             </p>
                                             <p class="text-[10px]">
                                                 {{ notification.data.message }}
