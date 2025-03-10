@@ -3,6 +3,7 @@ import { Link, router, usePage } from "@inertiajs/vue3";
 import { forEach } from "lodash";
 import { FreeMode } from "swiper/modules";
 import {
+    nextTick,
     onMounted,
     onUpdated,
     ref,
@@ -21,14 +22,51 @@ let props = defineProps({
 });
 
 let swiperContainer = useTemplateRef("swiper-container");
-// let next = useTemplateRef("next");
-// let prev = useTemplateRef("prev");
+let next = useTemplateRef("next");
+let prev = useTemplateRef("prev");
 
-// onMounted(() => {
-//     next.value.addEventListener("click", () => {
-//         swiperContainer.value.swiper.slideNext();
+onMounted(() => {
+    nextTick(() => {
+        swiperContainer.value.swiper.update();
+        updateStyleArrow();
+    });
+
+    next.value.addEventListener("click", () => {
+        if (!swiperContainer.value.swiper.isEnd) {
+            swiperContainer.value.swiper.slideNext();
+        }
+        updateStyleArrow();
+    });
+    prev.value.addEventListener("click", () => {
+        if (!swiperContainer.value.swiper.isBeginning) {
+            swiperContainer.value.swiper.slidePrev();
+        }
+        updateStyleArrow();
+    });
+});
+
+// onUpdated(() => {
+//     console.log('hello');
+
+//     nextTick(() => {
+//         swiperContainer.value.swiper.update();
+//         updateStyleArrow();
 //     });
 // });
+
+function updateStyleArrow() {
+    if (swiperContainer.value.swiper.isEnd) {
+        next.value.classList.add("text-orange-100", "pointer-events-none");
+    } else {
+        next.value.classList.remove("text-orange-100", "pointer-events-none");
+    }
+
+    if (swiperContainer.value.swiper.isBeginning) {
+        prev.value.classList.add("text-orange-100", "pointer-events-none");
+    } else {
+        prev.value.classList.remove("text-orange-100", "pointer-events-none");
+    }
+}
 
 let workingSchedCheckbox;
 let workingModesCheckbox;
@@ -132,7 +170,7 @@ function updateWorkingModes() {
             }
         }
     });
-    console.log(workingModes.value);
+
     submit();
     resetFilter();
 }
@@ -154,7 +192,7 @@ function updateExperiences() {
             }
         }
     });
-    console.log(experiences.value);
+
     submit();
     resetFilter();
 }
@@ -166,7 +204,7 @@ function filterTag(tag, event) {
 
     tagbuttons.forEach((e) => {
         console.log(e);
-        e.classList.remove("bg-blue-300", "text-white");
+        e.classList.remove("bg-[#171816]", "text-white");
     });
 
     if (lastTagValueClicked.value != tag) {
@@ -175,7 +213,7 @@ function filterTag(tag, event) {
             jobs.value = jobs.value.filter((value, index) => {
                 return value.job_title === tag;
             });
-            tagbutton.classList.add("bg-blue-300", "text-white");
+            tagbutton.classList.add("bg-[#171816]", "text-white");
             lastTagValueClicked.value = tag;
             console.log("if-if");
             return;
@@ -184,7 +222,7 @@ function filterTag(tag, event) {
         jobs.value = jobs.value.filter((value, index) => {
             return value.job_title === tag;
         });
-        tagbutton.classList.add("bg-blue-300", "text-white");
+        tagbutton.classList.add("bg-[#171816]", "text-white");
         tagActive.value = true;
         lastTagValueClicked.value = tag;
         console.log("if");
@@ -200,7 +238,7 @@ function resetFilter() {
 
     tagbuttons.forEach((e) => {
         console.log(e);
-        e.classList.remove("bg-blue-300", "text-white");
+        e.classList.remove("bg-[#171816]", "text-white");
     });
     lastTagValueClicked.value = null;
     tagActive.value = false;
@@ -417,15 +455,20 @@ watch(search, debounce(submit, 500));
             </div>
             <div class="overflow-hidden p-3">
                 <header class="mb-4 flex justify-end">
-                    <input
-                        v-model="search"
-                        type="text"
-                        class="w-96 rounded-full border p-2 px-5"
-                        placeholder="Search job title"
-                    />
+                    <div class="relative">
+                        <input
+                            v-model="search"
+                            type="text"
+                            class="w-96 rounded-full border p-2 px-5 pl-10"
+                            placeholder="Search job title"
+                        />
+                        <i
+                            class="bi bi-search absolute left-4 top-2 text-gray-500"
+                        ></i>
+                    </div>
                 </header>
 
-                <div class="h-16">
+                <div class="relative mb-3 h-16 px-8">
                     <swiper-container
                         ref="swiper-container"
                         class="h-full"
@@ -433,7 +476,6 @@ watch(search, debounce(submit, 500));
                         slides-per-view="auto"
                         :free-mode="true"
                         :free-mode-sticky="false"
-                        :navigation="true"
                     >
                         <TransitionGroup name="list">
                             <swiper-slide
@@ -445,7 +487,7 @@ watch(search, debounce(submit, 500));
                                     @click="filterTag(jobTitle, $event)"
                                     href="/"
                                     :class="[
-                                        'tag-buttons rounded-full border border-blue-500 px-5 py-2 text-[12px] text-blue-500 hover:cursor-pointer',
+                                        'tag-buttons rounded border border-[#9f9f9f] px-2 py-2 text-[12px] font-bold text-[#9f9f9f] hover:cursor-pointer',
                                     ]"
                                 >
                                     {{ jobTitle }}
@@ -453,6 +495,18 @@ watch(search, debounce(submit, 500));
                             </swiper-slide>
                         </TransitionGroup>
                     </swiper-container>
+                    <div
+                        ref="prev"
+                        class="absolute left-[-10px] top-[50%] z-[999px] translate-y-[-50%] text-orange-500"
+                    >
+                        <i class="bi bi-arrow-left-short text-3xl"></i>
+                    </div>
+                    <div
+                        ref="next"
+                        class="absolute right-[-10px] top-[50%] translate-y-[-50%] text-orange-500"
+                    >
+                        <i class="bi bi-arrow-right-short text-3xl"></i>
+                    </div>
                 </div>
 
                 <TransitionGroup

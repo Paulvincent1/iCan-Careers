@@ -55,7 +55,7 @@ let datePosted = computed(() => {
                 <i
                     @click=""
                     :class="[
-                        'bi bi-bookmark-dash-fill text-green-500 hover:cursor-pointer',
+                        'bi bi-bookmark-dash-fill text-orange-500 hover:cursor-pointer',
                         {
                             'bi-bookmark-dash-fill': isSaved,
                             'bi-bookmark-dash': !isSaved,
@@ -120,7 +120,7 @@ let datePosted = computed(() => {
             <Link
                 :href="route('jobsearch.show', job.id)"
                 as="button"
-                class="flex-1 rounded-lg border border-green-500 p-3 text-green-500"
+                class="flex-1 rounded-lg border border-orange-500 p-3 text-orange-500"
             >
                 Details
             </Link>
@@ -130,7 +130,7 @@ let datePosted = computed(() => {
                 method="post"
                 preserve-scroll
                 :href="route('jobsearch.save.job', job.id)"
-                class="flex-1 rounded-lg border bg-green-500 p-3 text-white"
+                class="flex-1 rounded-lg border bg-orange-500 p-3 text-white"
             >
                 {{ isSaved === 1 ? "Saved" : "Save for later" }}
             </Link>

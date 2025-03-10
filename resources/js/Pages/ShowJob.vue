@@ -127,6 +127,10 @@ function closeJob() {
                         alt=""
                     />
                     <Link
+                        v-if="
+                            page.props.auth.user.role.name === 'Senior' ||
+                            page.props.auth.user.role.name === 'PWD'
+                        "
                         @click="saveJob"
                         as="button"
                         method="post"

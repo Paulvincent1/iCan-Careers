@@ -114,10 +114,16 @@ let channelChatHeads = null;
 function listenChannelChatHeads() {
     const channelName = "chathead-" + page.props.auth.user.authenticated.id;
 
-    if (channelChatHeads) {
-        console.log("unsub");
+    console.log(window.Echo.connector.channels[channelName]?.subscription);
 
-        channelChatHeads.unsubscribe();
+    if (window.Echo.connector.channels[channelName]?.subscription) {
+        if (
+            !window.Echo.connector.channels[channelName]?.subscription
+                .subscribed
+        ) {
+            window.Echo.connector.channels[channelName].subscribe();
+            return;
+        }
     }
 
     channelChatHeads = window.Echo.channel(channelName).listen(
@@ -128,6 +134,7 @@ function listenChannelChatHeads() {
             console.log(chatHeads.value);
         },
     );
+    console.log(channelChatHeads.subscription);
 }
 
 function unshiftLatestChatHead(userId, newChatHead) {
@@ -156,11 +163,7 @@ function goToChat(userId) {
 }
 
 onBeforeUnmount(() => {
-    if (channelChatHeads) {
-        channelChatHeads.unsubscribe();
-        // Stop listening to the '.message.event' event on the channel
-        channelChatHeads.stopListening(".message.event");
-    }
+    channelChatHeads.stopListening(".message.event");
 });
 </script>
 <template>
@@ -391,7 +394,7 @@ onBeforeUnmount(() => {
                                                     )
                                                 "
                                                 as="button"
-                                                class="text-lg text-[#171816]"
+                                                class="text-sm text-[#171816]"
                                             >
                                                 <i
                                                     class="bi bi-arrow-right"
