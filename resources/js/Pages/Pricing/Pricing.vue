@@ -141,12 +141,12 @@ function openInvoiceModal(e) {
 }
 
 function closeInvoiceModal() {
-    console.log("close");
+    
 
     isOpenInvoiceModal.value = false;
 }
 
-console.log(pricingPlans);
+
 </script>
 
 <template>

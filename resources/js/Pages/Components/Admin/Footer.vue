@@ -7,6 +7,7 @@ import {
     faLinkedin,
     faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
+import { Link } from "@inertiajs/vue3";
 
 // Add the icons only for this component
 library.add(faFacebook, faInstagram, faLinkedin, faTwitter);
@@ -37,9 +38,9 @@ library.add(faFacebook, faInstagram, faLinkedin, faTwitter);
                         >
                     </li>
                     <li>
-                        <a href="/jobs" class="text-gray-400 hover:text-white"
-                            >Find Jobs</a
-                        >
+                        <Link :href="route('jobsearch')" class="text-gray-400 hover:text-white"
+                            >Find Jobs
+                        </Link>
                     </li>
                     <li>
                         <a
@@ -50,13 +51,13 @@ library.add(faFacebook, faInstagram, faLinkedin, faTwitter);
                     </li>
                     <li>
                         <a
-                            href="/stories"
+                            href="/pricing"
                             class="text-gray-400 hover:text-white"
-                            >Success Stories</a
+                            >Pricing</a
                         >
                     </li>
                     <li>
-                        <a href="/faq" class="text-gray-400 hover:text-white"
+                        <a href="/" class="text-gray-400 hover:text-white"
                             >FAQs</a
                         >
                     </li>

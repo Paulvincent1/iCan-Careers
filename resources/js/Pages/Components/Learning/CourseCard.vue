@@ -1,3 +1,7 @@
+<script setup>
+defineProps(["course"]);
+</script>
+
 <template>
   <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md hover:shadow-lg transition">
     <img :src="course.image" alt="Course Thumbnail" class="rounded-lg mb-4 h-40 w-full object-cover" />
@@ -8,9 +12,3 @@
     </button>
   </div>
 </template>
-
-<script>
-export default {
-  props: ["course"],
-};
-</script>

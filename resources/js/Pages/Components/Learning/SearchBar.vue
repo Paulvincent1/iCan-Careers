@@ -1,3 +1,8 @@
+<script setup>
+defineProps(["modelValue"]);
+defineEmits(["update:modelValue"]);
+</script>
+
 <template>
   <div class="mb-6 flex justify-between items-center">
     <input
@@ -9,10 +14,3 @@
     />
   </div>
 </template>
-
-<script>
-export default {
-  props: ["modelValue"],
-  emits: ["update:modelValue"],
-};
-</script>
