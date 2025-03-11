@@ -77,7 +77,7 @@ function updateJobTitle() {
 
 function updateWorkDetails() {
     router.put(
-        "",
+        "/jobseekers/myprofile/updateprofile",
         {
             job_type: workerProfile.value.job_type,
             work_hour_per_day: workerProfile.value.work_hour_per_day,
