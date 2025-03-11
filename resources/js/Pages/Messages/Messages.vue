@@ -21,6 +21,10 @@ let props = defineProps({
     firstMessageChatHeadProps: null,
     messageProps: null,
     userDirectMessageProps: null,
+    user: {
+        type: Object,
+        required: true,
+    },
 });
 
 let chatContainer = useTemplateRef("chat-container");
@@ -554,10 +558,14 @@ watch(
                         <div class="flex items-center gap-2 border-b p-4">
                             <div class="h-10 w-10">
                                 <img
-                                    class="h-full w-full"
-                                    src="/assets/images.png"
-                                    alt=""
-                                />
+                                :src="
+                                    user.profile_photo_path
+                                        ? user.profile_photo_path
+                                        : 'assets/profile_placeholder.jpg'
+                                "
+                                alt="User Profile"
+                                class="h-full w-full rounded-full object-cover"
+                            />
                             </div>
                             <div>
                                 <p>
