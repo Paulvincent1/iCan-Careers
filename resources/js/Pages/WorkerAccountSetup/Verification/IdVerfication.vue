@@ -158,14 +158,14 @@ const submit = () => {
                         <SubmitImage
                             id="govId"
                             @imageAdded="govIdChange"
-                            description="Upload your government ID photo here"
+                            description="<span class='text-blue-500'><u>Upload</u></span> your Government ID here"
                             :error="form.errors.id_image"
                         ></SubmitImage>
 
                         <SubmitImage
                             id="selfieId"
                             @imageAdded="selfieIdChange"
-                            description="Upload your selfie ID photo here"
+                            description="<span class='text-blue-500'><u>Upload</u></span> your Selfie here"
                             :error="form.errors.selfie_image"
                         ></SubmitImage>
                     </div>

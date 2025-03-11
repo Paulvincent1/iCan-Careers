@@ -92,7 +92,7 @@ onUnmounted(() => {
             <div class="flex flex-1 justify-center md:justify-start">
                 <Link href="/admin">
                     <img
-                        src="/assets/iCanCareersincognito.png"
+                        src="/assets/iCanCareersLogo.png"
                         alt="Logo"
                         class="h-10 md:hidden lg:hidden"
                     />

@@ -75,7 +75,7 @@ let onHover = ref(false);
                 />
                 <button
                     :disabled="disabled"
-                    class="rounded bg-green-300 p-1 text-white"
+                    class="rounded bg-[#fa8334] p-1 text-white"
                 >
                     Save
                 </button>
@@ -125,7 +125,7 @@ let onHover = ref(false);
                         updateExperience();
                         experienceActive = false;
                     "
-                    class="rounded bg-green-300 p-1 text-white"
+                    class="rounded bg-[#fa8334] p-1 text-white"
                 >
                     Save Experience
                 </button>

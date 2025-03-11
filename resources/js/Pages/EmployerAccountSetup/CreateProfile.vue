@@ -105,64 +105,73 @@ const submit = () => {
 <template>
     <Head title="Create Profile | iCan Careers" />
 
-    <div class="flex justify-center">
-        <div class="w-full max-w-3xl bg-white shadow-md rounded-lg p-8 mt-8 border border-gray-300">
+    <div class="">
+        <div class="flex justify-center  ">
+        <div class="w-full max-w-5xl bg-white shadow-md rounded-lg p-8 mt-8 border border-gray-300">
             <h2 class="text-3xl font-bold text-gray-900 text-center">Create Your Employer Profile</h2>
             <p class="text-lg text-gray-700 text-center mb-6">
                 Please provide your details to create your employer profile.
             </p>
 
-            <form @submit.prevent="submit" class="space-y-6">
+            <hr class="my-4 border-gray-300" />
+            <h3 class="text-xl font-bold text-gray-900">Personal Information</h3>
+            <h3 class="text-xs">This information will be displayed publicly so be careful what you share.</h3>
+
+            <form @submit.prevent="submit" class="space-y-6 mt-4">
                 <!-- Full Name -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-800">Full Name</label>
+                <div class="flex flex-col my-7">
+                    <label class="text-lg font-semibold text-gray-800">Full Name</label>
                     <input
                         v-model.trim="form.full_name"
                         type="text"
-                        class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="John Doe"
+                        class="w-full mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
+                        placeholder="ex: Draven Troy Coloma"
                         required
                     />
                     <InputFlashMessage type="error" :message="form.errors.full_name" />
                 </div>
 
-                <!-- Phone Number -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-800">Phone Number</label>
+                <div class="grid grid-cols-2 gap-5 ">
+
+                     <!-- Birth Year -->
+                <div class="flex flex-col">
+                    <label class="text-lg font-semibold text-gray-800">Birth Year</label>
+                    <input
+                        v-model.number="form.birth_year"
+                        type="number"
+                        min="1900"
+                        :max="dayjs().year() - 18"
+                        class="w-full mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
+                        placeholder="YYYY"
+                        required
+                    />
+                </div>
+                    <!-- Phone Number -->
+                <div class="flex flex-col">
+                    <label class=" text-lg font-semibold text-gray-800">Phone Number</label>
                     <input
                         v-model.trim="form.phone_number"
                         type="number"
-                        class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                        class="w-full mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
                         placeholder="09123456789"
                         required
                     />
                     <InputFlashMessage type="error" :message="form.errors.phone_number" />
                 </div>
 
-                <!-- Birth Year -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-800">Birth Year</label>
-                    <input
-                        v-model.number="form.birth_year"
-                        type="number"
-                        min="1900"
-                        :max="dayjs().year() - 18"
-                        class="w-32 mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg text-center focus:ring-2 focus:ring-blue-500"
-                        placeholder="YYYY"
-                        required
-                    />
+
                 </div>
 
                 <!-- Gender -->
-                <div>
+                <div class="flex flex-col">
                     <p class="text-lg font-semibold text-gray-800">Gender</p>
                     <div class="flex items-center gap-6 mt-2">
-                        <label class="flex items-center gap-2 cursor-pointer text-lg">
-                            <input v-model="form.gender" type="radio" value="Male" class="w-6 h-6" />
+                        <label class="flex items-center gap-2 cursor-pointer text-md">
+                            <input v-model="form.gender" type="radio" value="Male" class="w-4 h-4" />
                             <span class="text-gray-700">Male</span>
                         </label>
-                        <label class="flex items-center gap-2 cursor-pointer text-lg">
-                            <input v-model="form.gender" type="radio" value="Female" class="w-6 h-6" />
+                        <label class="flex items-center gap-2 cursor-pointer text-md">
+                            <input v-model="form.gender" type="radio" value="Female" class="w-4 h-4" />
                             <span class="text-gray-700">Female</span>
                         </label>
                     </div>
@@ -170,33 +179,54 @@ const submit = () => {
                 </div>
 
                 <!-- Employer Type -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-800">What kind of employer are you?</label>
+                <div class="flex flex-col">
+
+                    <label class="my-3 flex text-lg font-semibold text-gray-800">What kind of employer are you?</label>
                     <select
                         v-model="form.employer_type"
-                        class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                        class="w-[300px] mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
                         required
                     >
                         <option value="business">Business / Company Employer</option>
                         <option value="individual">Individual (Freelance)</option>
                     </select>
                 </div>
+                <hr class="my-4 border-gray-300" />
 
                 <!-- Company Form (Conditional) -->
                 <Transition name="fade">
+
                     <div v-if="showCompanyForm" class="space-y-6">
-                        <h3 class="text-xl font-bold text-gray-900">Company Details</h3>
+
+
 
                         <!-- Search Existing Company -->
-                        <div>
-                            <label class="block text-lg font-semibold text-gray-800">Search Existing Company</label>
+                        <div class="relative w-full">
+                            <h3 class="text-xl font-bold text-gray-900">Company Details</h3>
+                            <h3 class="text-xs mb-7">Your company details help potential job seekers learn more about your business. Ensure the information you provide is accurate and represents your company well.</h3>
+                            <label class="mt-7 text-lg font-semibold text-gray-800">Look Up an Existing Company</label>
+                           <div class="relative">
                             <input
                                 v-model.trim="searchBusiness"
                                 type="text"
-                                class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
-                                placeholder="Search existing company"
+                                class="w-full border rounded-lg px-4 py-2 text-lg outline-blue-400 pl-10"
+                                placeholder="Enter company name to search..."
                                 autocomplete="off"
                             />
+                            <svg
+                                class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                        >
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-4.35-4.35M16.65 10.65a6 6 0 1 0-8.49 8.49 6 6 0 0 0 8.49-8.49z"
+                             />
+                             </svg>
+
+                           </div>
+
                             <div class="mt-2 h-52 w-full overflow-y-auto border border-gray-400 rounded-lg p-2">
                                 <div
                                     v-for="business in bussinessProps"
@@ -221,36 +251,35 @@ const submit = () => {
 
                         <!-- Company Information -->
                         <div v-if="!isBusinessSelected">
-                            <h3 class="text-xl font-bold text-gray-900">Company Information</h3>
 
                             <!-- Business Name -->
-                            <div>
-                                <label class="block text-lg font-semibold text-gray-800">Business / Company Name</label>
+                            <div class="flex flex-col">
+                                <label class="text-lg font-semibold text-gray-800">Business / Company Name</label>
                                 <input
                                     v-model.trim="form.business_name"
                                     type="text"
-                                    class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                                    class="w-full mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
                                     placeholder="e.g. iCan Careers"
                                 />
                                 <InputFlashMessage type="error" :message="form.errors.business_name" />
                             </div>
 
                             <!-- Business Logo -->
-                            <div>
-                                <label class="block text-lg font-semibold text-gray-800">Business Logo</label>
+                            <div class="flex flex-col my-7">
+                                <label class="text-lg font-semibold text-gray-800">Business Logo</label>
                                 <SubmitImage
                                     @imageAdded="imageAdded"
-                                    description="Upload the business logo here"
+                                    description="<span class='text-blue-500'><u>Upload</u></span> the business logo here"
                                     :error="form.errors.business_logo"
                                 />
                             </div>
 
                             <!-- Industry -->
-                            <div>
-                                <label class="block text-lg font-semibold text-gray-800">Industry</label>
+                            <div class="flex flex-col w-full">
+                                <label class="text-lg font-semibold text-gray-800">Industry</label>
                                 <select
                                     v-model="form.industry"
-                                    class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                                    class="w-full max-w-md border rounded-lg px-4 py-2 text-lg outline-blue-400 md:max-w-sm"
                                 >
                                     <option value="Technology and IT">Technology and IT</option>
                                     <option value="Remote Customer Support">Remote Customer Support</option>
@@ -263,18 +292,18 @@ const submit = () => {
                                     v-if="showInput"
                                     v-model.trim="otherIndustry"
                                     type="text"
-                                    class="w-full mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                                    class="w-full mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
                                     placeholder="Please Specify"
                                 />
                                 <InputFlashMessage type="error" :message="form.errors.industry" />
                             </div>
 
                             <!-- Company Description -->
-                            <div>
-                                <label class="block text-lg font-semibold text-gray-800">Company Description</label>
+                            <div class="my-7">
+                                <label class="text-lg font-semibold text-gray-800">Company Description</label>
                                 <textarea
                                     v-model.trim="form.business_description"
-                                    class="w-full h-40 mt-2 border border-gray-400 bg-gray-100 rounded-lg px-4 py-3 text-lg focus:ring-2 focus:ring-blue-500"
+                                    class="w-full h-[200px] mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400 resize-none"
                                     placeholder="Tell us about your company..."
                                 ></textarea>
                                 <InputFlashMessage type="error" :message="form.errors.business_description" />
@@ -282,24 +311,43 @@ const submit = () => {
 
                             <!-- Company Location -->
                             <div>
-                                <label class="block text-lg font-semibold text-gray-800">Company Location</label>
-                                <Maps @update:coordinates="setMarkLocation" />
+                                <label class="block text-lg font-semibold text-gray-800 mb-4">Company Location</label>
+                                <div class="bg-black p-1">
+                                    <Maps @update:coordinates="setMarkLocation" />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </Transition>
 
-                <!-- Submit Button -->
-                <div class="flex justify-center">
-                    <button
-                        class="w-full bg-green-500 text-white font-bold px-6 py-4 text-xl rounded-lg hover:bg-green-600 transition shadow-md"
-                        type="submit"
-                    >
-                        Save Profile
-                    </button>
-                </div>
+                <div class="mt-4 flex justify-end gap-3">
+                            <!-- Submit Button -->
+                            <div
+                                type="button"
+                                @click="
+                                    $inertia.visit(route('employer.dashboard'))
+                                "
+                                class="mt-4 flex justify-end"
+                            >
+                                <button
+                                    class="cursor-pointer rounded p-2 text-black"
+                                >
+                                    <u>Skip for now</u>
+                                </button>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="mt-4 flex justify-end">
+                                <button
+                                    class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
+                                >
+                                    Save Profile
+                                </button>
+                            </div>
+                        </div>
             </form>
         </div>
+    </div>
     </div>
 </template>
 

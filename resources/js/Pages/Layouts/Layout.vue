@@ -11,7 +11,7 @@ let closeProfileStupMessageEmployer = ref(false);
 
 <template>
     <Navbar />
-    <main class="mt-[4.625rem]">
+    <main class="mt-[4.625rem] ">
         <slot></slot>
     </main>
     <Teleport defer to="body">

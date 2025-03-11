@@ -81,7 +81,7 @@ const submit = () => {
             if (form.skills[i].star === "") {
                 errorMessage.value = "Please rate all your skills";
                 return;
-            }   
+            }
         }
     } else {
         errorMessage.value = "Please add a skill";
@@ -105,13 +105,13 @@ const submit = () => {
                 </p>
 
                 <!-- Add Skill Input -->
-                <div class="p-6 bg-gray-100 rounded-lg shadow-md mb-6">
+                <div class="p-6 mb-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Add a Skill</h3>
                     <AddSkillInput @addSkill="addSkill" />
                 </div>
 
                 <!-- Skills List -->
-                <div class="p-6 bg-gray-100 rounded-lg shadow-md">
+                <div class="p-6 ">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Your Skills</h3>
 
                     <div v-if="form.skills.length" class="space-y-4">
@@ -134,14 +134,31 @@ const submit = () => {
                 <hr class="my-7" />
 
                 <!-- Save Button -->
-                <div class="flex justify-center">
-                    <button
-                        @click="submit"
-                        class="w-full bg-green-500 text-white font-bold px-6 py-4 text-xl rounded-lg hover:bg-green-600 transition shadow-md disabled:opacity-50"
-                    >
-                        Save Skills
-                    </button>
-                </div>
+                <div class="mt-4 flex justify-end gap-3">
+                            <!-- Submit Button -->
+                            <div
+                                type="button"
+                                @click="
+                                    $inertia.visit(route('worker.dashboard'))
+                                "
+                                class="mt-4 flex justify-end"
+                            >
+                                <button
+                                    class="cursor-pointer rounded p-2 text-black"
+                                >
+                                    <u>Skip for now</u>
+                                </button>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="mt-4 flex justify-end">
+                                <button
+                                    class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
+                                >
+                                    Save Skills
+                                </button>
+                            </div>
+                        </div>
             </div>
 
             <!-- Right Side: Step-by-Step Instructions -->
