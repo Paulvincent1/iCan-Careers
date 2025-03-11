@@ -165,7 +165,10 @@ class JobPostController extends Controller
     public function edit(JobPost $jobid)
     {
         // dd($jobid);
-        return inertia('Employer/CreateJob', ['jobPostProp' => $jobid]);
+        if($jobid->job_status === 'Closed'){
+            return redirect()->back();
+        }
+        return inertia('Employer/CreateJob', ['jobPostProp' => $jobid, 'isEdit' => true]);
     }
 
     /**

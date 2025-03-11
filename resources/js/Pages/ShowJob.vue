@@ -148,17 +148,30 @@ function closeJob() {
                             ]"
                         ></i>
                     </Link>
+                    <Link
+                        v-else
+                        v-if="!isClosed"
+                        as="button"
+                        method="get"
+                        preserve-scroll
+                        :href="route('employer.jobpost.edit', jobPostProps.id)"
+                        class=""
+                    >
+                        <i
+                            class="bi bi-pencil-fill absolute bottom-[-5px] right-[-10px] text-lg text-orange-500"
+                        ></i>
+                    </Link>
                 </div>
             </div>
         </div>
         <div class="xs container mx-auto mt-12 px-[0.5rem] xl:max-w-7xl">
             <p
-                class="my-2 break-words text-center text-[20px] font-medium md:text-[26px]"
+                class="my-2 break-words text-center text-[18px] font-medium md:text-[24px]"
             >
                 {{ jobPostProps.job_title }}
             </p>
             <Link class="flex items-center justify-center gap-2">
-                <p class="text-center text-gray-500">
+                <p class="text-center text-sm text-gray-500 underline">
                     {{
                         jobPostProps.employer.employer_profile
                             .business_information
@@ -208,16 +221,17 @@ function closeJob() {
                     preserve-scroll
                     :href="route('employer.jobpost.close', jobPostProps.id)"
                     :class="[
-                        'w-44 rounded border border-red-400 p-2 px-8 font-bold text-red-400',
+                        'rounded border border-[#171816] p-2 px-5 text-[12px] font-bold text-[#171816]',
                         {
-                            'pointer-events-none bg-red-400 text-white':
+                            'pointer-events-none bg-[#171816] text-white':
                                 isClosed,
                         },
                     ]"
                 >
-                    {{ isClosed ? "Closed" : "Close this job" }}
+                    {{ isClosed ? "CLOSED" : "CLOSE THIS JOB" }}
+                    <i class="bi bi-x-circle-fill"></i>
                 </Link>
-                <Link
+                <!-- <Link
                     v-if="!isClosed"
                     as="button"
                     method="get"
@@ -226,7 +240,7 @@ function closeJob() {
                     class="w-44 rounded border border-blue-400 p-2 px-8 font-bold text-blue-400"
                 >
                     Edit
-                </Link>
+                </Link> -->
             </div>
         </div>
         <div class="flex-1 bg-[#f3f7fa]">

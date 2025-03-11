@@ -23,7 +23,8 @@ class EmployerDashboardController extends Controller
             $query->wherePivot('current' , true);
         }])->where('employer_id',  $user->id)->latest()->get();
 
-        $hiredWorkers = $jobs->pluck('employedWorkers')->flatten()->unique();
+        $hiredWorkers = $jobs->pluck('employedWorkers')->flatten()->unique('id');
+        // dd($hiredWorkers);
         $subscription = EmployerSubscription::where('employer_id', $user->id)->first(); 
 
         $invoices =  $user->employerInvoices()->with('worker')->get();
@@ -117,6 +118,7 @@ class EmployerDashboardController extends Controller
         return inertia('Employer/Applicants',
             [
                 'applicantsProps' => $applicants,
+                'applicantsCount' => $applicants->count(),
                 'statusCountProps' => $statusCounts ,
                 'messageProp' => session()->get('message'),
                 'jobProps' => $jobid,

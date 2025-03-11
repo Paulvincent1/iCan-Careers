@@ -992,10 +992,19 @@ const formatCurrency =
         </div>
     </div>
     <ReusableModal @closeModal="closeModalPayout" v-if="openPayoutModal">
-        <div class="h-[500px] w-[350px] overflow-auto rounded bg-white p-2">
+        <div
+            class="h-[500px] w-[350px] overflow-auto rounded bg-white p-4 text-[#171816]"
+        >
             <div>
-                <h2 class="mb-5 text-xl font-medium">Choose Payout option</h2>
-                <div>
+                <div class="mb-2 rounded-lg bg-orange-400 p-5">
+                    <p class="mb-2 text-sm text-white">My Balance</p>
+                    <p class="mb-1 text-4xl font-bold text-white">{{ formatCurrency(balance.balance) }}</p>
+                    <p class="text-[12px] text-white">
+                        Available balance to withdraw
+                    </p>
+                </div>
+                <div class="px-1">
+                    <p class="mb-1 text-sm font-medium">Choose Payout option</p>
                     <!-- <div class="cursor-pointer">
                         <div
                             @click="openCardForm = !openCardForm"
@@ -1095,9 +1104,10 @@ const formatCurrency =
                         <div
                             @click="openEwalletForm = !openEwalletForm"
                             :class="[
-                                'flex items-center justify-between border p-3',
+                                'flex items-center justify-between rounded-lg border p-3',
                                 {
-                                    'border-b-0': openEwalletForm,
+                                    'rounded-bl-none rounded-br-none border-b-0':
+                                        openEwalletForm,
                                 },
                             ]"
                         >
@@ -1144,7 +1154,7 @@ const formatCurrency =
                                         :message="errorMessage.gcashAmount"
                                         type="error"
                                     ></InputFlashMessage>
-                                    <p class="text-sm">
+                                    <p class="text-[12px]">
                                         Available Balance:
                                         {{ formatCurrency(balance.balance) }}
                                     </p>
@@ -1178,7 +1188,7 @@ const formatCurrency =
                                 <div class="flex justify-center">
                                     <button
                                         @click="createPayout('PH_GCASH')"
-                                        class="rounded bg-slate-400 p-2 text-white"
+                                        class="rounded bg-[#171816] p-2 text-white"
                                     >
                                         Pay Now
                                     </button>
@@ -1190,9 +1200,10 @@ const formatCurrency =
                         <div
                             @click="openOnlineBanking = !openOnlineBanking"
                             :class="[
-                                'flex items-center justify-between border p-3',
+                                'flex items-center justify-between rounded-lg border p-3',
                                 {
-                                    'border-b-0': openOnlineBanking,
+                                    'rounded-bl-none rounded-br-none border-b-0':
+                                        openOnlineBanking,
                                 },
                             ]"
                         >
@@ -1235,7 +1246,7 @@ const formatCurrency =
                                         :message="errorMessage.bpiAmount"
                                         type="error"
                                     ></InputFlashMessage>
-                                    <p class="text-sm">
+                                    <p class="text-[12px]">
                                         Available Balance:
                                         {{ formatCurrency(balance.balance) }}
                                     </p>
@@ -1269,7 +1280,7 @@ const formatCurrency =
                                 <div class="flex justify-center">
                                     <button
                                         @click="createPayout('PH_BPI')"
-                                        class="rounded bg-slate-400 p-2 text-white"
+                                        class="rounded bg-[#171816] p-2 text-white"
                                     >
                                         Pay Now
                                     </button>

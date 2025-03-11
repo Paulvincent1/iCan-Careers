@@ -16,6 +16,7 @@ defineOptions({});
 let props = defineProps({
     locationProps: null,
     jobPostProp: null,
+    isEdit: null,
 });
 
 let form = useForm({
@@ -155,14 +156,14 @@ const submit = () => {
     <Head title="Create Job | iCan Careers" />
     <div class="flex justify-center bg-[#eff2f6] text-[#171816]">
         <div
-            class="mt-8 flex w-full max-w-5xl flex-col rounded-lg bg-white p-8 md:flex-row"
+            class="omd:flex-row mt-8 flex w-full max-w-5xl flex-col rounded-lg bg-white p-8"
         >
             <!-- Left Side: Job Post Form -->
             <div class="w-full pr-6">
                 <h2
                     class="text-center text-3xl font-bold text-gray-900 md:text-left"
                 >
-                    Post a Job
+                    {{ isEdit ? "Edit a Job" : "Post a Job" }}
                 </h2>
                 <p class="mb-6 text-center text-lg text-gray-700 md:text-left">
                     Fill out the form below to post a new job opportunity.
