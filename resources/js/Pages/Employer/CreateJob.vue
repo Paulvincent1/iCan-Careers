@@ -170,9 +170,12 @@ const submit = () => {
                 </p>
 
                 <hr class="my-4 border-gray-300" />
-
+                <h3 class="text-xl font-bold text-gray-900">Job Information</h3>
+                <h3>This information will be displayed publicly so be careful what you share.</h3>
                 <form @submit.prevent="submit">
-                    <div class="space-y-6">
+
+                    <div class="space-y-6 mt-4">
+
                         <!-- Job Title -->
                         <div class="grid grid-cols-2 gap-5">
                             <div class="flex flex-col">
@@ -213,7 +216,7 @@ const submit = () => {
                         </div>
 
                         <hr class="my-4 border-gray-300" />
-
+                        <h3 class="text-xl font-bold text-gray-900">Work Details</h3>
                         <!-- Work Arrangement -->
                         <div class="flex w-full flex-col">
                             <label class="mb-2 font-semibold"
@@ -279,7 +282,7 @@ const submit = () => {
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             <!-- Hour Per Day -->
                             <div class="flex flex-col">
                                 <label class="mb-2 font-semibold"
@@ -338,7 +341,6 @@ const submit = () => {
                             </div>
                         </div>
 
-                        <hr class="my-4 border-gray-300" />
 
                         <!-- Description -->
                         <div class="flex flex-col">
@@ -347,7 +349,7 @@ const submit = () => {
                             >
                             <textarea
                                 v-model="form.description"
-                                class="resize-none rounded border px-3 py-2 outline-blue-400"
+                                class="resize-none h-[250px] rounded border px-3 py-2 outline-blue-400"
                                 placeholder="Enter job description"
                                 required
                             ></textarea>

@@ -16,8 +16,8 @@ let props = defineProps({
     <div class="relative">
         <select
             v-model="model"
-            class="w-full appearance-none border px-3 py-2 outline-blue-400 bg-gray-100"
-            :class="{ 'border-red-500': error }" 
+            class="w-[350px] appearance-none border px-3 py-2 outline-blue-400"
+            :class="{ 'border-red-500': error }"
         >
             <option disabled value="">Select your highest education</option>
             <option value="Primary School Completed">
@@ -35,10 +35,11 @@ let props = defineProps({
             <option v-if="openToAll" value="Open to all">
                 Open to All (Any Educational Attainment)
             </option>
+
+
+
         </select>
-        <i
-            class="bi bi-chevron-down absolute right-2 top-[50%] translate-y-[-50%] text-[16px] font-bold text-purple-500"
-        ></i>
+
         <InputFlashMessage type="error" :message="error" />
     </div>
 </template>
