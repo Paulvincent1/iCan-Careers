@@ -26,7 +26,7 @@ class JobPostController extends Controller
     public function create()
     {
         if(!Gate::allows('employer-profile-check')) {
-            return redirect()->back();
+            return redirect()->route('reate.profile.employer');
         }
         $user = Auth::user();
         // dd($user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->count());

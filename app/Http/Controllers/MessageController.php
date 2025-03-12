@@ -20,10 +20,15 @@ class MessageController extends Controller
     public function index(Request $request)
     {
 
-        if ($request->user()->roles()->first()->name === 'Employer') {
-            if (!Gate::allows('employer-profile-check')) {
-                return redirect()->back();
-            }
+
+        if($request->user()->roles()->first()->name === 'Employer'){
+            if(!Gate::allows('employer-profile-check')) {
+                return redirect()->route('reate.profile.employer');
+
+        if($request->user()->roles()->first()->name != 'Employer'){
+            if(!Gate::allows('worker-profile-check')){
+                return redirect()->route('create.profile');
+            }    
         }
 
         // this code is used when theres a query params user in the url.

@@ -11,6 +11,7 @@ use App\Http\Controllers\JobSearchController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WorkerBasicInfoController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
@@ -111,6 +112,8 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class
 
         Route::post('/showjob/{id}',[JobSearchController::class,'apply'])->name('jobsearch.apply');
 
+        Route::get('/profile/{employerId}',[EmployerProfileController::class, 'showEmployerProfile'])->name('visit.employer.profile');
+
     });
 
 });
@@ -180,6 +183,10 @@ Route::middleware([ForceGetRedirect::class])->group(function() {
 
     //notification
     Route::put('/mark-as-read-notifications', [NotificationController::class, 'markAllNotificationRead'])->name('user.mark-all-notification-as-read');
+
+    
+    //report user
+    Route::post('/report/{userId}', [ReportController::class,'store'])->name('report.user');
 
 
 
