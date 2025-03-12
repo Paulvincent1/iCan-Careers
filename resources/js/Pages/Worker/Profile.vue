@@ -7,6 +7,7 @@ import { Link, router } from "@inertiajs/vue3";
 import AddSkillModal from "../Components/Modal/AddSkillModal.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
+import ReusableModal from "../Components/Modal/ReusableModal.vue";
 
 let props = defineProps({
     userProp: Object,
@@ -307,6 +308,72 @@ function updateResume(e) {
         },
     );
 }
+
+const reports = [
+    {
+        reason: "Work Performance Issues",
+        descriptions: [
+            "Work Not Delivered",
+            "Missed Deadlines",
+            "Low-Quality Work",
+            "Refusal to Revise Work",
+        ],
+    },
+    {
+        reason: "Fraud & Dishonesty",
+        descriptions: [
+            "Fake Profile or Misrepresentation",
+            "Plagiarized or Stolen Work",
+            "Multiple Accounts",
+            "Scamming the Employer",
+        ],
+    },
+    {
+        reason: "Unprofessional Behavior",
+        descriptions: [
+            "Unresponsive Worker",
+            "Rude or Disrespectful Communication",
+            "Harassment or Threats",
+        ],
+    },
+    {
+        reason: "Platform Violations",
+        descriptions: [
+            "Asking for Off-Platform Payments",
+            "Spamming or Self-Promotion",
+            "Discrimination",
+        ],
+    },
+];
+
+let isShowReportModal = ref(false);
+
+let reasonSelected = ref("");
+let descriptions = ref([]);
+
+function selectReason(report) {
+    console.log(report);
+
+    reasonSelected.value = report.reason;
+    descriptions.value = report.descriptions;
+}
+
+function submitReport(reason) {
+    router.post(
+        route("report.user", { userId: route().params.applicantId }),
+        {
+            reason,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                isShowReportModal.value = false;
+                showSuccessMessage();
+            },
+        },
+    );
+}
 </script>
 <template>
     <Head title="Profile | iCan Careers" />
@@ -434,7 +501,17 @@ function updateResume(e) {
             >
                 <div class="flex flex-col gap-4 text-[16px] text-gray-600">
                     <div class="rounded-lg bg-white p-8">
-                        <p class="mb-3 text-[20px] font-bold">Overview</p>
+                        <div class="mb-3 flex items-center justify-between">
+                            <p class="text-[20px] font-bold">Overview</p>
+                            <button
+                                v-if="visitor"
+                                @click="isShowReportModal = true"
+                            >
+                                <i
+                                    class="bi bi-exclamation-diamond-fill text-red-600"
+                                ></i>
+                            </button>
+                        </div>
                         <div class="mb-4 flex items-center gap-4">
                             <div
                                 class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200"
@@ -690,6 +767,53 @@ function updateResume(e) {
             </Transition>
         </Teleport>
     </div>
+
+    <ReusableModal
+        v-if="isShowReportModal"
+        @closeModal="isShowReportModal = false"
+    >
+        <div
+            class="w-[350px] max-w-[500px] rounded bg-white px-4 py-4 sm:w-[500px]"
+        >
+            <div class="mb-3 flex justify-between">
+                <button
+                    @click="reasonSelected = ''"
+                    :class="{ invisible: !reasonSelected }"
+                >
+                    <i class="bi bi-arrow-left-circle-fill text-2xl"></i>
+                </button>
+                <h2 class="text-2xl">Report</h2>
+                <button @click="isShowReportModal = false">
+                    <i class="bi bi-x-circle text-2xl"></i>
+                </button>
+            </div>
+            <div class="mb-3 flex flex-col">
+                <label for="" class="text-sm text-gray-500">{{
+                    reasonSelected
+                }}</label>
+                <button
+                    v-show="!reasonSelected"
+                    v-for="(report, index) in reports"
+                    :key="index"
+                    @click="selectReason(report)"
+                    class="flex items-center justify-between py-2 transition-all"
+                >
+                    <p>{{ report.reason }}</p>
+                    <i class="bi bi-caret-right font-bold"></i>
+                </button>
+                <button
+                    v-show="reasonSelected"
+                    v-for="(description, index) in descriptions"
+                    :key="index"
+                    @click="submitReport(description)"
+                    class="flex items-center justify-between py-2 transition-all"
+                >
+                    <p>{{ description }}</p>
+                    <i class="bi bi-caret-right font-bold"></i>
+                </button>
+            </div>
+        </div>
+    </ReusableModal>
 </template>
 
 <style scoped>

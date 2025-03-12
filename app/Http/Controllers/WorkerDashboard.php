@@ -15,6 +15,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Spatie\LaravelPdf\Facades\Pdf;
 
 class WorkerDashboard extends Controller
@@ -119,6 +120,10 @@ class WorkerDashboard extends Controller
     }
 
     public function createInvoice(){
+
+        if(!Gate::allows('worker-profile-check')){
+            return redirect()->route('create.profile');
+        }
 
         $user = Auth::user();
         $jobs = $user->myJobs()->with('employer')->wherePivot('current',true)->get();

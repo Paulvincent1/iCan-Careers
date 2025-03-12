@@ -84,8 +84,30 @@ class EmployerProfileController extends Controller
         'messageProp' => session('message'),
         'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
         'subscriptionProps' => $subscription,
-    ]);
-}
+        ]);
+    }
+
+    public function showEmployerProfile(User $employerId)
+    {
+        if(!$employerId->employerProfile){
+            return redirect()->back();
+        }
+        
+        $employerProfile = $employerId->employerProfile;
+        $jobsPosted = JobPost::where('employer_id', $employerId->id)->get();
+        $business = $employerId->employerProfile?->businessInformation;
+        $subscription = EmployerSubscription::where('employer_id', $employerId->id)->first();
+
+        return inertia('Employer/Profile', [
+            "user" => $employerId,
+            'employerProfileProp' => $employerProfile,
+            'businessProps' => $business ?? null,
+            'messageProp' => session('message'),
+            'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
+            'subscriptionProps' => $subscription,
+            'visitor' => true,
+            ]);
+    }
 
 
      public function updateProfile(Request $request)

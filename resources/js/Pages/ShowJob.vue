@@ -6,6 +6,7 @@ import { Link, router, usePage } from "@inertiajs/vue3";
 import ReusableModal from "./Components/Modal/ReusableModal.vue";
 import SuccessfulMessage from "./Components/Popup/SuccessfulMessage.vue";
 import InputFlashMessage from "./Components/InputFlashMessage.vue";
+import { route } from "../../../vendor/tightenco/ziggy/src/js";
 
 let props = defineProps({
     jobPostProps: null,
@@ -170,15 +171,14 @@ function closeJob() {
             >
                 {{ jobPostProps.job_title }}
             </p>
-            <Link class="flex items-center justify-center gap-2">
+            <Link
+                :href="
+                    route('visit.employer.profile', jobPostProps.employer.id)
+                "
+                class="flex items-center justify-center gap-2"
+            >
                 <p class="text-center text-sm text-gray-500 underline">
-                    {{
-                        jobPostProps.employer.employer_profile
-                            .business_information
-                            ? jobPostProps.employer.employer_profile
-                                  .business_information.business_name
-                            : jobPostProps.employer.name
-                    }}
+                    {{ jobPostProps.employer.name }}
                 </p>
                 <i class="bi bi-arrow-right"></i>
             </Link>
@@ -193,9 +193,10 @@ function closeJob() {
                     v-if="jobPostProps.job_status === 'Open'"
                 >
                     <button
+                        v-if="page.props.auth.worker_verified"
                         @click="showModal = true"
                         :class="[
-                            'job w-fit rounded-full border border-[#171816] p-2 px-8 font-bold text-[#171816]',
+                            'job w-fit rounded-full border border-[#171816] p-2 px-8 text-sm font-bold text-[#171816]',
                             {
                                 'pointer-events-none bg-[#171816] text-white':
                                     isApplied,
@@ -206,10 +207,16 @@ function closeJob() {
                         <!-- <i class="bi bi-patch-check-fill"></i> -->
                         <i class="bi bi-file-person"></i>
                     </button>
+                    <p v-else class="font-bold text-orange-500">
+                        Your account is not yet verified.
+                    </p>
                 </div>
-                <div v-else class="mb-3 mt-3">
-                    <p class="text-center text-lg font-bold text-red-500">
-                        This job listing is closed
+                <div v-else class="mx-auto mb-3 mt-3 w-fit">
+                    <p
+                        class="rounded border border-[#171816] bg-[#171816] p-2 px-5 text-[12px] font-bold text-white"
+                    >
+                        CLOSED
+                        <i class="bi bi-x-circle-fill"></i>
                     </p>
                 </div>
             </div>

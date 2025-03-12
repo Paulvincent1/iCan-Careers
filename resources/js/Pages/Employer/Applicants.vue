@@ -303,7 +303,21 @@ function openModal(e) {
         >
             <div class="mb-2">
                 <h2 class="text-[26px]">{{ jobProps.job_title }}</h2>
-                <p class="text-[#171816]">Applicants: {{ applicantsCount }}</p>
+                <div class="flex items-center gap-2">
+                    <p class="text-[#171816]">
+                        Applicants: {{ applicantsCount }}
+                    </p>
+                    <p
+                        v-if="
+                            page.props.auth.user.employer.subscription
+                                .subscription_type === 'Free'
+                        "
+                        class="font-bold text-orange-500"
+                    >
+                        <i class="bi bi-exclamation-triangle-fill"></i> You
+                        cannot hire applicants in free tier.
+                    </p>
+                </div>
             </div>
             <div class="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
                 <div>
@@ -490,6 +504,11 @@ function openModal(e) {
                                 </td>
                                 <td class="p-3 text-start font-normal">
                                     <select
+                                        :disabled="
+                                            page.props.auth.user.employer
+                                                .subscription
+                                                .subscription_type === 'Free'
+                                        "
                                         v-if="
                                             applicant.pivot.status !=
                                                 'Rejected' &&

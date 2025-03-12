@@ -47,6 +47,15 @@ class AppServiceProvider extends ServiceProvider
 
             return true;
         });
+
+        Gate::define('worker-profile-check', function (User $user){
+            if(!$user->workerProfile()) {
+                return false;
+            }
+
+            return true;
+        });
+
             // Share authenticated user globally with Inertia
         Inertia::share([
             'auth' => [

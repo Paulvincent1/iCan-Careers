@@ -12,6 +12,8 @@ onMounted(() => {
     backdrop.value.addEventListener("click", (e) => {
         if (modalContent.value) {
             if (!modalContent.value.contains(e.target)) {
+                console.log(modalContent.value);
+
                 emit("closeModal");
             }
         }
