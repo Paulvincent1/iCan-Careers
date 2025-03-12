@@ -153,6 +153,7 @@ const submit = () => {
                             <!-- Submit Button -->
                             <div class="mt-4 flex justify-end">
                                 <button
+                                @click="submit"
                                     class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
                                 >
                                     Save Skills

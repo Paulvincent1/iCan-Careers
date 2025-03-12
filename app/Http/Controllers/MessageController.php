@@ -20,11 +20,10 @@ class MessageController extends Controller
     public function index(Request $request)
     {
 
+
         if($request->user()->roles()->first()->name === 'Employer'){
             if(!Gate::allows('employer-profile-check')) {
                 return redirect()->route('reate.profile.employer');
-            }
-        }
 
         if($request->user()->roles()->first()->name != 'Employer'){
             if(!Gate::allows('worker-profile-check')){
@@ -42,76 +41,69 @@ class MessageController extends Controller
         $messages = null;
         $firstMessageChatHead = null;
 
-        if($userDirectMessage){
-            if(!$userDirectMessage->sentMessages()->where('receiver_id',$user->id)->first() && !$userDirectMessage->receivedMessages()->where('sender_id',$user->id)->first()){
-            //    dd('hi');
+        if ($userDirectMessage) {
+            if (!$userDirectMessage->sentMessages()->where('receiver_id', $user->id)->first() && !$userDirectMessage->receivedMessages()->where('sender_id', $user->id)->first()) {
+                //    dd('hi');
                 $firstMessageChatHead = [
                     'user' => $userDirectMessage,
                     'latestMessage' => null
                 ];
             }
 
-            $messages = Message::where(function ($query) use($user, $userDirectMessage) {
+            $messages = Message::where(function ($query) use ($user, $userDirectMessage) {
 
                 $query->where('sender_id', $user->id)->where('receiver_id', $userDirectMessage->id);
-
-            })->orWhere(function ($query) use($user, $userDirectMessage) {
+            })->orWhere(function ($query) use ($user, $userDirectMessage) {
 
                 $query->where('receiver_id', $user->id)->where('sender_id', $userDirectMessage->id);
-
-            })->orderBy('created_at','desc')->paginate(20)->withQueryString();
-
-        }else{
+            })->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
+        } else {
             $firstMessageChatHead = null;
         }
 
-        if($request->get('q')){
-            $usersId = Message::where('sender_id',$user->id)->whereHas('receiver', function ($query) use($request) {
-                $query->where('name', 'like', '%'. $request->get('q') . '%');
+        if ($request->get('q')) {
+            $usersId = Message::where('sender_id', $user->id)->whereHas('receiver', function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->get('q') . '%');
             })->pluck('receiver_id')
-            ->merge(Message::where('receiver_id',$user->id)->whereHas('sender', function ($query) use($request){
-                $query->where('name', 'like', '%'. $request->get('q') . '%');
-            })->pluck('sender_id'))->unique()
-            ->filter(function ($id) use ($user) {
-                return $id != $user->id;
-            });
-        }else {
+                ->merge(Message::where('receiver_id', $user->id)->whereHas('sender', function ($query) use ($request) {
+                    $query->where('name', 'like', '%' . $request->get('q') . '%');
+                })->pluck('sender_id'))->unique()
+                ->filter(function ($id) use ($user) {
+                    return $id != $user->id;
+                });
+        } else {
 
             // users that we interact
-            $usersId = Message::where('sender_id',$user->id)->pluck('receiver_id')
-            ->merge(Message::where('receiver_id',$user->id)->pluck('sender_id'))->unique()
-            ->filter(function ($id) use ($user) {
-                return $id != $user->id;
-            });
+            $usersId = Message::where('sender_id', $user->id)->pluck('receiver_id')
+                ->merge(Message::where('receiver_id', $user->id)->pluck('sender_id'))->unique()
+                ->filter(function ($id) use ($user) {
+                    return $id != $user->id;
+                });
         }
 
 
-        $users = User::whereIn('id',$usersId)->get();
+        $users = User::whereIn('id', $usersId)->get();
         $chatHeads = [];
 
-        foreach($users as $userchat){
+        foreach ($users as $userchat) {
             $sent = $userchat->sentMessages()->latest()->first();
             $received = $userchat->receivedMessages()->latest()->first();
 
             $latestMessage = null;
-            if($sent && $received){
-                if($sent->created_at > $received->created_at){
+            if ($sent && $received) {
+                if ($sent->created_at > $received->created_at) {
 
                     $latestMessage = $sent;
-                }else{
+                } else {
 
                     $latestMessage = $received;
                 }
-
-
-            }elseif($sent){
+            } elseif ($sent) {
 
                 $latestMessage = $sent;
-
-            }elseif($received){
+            } elseif ($received) {
 
                 $latestMessage = $received;
-
             }
 
 
@@ -119,19 +111,20 @@ class MessageController extends Controller
                 'user' => $userchat,
                 'latestMessage' => $latestMessage
             ];
-
-
         }
 
-        usort($chatHeads, function ($a, $b){
-           return $b['latestMessage']->created_at <=> $a['latestMessage']->created_at;
+        usort($chatHeads, function ($a, $b) {
+            return $b['latestMessage']->created_at <=> $a['latestMessage']->created_at;
         });
 
         // dd($chatHeads);
 
 
 
-        return inertia('Messages/Messages', ['firstMessageChatHeadProps' => $firstMessageChatHead, 'chatHeadProps' => $chatHeads , 'messageProps' => $messages, 'userDirectMessageProps' => $userDirectMessage]);
+        return inertia('Messages/Messages', ['user' => [
+            'name' => $user->name,
+            'profile_photo_path' => $user->profile_img ?? null, // Ensure it's included
+        ], 'firstMessageChatHeadProps' => $firstMessageChatHead, 'chatHeadProps' => $chatHeads, 'messageProps' => $messages, 'userDirectMessageProps' => $userDirectMessage]);
     }
 
     /**
@@ -167,7 +160,6 @@ class MessageController extends Controller
         broadcast(new ChatHeadMessage($message))->toOthers();
 
         return redirect()->back();
-
     }
 
     /**
