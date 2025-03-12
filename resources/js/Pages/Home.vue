@@ -1,10 +1,22 @@
 <script setup>
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import 'swiper/swiper-bundle.css'; // Import Swiper styles
 import Rating from "./Components/Rating.vue";
 import Searchbar from "./Components/Searchbar.vue";
 import Statistic from "./Components/Statistic.vue";
 import Joblisting from "./Components/Joblisting.vue";
 import Testimonials from "./Components/Testimonials.vue";
 import Footer from "./Components/Admin/Footer.vue";
+
+
+
+
+const images = [
+    "/assets/hero.jpg",
+    "/assets/hero2.jpg",
+    "/assets/hero3.jpg",
+];
+
 
 const jobs = [
     {
@@ -95,11 +107,21 @@ const testimonials = [
                 <div
                     class="relative 2xl:left-[-20px] 2xl:top-[-300px] 2xl:w-[500px]"
                 >
-                    <img
+                    <!-- Swiper Carousel -->
+                    <Swiper
                         class="absolute left-0 top-0 h-[600px] w-[1000px] max-w-none"
-                        src="/assets/hero.jpg"
-                        alt="hero-section"
-                    />
+                        :slides-per-view="1"
+                        :loop="true"
+                        :autoplay="{ delay: 3000 }"
+                    >
+                        <SwiperSlide v-for="(image, index) in images" :key="index">
+                            <img
+                                :src="image"
+                                :alt="`hero-section-${index}`"
+                                class="h-full w-full object-cover"
+                            />
+                        </SwiperSlide>
+                    </Swiper>
                 </div>
             </div>
         </div>
