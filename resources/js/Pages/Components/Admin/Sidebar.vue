@@ -47,11 +47,18 @@ defineProps({
 
 const emit = defineEmits(["toggleSidebar"]);
 
-// Payment Dropdown
+// Payments Dropdown
 const isPaymentOpen = ref(false);
 const togglePaymentDropdown = () => {
     isPaymentOpen.value = !isPaymentOpen.value;
 };
+
+// Reports Dropdown
+const isReportOpen = ref(false);
+const toggleReportDropdown = () => {
+    isReportOpen.value = !isReportOpen.value;
+};
+
 
 // Close sidebar on mobile after clicking a link or X button
 const closeSidebarOnMobile = () => {
@@ -101,21 +108,39 @@ const closeSidebarOnMobile = () => {
                 <font-awesome-icon :icon="['fas', 'building']" class="nav-icon" />
                 Employers
             </Link>
-            <Link @click="closeSidebarOnMobile" href="/admin/reported-users" class="nav-link">
-                <font-awesome-icon :icon="['fas', 'exclamation-triangle']" class="nav-icon" />
-                Reported Users
-            </Link>
+
             <Link @click="closeSidebarOnMobile" href="/admin/job-approvals" class="nav-link">
                 <font-awesome-icon :icon="['fas', 'clipboard-check']" class="nav-icon" />
                 Job Approvals
             </Link>
+
+            <!-- Reported User-->
+            <div>
+                <button @click="toggleReportDropdown" class="nav-link flex justify-between">
+                    <div class="flex items-center">
+                        <font-awesome-icon :icon="['fas', 'exclamation-triangle']" class="nav-icon" />
+                        Reports
+                    </div>
+                    <span class="transition-transform duration-300" :class="{ 'rotate-90': isReportOpen }">▶</span>
+                </button>
+                <div v-if="isReportOpen" class="border-l ml-6 transition-all duration-300 ease-in-out">
+                    <Link @click="closeSidebarOnMobile" href="/admin/reported-users" class="nav-link pl-5">
+                        <font-awesome-icon :icon="['fas', 'history']" class="nav-icon" />
+                        Reported Users
+                    </Link>
+                    <Link @click="closeSidebarOnMobile" href="/admin/reported-posts" class="nav-link pl-5">
+                        <font-awesome-icon :icon="['fas', 'user-tag']" class="nav-icon" />
+                        Reported Posts
+                    </Link>
+                </div>
+            </div>
 
             <!-- Payment Section with Dropdown -->
             <div>
                 <button @click="togglePaymentDropdown" class="nav-link flex justify-between">
                     <div class="flex items-center">
                         <font-awesome-icon :icon="['fas', 'money-bill-wave']" class="nav-icon" />
-                        Payment
+                        Payments
                     </div>
                     <span class="transition-transform duration-300" :class="{ 'rotate-90': isPaymentOpen }">▶</span>
                 </button>

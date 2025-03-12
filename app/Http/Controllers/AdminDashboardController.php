@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EmployerProfile;
 use App\Models\EmployerSubscription;
 use App\Models\JobPost;
+use App\Models\Report;
 use App\Models\User;
 use App\Models\Salary;
 use App\Models\SubscriptionPaymentHistory;
@@ -152,7 +153,35 @@ class AdminDashboardController extends Controller
 
     public function reportedUsers()
     {
-        return Inertia::render('Admin/ReportedUsers');
+        $reports = Report::with(['reported', 'reporter'])->latest()->get();
+
+        return Inertia::render('Admin/ReportedUsers', [
+            'reports' => $reports
+        ]);
+    }
+
+    public function warnUser($id)
+    {
+        $report = Report::findOrFail($id);
+        $report->status = 'Warned';
+        $report->save();
+
+        return back()->with('success', 'User has been warned.');
+    }
+
+    public function banUser($id)
+    {
+        $report = Report::findOrFail($id);
+        $report->status = 'Banned';
+        $report->save();
+
+        return back()->with('success', 'User has been banned.');
+    }
+
+
+    public function reportedPosts()
+    {
+        return Inertia::render('Admin/ReportedPosts');
     }
 
     public function jobApprovals()

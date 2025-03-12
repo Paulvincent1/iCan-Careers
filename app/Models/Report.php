@@ -8,7 +8,8 @@ class Report extends Model
 {
     protected $fillable = [
         'reason',
-        'reported_user_id'
+        'reported_user_id',
+        'complainant_user_id'
     ];
 
     public function reporter(){

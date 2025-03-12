@@ -13,8 +13,8 @@ import Footer from "./Components/Admin/Footer.vue";
 
 const images = [
     "/assets/hero.jpg",
-    "/assets/hero2.jpg",
-    "/assets/hero3.jpg",
+    "/assets/hero1.png",
+    "/assets/hero4.png",
 ];
 
 
@@ -83,7 +83,7 @@ const testimonials = [
             <div
                 class="container mx-auto flex h-full w-full flex-col items-center justify-center gap-8 sm:flex-row"
             >
-                <div class="2xl:w-[500px]">
+                <div class="2xl:w-[500px] text-center lg:text-left">
                     <p class="my-7 text-center text-[32px]">
                         Where Others Can't, We Do.
                     </p>
@@ -104,12 +104,12 @@ const testimonials = [
                     </div>
                 </div>
 
+                <!-- Swiper Carousel (Hidden on Small Screens) -->
                 <div
-                    class="relative 2xl:left-[-20px] 2xl:top-[-300px] 2xl:w-[500px]"
+                    class="relative hidden md:hidden lg:flex 2xl:left-[-20px] 2xl:top-[-300px] 2xl:w-[500px]"
                 >
-                    <!-- Swiper Carousel -->
                     <Swiper
-                        class="absolute left-0 top-0 h-[600px] w-[1000px] max-w-none"
+                        class="absolute left-0 top-0 h-[600px] w-[800px] max-w-none"
                         :slides-per-view="1"
                         :loop="true"
                         :autoplay="{ delay: 3000 }"

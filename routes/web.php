@@ -25,7 +25,7 @@ use App\Models\EmployerProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-    
+
 Route::get('/', function () {
     $userRole = '';
     if($auth = Auth::user()){
@@ -40,7 +40,7 @@ Route::get('/', function () {
         }
 
         return redirect()->route('admin.dashboard');
-       
+
     }
     return inertia('Home');
 })->name('home');
@@ -48,7 +48,7 @@ Route::get('/', function () {
 
 Route::middleware(['guest'])->group(function (){
 
-    
+
     Route::get('/register',[AuthController::class, 'registerCreate'])->name('register.create');
     Route::post('/register',[AuthController::class, 'register'])->name('register.post');
 
@@ -71,11 +71,11 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class
     Route::prefix('verification')->group(function () {
 
         Route::get('/',[WorkerVerificationController::class, 'index'])->name('account.verify');
-        
+
         Route::get('/id',[WorkerVerificationController::class, 'verificationId'])->name('account.verifiy.id');
         Route::post('/id', [WorkerVerificationController::class, 'store'])->name('account.verifiy.id.post');
     });
-    
+
     Route::get('/createprofile',[WorkerProfileController::class, 'createProfile'])->name('create.profile');
     Route::post('/createprofile',[WorkerProfileController::class, 'storeProfile'])->name('create.profile.post');
 
@@ -94,7 +94,7 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class
     Route::post('/send-invoice', [WorkerDashboard::class,'sendInvoice'])->name('worker.send.invoice');
 
 
-    
+
     Route::get('/myprofile',[WorkerProfileController::class, 'myProfile'])->name('worker.profile');
     Route::put('/myprofile/updateprofile',[WorkerProfileController::class, 'updateProfile'])->name('update.profile.put');
     Route::put('/myprofile/updateskill/{skillid}',[WorkerProfileController::class, 'updateSkill'])->name('update.profile.put');
@@ -125,7 +125,7 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
     Route::post('/createprofile',[EmployerProfileController::class, 'storeProfile'])->name('create.profile.employer.post');
     Route::get('/myprofile',[EmployerProfileController::class, 'myProfile'])->name('employer.profile');
     Route::put('/myprofile/updateprofile',[EmployerProfileController::class, 'updateProfile'])->name('update.profile.put');
- 
+
 
     Route::get('/',[EmployerDashboardController::class, 'index'])->name('employer.dashboard');
     Route::get('/createjob',[JobPostController::class, 'create'])->name('create.job');
@@ -150,11 +150,15 @@ Route::prefix('admin')->middleware([isAdmin::class])->group(function (){
     Route::get('/workers', [AdminDashboardController::class, 'workers'])->name('admin.workers');
     Route::put('/workers/{id}/verify', [AdminDashboardController::class, 'toggleVerification'])->name('admin.workers.verify');
     Route::get('/workers/{id}/verification', [AdminDashboardController::class, 'workerVerificationDetails'])
-    ->name('admin.workers.verification'); 
+    ->name('admin.workers.verification');
     Route::delete('/workers/{id}/delete', [AdminDashboardController::class, 'deleteVerification'])
     ->name('admin.workers.delete');
     Route::get('/employers',[AdminDashboardController::class, 'employers'])->name('admin.employers');
     Route::get('/reported-users',[AdminDashboardController::class, 'reportedUsers'])->name('admin.reported.users');
+    Route::put('/reported-users/warn/{id}', [AdminDashboardController::class, 'warnUser']);
+    Route::put('/reported-users/ban/{id}', [AdminDashboardController::class, 'banUser']);
+
+    Route::get('/reported-posts',[AdminDashboardController::class, 'reportedPosts'])->name('admin.reported.posts');
     Route::get('/job-approvals', [AdminDashboardController::class, 'jobApprovals'])->name('admin.job.approvals');
     Route::put('/job-approvals/{id}/update', [JobPostController::class, 'updateJobStatus'])
         ->name('admin.job.approvals.update');
@@ -162,7 +166,7 @@ Route::prefix('admin')->middleware([isAdmin::class])->group(function (){
     Route::get('/payment-history',[AdminDashboardController::class, 'paymentHistory'])->name('admin.payment-history');
     Route::get('/table-subscription', [AdminDashboardController::class, 'subscribeUsers'])
         ->name('admin.table-subscription');
-    
+
 });
 
 
@@ -173,18 +177,18 @@ Route::middleware([ForceGetRedirect::class])->group(function() {
     //chat routes
     Route::prefix('/messages')->group(function(){
 
-        
+
         Route::get('/', [MessageController::class,'index'])->name('messages');
 
         Route::post('/send/{receiverId}', [MessageController::class,'store'])->name('messages.send');
-        
+
     });
 
 
     //notification
     Route::put('/mark-as-read-notifications', [NotificationController::class, 'markAllNotificationRead'])->name('user.mark-all-notification-as-read');
 
-    
+
     //report user
     Route::post('/report/{userId}', [ReportController::class,'store'])->name('report.user');
 
@@ -195,7 +199,7 @@ Route::middleware([ForceGetRedirect::class])->group(function() {
 
     Route::get('/{path}/{workerId?}',[WorkerProfileController::class,'showResume'])->where('path','^[^\/]+\/[^\/]+$')->where('workerId', '[0-9]+')->name('show.resume');
 
-   
+
 });
 
 //for webhooks

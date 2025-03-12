@@ -1,14 +1,18 @@
 <script setup>
 import { ref, computed } from "vue";
-import { router, usePage } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
 
 defineOptions({
     layout: AdminLayout,
 });
 
-// Get reported users data from backend
-const reportedUsers = ref(usePage().props.reports || []);
+// Dummy reported users data
+const reportedUsers = ref([
+    { id: 1, name: "Draven", reason: "Harassment", status: "Pending" },
+    { id: 2, name: "Jane Smith", reason: "Scam", status: "Warned" },
+    { id: 3, name: "Charlie Johnson", reason: "Spam", status: "Pending" },
+    { id: 4, name: "Alice Brown", reason: "Fraud", status: "Banned" },
+]);
 
 // Tabs for filtering users
 const tabs = [
@@ -39,29 +43,21 @@ const statusClass = (status) => {
     };
 };
 
-// Warn user function (API call)
+// Warn user function
 const warnUser = (id) => {
-    router.put(`/admin/reported-users/warn/${id}`, {}, {
-        onSuccess: () => {
-            const user = reportedUsers.value.find((u) => u.id === id);
-            if (user) user.status = "Warned";
-        },
-    });
+    const user = reportedUsers.value.find((u) => u.id === id);
+    if (user) user.status = "Warned";
 };
 
-// Ban user function (API call)
+// Ban user function
 const banUser = (id) => {
-    router.put(`/admin/reported-users/ban/${id}`, {}, {
-        onSuccess: () => {
-            const user = reportedUsers.value.find((u) => u.id === id);
-            if (user) user.status = "Banned";
-        },
-    });
+    const user = reportedUsers.value.find((u) => u.id === id);
+    if (user) user.status = "Banned";
 };
 </script>
 
 <template>
-    <Head title="Reported Users | iCan Careers" />
+    <Head title="ReportedUser | iCan Careers" />
     <div class="p-4 bg-white">
         <!-- Tabs Navigation -->
         <nav class="mb-6">
@@ -81,7 +77,7 @@ const banUser = (id) => {
             </ul>
         </nav>
 
-        <h1 class="mb-4 text-2xl font-bold">Reported Users</h1>
+        <h1 class="mb-4 text-2xl font-bold">Reported Posts</h1>
 
         <!-- Desktop Table (Hidden on Mobile) -->
         <div class="hidden md:block overflow-x-auto">
@@ -89,8 +85,7 @@ const banUser = (id) => {
                 <thead>
                     <tr class="bg-gray-200 text-left">
                         <th class="p-3">ID</th>
-                        <th class="p-3">Reported By</th>
-                        <th class="p-3">Reported User</th>
+                        <th class="p-3">Name</th>
                         <th class="p-3">Reason</th>
                         <th class="p-3">Status</th>
                         <th class="p-3">Action</th>
@@ -99,8 +94,7 @@ const banUser = (id) => {
                 <tbody>
                     <tr v-for="user in filteredUsers" :key="user.id" class="border-b">
                         <td class="p-3">{{ user.id }}</td>
-                        <td class="p-3">{{ user.reporter?.name || "Unknown" }}</td>
-                        <td class="p-3">{{ user.reported?.name || "Unknown" }}</td>
+                        <td class="p-3">{{ user.name }}</td>
                         <td class="p-3">{{ user.reason }}</td>
                         <td class="p-3">
                             <span :class="statusClass(user.status)">{{ user.status }}</span>
@@ -133,8 +127,7 @@ const banUser = (id) => {
                 :key="user.id"
                 class="bg-white p-4 rounded-lg shadow border"
             >
-                <p class="text-lg font-semibold text-gray-800">{{ user.reporter?.name || "Unknown" }}</p>
-                <p class="text-lg font-semibold text-gray-800">{{ user.reported?.name || "Unknown" }}</p>
+                <p class="text-lg font-semibold text-gray-800">{{ user.name }}</p>
                 <p class="text-sm text-gray-600"><strong>Reason:</strong> {{ user.reason }}</p>
                 <p class="text-sm text-gray-600 flex items-center gap-1">
                     <strong>Status:</strong>
