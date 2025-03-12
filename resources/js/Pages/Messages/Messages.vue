@@ -619,8 +619,11 @@ watch(
                         >
                             <div class="h-12 w-12">
                                 <img
-                                    src="/assets/profile_placeholder.jpg"
-                                    alt=""
+                                    :src="
+                                            chatHead.user.profile_img ??
+                                            '/assets/images.png'
+                                        "
+                                        alt=""
                                     class="h-full w-full rounded-full"
                                 />
                             </div>

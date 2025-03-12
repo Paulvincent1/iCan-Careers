@@ -409,7 +409,10 @@ const formatCurrency =
                             >
                                 <div class="h-12 w-12">
                                     <img
-                                        src="/assets/profile_placeholder.jpg"
+                                        :src="
+                                            chatHead.user.profile_img ??
+                                            '/assets/images.png'
+                                        "
                                         alt=""
                                         class="h-full w-full rounded-full"
                                     />
@@ -998,7 +1001,9 @@ const formatCurrency =
             <div>
                 <div class="mb-2 rounded-lg bg-orange-400 p-5">
                     <p class="mb-2 text-sm text-white">My Balance</p>
-                    <p class="mb-1 text-4xl font-bold text-white">{{ formatCurrency(balance.balance) }}</p>
+                    <p class="mb-1 text-4xl font-bold text-white">
+                        {{ formatCurrency(balance.balance) }}
+                    </p>
                     <p class="text-[12px] text-white">
                         Available balance to withdraw
                     </p>
