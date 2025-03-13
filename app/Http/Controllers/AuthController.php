@@ -41,21 +41,23 @@ class AuthController extends Controller
             ]
             );
 
-            $user = User::create($fields);
-            $role = Role::where('name', $fields['role'])->first();
-            
-
-            $user->roles()->attach($role->id);
 
             if($fields['role'] === 'Employer'){
+
+                DB::beginTransaction();
+                                
+                $user = User::create($fields);
+                $role = Role::where('name', $fields['role'])->first();
+                
+
+                $user->roles()->attach($role->id);
                 // creating a free tier subscription if the user is employer
                 $user->employerSubscription()->create([
                     'subscription_type' => 'Free',
                     'start_date' => Carbon::now(),
                 ]);
 
-                DB::beginTransaction();
-
+            
                 try {
 
                
@@ -120,14 +122,23 @@ class AuthController extends Controller
                 }catch(Exception $e){
 
                     DB::rollBack();
-                    dd($e->getMessage());
+                    
+                    return redirect()->back()->withErrors(['message' => 'Error creating account, Please try again.']);
 
                 }
 
                    
             }
 
+            
+
             if($fields['role'] === 'PWD' || $fields['role'] === 'Senior'){
+                
+                $user = User::create($fields);
+                $role = Role::where('name', $fields['role'])->first();
+                
+
+                $user->roles()->attach($role->id);
 
                 $user->balance()->create([
                     'balance' => 0,

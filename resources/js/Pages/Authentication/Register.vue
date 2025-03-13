@@ -51,6 +51,10 @@ onMounted(() => {
                     <Quotes />
                 </p>
             </div>
+            <InputFlashMessage
+                :message="$page.props.errors.message"
+                type="error"
+            />
             <AuthInput
                 name="NAME"
                 :message="form.errors.name"
