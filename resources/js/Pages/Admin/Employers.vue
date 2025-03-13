@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
 import DataTable from "vue3-easy-data-table";
@@ -7,6 +7,22 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faSearch, faBuilding, faFilter } from "@fortawesome/free-solid-svg-icons";
 
+
+const darkMode = ref(localStorage.getItem("theme") === "dark");
+
+onMounted(() => {
+    // Apply theme on mount
+    document.documentElement.classList.toggle("dark", darkMode.value);
+
+    // Listen for changes from other components
+    window.addEventListener("theme-changed", () => {
+        darkMode.value = localStorage.getItem("theme") === "dark";
+        document.documentElement.classList.toggle("dark", darkMode.value);
+    });
+});
+const textSrc = computed(() =>
+    darkMode.value ? 'text-white' : 'text-gray-900'
+);
 // Add icons
 library.add(faSearch, faBuilding, faFilter);
 
@@ -64,15 +80,18 @@ const headers = [
 
 <template>
     <Head title="Employers | iCan Careers" />
-    <div class="p-4 bg-white">
+    <div :class="['p-4', darkMode ? 'bg-black' : 'bg-white']">
         <!-- Tabs for Employer Type Filters -->
         <nav class="mb-6">
             <ul class="flex space-x-4 border-b overflow-x-auto">
                 <li v-for="tab in tabs" :key="tab.id"
                     @click="activeTab = tab.id"
                     :class="{
-                        'border-b-2 border-blue-500 font-semibold': activeTab === tab.id,
-                        'text-gray-500 hover:text-gray-700': activeTab !== tab.id
+                        'border-b-2 border-yellow-300 font-semibold': activeTab === tab.id,
+                       'text-yellow-300': activeTab === tab.id && !darkMode,  // Light mode active tab color
+                        'text-yellow-300': activeTab === tab.id && darkMode, // Dark mode active tab color
+                        'text-gray-500': activeTab !== tab.id && !darkMode,  // Light mode inactive tab
+                        'text-white': activeTab !== tab.id && darkMode
                     }"
                     class="cursor-pointer px-4 py-2 whitespace-nowrap">
                     {{ tab.label }}
@@ -82,7 +101,7 @@ const headers = [
 
         <h1 class="mb-4 text-xl font-bold flex items-center gap-2">
             <font-awesome-icon :icon="['fas', 'building']" class="text-[#fa8334]" />
-            Employer List
+            <p :class="textSrc">Employers Management</p>
         </h1>
 
         <!-- Search Bar -->
