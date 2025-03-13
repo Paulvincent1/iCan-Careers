@@ -121,6 +121,8 @@ class AdminDashboardController extends Controller
     {
         $worker = WorkerVerification::where('user_id', $id)->first();
 
+        $userWorker = User::where('id',$id);
+
         if (!$worker) {
             return redirect()->back()->with([
                 'error' => 'Nothing to delete.'
@@ -128,8 +130,8 @@ class AdminDashboardController extends Controller
         }
         $worker->delete();  // Try deleting the record
 
-        $worker->notify(new WorkerVerificationNotification(worker:$worker,verified:false));
-        broadcast(new WorkerVerificationNotification(worker:$worker,verified:false));
+        $worker->notify(new WorkerVerificationNotification(worker:$userWorker,verified:false));
+        broadcast(new WorkerVerificationNotification(worker:$userWorker,verified:false));
 
         return redirect()->back()->with(['message' => 'Successfuly updated!']);
     }
