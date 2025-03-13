@@ -32,7 +32,7 @@ class HiringProcessNotification extends Notification implements ShouldBroadcastN
             ->status;
 
         if($this->status === 'Rejected'){
-            $this->message = 'Your application for the' . $jobPost->job_title . 'position has been declined. Thank you for applying.';
+            $this->message = 'Your application for the ' . $jobPost->job_title . ' position has been declined. Thank you for applying.';
         }else{
             $this->message =  'Congrats! Your application for
             the ' . $jobPost->job_title .

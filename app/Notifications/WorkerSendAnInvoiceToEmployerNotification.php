@@ -29,7 +29,7 @@ class WorkerSendAnInvoiceToEmployerNotification extends Notification implements 
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -47,7 +47,7 @@ class WorkerSendAnInvoiceToEmployerNotification extends Notification implements 
     {
         return [
             'status' => $this->worker->name,
-            'message' => $this->worker->name . 'requested an invoice.',
+            'message' => $this->worker->name . ' requested an invoice.',
             'image' => $this->worker->profile_img,
         ];
     } 
@@ -56,7 +56,7 @@ class WorkerSendAnInvoiceToEmployerNotification extends Notification implements 
     {
         return [
             'status' => $this->worker->name,
-            'message' => $this->worker->name . 'requested an invoice.',
+            'message' => $this->worker->name . ' requested an invoice.',
             'image' => $this->worker->profile_img,
         ];
     } 
@@ -73,6 +73,14 @@ class WorkerSendAnInvoiceToEmployerNotification extends Notification implements 
         return 'notification.event';
     }
 
+    public function broadcastWith()
+    {
+        return [
+            'status' => $this->worker->name,
+            'message' => $this->worker->name . ' requested an invoice.',
+            'image' => $this->worker->profile_img,
+        ];
+    }
 
     /**
      * Get the array representation of the notification.

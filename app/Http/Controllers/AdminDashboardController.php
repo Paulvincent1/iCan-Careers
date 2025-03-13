@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Salary;
 use App\Models\SubscriptionPaymentHistory;
 use App\Models\WorkerVerification;
+use App\Notifications\WorkerVerificationNotification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -103,6 +104,10 @@ class AdminDashboardController extends Controller
     public function toggleVerification($id)
     {
         $worker = User::findOrFail($id);
+        if($worker->verified){
+            $worker->notify(new WorkerVerificationNotification(worker:$worker,verified:true));
+            broadcast(new WorkerVerificationNotification(worker:$worker,verified:true));
+        }
         $worker->verified = !$worker->verified; // Toggle between true/false
         $worker->save();
 
@@ -121,6 +126,10 @@ class AdminDashboardController extends Controller
             ]);
         }
         $worker->delete();  // Try deleting the record
+
+        $worker->notify(new WorkerVerificationNotification(worker:$worker,verified:false));
+        broadcast(new WorkerVerificationNotification(worker:$worker,verified:false));
+
         return redirect()->back()->with(['message' => 'Successfuly updated!']);
     }
     public function employers()

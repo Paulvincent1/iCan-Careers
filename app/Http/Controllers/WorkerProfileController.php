@@ -250,6 +250,15 @@ class WorkerProfileController extends Controller
     public function show(User $applicantId)
     {
 
+        $user = Auth::user();
+        $isEmployed = null;
+        if($user->roles()->first()->name === 'Employer'){
+            $isEmployed = $applicantId->myJobs()->where('current' ,true)->whereHas('employer', function ($query) use($user) {
+                $query->where('id', $user->id);
+            })->first();
+        }
+
+        
         $workerSkills = $applicantId->workerSkills;
         $workerProfile = $applicantId->workerProfile;
 
@@ -257,7 +266,8 @@ class WorkerProfileController extends Controller
          'workerSkillsProp' => $workerSkills,
          'workerProfileProp' => $workerProfile,
          'messageProp' => session('message'),
-         'visitor' => true
+         'visitor' => true,
+         'currentlyEmployedByMeProp' => $isEmployed
         ]);
     }
 

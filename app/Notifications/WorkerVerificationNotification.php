@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Models\JobPost;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
@@ -12,14 +11,14 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WokerAppliesToJobPostNotification extends Notification implements ShouldBroadcastNow
+class WorkerVerificationNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(private User $applicant, private User $employer, private JobPost $jobPost)
+    public function __construct(private User $worker, private bool $verified)
     {
         //
     }
@@ -31,7 +30,7 @@ class WokerAppliesToJobPostNotification extends Notification implements ShouldBr
      */
     public function via(object $notifiable): array
     {
-        return ['database','broadcast'];
+        return ['mail'];
     }
 
     /**
@@ -48,25 +47,25 @@ class WokerAppliesToJobPostNotification extends Notification implements ShouldBr
     public function toDatabase(object $notifiable)
     {
         return [
-            'status' => $this->applicant->name,
-            'message' => $this->applicant->name . ' applies to your job post ' . $this->jobPost->job_title . '.',
-            'image' => $this->applicant->profile_img,
+            'status' => $this->verified ? 'Congratulations!' : 'Verification Required',
+            'message' =>  $this->verified ? "Your account is now fully verified! you can now apply for jobs." : "Unfortunately, your verification was not approved. Please check your submitted documents and try again.",
+            'image' =>  $this->verified ? 'assets/congratulations.jpg' : 'assets/denied.jpg' , 
         ];
     }
 
     public function toBroadcast(object $notifiable)
     {
         return [
-            'status' => $this->applicant->name,
-            'message' => $this->applicant->name . ' applies to your job post ' . $this->jobPost->job_title . '.',
-            'image' => $this->applicant->profile_img,
+            'status' => $this->verified ? 'Congratulations!' : 'Verification Required',
+            'message' =>  $this->verified ? "Your account is now fully verified! you can now apply for jobs." : "Unfortunately, your verification was not approved. Please check your submitted documents and try again.",
+            'image' =>  $this->verified ? 'assets/congratulations.jpg' : 'assets/denied.jpg' , 
         ];
     }
 
     public function broadcastOn()
     {
 
-        return new Channel('notification-' . $this->employer->id);
+        return new Channel('notification-' . $this->worker->id);
 
     }
 
@@ -78,9 +77,9 @@ class WokerAppliesToJobPostNotification extends Notification implements ShouldBr
     public function broadcastWith()
     {
         return [
-            'status' => $this->applicant->name,
-            'message' => "{$this->applicant->name} applies to your job post {$this->jobPost->job_title}.",
-            'image' => $this->applicant->profile_img,
+            'status' => $this->verified ? 'Congratulations!' : 'Verification Required',
+            'message' =>  $this->verified ? "Your account is now fully verified! you can now apply for jobs." : "Unfortunately, your verification was not approved. Please check your submitted documents and try again.",
+            'image' =>  $this->verified ? 'assets/congratulations.jpg' : 'assets/denied.jpg' , 
         ];
     }
 

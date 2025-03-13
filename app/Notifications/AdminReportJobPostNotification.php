@@ -2,22 +2,22 @@
 
 namespace App\Notifications;
 
-use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class EmployerPaysTheWorkerInvoiceNotification extends Notification
+class AdminReportJobPostNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(public User $employer, public User $worker)
+    public function __construct(private User $admin, private User $user)
     {
         //
     }
@@ -29,7 +29,7 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        return ['database','broadcast'];
     }
 
     /**
@@ -46,25 +46,25 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
     public function toDatabase()
     {
         return [
-            'status' => $this->employer->name,
-            'message' => $this->employer->name . ' pays the requested invoice.',
-            'image' => $this->employer->profile_img,
+            'status' => 'Someone reported a job post',
+            'message' => $this->user->name . ' reported a job post.',
+            'image' => $this->user->profile_img,
         ];
     }
 
     public function toBroadcast()
     {
         return [
-            'status' => $this->employer->name,
-            'message' => $this->employer->name . ' pays the requested invoice.',
-            'image' => $this->employer->profile_img,
+            'status' => 'Someone reported a job post',
+            'message' => $this->user->name . ' reported a job post.',
+            'image' => $this->user->profile_img,
         ];
     }
 
     public function broadcastOn()
     {
 
-        return new Channel('notification-' . $this->worker->id);
+        return new Channel('notification-' . $this->admin->id);
 
     }
 
@@ -76,12 +76,11 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
     public function broadcastWith()
     {
         return [
-            'status' => $this->employer->name,
-            'message' => $this->employer->name . ' pays the requested invoice.',
-            'image' => $this->employer->profile_img,
+            'status' => 'Someone reported a job post',
+            'message' => $this->user->name . ' reported a job post.',
+            'image' => $this->user->profile_img,
         ];
     }
-    
 
     /**
      * Get the array representation of the notification.

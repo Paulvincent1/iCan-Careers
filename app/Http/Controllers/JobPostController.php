@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobPost;
+use App\Models\User;
+use App\Notifications\AdminFreeJobPostNotification;
+use App\Notifications\FireWorkerNotification;
+use App\Notifications\JobOpenedByAdminNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -102,6 +106,13 @@ class JobPostController extends Controller
                     'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open',
                     // 'job_image' => $
                 ]);
+
+                $admin = User::whereHas('roles', function($query) {
+                    $query->where('name', 'Admin');
+                })->first();
+
+                $admin->notify(new AdminFreeJobPostNotification(admin:$admin,employer:$user));
+                broadcast(new AdminFreeJobPostNotification(admin:$admin,employer:$user));
                
                
             }else{
@@ -234,6 +245,15 @@ class JobPostController extends Controller
         $jobPost = JobPost::findOrFail($id);
         $jobPost->update(['job_status' => $request->status]);
 
+        $employer = User::whereHas('roles', function ($query) {
+            $query->where('name', 'Employer');
+        })->whereHas('employerJobPosts',function ($query) use($jobPost){
+            $query->where('id',  $jobPost->id);
+        })->first();
+
+        $employer->notify(new JobOpenedByAdminNotification(employer:$employer,jobPost:$jobPost));
+        broadcast(new JobOpenedByAdminNotification(employer:$employer,jobPost:$jobPost));
+
         return redirect()->route('admin.job.approvals')->with('success', 'Job status updated successfully.');
     }
 
@@ -272,6 +292,27 @@ class JobPostController extends Controller
 
         Inertia::clearHistory();
         return redirect()->route('employer.dashboard');
+    }
+
+    public function fireWorker(User $workerId){
+
+        // dd($workerId);
+        $employer = Auth::user();
+
+        $currentJob = $workerId->myJobs()->where('current', true)-> whereHas('employer', function ($query) use($employer) {
+            $query->where('id', $employer->id);
+        })->first();
+
+        if($currentJob){
+            // expects the related model(myJobs) id not the pivot table id.
+            $workerId->myJobs()->updateExistingPivot($currentJob->id, ['current' => false]);
+
+            $workerId->notify(new FireWorkerNotification(employer:$employer,worker:$workerId));
+            broadcast(new FireWorkerNotification(employer:$employer,worker:$workerId));
+        }
+
+        return redirect()->back()->with('message','Successfully ended the contract.');
+
     }
 
     /**

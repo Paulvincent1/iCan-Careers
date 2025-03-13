@@ -2,15 +2,16 @@
 
 namespace App\Notifications;
 
-use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class EmployerPaysTheWorkerInvoiceNotification extends Notification
+class FireWorkerNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 
@@ -43,22 +44,24 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
                     ->line('Thank you for using our application!');
     }
 
-    public function toDatabase()
+    public function toDatabase(object $notifiable)
     {
         return [
-            'status' => $this->employer->name,
-            'message' => $this->employer->name . ' pays the requested invoice.',
+            'status' => 'Contract Ended',
+            'message' => "We appreciate your hard work, but your contract with " . $this->employer->name .
+             " has now ended. We wish you success in your future opportunities!",
             'image' => $this->employer->profile_img,
         ];
     }
 
-    public function toBroadcast()
+    public function toBroadcast(object $notifiable)
     {
-        return [
-            'status' => $this->employer->name,
-            'message' => $this->employer->name . ' pays the requested invoice.',
+        return new BroadcastMessage([
+          'status' => 'Contract Ended',
+            'message' => "We appreciate your hard work, but your contract with " . $this->employer->name .
+             " has now ended. We wish you success in your future opportunities!",
             'image' => $this->employer->profile_img,
-        ];
+        ]);
     }
 
     public function broadcastOn()
@@ -76,12 +79,12 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
     public function broadcastWith()
     {
         return [
-            'status' => $this->employer->name,
-            'message' => $this->employer->name . ' pays the requested invoice.',
-            'image' => $this->employer->profile_img,
+            'status' => 'Contract Ended',
+              'message' => "We appreciate your hard work, but your contract with " . $this->employer->name .
+               " has now ended. We wish you success in your future opportunities!",
+              'image' => $this->employer->profile_img,
         ];
     }
-    
 
     /**
      * Get the array representation of the notification.

@@ -237,7 +237,10 @@ console.log(page.props.auth.user.unreadNotifications);
                                         <div class="h-[32px] min-w-8">
                                             <img
                                                 class="h-full w-full rounded-full object-cover"
-                                                src="/assets/images.png"
+                                                :src="
+                                                    notifications.image ??
+                                                    '/assets/images.png'
+                                                "
                                                 alt=""
                                             />
                                         </div>

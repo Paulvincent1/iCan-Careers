@@ -73,4 +73,9 @@ class JobPost extends Model
         ->withPivot('current','id')
         ->withTimestamps();
     }
+
+    public function reportsAgainstThisPost()
+    {
+        return $this->hasMany(ReportJobPost::class,'reported_job_post_id');
+    }
 }
