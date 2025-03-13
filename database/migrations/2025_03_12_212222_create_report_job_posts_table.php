@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('report_job_posts', function (Blueprint $table) {
             $table->id();
             $table->string('reason');
-            $table->foreignId('reported_job_post_id')->constrained('job_post')->cascadeOnDelete();
+            $table->foreignId('reported_job_post_id')->constrained('job_posts')->cascadeOnDelete();
             $table->foreignId('complainant_user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
