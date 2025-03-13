@@ -54,6 +54,7 @@ class HandleInertiaRequests extends Middleware
             'auth.worker_verified' => function () use($request){
                 return $request->user() ? ($request->user()->workerVerification ? $request->user()->workerVerification : null) : null;
             },
+            'auth.wokerIsVerified' => fn ()  =>  $request->user()?->verified,
             'auth.employer_profile' => function () use($request) {
                 if($request->user()){
                     if($request->user()->roles()->where('name','Employer')->exists()){

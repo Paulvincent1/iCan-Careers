@@ -19,6 +19,7 @@ let props = defineProps({
     isPending: {
         type: null,
     },
+    currentlyEmployedByMeProp: null,
 });
 
 let { appContext } = getCurrentInstance();
@@ -374,6 +375,24 @@ function submitReport(reason) {
         },
     );
 }
+
+function fireWorker() {
+    if (confirm("Are you sure you want to end the contract?")) {
+        router.put(
+            route("fireworker", {
+                workerId: route().params.applicantId,
+            }),
+            {},
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    showSuccessMessage();
+                },
+            },
+        );
+    }
+}
 </script>
 <template>
     <Head title="Profile | iCan Careers" />
@@ -490,6 +509,14 @@ function submitReport(reason) {
 
                 <div v-if="isPending">
                     <p class="text-yellow-400">{{ isPending }}</p>
+                </div>
+                <div v-if="currentlyEmployedByMeProp">
+                    <button
+                        @click="fireWorker"
+                        class="rounded-full bg-red-500 px-4 py-1 font-bold text-white"
+                    >
+                        End Contract
+                    </button>
                 </div>
             </div>
         </div>

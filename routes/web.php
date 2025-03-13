@@ -12,6 +12,7 @@ use App\Http\Controllers\LearningController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReportJobPostController;
 use App\Http\Controllers\WorkerBasicInfoController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\WorkerSkillsController;
 use App\Http\Controllers\WorkerVerificationController;
 use App\Http\Middleware\ForceGetRedirect;
 use App\Http\Middleware\isAdmin;
+use App\Http\Middleware\isBan;
 use App\Http\Middleware\isEmployer;
 use App\Http\Middleware\isWorker;
 use App\Models\EmployerProfile;
@@ -66,7 +68,7 @@ Route::middleware(['guest'])->group(function (){
 Route::post('/logout',[AuthController::class, 'logout'])->middleware(['auth'])->name('logout');
 
 
-Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class])->group(function (){
+Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class,isBan::class])->group(function (){
 
     Route::prefix('verification')->group(function () {
 
@@ -119,7 +121,7 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class,isWorker::class
 });
 
 
-Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::class])->group(function (){
+Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::class,isBan::class])->group(function (){
 
     Route::get('/createprofile',[EmployerProfileController::class, 'createProfile'])->name('create.profile.employer');
     Route::post('/createprofile',[EmployerProfileController::class, 'storeProfile'])->name('create.profile.employer.post');
@@ -141,6 +143,9 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class,isEmployer::clas
     Route::get('/applicants/{jobid}',[EmployerDashboardController::class, 'showJobApplicants'])->name('job.applicants');
     Route::put('/applicants/{pivotId}',[EmployerDashboardController::class, 'updateStatus'])->name('job.applicants.update.status');
     Route::put('/applicants/{pivotId}/add-interview-schedule',[EmployerDashboardController::class, 'addInterview'])->name('job.applicants.addinterview');
+
+    // fire worker
+    Route::put('/fire-worker/{workerId}', [JobPostController::class, 'fireWorker'])->name('fireworker');
 
 });
 
@@ -191,6 +196,9 @@ Route::middleware([ForceGetRedirect::class])->group(function() {
 
     //report user
     Route::post('/report/{userId}', [ReportController::class,'store'])->name('report.user');
+
+    //report job post
+    Route::post('/report/job-post/{jobpostId}', [ReportJobPostController::class,'store'])->name('report.job-post');
 
 
 

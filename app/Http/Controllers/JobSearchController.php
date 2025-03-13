@@ -102,6 +102,7 @@ class JobSearchController extends Controller
             $user->appliedJobs()->attach($id->id);
             
             $id->employer->notify(new WokerAppliesToJobPostNotification(applicant:$user,employer:$id->employer,jobPost:$id));
+            broadcast(new WokerAppliesToJobPostNotification(applicant:$user,employer:$id->employer,jobPost:$id));
 
             return redirect()->back()->with(['messageProp' => 'Successfuly applied!']);
         }

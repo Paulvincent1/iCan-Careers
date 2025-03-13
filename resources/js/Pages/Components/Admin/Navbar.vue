@@ -1,5 +1,12 @@
 <script setup>
-import { ref, onMounted, onUnmounted, useTemplateRef, watch } from "vue";
+import {
+    ref,
+    onMounted,
+    onUnmounted,
+    useTemplateRef,
+    watch,
+    computed,
+} from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 
 import { nanoid } from "nanoid";
@@ -20,7 +27,7 @@ const notificationButton = useTemplateRef("dropNotification");
 
 // Page data
 let page = usePage();
-let notifications = ref(page.props.auth?.user.unreadNotifications);
+let notifications = computed(() => page.props.auth?.user.unreadNotifications);
 
 // Function to toggle profile dropdown
 const toggleDropdown = (event) => {
@@ -102,59 +109,79 @@ onUnmounted(() => {
             <!-- Profile & Notifications -->
             <div class="ml-auto flex items-center gap-3">
                 <!-- Notification Bell -->
-                <div ref="dropNotification" class="relative">
-                    <button
-                        @click="
-                            showNotificationDropDown = !showNotificationDropDown
-                        "
-                        class="relative focus:outline-none"
-                    >
+
+                <!-- Notification Dropdown -->
+                <div
+                    ref="dropNotification"
+                    @click="
+                        showNotificationDropDown = !showNotificationDropDown
+                    "
+                    class="relative flex flex-col"
+                >
+                    <div class="relative">
                         <i class="bi bi-bell text-lg"></i>
-
-                        <!-- Notification Count Badge (Shows only when there are notifications) -->
-                        <span
-                            v-if="true"
-                            class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white"
-                        >
-                            {{
-                                notifications.length > 99
-                                    ? "99+"
-                                    : notifications.length
-                            }}
-                        </span>
-                    </button>
-
-                    <!-- Notification Dropdown -->
+                        <i
+                            v-if="notifications?.length"
+                            class="bi bi-circle-fill absolute right-0 top-0 text-[8px] text-red-500"
+                        ></i>
+                    </div>
                     <div
-                        v-if="showNotificationDropDown"
-                        class="absolute right-0 mt-2 w-80 rounded-lg border bg-white p-3 shadow-lg"
+                        v-show="showNotificationDropDown"
+                        class="absolute right-[50%] top-10 h-fit max-h-[calc(100vh-4.625rem-3.5rem)] w-80 translate-x-[50%] overflow-y-auto rounded bg-white px-5 py-2 text-sm shadow md:right-0 md:top-12 md:translate-x-0"
                     >
-                        <p class="text-xl font-bold">Notifications</p>
-                        <p class="font-bold underline underline-offset-8">
-                            All
-                        </p>
-                        <div v-if="notifications.length">
+                        <div class="mb-2">
+                            <p class="text-xl font-bold">Notifications</p>
+                        </div>
+                        <div
+                            :class="[
+                                'flex justify-between',
+                                {
+                                    'mb-6': notifications?.length,
+                                    'mb-3': !notifications?.length,
+                                },
+                            ]"
+                        >
+                            <p class="font-bold underline underline-offset-8">
+                                All
+                            </p>
+                            <Link
+                                method="put"
+                                :href="
+                                    route('user.mark-all-notification-as-read')
+                                "
+                                as="button"
+                                >Mark all as read</Link
+                            >
+                        </div>
+                        <div>
                             <div
                                 v-for="notification in notifications"
                                 :key="notification.id"
-                                class="mb-3 flex items-start gap-3"
+                                class="mb-3 flex flex-row gap-3"
                             >
-                                <img
-                                    class="h-8 w-8 rounded-full"
-                                    src="/assets/images.png"
-                                    alt="User"
-                                />
+                                <div class="h-[32px] min-w-8">
+                                    <img
+                                        class="h-full w-full rounded-full object-cover"
+                                        :src="
+                                            notifications.image ??
+                                            '/assets/images.png'
+                                        "
+                                        alt=""
+                                    />
+                                </div>
                                 <div>
                                     <p class="font-bold">
                                         {{ notification.data.status }}
                                     </p>
-                                    <p class="text-xs">
+                                    <p class="text-[10px]">
                                         {{ notification.data.message }}
                                     </p>
                                 </div>
                             </div>
+                            <div v-if="!notifications?.length">
+                                <p class="mb-3 text-center">No Notifications</p>
+                            </div>
                         </div>
-                        <p v-else class="text-center">No Notifications</p>
                     </div>
                 </div>
 

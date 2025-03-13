@@ -2,22 +2,23 @@
 
 namespace App\Notifications;
 
-use App\Models\Invoice;
+use App\Models\JobPost;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class EmployerPaysTheWorkerInvoiceNotification extends Notification
+class JobOpenedByAdminNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(public User $employer, public User $worker)
+    public function __construct(private User $employer, private JobPost $jobPost)
     {
         //
     }
@@ -29,7 +30,7 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        return ['mail'];
     }
 
     /**
@@ -43,11 +44,12 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
                     ->line('Thank you for using our application!');
     }
 
+    
     public function toDatabase()
     {
         return [
-            'status' => $this->employer->name,
-            'message' => $this->employer->name . ' pays the requested invoice.',
+            'status' => 'Job is opened',
+            'message' => 'Your job post ' . $this->jobPost->job_title . ' is now open.',
             'image' => $this->employer->profile_img,
         ];
     }
@@ -55,8 +57,8 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
     public function toBroadcast()
     {
         return [
-            'status' => $this->employer->name,
-            'message' => $this->employer->name . ' pays the requested invoice.',
+            'status' => 'Job is opened',
+            'message' => 'Your job post ' . $this->jobPost->job_title . ' is now open.',
             'image' => $this->employer->profile_img,
         ];
     }
@@ -64,7 +66,7 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
     public function broadcastOn()
     {
 
-        return new Channel('notification-' . $this->worker->id);
+        return new Channel('notification-' . $this->employer->id);
 
     }
 
@@ -76,12 +78,12 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
     public function broadcastWith()
     {
         return [
-            'status' => $this->employer->name,
-            'message' => $this->employer->name . ' pays the requested invoice.',
+            'status' => 'Job is opened',
+            'message' => 'Your job post ' . $this->jobPost->job_title . ' is now open.',
             'image' => $this->employer->profile_img,
         ];
     }
-    
+
 
     /**
      * Get the array representation of the notification.

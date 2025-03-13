@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\WorkerVerification;
+use App\Notifications\AdminWorkerVerificationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -65,6 +67,15 @@ class WorkerVerificationController extends Controller
             'selfie_image' => '/storage/'.$selfieImage,
         ]);
 
+        $admin = User::whereHas('roles', function($query) {
+            $query->where('name', 'Admin');
+        })->first();
+
+        $admin->notify(new AdminWorkerVerificationNotification(admin:$admin,user:$user));
+        broadcast(new AdminWorkerVerificationNotification(admin:$admin,user:$user));
+        
+
+        
         Inertia::clearHistory();
         return redirect()->route('worker.dashboard');
     }

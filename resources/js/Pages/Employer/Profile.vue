@@ -408,7 +408,7 @@ function submitReport(reason) {
                                 <div
                                     v-for="job in jobsPostedProps"
                                     :key="job.id"
-                                    class="mb-4 transform overflow-hidden rounded-lg border bg-white text-[#fa8334] shadow shadow-xl shadow-black/10 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                                    class="mb-4 transform overflow-hidden rounded-lg border bg-white text-[#fa8334] shadow-xl shadow-black/10 transition-all duration-300 hover:scale-105 hover:shadow-lg"
                                 >
                                     <Link
                                         :href="

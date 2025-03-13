@@ -107,6 +107,75 @@ let isClosed = ref(props.jobPostProps.job_status === "Closed");
 function closeJob() {
     isClosed.value = true;
 }
+
+const reports = [
+    {
+        reason: "Payment Concerns",
+        descriptions: [
+            "Unclear or Missing Payment Details",
+            "Unrealistic Pay for Work",
+            "Asking for Free Work",
+            "Delayed or No Payment History",
+        ],
+    },
+    {
+        reason: "Misleading Job Information",
+        descriptions: [
+            "Fake Job Posting",
+            "Misleading Job Description",
+            "Unrealistic Job Expectations",
+            "Job Removed After Application",
+        ],
+    },
+    {
+        reason: "Unprofessional or Unethical Behavior",
+        descriptions: [
+            "Harassment or Abuse",
+            "Discrimination",
+            "Unprofessional Communication",
+            "Forcing Off-Platform Work",
+        ],
+    },
+    {
+        reason: "Fraud & Policy Violations",
+        descriptions: [
+            "Fake Employer Profile",
+            "Spam or Scam Job Post",
+            "Violates Platform Policies",
+        ],
+    },
+];
+
+let isShowReportModal = ref(false);
+
+let reasonSelected = ref("");
+let descriptions = ref([]);
+
+function selectReason(report) {
+    console.log(report);
+
+    reasonSelected.value = report.reason;
+    descriptions.value = report.descriptions;
+}
+
+function submitReport(reason) {
+    console.log(route().params.id);
+
+    router.post(
+        route("report.job-post", { jobpostId: route().params.id }),
+        {
+            reason,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                isShowReportModal.value = false;
+                // showSuccessMessage();
+            },
+        },
+    );
+}
 </script>
 <template>
     <Head title="Show Job | iCan Careers" />
@@ -193,7 +262,7 @@ function closeJob() {
                     v-if="jobPostProps.job_status === 'Open'"
                 >
                     <button
-                        v-if="page.props.auth.worker_verified"
+                        v-if="page.props.auth?.wokerIsVerified"
                         @click="showModal = true"
                         :class="[
                             'job w-fit rounded-full border border-[#171816] p-2 px-8 text-sm font-bold text-[#171816]',
@@ -253,9 +322,16 @@ function closeJob() {
         <div class="flex-1 bg-[#f3f7fa]">
             <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
                 <div class="grid gap-5 pt-5 lg:grid-cols-[1fr,300px]">
-                    <div class="rounded-lg bg-white px-8 py-5">
+                    <div class="self-start rounded-lg bg-white px-8 py-5">
                         <div class="mb-3">
-                            <p class="text-[20px] font-bold">Description</p>
+                            <div class="flex justify-between">
+                                <p class="text-[20px] font-bold">Description</p>
+                                <button @click="isShowReportModal = true">
+                                    <i
+                                        class="bi bi-exclamation-diamond-fill text-red-600"
+                                    ></i>
+                                </button>
+                            </div>
                             <p class="whitespace-pre-wrap break-words text-sm">
                                 {{ jobPostProps.description }}
                             </p>
@@ -431,4 +507,50 @@ function closeJob() {
             type="Success"
         ></SuccessfulMessage>
     </div>
+    <ReusableModal
+        v-if="isShowReportModal"
+        @closeModal="isShowReportModal = false"
+    >
+        <div
+            class="w-[350px] max-w-[500px] rounded bg-white px-4 py-4 sm:w-[500px]"
+        >
+            <div class="mb-3 flex justify-between">
+                <button
+                    @click="reasonSelected = ''"
+                    :class="{ invisible: !reasonSelected }"
+                >
+                    <i class="bi bi-arrow-left-circle-fill text-2xl"></i>
+                </button>
+                <h2 class="text-2xl">Report</h2>
+                <button @click="isShowReportModal = false">
+                    <i class="bi bi-x-circle text-2xl"></i>
+                </button>
+            </div>
+            <div class="mb-3 flex flex-col">
+                <label for="" class="text-sm text-gray-500">{{
+                    reasonSelected
+                }}</label>
+                <button
+                    v-show="!reasonSelected"
+                    v-for="(report, index) in reports"
+                    :key="index"
+                    @click="selectReason(report)"
+                    class="flex items-center justify-between py-2 transition-all"
+                >
+                    <p>{{ report.reason }}</p>
+                    <i class="bi bi-caret-right font-bold"></i>
+                </button>
+                <button
+                    v-show="reasonSelected"
+                    v-for="(description, index) in descriptions"
+                    :key="index"
+                    @click="submitReport(description)"
+                    class="flex items-center justify-between py-2 transition-all"
+                >
+                    <p>{{ description }}</p>
+                    <i class="bi bi-caret-right font-bold"></i>
+                </button>
+            </div>
+        </div>
+    </ReusableModal>
 </template>

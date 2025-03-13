@@ -135,11 +135,17 @@ class User extends Authenticatable
         return $this->hasMany(SubscriptionPaymentHistory::class, 'employer_id');
     }
 
+    // for user report
     public function reportsMade(){
         return $this->hasMany(Report::class , 'complainant_user_id');
     }
 
     public function reportsAgainstMe() {
         return $this->hasMany(Report::class, 'reported_user_id');
+    }
+
+    // for job post report
+    public function reportsMadeToJobPost(){
+        return $this->hasMany(ReportJobPost::class , 'complainant_user_id');
     }
 }

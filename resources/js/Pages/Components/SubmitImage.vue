@@ -49,7 +49,6 @@ function imageChange(e) {
                     </g>
                 </svg>
                 <p class="text-center text-slate-500" v-html="description"></p>
-
             </div>
             <input
                 :id="id"

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Report;
+use App\Models\ReportJobPost;
 use App\Models\User;
-use App\Notifications\AdminReportUserNotification;
+use App\Notifications\AdminReportJobPostNotification;
 use Illuminate\Http\Request;
 
-class ReportController extends Controller
+class ReportJobPostController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -28,24 +28,25 @@ class ReportController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, User $userId)
+    public function store(Request $request, User $jobpostId)
     {
         $request->validate([
             'reason' => 'required'
         ]);
 
         $user = $request->user();
-        $user->reportsMade()->create([
+        $user->reportsMadeToJobPost()->create([
             'reason' => $request->reason,
-            'reported_user_id' => $userId->id,
+            'reported_job_post_id' => $jobpostId->id,
         ]);
 
         $admin = User::whereHas('roles', function($query) {
             $query->where('name', 'Admin');
         })->first();
 
-        $admin->notify(new AdminReportUserNotification(admin:$admin,user:$user));
-        broadcast(new AdminReportUserNotification(admin:$admin,user:$user));
+        $admin->notify(new AdminReportJobPostNotification(admin:$admin,user:$user));
+        broadcast(new AdminReportJobPostNotification(admin:$admin,user:$user));
+        
 
 
         return redirect()->back()->with('message','Thank you for reporting this user! We will review the behaviour of this user.');
@@ -54,7 +55,7 @@ class ReportController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Report $report)
+    public function show(ReportJobPost $reportJobPost)
     {
         //
     }
@@ -62,7 +63,7 @@ class ReportController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Report $report)
+    public function edit(ReportJobPost $reportJobPost)
     {
         //
     }
@@ -70,7 +71,7 @@ class ReportController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Report $report)
+    public function update(Request $request, ReportJobPost $reportJobPost)
     {
         //
     }
@@ -78,7 +79,7 @@ class ReportController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Report $report)
+    public function destroy(ReportJobPost $reportJobPost)
     {
         //
     }
