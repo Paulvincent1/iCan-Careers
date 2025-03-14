@@ -473,12 +473,12 @@ function fireWorker() {
                         <input
                             type="text"
                             v-model="workerProfile.job_title"
-                            class="mr-2 rounded border p-1 outline-none ring-green-300 transition-all hover:ring-1 focus:ring-1"
+                            class="mr-2 rounded border p-1 outline-none ring-orange-300 transition-all hover:ring-1 focus:ring-1"
                             required
                         />
                         <button
                             @click=""
-                            class="rounded bg-green-500 p-1 text-white"
+                            class="rounded bg-orange-500 p-1 text-white"
                         >
                             Save
                         </button>
@@ -488,15 +488,16 @@ function fireWorker() {
                     v-if="!$page.props.auth.worker_verified && !visitor"
                     class="flex flex-col items-center"
                 >
-                    <p class="mb-3 text-center text-red-500">
+                    <p class="mb-3 text-center text-orange-600">
                         Please verify your account to apply for jobs!
+                        <i class="bi bi-exclamation-triangle-fill"></i>
                     </p>
                     <Link
                         :href="route('account.verify')"
                         as="button"
-                        class="w-full rounded-lg border bg-red-500 py-2 text-white"
+                        class="w-fit rounded-lg border bg-orange-500 px-3 py-2 font-bold text-white"
                     >
-                        Click here to verify!
+                        Verfiy Now!
                     </Link>
                 </div>
                 <div
@@ -579,7 +580,7 @@ function fireWorker() {
                                     v-model:monthPay="workerProfile.month_pay"
                                 />
                                 <button
-                                    class="rounded bg-green-500 p-1 text-white"
+                                    class="rounded bg-orange-500 p-1 text-white"
                                 >
                                     Save
                                 </button>
@@ -635,11 +636,13 @@ function fireWorker() {
                             "
                         >
                             <textarea
-                                class="w-full border p-2 pb-28 outline-green-500"
+                                class="w-full border p-2 pb-28 outline-orange-500"
                                 v-model="workerProfile.profile_description"
                                 required
                             ></textarea>
-                            <button class="rounded bg-green-500 p-1 text-white">
+                            <button
+                                class="rounded bg-orange-500 p-1 text-white"
+                            >
                                 Save
                             </button>
                         </form>
@@ -652,7 +655,7 @@ function fireWorker() {
                             <button
                                 v-if="!visitor"
                                 @click="isOpenUpdateValue(true)"
-                                class="rounded-xl bg-green-400 px-2 text-white"
+                                class="rounded-xl bg-orange-400 px-2 text-white"
                             >
                                 Add Skill
                             </button>
@@ -709,7 +712,7 @@ function fireWorker() {
                         <button
                             v-show="showAddressSaveButton"
                             @click="updateAdress()"
-                            class="rounded bg-green-500 p-1 text-white"
+                            class="rounded bg-orange-500 p-1 text-white"
                         >
                             Save
                         </button>
@@ -727,7 +730,7 @@ function fireWorker() {
                         <button
                             v-show="showWebsiteLinkSaveButton"
                             @click="updateWebsiteLink()"
-                            class="rounded bg-green-500 p-1 text-white"
+                            class="rounded bg-orange-500 p-1 text-white"
                         >
                             Save
                         </button>
@@ -750,7 +753,7 @@ function fireWorker() {
                                     target="_blank"
                                     :href="'/' + workerProfile.resume_path"
                                     as="button"
-                                    class="rounded bg-green-500 px-2 py-1 text-white"
+                                    class="rounded bg-orange-500 px-2 py-1 text-white"
                                 >
                                     <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
@@ -776,7 +779,7 @@ function fireWorker() {
             <Transition>
                 <div v-if="messageShow" class="">
                     <div
-                        class="fixed left-[50%] top-20 flex translate-x-[-50%] items-center gap-2 rounded bg-green-200 p-4 text-green-600"
+                        class="fixed left-[50%] top-20 flex translate-x-[-50%] items-center gap-2 rounded bg-orange-200 p-4 text-orange-600"
                     >
                         <i class="bi bi-check-circle-fill"></i>
                         <p class="text-center">{{ props.messageProp }}</p>

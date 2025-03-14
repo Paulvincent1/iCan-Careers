@@ -36,7 +36,6 @@ function addResume(e) {
 
 let isDisabled = ref(false);
 const submit = () => {
-
     form.post(route("create.profile.post"), {
         onStart: () => {
             isDisabled.value = true;
@@ -51,32 +50,29 @@ const submit = () => {
 <template>
     <Head title="Create Profile | iCan Careers" />
 
-    <div class="flex justify-center">
-        <div
-            class="mt-8 w-full max-w-5xl rounded-lg border border-gray-300 bg-white p-8 shadow-md"
-        >
-            <h2 class="text-center text-3xl font-bold text-gray-900">
-                Create Your Profile
-            </h2>
-            <p class="mb-6 text-center text-lg text-gray-700">
-                Complete your details to get better job recommendations.
+    <div class="mb-4 flex justify-center">
+        <div class="mt-5 w-full rounded-lg bg-white p-8">
+            <h2 class="text-[24px] text-gray-900">Create Your Profile</h2>
+            <p class="mb-6 text-lg text-gray-700">
+                Complete your details to get better job opportunities.
             </p>
             <hr class="my-4 border-gray-300" />
-            <h3 class="text-xl font-bold text-gray-900">
-                        Finish your Profile
-                    </h3>
-                    <h3 class="text-xs mb-4">This information will be displayed publicly so be careful what you share.</h3>
+            <h3 class="text-[18px] font-bold text-gray-900">
+                Finish your Profile
+            </h3>
+            <h3 class="mb-4 text-xs">
+                This information will be displayed publicly so be careful what
+                you share.
+            </h3>
 
             <form @submit.prevent="submit" class="space-y-6">
                 <!-- Job Title -->
                 <div>
-                    <label class="text-lg font-semibold text-gray-800"
-                        >Job Title</label
-                    >
+                    <label class="text-gray-500">Job Title</label>
                     <input
                         v-model="form.job_title"
                         type="text"
-                        class="w-full mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
+                        class="mt-2 w-full rounded-lg border px-4 py-2 text-lg outline-orange-200"
                         placeholder="e.g. Social Media Manager"
                     />
                     <InputFlashMessage
@@ -87,12 +83,10 @@ const submit = () => {
 
                 <!-- Profile Description (Non-Adjustable) -->
                 <div>
-                    <label class="text-lg font-semibold text-gray-800"
-                        >Profile Description</label
-                    >
+                    <label class="text-gray-500">Profile Description</label>
                     <textarea
                         v-model="form.profile_description"
-                        class="w-full h-[200px] mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400 resize-none"
+                        class="mt-2 h-[200px] w-full resize-none rounded-lg border px-4 py-2 text-lg outline-orange-200"
                         placeholder="Describe your skills and work experience..."
                     ></textarea>
                     <InputFlashMessage
@@ -103,7 +97,7 @@ const submit = () => {
 
                 <!-- Educational Attainment (Now Required) -->
                 <div>
-                    <label class=" text-lg font-semibold text-gray-800"
+                    <label class="text-gray-500"
                         >Highest Educational Attainment
                         <span class="text-red-500">*</span></label
                     >
@@ -116,39 +110,37 @@ const submit = () => {
                 <hr class="my-4 border-gray-300" />
                 <!-- Work Details (Improved Layout) -->
                 <div class="rounded-lg">
-                    <h3 class="text-xl font-bold text-gray-900">
+                    <h3 class="text-[18px] font-bold text-gray-900">
                         Looking for
                     </h3>
-                    <h3 class="text-xs mb-4">Define your ideal job type, set your preferred work hours and salary, and discover opportunities that match your skills and goals.</h3>
+                    <h3 class="mb-4 text-xs">
+                        Define your ideal job type, set your preferred work
+                        hours and salary, and discover opportunities that match
+                        your skills and goals.
+                    </h3>
                     <!-- Job Type -->
                     <div>
-                            <label
-                                class="block text-lg font-semibold text-gray-800"
-                                >Job Type</label
-                            >
-                            <select
-                                v-model="form.job_type"
-                                class="w-[200px] mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
-                            >
-                                <option disabled value="">
-                                    Select job type
-                                </option>
-                                <option>Full-time</option>
-                                <option>Part-time</option>
-                            </select>
-                            <InputFlashMessage
-                        type="error"
-                        :message="form.errors.work_hour_per_day"
+                        <label class="block text-gray-500">Job Type</label>
+                        <select
+                            v-model="form.job_type"
+                            class="mt-2 w-[200px] rounded-lg border px-4 py-2 text-lg outline-blue-400"
+                        >
+                            <option disabled value="">Select job type</option>
+                            <option>Full-time</option>
+                            <option>Part-time</option>
+                        </select>
+                        <InputFlashMessage
+                            type="error"
+                            :message="form.errors.work_hour_per_day"
                         />
-                        </div>
+                    </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
-
-
+                    <div
+                        class="my-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                    >
                         <!-- Work Hours Per Day -->
                         <div>
-                            <label
-                                class="text-lg font-semibold text-gray-800"
+                            <label class="text-gray-500"
                                 >Work Hours per Day</label
                             >
                             <input
@@ -156,113 +148,109 @@ const submit = () => {
                                 type="number"
                                 min="1"
                                 max="12"
-                                class="w-full mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
+                                class="mt-2 w-full rounded-lg border px-4 py-2 text-lg outline-blue-400"
                                 placeholder="e.g. 6 hours"
                                 required
                             />
 
                             <InputFlashMessage
-        type="error"
-        :message="form.errors.work_hour_per_day"
-    />
+                                type="error"
+                                :message="form.errors.work_hour_per_day"
+                            />
                         </div>
 
                         <!-- Hourly Pay -->
                         <div>
-                            <label
-                                class="text-lg font-semibold text-gray-800"
-                                >Hourly Pay (₱)</label
-                            >
+                            <label class="text-gray-500">Hourly Pay (₱)</label>
                             <input
                                 v-model="form.hour_pay"
                                 type="number"
                                 min="0"
-                                class="w-full mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
+                                class="mt-2 w-full rounded-lg border px-4 py-2 text-lg outline-blue-400"
                                 placeholder="e.g. 150"
                                 required
                             />
                             <InputFlashMessage
-        type="error"
-        :message="form.errors.work_hour_per_day"
-    />
+                                type="error"
+                                :message="form.errors.work_hour_per_day"
+                            />
                         </div>
 
                         <!-- Monthly Pay -->
                         <div>
-                            <label
-                                class="text-lg font-semibold text-gray-800"
-                                >Monthly Pay (₱)</label
-                            >
+                            <label class="text-gray-500">Monthly Pay (₱)</label>
                             <input
                                 v-model="form.month_pay"
                                 type="number"
                                 min="0"
-                                class="w-full mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
+                                class="mt-2 w-full rounded-lg border px-4 py-2 text-lg outline-blue-400"
                                 placeholder="e.g. 20,000"
                                 required
                             />
                             <InputFlashMessage
-        type="error"
-        :message="form.errors.work_hour_per_day"
-    />
+                                type="error"
+                                :message="form.errors.work_hour_per_day"
+                            />
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-4">
+                <div
+                    class="grid grid-cols-1 gap-4 sm:grid-cols-1 lg:grid-cols-1"
+                >
                     <!-- Birth Year -->
-                <div>
-                    <label class="flex text-lg font-semibold text-gray-800"
-                        >Birth Year</label
-                    >
-                    <input
-                        v-model="form.birth_year"
-                        type="number"
-                        min="1900"
-                        :max="dayjs().format('YYYY') - 18"
-                        class="w-[100px] mt-2 border rounded-lg px-4 py-2 text-lg outline-blue-400"
-                        placeholder="YYYY"
-                        required
-                    />
-                </div>
-
-                <!-- Gender -->
-                <div>
-                    <p class="text-lg font-semibold text-gray-800">Gender</p>
-                    <div class="mt-2 flex items-center gap-6">
-                        <label
-                            class="flex cursor-pointer items-center gap-2 text-lg"
-                        >
-                            <input
-                                v-model="form.gender"
-                                type="radio"
-                                value="Male"
-                                class="h-4 w-4"
-                            />
-                            <span class="text-gray-700 text-sm">Male</span>
-                        </label>
-                        <label
-                            class="flex cursor-pointer items-center gap-2 text-lg"
-                        >
-                            <input
-                                v-model="form.gender"
-                                type="radio"
-                                value="Female"
-                                class="h-4 w-4"
-                            />
-                            <span class="text-gray-700 text-sm">Female</span>
-                        </label>
+                    <div>
+                        <label class="block text-gray-500">Birth Year</label>
+                        <input
+                            v-model="form.birth_year"
+                            type="number"
+                            min="1900"
+                            :max="dayjs().format('YYYY') - 18"
+                            class="mt-2 w-[100px] rounded-lg border px-4 py-2 text-lg outline-blue-400"
+                            placeholder="YYYY"
+                            required
+                        />
                     </div>
-                    <InputFlashMessage
-                        type="error"
-                        :message="form.errors.gender"
-                    />
-                </div>
+
+                    <!-- Gender -->
+                    <div>
+                        <p class="text-gray-500">Gender</p>
+                        <div class="mt-2 flex items-center gap-6">
+                            <label
+                                class="flex cursor-pointer items-center gap-2 text-lg"
+                            >
+                                <input
+                                    v-model="form.gender"
+                                    type="radio"
+                                    value="Male"
+                                    class="h-4 w-4"
+                                />
+                                <span class="text-sm text-gray-700">Male</span>
+                            </label>
+                            <label
+                                class="flex cursor-pointer items-center gap-2 text-lg"
+                            >
+                                <input
+                                    v-model="form.gender"
+                                    type="radio"
+                                    value="Female"
+                                    class="h-4 w-4"
+                                />
+                                <span class="text-sm text-gray-700"
+                                    >Female</span
+                                >
+                            </label>
+                        </div>
+                        <InputFlashMessage
+                            type="error"
+                            :message="form.errors.gender"
+                        />
+                    </div>
                 </div>
 
                 <!-- Resume Upload (Shows File Name) -->
                 <div>
-                    <label class="block text-lg font-semibold text-gray-800"
+                    <label class="block text-gray-500"
                         >Upload Resume (Optional)</label
                     >
                     <div class="mt-2 flex items-center gap-4">
@@ -289,30 +277,26 @@ const submit = () => {
                 </div>
                 <hr class="my-4 border-gray-300" />
                 <div class="mt-4 flex justify-end gap-3">
-                            <!-- Submit Button -->
-                            <div
-                                type="button"
-                                @click="
-                                    $inertia.visit(route('worker.dashboard'))
-                                "
-                                class="mt-4 flex justify-end"
-                            >
-                                <button
-                                    class="cursor-pointer rounded p-2 text-black"
-                                >
-                                    <u>Skip for now</u>
-                                </button>
-                            </div>
+                    <!-- Submit Button -->
+                    <div
+                        type="button"
+                        @click="$inertia.visit(route('worker.dashboard'))"
+                        class="mt-4 flex justify-end"
+                    >
+                        <button class="cursor-pointer rounded p-2 text-black">
+                            <u>Skip for now</u>
+                        </button>
+                    </div>
 
-                            <!-- Submit Button -->
-                            <div class="mt-4 flex justify-end">
-                                <button
-                                    class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
-                                >
-                                    Save Profile
-                                </button>
-                            </div>
-                        </div>
+                    <!-- Submit Button -->
+                    <div class="mt-4 flex justify-end">
+                        <button
+                            class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
+                        >
+                            Save Profile
+                        </button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
