@@ -49,7 +49,7 @@ class ReportJobPostController extends Controller
         
 
 
-        return redirect()->back()->with('message','Thank you for reporting this user! We will review the behaviour of this user.');
+        return redirect()->back()->with('messageProp','Thank you for reporting this user! We will review the behaviour of this user.');
     }
 
     /**
