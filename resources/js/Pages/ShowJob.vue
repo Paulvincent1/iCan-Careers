@@ -171,7 +171,7 @@ function submitReport(reason) {
             preserveScroll: true,
             onSuccess: () => {
                 isShowReportModal.value = false;
-                // showSuccessMessage();
+                showMessage();
             },
         },
     );
