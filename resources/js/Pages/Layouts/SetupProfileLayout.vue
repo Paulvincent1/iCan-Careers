@@ -85,10 +85,12 @@ function updateBreadcrumbs() {
 </script>
 
 <template>
-    <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
-        <div class="flow-root">
-            <Breadcrumbs :steps="breadcrumbs" class="mt-4" />
-            <slot></slot>
+    <div class="min-h-[calc(100vh-4.625rem)] bg-[#eff2f6] text-[#171816]">
+        <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
+            <div class="flow-root">
+                <Breadcrumbs :steps="breadcrumbs" class="mt-4" />
+                <slot></slot>
+            </div>
         </div>
     </div>
 </template>

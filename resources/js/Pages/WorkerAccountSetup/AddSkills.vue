@@ -95,24 +95,33 @@ const submit = () => {
 <template>
     <Head title="Skills Add | iCan Careers" />
 
-    <div class="flex justify-center">
-        <div class="w-full max-w-5xl bg-white shadow-md rounded-lg p-8 mt-8 border border-gray-300 flex flex-col md:flex-row">
+    <div class="mb-3 flex justify-center">
+        <div
+            class="mt-5 flex flex-col items-start rounded-lg bg-white p-8 md:flex-row"
+        >
             <!-- Left Side: Skills Form -->
-            <div class="w-full md:w-2/3 pr-6">
-                <h2 class="text-3xl font-bold text-gray-900 text-center md:text-left">Tell us about your Skills</h2>
-                <p class="text-lg text-gray-700 text-center md:text-left mb-6">
-                    Select, rate, and describe your experience for your top skills. You can select up to <strong>15 skills</strong>.
+            <div class="w-full pr-6 md:w-2/3">
+                <h2 class="text-center text-[24px] md:text-left">
+                    Tell us about your Skills
+                </h2>
+                <p class="mb-6 text-center text-lg text-gray-700 md:text-left">
+                    Select, rate, and describe your experience for your top
+                    skills. You can select up to <strong>15 skills</strong>.
                 </p>
 
                 <!-- Add Skill Input -->
-                <div class="p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Add a Skill</h3>
+                <div class="mb-6 p-6">
+                    <h3 class="mb-1 text-xl font-bold text-gray-900">
+                        Add a Skill
+                    </h3>
                     <AddSkillInput @addSkill="addSkill" />
                 </div>
 
                 <!-- Skills List -->
-                <div class="p-6 ">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Your Skills</h3>
+                <div class="p-6">
+                    <h3 class="mb-4 text-xl font-bold text-gray-900">
+                        Your Skills
+                    </h3>
 
                     <div v-if="form.skills.length" class="space-y-4">
                         <Skill
@@ -126,53 +135,73 @@ const submit = () => {
                         />
                     </div>
 
-                    <p v-else class="text-gray-500 text-center mt-4">No skills added yet. Add your first skill above.</p>
+                    <p v-else class="mt-4 text-center text-gray-500">
+                        No skills added yet. Add your first skill above.
+                    </p>
 
-                    <InputFlashMessage class="mt-2" :message="errorMessage" type="error" />
+                    <InputFlashMessage
+                        class="mt-2"
+                        :message="errorMessage"
+                        type="error"
+                    />
                 </div>
 
                 <hr class="my-7" />
 
                 <!-- Save Button -->
                 <div class="mt-4 flex justify-end gap-3">
-                            <!-- Submit Button -->
-                            <div
-                                type="button"
-                                @click="
-                                    $inertia.visit(route('worker.dashboard'))
-                                "
-                                class="mt-4 flex justify-end"
-                            >
-                                <button
-                                    class="cursor-pointer rounded p-2 text-black"
-                                >
-                                    <u>Skip for now</u>
-                                </button>
-                            </div>
+                    <!-- Submit Button -->
+                    <div
+                        type="button"
+                        @click="$inertia.visit(route('worker.dashboard'))"
+                        class="mt-4 flex justify-end"
+                    >
+                        <button class="cursor-pointer rounded p-2 text-black">
+                            <u>Skip for now</u>
+                        </button>
+                    </div>
 
-                            <!-- Submit Button -->
-                            <div class="mt-4 flex justify-end">
-                                <button
-                                @click="submit"
-                                    class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
-                                >
-                                    Save Skills
-                                </button>
-                            </div>
-                        </div>
+                    <!-- Submit Button -->
+                    <div class="mt-4 flex justify-end">
+                        <button
+                            @click="submit"
+                            class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
+                        >
+                            Save Skills
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Right Side: Step-by-Step Instructions -->
-            <div class="hidden md:block w-1/3 bg-gray-50 p-6 rounded-lg shadow-md border border-gray-200">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">How to Add Skills</h3>
-                <ol class="list-decimal pl-5 text-gray-700 space-y-3">
+            <div
+                class="hidden w-1/3 rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-md md:block"
+            >
+                <h3 class="mb-4 text-xl font-bold text-gray-900">
+                    How to Add Skills
+                </h3>
+                <ol class="list-decimal space-y-3 pl-5 text-gray-700">
                     <li>Add a skill using the input field above.</li>
-                    <li>Click the <strong>+</strong> button to add it to your list.</li>
-                    <li>Rate your skill by clicking on the <strong>stars</strong>.</li>
-                    <li>Optionally, describe your experience in the provided field.</li>
-                    <li>Once done, click the <strong>Save Skills</strong> button to save.</li>
+                    <li>
+                        Click the <strong>+</strong> button to add it to your
+                        list.
+                    </li>
+                    <li>
+                        Rate your skill by clicking on the
+                        <strong>stars</strong>.
+                    </li>
+                    <li>
+                        Optionally, describe your experience in the provided
+                        field.
+                    </li>
+                    <li>
+                        Once done, click the <strong>Save Skills</strong> button
+                        to save.
+                    </li>
                 </ol>
-                <p class="text-gray-600 mt-4 text-sm">Need help? Contact support for assistance.</p>
+                <p class="mt-4 text-sm text-gray-600">
+                    Need help? Contact support for assistance.
+                </p>
             </div>
         </div>
     </div>
