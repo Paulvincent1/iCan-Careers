@@ -300,6 +300,8 @@ onBeforeUnmount(() => {
     channelChatHeads.stopListening(".message.event");
 });
 
+let isPayoutInfoModalOpen = ref(false);
+
 const formatCurrency =
     getCurrentInstance().appContext.config.globalProperties.formatCurrency;
 </script>
@@ -614,9 +616,9 @@ const formatCurrency =
                                     </div>
                                 </div>
                                 <div class="flex justify-start gap-3">
-                                    <div
+                                    <button
                                         @click="openModalPayout"
-                                        class="flex cursor-pointer flex-col items-center justify-center"
+                                        class="flex flex-col items-center justify-center"
                                     >
                                         <div
                                             class="flex h-10 w-10 items-center justify-center rounded-full bg-orange-400 p-2"
@@ -628,17 +630,20 @@ const formatCurrency =
                                         <p class="text-[12px] text-[#171816]">
                                             Payout
                                         </p>
-                                    </div>
+                                    </button>
                                     <div
                                         class="flex flex-col items-center justify-center"
                                     >
-                                        <div
-                                            class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-orange-400 p-2"
+                                        <button
+                                            @click="
+                                                isPayoutInfoModalOpen = true
+                                            "
+                                            class="flex h-10 w-10 items-center justify-center rounded-full bg-orange-400 p-2"
                                         >
                                             <i
                                                 class="bi bi-info-circle-fill text-white"
                                             ></i>
-                                        </div>
+                                        </button>
                                         <p class="text-[12px] text-[#171816]">
                                             Info
                                         </p>
@@ -1293,6 +1298,53 @@ const formatCurrency =
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </ReusableModal>
+    <ReusableModal
+        v-if="isPayoutInfoModalOpen"
+        @closeModal="isPayoutInfoModalOpen = false"
+    >
+        <div class="w-[350px] rounded-lg bg-white p-2">
+            <div class="flex items-start justify-between">
+                <div
+                    class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-orange-50 p-3"
+                >
+                    <i class="bi bi-info-circle text-lg text-orange-600"></i>
+                </div>
+                <button @click="isPayoutInfoModalOpen = false" class="p-2">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="px-2">
+                <div class="mb-4">
+                    <h2 class="text-2xl">
+                        Payout Information
+                        <i class="bi bi-megaphone-fill text-orange-500"></i>
+                    </h2>
+                    <p class="text-sm text-gray-500">
+                        Please note that payouts can only be made once your
+                        balance is settled.
+                    </p>
+                </div>
+                <div>
+                    <ul class="text-sm">
+                        <li class="mb-3 list-inside list-disc">
+                            <span class="font-bold"> Unsettled Balance: </span>
+                            This represents funds that are still processing.
+                        </li>
+                        <li class="mb-3 list-inside list-disc">
+                            <span class="font-bold"> Settlement Time: </span>
+                            It typically takes 3 to 5 business days for funds to
+                            move from unsettled to available balance.
+                        </li>
+                        <li class="mb-3 list-inside list-disc">
+                            <span class="font-bold"> Withdrawals: </span>
+                            Once settled, you can withdraw the money from your
+                            dashboard.
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
