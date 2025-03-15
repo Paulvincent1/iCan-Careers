@@ -108,9 +108,12 @@ class AdminDashboardController extends Controller
     public function toggleVerification($id)
     {
         $worker = User::findOrFail($id);
-        if ($worker->verified) {
-            $worker->notify(new WorkerVerificationNotification(worker: $worker, verified: true));
-            broadcast(new WorkerVerificationNotification(worker: $worker, verified: true));
+      
+        if(!$worker->verified){
+          
+            $worker->notify(new WorkerVerificationNotification(worker:$worker,verified:true));
+            broadcast(new WorkerVerificationNotification(worker:$worker,verified:true));
+
         }
         $worker->verified = !$worker->verified; // Toggle between true/false
         $worker->save();
@@ -124,7 +127,8 @@ class AdminDashboardController extends Controller
     {
         $worker = WorkerVerification::where('user_id', $id)->first();
 
-        $userWorker = User::where('id', $id);
+
+        $userWorker = User::findOrFail($id);
 
         if (!$worker) {
             return redirect()->back()->with([
@@ -133,8 +137,11 @@ class AdminDashboardController extends Controller
         }
         $worker->delete();  // Try deleting the record
 
-        $worker->notify(new WorkerVerificationNotification(worker: $userWorker, verified: false));
-        broadcast(new WorkerVerificationNotification(worker: $userWorker, verified: false));
+
+
+        $userWorker->notify(new WorkerVerificationNotification(worker:$userWorker,verified:false));
+        broadcast(new WorkerVerificationNotification(worker:$userWorker,verified:false));
+
 
         return redirect()->back()->with(['message' => 'Successfuly updated!']);
     }

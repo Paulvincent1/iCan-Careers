@@ -156,7 +156,7 @@ onMounted(() => {
                     :disabled="form.processing"
                     ref="saveBtn"
                     @click="submit"
-                    class="rounded bg-green-400 p-2"
+                    class="rounded bg-orange-400 p-2 text-white"
                 >
                     Save
                 </button>

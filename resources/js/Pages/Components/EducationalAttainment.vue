@@ -2,7 +2,7 @@
 import InputFlashMessage from "./InputFlashMessage.vue";
 
 let model = defineModel({
-    type: String,
+    type: null,
     required: true,
 });
 
@@ -16,7 +16,7 @@ let props = defineProps({
     <div class="relative">
         <select
             v-model="model"
-            class="w-[350px] appearance-none border px-3 py-2 outline-blue-400"
+            class="w-[200px] border px-3 py-2 outline-orange-200"
             :class="{ 'border-red-500': error }"
         >
             <option disabled value="">Select your highest education</option>
@@ -35,9 +35,6 @@ let props = defineProps({
             <option v-if="openToAll" value="Open to all">
                 Open to All (Any Educational Attainment)
             </option>
-
-
-
         </select>
 
         <InputFlashMessage type="error" :message="error" />

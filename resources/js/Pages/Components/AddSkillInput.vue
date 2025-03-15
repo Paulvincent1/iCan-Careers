@@ -59,7 +59,7 @@ function addSkill(name) {
             />
             <i
                 @click="addSkill(query)"
-                class="bi bi-plus-lg absolute right-3 top-[50%] translate-y-[-20%] cursor-pointer text-lg font-bold text-blue-500"
+                class="bi bi-plus-lg absolute right-3 top-[50%] translate-y-[-20%] cursor-pointer text-lg font-bold text-orange-500"
             ></i>
         </div>
 
