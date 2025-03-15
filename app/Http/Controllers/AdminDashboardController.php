@@ -6,7 +6,9 @@ use App\Models\EmployerProfile;
 use App\Models\EmployerSubscription;
 use App\Models\JobPost;
 use App\Models\Report;
+use App\Models\ReportJobPost;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Salary;
 use App\Models\SubscriptionPaymentHistory;
 use App\Models\WorkerVerification;
@@ -15,6 +17,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Redirect;
 
 class AdminDashboardController extends Controller
 {
@@ -105,9 +108,9 @@ class AdminDashboardController extends Controller
     public function toggleVerification($id)
     {
         $worker = User::findOrFail($id);
-        if($worker->verified){
-            $worker->notify(new WorkerVerificationNotification(worker:$worker,verified:true));
-            broadcast(new WorkerVerificationNotification(worker:$worker,verified:true));
+        if ($worker->verified) {
+            $worker->notify(new WorkerVerificationNotification(worker: $worker, verified: true));
+            broadcast(new WorkerVerificationNotification(worker: $worker, verified: true));
         }
         $worker->verified = !$worker->verified; // Toggle between true/false
         $worker->save();
@@ -121,7 +124,7 @@ class AdminDashboardController extends Controller
     {
         $worker = WorkerVerification::where('user_id', $id)->first();
 
-        $userWorker = User::where('id',$id);
+        $userWorker = User::where('id', $id);
 
         if (!$worker) {
             return redirect()->back()->with([
@@ -130,8 +133,8 @@ class AdminDashboardController extends Controller
         }
         $worker->delete();  // Try deleting the record
 
-        $worker->notify(new WorkerVerificationNotification(worker:$userWorker,verified:false));
-        broadcast(new WorkerVerificationNotification(worker:$userWorker,verified:false));
+        $worker->notify(new WorkerVerificationNotification(worker: $userWorker, verified: false));
+        broadcast(new WorkerVerificationNotification(worker: $userWorker, verified: false));
 
         return redirect()->back()->with(['message' => 'Successfuly updated!']);
     }
@@ -171,29 +174,108 @@ class AdminDashboardController extends Controller
         ]);
     }
 
-    public function warnUser($id)
+
+    public function toggleBan($id)
     {
-        $report = Report::findOrFail($id);
-        $report->status = 'Warned';
-        $report->save();
+        $user = User::find($id); // Find the reported user directly
 
-        return back()->with('success', 'User has been warned.');
-    }
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
 
-    public function banUser($id)
-    {
-        $report = Report::findOrFail($id);
-        $report->status = 'Banned';
-        $report->save();
+        $user->ban = !$user->ban; // Toggle ban status
+        $user->save();
 
-        return back()->with('success', 'User has been banned.');
+        return redirect()->back()->with('success', 'User ban status updated successfully.');
     }
 
 
     public function reportedPosts()
     {
-        return Inertia::render('Admin/ReportedPosts');
+        $reportPosts = ReportJobPost::with(['reporter', 'reportedJobPost'])->latest()->get();
+        $user = Auth::user();
+
+        return Inertia::render('Admin/ReportedPosts', [
+            'reports' => $reportPosts,
+            'userProps' => $user,
+        ]);
     }
+
+
+
+    public function banJob($id)
+    {
+        $report = ReportJobPost::with('reportedJobPost.employer')->findOrFail($id);
+
+        if (!$report->reportedJobPost) {
+            return Redirect::back()->with('error', "❌ No reported job post found for report ID: $id");
+        }
+
+        if (!$report->reportedJobPost->employer) {
+            return Redirect::back()->with('error', "❌ No employer found for job post ID: {$report->reportedJobPost->id}");
+        }
+
+        // Toggle employer ban status
+        $employer = $report->reportedJobPost->employer;
+        $employer->ban = !$employer->ban;
+        $employer->save();
+
+        // Fetch updated reports
+        $reports = ReportJobPost::with(['reportedJobPost.employer'])->get();
+
+        // ✅ Redirect back with updated reports
+        return Inertia::render('Admin/ReportedPosts', [
+            'reports' => $reports
+        ])->with('success', 'Ban status updated successfully.');
+    }
+
+
+    public function showReportedJob($id)
+    {
+        $job = JobPost::with('employer')->findOrFail($id);
+
+        // Ensure location is properly formatted
+        if (is_string($job->location)) {
+            $job->location = json_decode($job->location, true); // Decode only if it's a string
+        }
+
+        return Inertia::render('Admin/ReportedPostsDetails', [
+            'job' => $job
+        ]);
+    }
+    // public function banJob(Request $request, $id)
+    // {
+    //     if ($request->method() !== 'PUT') {
+    //         return response()->json(['error' => 'Method Not Allowed'], 405);
+    //     }
+
+    //     $report = ReportJobPost::with('reportedJobPost.employer')->findOrFail($id);
+
+    //     if ($report->reportedJobPost && $report->reportedJobPost->employer) {
+    //         $employer = $report->reportedJobPost->employer;
+    //         $employer->update(['ban' => !$employer->ban]); // Toggle employer ban/unban
+    //     }
+
+    //     $report->update(['ban' => !$report->ban]);
+
+    //     return response()->json([
+    //         'success' => 'Employer ban status updated.',
+    //         'report' => $report,
+    //     ]);
+    // }
+
+
+
+    public function deleteJob($id)
+    {
+        $job = JobPost::findOrFail($id);
+        $job->delete();
+
+        return redirect()->route('admin.reported.posts')->with('success', 'Job post deleted successfully.');
+    }
+
+
+
 
     public function jobApprovals()
     {

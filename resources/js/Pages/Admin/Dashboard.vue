@@ -64,7 +64,7 @@ const earningsData = computed(() => ({
 <template>
     <Head title="Dashboard | iCan Careers" />
 
-    <div :class="['p-4', darkMode ? 'bg-black' : 'bg-white']">
+    <div :class="['p-4', darkMode ? 'bg-gray-700' : 'bg-white']">
 
 
         <!-- Grouped Main Chart & Key Statistics -->

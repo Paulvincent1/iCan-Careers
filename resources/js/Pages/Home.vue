@@ -80,6 +80,7 @@ const testimonials = [
     <Head title="Home | iCan Careers" />
     <section class="overflow-hidden bg-[#FEFBF9]">
         <div class="container mx-auto h-[607px] px-[0.5rem] py-4 md:max-w-7xl">
+            
             <div
                 class="container mx-auto flex h-full w-full flex-col items-center justify-center gap-8 sm:flex-row"
             >
