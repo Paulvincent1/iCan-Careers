@@ -1,11 +1,30 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
+import DataTable from "vue3-easy-data-table";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faSearch, faUser, faBan } from "@fortawesome/free-solid-svg-icons";
 
-defineOptions({
-    layout: AdminLayout,
+// Dark mode logic
+const darkMode = ref(localStorage.getItem("theme") === "dark");
+
+onMounted(() => {
+    document.documentElement.classList.toggle("dark", darkMode.value);
+    window.addEventListener("theme-changed", () => {
+        darkMode.value = localStorage.getItem("theme") === "dark";
+        document.documentElement.classList.toggle("dark", darkMode.value);
+    });
 });
+
+const textSrc = computed(() => (darkMode.value ? 'text-white' : 'text-gray-900'));
+
+// Add icons
+library.add(faSearch, faUser, faBan);
+
+// Define Layout
+defineOptions({ layout: AdminLayout });
 
 // Get reported users data from backend
 const reportedUsers = ref(usePage().props.reports || []);
@@ -13,48 +32,56 @@ const reportedUsers = ref(usePage().props.reports || []);
 // Tabs for filtering users
 const tabs = [
     { id: "all", label: "All" },
-    { id: "pending", label: "Pending" },
-    { id: "warned", label: "Warned" },
+    { id: "active", label: "Active" },
     { id: "banned", label: "Banned" },
 ];
 
 // Active tab state
 const activeTab = ref("all");
 
-// Filter users based on active tab
+// Search input state
+const searchQuery = ref("");
+
+// Filtered Users (Based on Tab and Search)
 const filteredUsers = computed(() => {
-    return activeTab.value === "all"
-        ? reportedUsers.value
-        : reportedUsers.value.filter(
-              (user) => user.status.toLowerCase() === activeTab.value
-          );
+    let filtered = reportedUsers.value;
+
+    // Filter by Tab
+    if (activeTab.value === "active") {
+        filtered = filtered.filter(user => !user.reported.ban);
+    } else if (activeTab.value === "banned") {
+        filtered = filtered.filter(user => user.reported.ban);
+    }
+
+    // Search Filtering
+    if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase();
+        filtered = filtered.filter(user =>
+            user.reporter?.name.toLowerCase().includes(query) ||
+            user.reported?.name.toLowerCase().includes(query) ||
+            user.reason.toLowerCase().includes(query)
+        );
+    }
+
+    return filtered;
 });
 
-// Function to determine status styles
-const statusClass = (status) => {
-    return {
-        "text-gray-700 bg-gray-200 px-2 py-1 rounded-full": status === "Pending",
-        "text-yellow-700 bg-yellow-200 px-2 py-1 rounded-full": status === "Warned",
-        "text-red-700 bg-red-200 px-2 py-1 rounded-full": status === "Banned",
-    };
-};
+// Table Headers
+const headers = [
+    { text: "ID", value: "id", sortable: true },
+    { text: "Reported By", value: "reporter.name", sortable: false },
+    { text: "Reported User", value: "reported.name", sortable: false },
+    { text: "Reason", value: "reason", sortable: false },
+    { text: "Status", value: "reported.ban", sortable: false },
+    { text: "Action", value: "action", sortable: false },
+];
 
-// Warn user function (API call)
-const warnUser = (id) => {
-    router.put(`/admin/reported-users/warn/${id}`, {}, {
+// Toggle Ban Function
+const toggleBan = (reportedUserId) => {
+    router.put(`/admin/reported-users/toggle-ban/${reportedUserId}`, {}, {
+        preserveScroll: true,
         onSuccess: () => {
-            const user = reportedUsers.value.find((u) => u.id === id);
-            if (user) user.status = "Warned";
-        },
-    });
-};
-
-// Ban user function (API call)
-const banUser = (id) => {
-    router.put(`/admin/reported-users/ban/${id}`, {}, {
-        onSuccess: () => {
-            const user = reportedUsers.value.find((u) => u.id === id);
-            if (user) user.status = "Banned";
+            router.reload({ only: ['reports'] });
         },
     });
 };
@@ -62,17 +89,20 @@ const banUser = (id) => {
 
 <template>
     <Head title="Reported Users | iCan Careers" />
-    <div class="p-4 bg-white">
+    <div :class="['p-4', darkMode ? 'bg-gray-700' : 'bg-white']">
         <!-- Tabs Navigation -->
         <nav class="mb-6">
-            <ul class="flex w-full flex-wrap gap-2 border-b overflow-x-auto">
+            <ul class="flex space-x-4 border-b overflow-x-auto">
                 <li
                     v-for="tab in tabs"
                     :key="tab.id"
                     @click="activeTab = tab.id"
                     :class="{
-                        'border-b-2 border-blue-500 font-semibold': activeTab === tab.id,
-                        'text-gray-500 hover:text-gray-700': activeTab !== tab.id,
+                        'border-b-2 border-yellow-300 font-semibold': activeTab === tab.id,
+                        'text-yellow-300': activeTab === tab.id && !darkMode,
+                        'text-yellow-300': activeTab === tab.id && darkMode,
+                        'text-gray-500': activeTab !== tab.id && !darkMode,
+                        'text-white': activeTab !== tab.id && darkMode,
                     }"
                     class="cursor-pointer px-4 py-2 whitespace-nowrap"
                 >
@@ -81,79 +111,76 @@ const banUser = (id) => {
             </ul>
         </nav>
 
-        <h1 class="mb-4 text-2xl font-bold">Reported Users</h1>
+        <h1 class="mb-4 text-xl font-bold flex items-center gap-2">
+            <font-awesome-icon :icon="['fas', 'user']" class="text-[#fa8334]" />
+            <p :class="textSrc">Reported Users Management</p>
+        </h1>
 
-        <!-- Desktop Table (Hidden on Mobile) -->
-        <div class="hidden md:block overflow-x-auto">
-            <table class="w-full bg-white shadow-md rounded-lg">
-                <thead>
-                    <tr class="bg-gray-200 text-left">
-                        <th class="p-3">ID</th>
-                        <th class="p-3">Reported By</th>
-                        <th class="p-3">Reported User</th>
-                        <th class="p-3">Reason</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="user in filteredUsers" :key="user.id" class="border-b">
-                        <td class="p-3">{{ user.id }}</td>
-                        <td class="p-3">{{ user.reporter?.name || "Unknown" }}</td>
-                        <td class="p-3">{{ user.reported?.name || "Unknown" }}</td>
-                        <td class="p-3">{{ user.reason }}</td>
-                        <td class="p-3">
-                            <span :class="statusClass(user.status)">{{ user.status }}</span>
-                        </td>
-                        <td class="p-3 flex gap-2">
-                            <button
-                                v-if="user.status === 'Pending'"
-                                @click="warnUser(user.id)"
-                                class="rounded bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600"
-                            >
-                                Warn
-                            </button>
-                            <button
-                                v-if="user.status !== 'Banned'"
-                                @click="banUser(user.id)"
-                                class="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-                            >
-                                Ban
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Search Bar -->
+        <div class="mb-4 flex items-center gap-2 bg-gray-100 p-3 rounded-md">
+            <font-awesome-icon :icon="['fas', 'search']" class="text-gray-500" />
+            <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search by reporter, reported user, or reason..."
+                class="w-full bg-transparent outline-none"
+            />
         </div>
 
-        <!-- Mobile Layout (Hidden on Desktop) -->
-        <div class="md:hidden space-y-4">
+        <!-- DataTable for Larger Screens -->
+        <div class="relative z-0 hidden sm:block">
+            <DataTable
+                :headers="headers"
+                :items="filteredUsers"
+                :rows-per-page="10"
+                :sort-by="'id'"
+                :sort-type="'asc'"
+            >
+                <!-- Custom slot for Status -->
+                <template #item-reported.ban="{ reported }">
+                    <span :class="reported.ban ? 'bg-red-500 text-white' : 'bg-green-500 text-white'" class="px-3 py-1 rounded-full text-sm">
+                        {{ reported.ban ? "Banned" : "Active" }}
+                    </span>
+                </template>
+
+                <!-- Custom slot for Action -->
+                <template #item-action="{ reported }">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" v-model="reported.ban" @change="toggleBan(reported.id)" class="sr-only" />
+                        <div class="relative w-10 h-5 bg-gray-300 rounded-full transition duration-300"
+                            :class="{'bg-red-500': reported.ban}">
+                            <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform duration-300"
+                                :class="{'translate-x-5': reported.ban }">
+                            </div>
+                        </div>
+                    </label>
+                </template>
+            </DataTable>
+        </div>
+
+        <!-- Card Layout for Mobile -->
+        <div class="sm:hidden space-y-4">
             <div
                 v-for="user in filteredUsers"
                 :key="user.id"
-                class="bg-white p-4 rounded-lg shadow border"
+                class="bg-white p-4 rounded-lg shadow-md"
             >
-                <p class="text-lg font-semibold text-gray-800">{{ user.reporter?.name || "Unknown" }}</p>
-                <p class="text-lg font-semibold text-gray-800">{{ user.reported?.name || "Unknown" }}</p>
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-semibold">{{ user.reported?.name || "Unknown" }}</h2>
+                    <span :class="user.reported.ban ? 'bg-red-500 text-white' : 'bg-green-500 text-white'" class="px-3 py-1 rounded-full text-sm">
+                        {{ user.reported.ban ? "Banned" : "Active" }}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-600"><strong>Reported By:</strong> {{ user.reporter?.name || "Unknown" }}</p>
                 <p class="text-sm text-gray-600"><strong>Reason:</strong> {{ user.reason }}</p>
-                <p class="text-sm text-gray-600 flex items-center gap-1">
-                    <strong>Status:</strong>
-                    <span :class="statusClass(user.status)">{{ user.status }}</span>
-                </p>
-                <div class="mt-3 flex flex-col sm:flex-row sm:gap-2">
+
+                <div class="mt-3 flex justify-end">
                     <button
-                        v-if="user.status === 'Pending'"
-                        @click="warnUser(user.id)"
-                        class="rounded bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600 sm:w-1/2"
+                        @click="toggleBan(user.reported.id)"
+                        :class="user.reported.ban ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'"
+                        class="rounded px-4 py-2 text-white"
                     >
-                        Warn
-                    </button>
-                    <button
-                        v-if="user.status !== 'Banned'"
-                        @click="banUser(user.id)"
-                        class="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600 sm:w-1/2"
-                    >
-                        Ban
+                        {{ user.reported.ban ? "Unban" : "Ban" }}
                     </button>
                 </div>
             </div>

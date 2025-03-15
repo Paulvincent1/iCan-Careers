@@ -80,7 +80,7 @@ const headers = [
 
 <template>
     <Head title="Employers | iCan Careers" />
-    <div :class="['p-4', darkMode ? 'bg-black' : 'bg-white']">
+    <div :class="['p-4', darkMode ? 'bg-gray-700' : 'bg-white']">
         <!-- Tabs for Employer Type Filters -->
         <nav class="mb-6">
             <ul class="flex space-x-4 border-b overflow-x-auto">
@@ -116,7 +116,7 @@ const headers = [
         </div>
 
         <!-- DataTable for Larger Screens -->
-        <div class="hidden sm:block">
+        <div class="relative z-0 hidden sm:block">
             <DataTable
                 :headers="headers"
                 :items="filteredEmployers"

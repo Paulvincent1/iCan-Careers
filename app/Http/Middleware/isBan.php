@@ -17,14 +17,14 @@ class isBan
     public function handle(Request $request, Closure $next): Response
     {
         if($request->user()->ban){
-            
+
            Auth::logout();
 
            $request->session()->invalidate();
 
            $request->session()->regenerateToken();
 
-           return redirect('/');
+           return redirect('/')->with('error', 'Your account has been banned.');
         }
         return $next($request);
     }

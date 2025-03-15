@@ -16,6 +16,22 @@ defineProps({
     isSidebarOpen: Boolean,
 });
 
+const darkMode = ref(localStorage.getItem("theme") === "dark");
+
+onMounted(() => {
+    // Apply theme on mount
+    document.documentElement.classList.toggle("dark", darkMode.value);
+
+    // Listen for changes from other components
+    window.addEventListener("theme-changed", () => {
+        darkMode.value = localStorage.getItem("theme") === "dark";
+        document.documentElement.classList.toggle("dark", darkMode.value);
+    });
+});
+const textSrc = computed(() =>
+    darkMode.value ? 'text-white' : 'text-gray-900'
+);
+
 // State for dropdowns
 const isDropdownOpen = ref(false);
 const showNotificationDropDown = ref(false);
@@ -69,7 +85,7 @@ onUnmounted(() => {
 
 <template>
     <!-- Navbar Wrapper -->
-    <div class="fixed relative sticky left-0 top-0 border-gray-300/20 bg-white">
+    <div :class="['fixed relative sticky left-0 top-0 border-gray-300/20 bg-white', darkMode ? 'dark:bg-gray-800' : 'bg-white']">
         <nav
             class="mx-auto flex max-w-screen-xl items-center justify-between p-3"
         >
@@ -95,16 +111,7 @@ onUnmounted(() => {
                 </button>
             </div>
 
-            <!-- Logo -->
-            <div class="flex flex-1 justify-center md:justify-start">
-                <Link href="/admin">
-                    <img
-                        src="/assets/iCanCareersLogo.png"
-                        alt="Logo"
-                        class="h-10 md:hidden lg:hidden"
-                    />
-                </Link>
-            </div>
+
 
             <!-- Profile & Notifications -->
             <div class="ml-auto flex items-center gap-3">
@@ -119,10 +126,10 @@ onUnmounted(() => {
                     class="relative flex flex-col"
                 >
                     <div class="relative">
-                        <i class="bi bi-bell text-lg"></i>
+                        <i :class="['bi bi-bell text-lg', textSrc]"></i>
                         <i
                             v-if="notifications?.length"
-                            class="bi bi-circle-fill absolute right-0 top-0 text-[8px] text-red-500"
+                            :class="['bi bi-circle-fill absolute right-0 top-0 text-[8px] text-red-500', darkMode ? 'text-red' : 'text-red-500']"
                         ></i>
                     </div>
                     <div
@@ -199,8 +206,8 @@ onUnmounted(() => {
                             alt="Profile"
                             class="h-10 w-10 rounded-full border"
                         />
-                        <p class="text-sm">Me</p>
-                        <i class="bi bi-chevron-down text-sm"></i>
+                        <p :class="['text-sm', textSrc]">Me</p>
+                        <i :class="['bi bi-chevron-down text-sm', textSrc]"></i>
                     </button>
 
                     <!-- Profile Dropdown Menu -->
@@ -210,7 +217,7 @@ onUnmounted(() => {
                     >
                         <Link
                             :href="route('admin.dashboard')"
-                            class="block px-4 py-2 text-black hover:bg-gray-100"
+                            class="flex item-center px-4 py-2 text-black hover:bg-gray-100 w-full"
                             @click="profileDropdown = false"
                         >
                             <i class="bi bi-person"></i> Dashboard
@@ -219,7 +226,7 @@ onUnmounted(() => {
                             :href="route('logout')"
                             method="post"
                             as="button"
-                            class="block px-4 py-2 text-black hover:bg-gray-100"
+                            class="flex item-center px-4 py-2 text-black hover:bg-gray-100 w-full"
                             @click="profileDropdown = false"
                         >
                             <i class="bi bi-box-arrow-left"></i> Logout

@@ -111,13 +111,13 @@ const textSrc = computed(() =>
             :class="[
             'fixed left-0 top-0 z-50 h-full w-64 transform  transition-all duration-500 ease-in-out',
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
-            darkMode ? 'bg-black' : 'bg-white'
+            darkMode ? 'bg-gray-800' : 'bg-white'
         ]"
         >
         <!-- Sidebar Header with Logo & Close Button -->
-            <div :class="['flex items-center justify-center p-3', darkMode ? '' : 'border-b']">
+            <div :class="['flex items-center justify-center p-1', darkMode ? 'border-b' : 'border-b']">
                 <!-- Logo (Hidden on Mobile, Centered on Larger Screens) -->
-                 <div :class="['w-full flex justify-center p-1 m-1', darkMode ? 'bg-black border' : 'bg-white' ]">
+                 <div :class="['w-full flex justify-center p-1 m-1', darkMode ? 'bg-gray-700' : 'bg-white' ]">
                      <Link href="/admin">
                  <img :src="logoSrc" alt="Logo" class="h-14" />
                      </Link>
@@ -242,7 +242,7 @@ const textSrc = computed(() =>
     align-items: center;
     padding: 12px;
     font-weight: 600;
-    transition: all 0.3s ease-in-out;
+
     border-radius: 8px;
     position: relative;
     color: #333;
@@ -255,9 +255,7 @@ const textSrc = computed(() =>
 /* Hover Effect */
 .nav-link:hover {
     background-color: rgba(0, 123, 255, 0.1);
-    color: #fa8334;
     border-left: 3px solid #fa8334;
-    transform: scale(1.05);
 }
 
 /* Icon Styling */
