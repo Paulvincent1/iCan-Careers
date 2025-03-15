@@ -57,6 +57,13 @@ library.add(faFacebook, faInstagram, faLinkedin, faTwitter);
                         >
                     </li>
                     <li>
+                        <a
+                            href="/learning"
+                            class="text-gray-400 hover:text-white"
+                            >Learning</a
+                        >
+                    </li>
+                    <li>
                         <a href="/" class="text-gray-400 hover:text-white"
                             >FAQs</a
                         >
