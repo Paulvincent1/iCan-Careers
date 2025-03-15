@@ -5,13 +5,14 @@ namespace App\Notifications;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WorkerVerificationNotification extends Notification implements ShouldBroadcastNow
+class WorkerVerificationNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -49,7 +50,7 @@ class WorkerVerificationNotification extends Notification implements ShouldBroad
         return [
             'status' => $this->verified ? 'Congratulations!' : 'Verification Required',
             'message' =>  $this->verified ? "Your account is now fully verified! you can now apply for jobs." : "Unfortunately, your verification was not approved. Please check your submitted documents and try again.",
-            'image' =>  $this->verified ? 'assets/congratulations.jpg' : 'assets/denied.jpg' , 
+            'image' =>  $this->verified ? 'assets/congratulations.jpg' : 'assets/denied.jpg' ,
         ];
     }
 
@@ -58,7 +59,7 @@ class WorkerVerificationNotification extends Notification implements ShouldBroad
         return [
             'status' => $this->verified ? 'Congratulations!' : 'Verification Required',
             'message' =>  $this->verified ? "Your account is now fully verified! you can now apply for jobs." : "Unfortunately, your verification was not approved. Please check your submitted documents and try again.",
-            'image' =>  $this->verified ? 'assets/congratulations.jpg' : 'assets/denied.jpg' , 
+            'image' =>  $this->verified ? 'assets/congratulations.jpg' : 'assets/denied.jpg' ,
         ];
     }
 
@@ -79,7 +80,7 @@ class WorkerVerificationNotification extends Notification implements ShouldBroad
         return [
             'status' => $this->verified ? 'Congratulations!' : 'Verification Required',
             'message' =>  $this->verified ? "Your account is now fully verified! you can now apply for jobs." : "Unfortunately, your verification was not approved. Please check your submitted documents and try again.",
-            'image' =>  $this->verified ? 'assets/congratulations.jpg' : 'assets/denied.jpg' , 
+            'image' =>  $this->verified ? 'assets/congratulations.jpg' : 'assets/denied.jpg' ,
         ];
     }
 

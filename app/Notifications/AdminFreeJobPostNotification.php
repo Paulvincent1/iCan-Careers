@@ -5,12 +5,13 @@ namespace App\Notifications;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AdminFreeJobPostNotification extends Notification implements ShouldBroadcastNow
+class AdminFreeJobPostNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -42,7 +43,7 @@ class AdminFreeJobPostNotification extends Notification implements ShouldBroadca
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
     }
-    
+
     public function toDatabase()
     {
         return [
