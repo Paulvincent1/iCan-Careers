@@ -30,7 +30,7 @@ class WorkerDashboard extends Controller
         $this->invoiceService = $invoiceService;
         $this->payoutService = $payoutService;
     }
-    
+
 
     public function index(){
         $user = Auth::user();
@@ -44,12 +44,12 @@ class WorkerDashboard extends Controller
         }
 
         $savedJobs = $user->savedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
-        
+
         $appliedJobs = $user->appliedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
 
         $invoiceTransactions = $user->workerInvoices()->whereIn('status',['PAID','SETTLED'])->with('employer')->latest()->get();
 
-        $invoices = $user->workerInvoices()->latest()->get(); 
+        $invoices = $user->workerInvoices()->latest()->get();
         // dd($invoiceTransactions);
 
         // users that we interact
@@ -101,7 +101,7 @@ class WorkerDashboard extends Controller
         });
 
 
-        return inertia('Worker/Dashboard', 
+        return inertia('Worker/Dashboard',
         [
             'user' => [
                 'name' => $user->name,
@@ -171,7 +171,7 @@ class WorkerDashboard extends Controller
        $totalAmount = $fields['totalAmount'] + $xenditTransactionFee + $vatTransactionFee;
 
     //    dd($totalAmount);
-       
+
         return Pdf::view('pdf.invoice',[
             'invoiceId' => 'test',
             'dueDate' => $fields['dueDate'],
@@ -195,9 +195,9 @@ class WorkerDashboard extends Controller
             'billTo' => 'required',
             'items' => 'required',
             'items.*.description' => 'required',
-            'items.*.hours' => 'required',
-            'items.*.rate' => 'required',
-            'totalAmount' => 'required|numeric|max:50000',
+            'items.*.hours' => 'required|min:0',
+            'items.*.rate' => 'required|min:0',
+            'totalAmount' => 'required|numeric|max:50000|min:0',
         ]);
 
 
@@ -211,11 +211,11 @@ class WorkerDashboard extends Controller
 
             $externalId = 'INV-' . strtoupper(uniqid());
 
-    
+
             $secondsDuration = Carbon::now()->diffInSeconds(Carbon::parse($fields['dueDate'] . ' 23:59:00'));
             // dd(Carbon::now());
 
-            
+
             $xenditTransactionFee = (($fields['totalAmount'] / 0.955) * 0.045);
             $vatTransactionFee = $xenditTransactionFee * 0.12;
 
@@ -248,7 +248,7 @@ class WorkerDashboard extends Controller
 
             dispatch(new ProcessInvoicePdf(
              employer: $employer,
-             externalId:  $externalId, 
+             externalId:  $externalId,
              dueDate: $fields['dueDate'],
              description: $fields['description'],
              items: $items,
@@ -272,7 +272,7 @@ class WorkerDashboard extends Controller
             dd($e->getMessage());
 
         }
-      
+
     }
 
     public function payout(Request $request){
@@ -303,9 +303,9 @@ class WorkerDashboard extends Controller
                 accountNumber:$fields['accountNumber'] ,
                 amount: $fields['amount'],
             );
-           
-      
-            
+
+
+
             $user->payouts()->create(
                 [
                     'reference_id' => $payoutUniqueId,
@@ -321,14 +321,14 @@ class WorkerDashboard extends Controller
             DB::commit();
 
             return redirect()->back();
-        
-                
+
+
         }catch(Exception $e){
 
             DB::rollBack();
 
             dd($e->getMessage());
-            
+
 
         }
 

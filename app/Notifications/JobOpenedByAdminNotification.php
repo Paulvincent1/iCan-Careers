@@ -6,12 +6,13 @@ use App\Models\JobPost;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class JobOpenedByAdminNotification extends Notification implements ShouldBroadcastNow
+class JobOpenedByAdminNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -44,7 +45,7 @@ class JobOpenedByAdminNotification extends Notification implements ShouldBroadca
                     ->line('Thank you for using our application!');
     }
 
-    
+
     public function toDatabase()
     {
         return [

@@ -5,13 +5,14 @@ namespace App\Notifications;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class FireWorkerNotification extends Notification implements ShouldBroadcastNow
+class FireWorkerNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 

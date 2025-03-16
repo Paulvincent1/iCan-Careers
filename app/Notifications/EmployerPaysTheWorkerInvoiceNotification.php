@@ -6,11 +6,12 @@ use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class EmployerPaysTheWorkerInvoiceNotification extends Notification
+class EmployerPaysTheWorkerInvoiceNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -81,7 +82,7 @@ class EmployerPaysTheWorkerInvoiceNotification extends Notification
             'image' => $this->employer->profile_img,
         ];
     }
-    
+
 
     /**
      * Get the array representation of the notification.

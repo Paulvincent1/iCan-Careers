@@ -5,12 +5,13 @@ namespace App\Notifications;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WorkerSendAnInvoiceToEmployerNotification extends Notification implements ShouldBroadcastNow
+class WorkerSendAnInvoiceToEmployerNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -50,7 +51,7 @@ class WorkerSendAnInvoiceToEmployerNotification extends Notification implements 
             'message' => $this->worker->name . ' requested an invoice.',
             'image' => $this->worker->profile_img,
         ];
-    } 
+    }
 
     public function toBroadcast(object $notifiable)
     {
@@ -59,7 +60,7 @@ class WorkerSendAnInvoiceToEmployerNotification extends Notification implements 
             'message' => $this->worker->name . ' requested an invoice.',
             'image' => $this->worker->profile_img,
         ];
-    } 
+    }
 
     public function broadcastOn()
     {
