@@ -32,6 +32,7 @@
                 </div>
                 <h3 class="text-xl font-semibold text-[#fa8334] mt-4">{{ card.title }}</h3>
                 <p class="text-gray-600 mt-2">{{ card.description }}</p>
+                <p class="text-blue-400 "><u>Click to know more about Developer</u></p>
               </div>
 
               <!-- Back Side -->
@@ -59,10 +60,10 @@
       backText: "I am a full stack developer with 5 years of experience.",
     },
     {
-      title: "Smart Matching",
-      description: "Our system recommends the best workers based on your needs.",
-      image: null,
-      backText: "We use AI-driven technology to match you with the perfect candidate.",
+      title: "Draven Troy Coloma",
+      description: "Document Writer",
+      image: "/assets/Draven.jpg",
+      backText: "I am a Document Writer and Perfectionist",
     },
     {
       title: "Affordable Plans",

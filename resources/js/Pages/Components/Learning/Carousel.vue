@@ -14,13 +14,12 @@ defineProps(["slides"]);
       :modules="[Pagination, Autoplay, Navigation]"
       :slides-per-view="1"
       :space-between="20"
-      :pagination="{ clickable: true }"
-      :navigation="true"
+      
       :autoplay="{ delay: 3000 }"
-      class="mb-8 rounded-xl overflow-hidden shadow-lg"
+      class="mb-8 rounded-xl overflow-hidden"
     >
       <SwiperSlide v-for="slide in slides" :key="slide.id">
-        <div class="relative h-100">
+        <div class="relative h-[450px]">
           <img :src="slide.image" class="w-full h-full object-cover brightness-100" />
 
         </div>

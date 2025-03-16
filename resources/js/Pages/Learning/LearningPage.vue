@@ -76,6 +76,9 @@ const courseTitle = computed(() => {
                 <p class="text-lg text-black text-left">
                 Enhance your skills and gain confidence in your job search.
                 </p>
+                <div class="w-64 h-64 mt-10">
+                  <a href="/register"><button class="border bg-black text-white rounded-xl w-full h-20">Start My Free Trial</button></a>
+                </div>
             </div>
 
             <!-- Right Side: Carousel Component -->

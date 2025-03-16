@@ -29,7 +29,6 @@ defineProps({
       :slides-per-view="1"
       :space-between="20"
       :navigation="true"
-
       :pagination="{ clickable: true }"
       :breakpoints="{
         640: {
@@ -55,5 +54,6 @@ defineProps({
   display: flex;
   justify-content: center;
   align-items: center;
+  
 }
 </style>
