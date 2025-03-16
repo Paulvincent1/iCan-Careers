@@ -95,10 +95,10 @@ function validateFields() {
         form.items.description === null ||
         form.items.hours === null ||
         form.items.hours === 0 ||
-        form.items.hours < 0 ||
+        form.items.hours < 1 ||
         form.items.rate === null ||
         form.items.rate === 0 ||
-        form.items.rate < 0
+        form.items.rate < 1
     ) {
         errorMessage.value.items = "Please complete this field or enter correct value";
         return false;

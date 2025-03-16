@@ -195,9 +195,9 @@ class WorkerDashboard extends Controller
             'billTo' => 'required',
             'items' => 'required',
             'items.*.description' => 'required',
-            'items.*.hours' => 'required|min:0',
-            'items.*.rate' => 'required|min:0',
-            'totalAmount' => 'required|numeric|max:50000|min:0',
+            'items.*.hours' => 'required|numeric|min:1',
+            'items.*.rate' => 'required|numeric|min:1',
+            'totalAmount' => 'required|numeric|max:50000|min:1',
         ]);
 
 
