@@ -1,13 +1,13 @@
 <script setup>
-import { Link} from "@inertiajs/vue3";
-import { ref, computed, onMounted, } from "vue";
+import { ref, computed, onMounted } from "vue";
 import SearchBar from "../Components/Learning/SearchBar.vue";
 import UseCourses from "../Components/Learning/UseCourses.vue";
 import CourseSlider from "../Components/Learning/CourseSlider.vue";
 import Footer from "../Components/Admin/Footer.vue";
 import Developers from "../Components/Learning/Developers.vue";
 import Carousel from "../Components/Learning/Carousel.vue";
-import Navlinks from "../Components/Learning/Navlinks.vue";
+import CourtList from "../Components/Learning/CourtList.vue";
+
 
 // Reference to the UseCourses component
 const useCoursesComponent = ref(null);
@@ -66,31 +66,8 @@ const courseTitle = computed(() => {
 </script>
 
 <template>
-  <Head title="Learning | iCan Careers" />
-  <div class="min-screen bg-gray-10 p-6">
-    <div class="max-w-6xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center mb-8 ">
-            <!-- Left Side: Text Content -->
-            <div>
-                <h1 class="text-5xl font-[400] text-black text-left mb-4">
-                Discover Your Next Learning Opportunity
-                </h1>
-                <p class="text-2xl text-black text-left">
-                Enhance your <Link :href="route('learning.jobseeking')" class="hover:text-blue-500 font-bold"><u>skills</u></Link> and gain confidence in your job search.
-                </p>
-                <div class="w-64 h-64 mt-10">
-                  <Link :href="route('register.create')"><button class="border bg-black text-white rounded-xl w-full h-20">Start My Free Trial</button></Link>
-                </div>
-            </div>
+  <Head title="Health | iCan Careers" />
 
-            <!-- Right Side: Carousel Component -->
-            <div class="hidden md:block">
-                <Carousel :slides="preview" />
-            </div>
-        </div>
-    </div>
-
-  </div>
   <div class="max-h-screen bg-gray-50 p-6">
     <div class="max-w-6xl mx-auto">
 
@@ -116,13 +93,14 @@ const courseTitle = computed(() => {
       <!-- 📚 Course Slider (Changes based on selected tab) -->
       <CourseSlider :courses="filteredCourses" :title="courseTitle" />
 
+
     </div>
 
   </div>
-  <Navlinks />
-  <Developers />
+    <div class="max-w-6xl mx-auto">
+        <CourtList category="health" />
+    </div>
   <Footer />
-
   <!-- Include the UseCourses component -->
   <UseCourses ref="useCoursesComponent" />
 </template>

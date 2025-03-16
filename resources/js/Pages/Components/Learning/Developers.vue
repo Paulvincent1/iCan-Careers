@@ -1,3 +1,46 @@
+<script setup>
+import { ref } from "vue";
+
+// Define variable first
+const plainText = `Cause when you love someone
+You open up your heart
+When you love someone
+You make room
+If you love someone
+And you're not afraid to lose 'em
+You probably never loved someone like I do
+You probably never loved someone like I do`;
+
+// Card data with referenced variables
+const cards = ref([
+  {
+    title: "Lloyd Jacky Mirasol",
+    description: "Game Dev Developer",
+    image: "/assets/Mirasol.jpg",
+    backText: "I am a Game Dev Developer with so many years of experience.",
+  },
+  {
+    title: "Draven Troy Coloma",
+    description: "Document Writer",
+    image: "/assets/Draven.jpg",
+    backText: `I am a Document Writer and Perfectionist. ${plainText}`, // Use backticks here
+  },
+  {
+    title: "Affordable Plans",
+    description: "Flexible pricing options to fit your budget with no hidden fees.",
+    image: null,
+    backText: "Choose a plan that fits your hiring needs without extra costs.",
+  },
+]);
+
+// Track flipped state for each card
+const flippedCards = ref(cards.value.map(() => false));
+
+// Function to flip a card
+const flipCard = (index) => {
+  flippedCards.value[index] = !flippedCards.value[index];
+};
+</script>
 <template>
     <section class="py-10 bg-blue-50">
       <div class="container mx-auto px-4 text-center">
@@ -48,39 +91,7 @@
     </section>
   </template>
 
-  <script setup>
-  import { ref } from "vue";
 
-  // Card data
-  const cards = ref([
-    {
-      title: "Lloyd Jacky Mirasol",
-      description: "Full Stack Developer",
-      image: "/assets/Mirasol.jpg",
-      backText: "I am a full stack developer with 5 years of experience.",
-    },
-    {
-      title: "Draven Troy Coloma",
-      description: "Document Writer",
-      image: "/assets/Draven.jpg",
-      backText: "I am a Document Writer and Perfectionist",
-    },
-    {
-      title: "Affordable Plans",
-      description: "Flexible pricing options to fit your budget with no hidden fees.",
-      image: null,
-      backText: "Choose a plan that fits your hiring needs without extra costs.",
-    },
-  ]);
-
-  // Track flipped state for each card
-  const flippedCards = ref(cards.value.map(() => false));
-
-  // Function to flip a card
-  const flipCard = (index) => {
-    flippedCards.value[index] = !flippedCards.value[index];
-  };
-  </script>
 
   <style scoped>
   .transform-style-3d {

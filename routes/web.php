@@ -213,3 +213,7 @@ Route::post('/webhook', [InvoiceController::class, 'webhook']);
 
 Route::get('/pricing', [EmployerSubscriptionController::class, 'pricing'])->name('pricing');
 Route::get('/learning', [LearningController::class, 'learning'])->name('learning');
+Route::get('/health', [LearningController::class, 'learningHealth'])->name('learning.health');
+Route::get('/creative', [LearningController::class, 'learningCreative'])->name('learning.creative');
+Route::get('/jobseeking', [LearningController::class, 'learningJobseeking'])->name('learning.jobseeking');
+

@@ -11,4 +11,21 @@ class LearningController extends Controller
     {
         return Inertia::render('Learning/LearningPage');
     }
+
+    public function learningHealth()
+    {
+        return Inertia::render('Learning/HealthPage');
+    }
+
+    public function learningCreative()
+    {
+        return Inertia::render('Learning/CreativePage');
+    }
+
+    public function learningJobseeking()
+    {
+        
+        return Inertia::render('Learning/JobseekingPage');
+    }
+
 }

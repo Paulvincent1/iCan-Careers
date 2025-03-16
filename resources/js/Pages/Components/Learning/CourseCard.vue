@@ -62,42 +62,48 @@ const formattedDescription = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:scale-105">
-    <!-- Video Player or YouTube Embed -->
-    <video
-      v-if="activeCourse && !isYouTubeLink(activeCourse.image)"
-      width="100%"
-      height="auto"
-      controls
+    <div
+      class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:scale-105 w-80 h-80 flex flex-col"
     >
-      <source :src="activeCourse.image" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-    <iframe
-      v-else-if="activeCourse && isYouTubeLink(activeCourse.image)"
-      width="100%"
-      height="360"
-      :src="getYouTubeEmbedUrl(activeCourse.image)"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen
-    ></iframe>
+      <!-- Video Player or YouTube Embed -->
+      <div class="w-full h-40 flex-shrink-0">
+        <video
+          v-if="activeCourse && !isYouTubeLink(activeCourse.image)"
+          class="w-full h-full object-cover rounded-md"
+          controls
+        >
+          <source :src="activeCourse.image" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <iframe
+          v-else-if="activeCourse && isYouTubeLink(activeCourse.image)"
+          class="w-full h-full rounded-md"
+          :src="getYouTubeEmbedUrl(activeCourse.image)"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
 
-    <!-- Course Title -->
-    <h2 v-if="activeCourse" class="text-lg font-semibold text-gray-800 dark:text-gray-100 mt-4">
-      {{ activeCourse.title }}
-    </h2>
+      <!-- Course Content -->
+      <div class="mt-2 flex flex-col flex-grow">
+        <!-- Course Title -->
+        <h2 class="text-lg font-semibold text-black">
+          {{ activeCourse.title }}
+        </h2>
 
-    <!-- Course Description with 'See More' -->
-    <div class="text-md text-gray-600 dark:text-gray-300 mt-2">
-      <span v-html="showFullDescription ? formattedDescription : truncatedDescription"></span>
-      <button
-        v-if="activeCourse.description.length > 100"
-        @click="showFullDescription = !showFullDescription"
-        class="text-blue-500 ml-2 hover:underline"
-      >
-        {{ showFullDescription ? "See Less" : "See More" }}
-      </button>
+        <!-- Course Description with 'See More' -->
+        <div class="text-md text-gray-500 mt-1 max-h-16 overflow-hidden text-ellipsis">
+          <span v-html="showFullDescription ? formattedDescription : truncatedDescription"></span>
+        </div>
+
+        <button
+          v-if="activeCourse.description.length > 100"
+          @click="showFullDescription = !showFullDescription"
+          class="text-blue-500 mt-auto hover:underline self-start"
+        >
+          {{ showFullDescription ? "See Less" : "See More" }}
+        </button>
+      </div>
     </div>
-  </div>
-</template>
+  </template>
