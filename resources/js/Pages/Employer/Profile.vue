@@ -589,7 +589,7 @@ function submitReport(reason) {
             <Transition>
                 <div v-if="messageShow" class="">
                     <div
-                        class="fixed left-[50%] top-20 flex translate-x-[-50%] items-center gap-2 rounded bg-green-200 p-4 text-green-600"
+                        class="fixed left-[50%] top-20 flex translate-x-[-50%] items-center gap-2 rounded bg-orange-200 p-4 text-orange-600"
                     >
                         <i class="bi bi-check-circle-fill"></i>
                         <p class="text-center">{{ props.messageProp }}</p>
