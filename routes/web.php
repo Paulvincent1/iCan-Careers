@@ -169,10 +169,14 @@ Route::prefix('admin')->middleware([isAdmin::class])->group(function () {
     Route::get('/job-approvals', [AdminDashboardController::class, 'jobApprovals'])->name('admin.job.approvals');
     Route::put('/job-approvals/{id}/update', [JobPostController::class, 'updateJobStatus'])
         ->name('admin.job.approvals.update');
-    Route::get('/job-posts/{id}', [JobPostController::class, 'showJob']);
+    Route::get('/job-posts/{id}', [JobPostController::class, 'showJob'])->name('admin.show-job-post');
     Route::get('/payment-history', [AdminDashboardController::class, 'paymentHistory'])->name('admin.payment-history');
     Route::get('/table-subscription', [AdminDashboardController::class, 'subscribeUsers'])
         ->name('admin.table-subscription');
+
+
+    // view profile user
+    Route::get('/user/{id}',[AdminDashboardController::class, 'viewProfile'])->name('admin.view-profile-user');
 });
 
 

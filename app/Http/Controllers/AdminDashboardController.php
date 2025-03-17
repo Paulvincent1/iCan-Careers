@@ -319,4 +319,55 @@ class AdminDashboardController extends Controller
             'subscribedUsers' => $subscribedUsers
         ]);
     }
+
+
+
+    public function viewProfile(User $id){
+
+
+        // worker
+        if($id->roles()->first()->name != 'Employer'){
+
+            if(!$id->workerProfile){
+                return redirect()->back();
+            }
+
+            $workerSkills = $id->workerSkills;
+            $workerProfile = $id->workerProfile;
+
+            return inertia('Worker/Profile',['userProp' => $id,
+            'workerSkillsProp' => $workerSkills,
+            'workerProfileProp' => $workerProfile,
+            'messageProp' => session('message'),
+            'visitor' => true,
+            'adminVisit' => true,
+            ]);
+        }
+
+        //employer
+        if($id->roles()->first()->name === 'Employer'){  
+
+            if(!$id->employerProfile){
+                return redirect()->back();
+            }
+
+            $employerProfile = $id->employerProfile;
+            $jobsPosted = JobPost::where('employer_id', $id->id)->get();
+            $business = $id->employerProfile?->businessInformation;
+            $subscription = EmployerSubscription::where('employer_id', $id->id)->first();
+    
+            return inertia('Employer/Profile', [
+            "user" => $id,
+            'employerProfileProp' => $employerProfile,
+            'businessProps' => $business ?? null,
+            'messageProp' => session('message'),
+            'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
+            'subscriptionProps' => $subscription,
+            'visitor' => true,
+            'adminVisit' => true,
+            ]);
+        }
+        
+
+    }
 }

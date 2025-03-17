@@ -283,7 +283,7 @@ class WorkerProfileController extends Controller
 
        if($user->workerProfile?->resume_path === $path || $user->employerJobPosts()->whereHas('usersWhoApplied', function ($query) use ($workerId){
         $query->where('worker_id',$workerId->id);
-       })->first()) {
+       })->first() || $user->roles()->first()->name === 'Admin') {
            return Storage::disk('local')->response($path);
         }
 

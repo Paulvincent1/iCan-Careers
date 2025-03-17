@@ -31,7 +31,7 @@ class WorkerVerificationNotification extends Notification implements ShouldBroad
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database','broadcast'];
     }
 
     /**
