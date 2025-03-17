@@ -1,18 +1,3 @@
-<template>
-    <section class="py-16 bg-gray-50">
-        <h2 class="text-3xl font-semibold text-center text-gray-800">Featured Jobs</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <template v-for="(row, rowIndex) in chunkedJobs" :key="rowIndex">
-                <div v-for="job in row" :key="job.id" class="p-6 bg-white shadow-lg rounded-xl transition-transform transform hover:scale-105">
-                    <h3 class="text-lg font-bold text-[#fa8334]">{{ job.title }}</h3>
-                    <p class="text-sm text-gray-600">{{ job.company }}</p>
-                    <p class="mt-2 text-gray-700">{{ job.description }}</p>
-                </div>
-            </template>
-        </div>
-    </section>
-</template>
-
 <script setup>
 import { computed } from "vue";
 
@@ -31,3 +16,21 @@ const chunkedJobs = computed(() => {
     return result;
 });
 </script>
+
+
+
+<template>
+    <section class="py-16 bg-gray-50">
+        <h2 class="text-3xl font-semibold text-center text-gray-800">Featured Jobs</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <template v-for="(row, rowIndex) in chunkedJobs" :key="rowIndex">
+                <div v-for="job in row" :key="job.id" class="p-6 bg-white shadow-lg rounded-xl transition-transform transform hover:scale-105">
+                    <h3 class="text-lg font-bold text-[#fa8334]">{{ job.title }}</h3>
+                    <p class="text-sm text-gray-600">{{ job.company }}</p>
+                    <p class="mt-2 text-gray-700">{{ job.description }}</p>
+                </div>
+            </template>
+        </div>
+    </section>
+</template>
+
