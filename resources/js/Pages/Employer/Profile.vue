@@ -31,6 +31,9 @@ let props = defineProps({
     visitor: {
         default: null,
     },
+    adminVisit: {
+        default: null,
+    },
 });
 
 const memberSince = computed(() => {
@@ -312,7 +315,7 @@ function submitReport(reason) {
                         <div class="mb-3 flex items-center justify-between">
                             <p class="text-[20px] font-bold">Overview</p>
                             <button
-                                v-if="visitor"
+                                v-if="visitor && !adminVisit"
                                 @click="isShowReportModal = true"
                             >
                                 <i
@@ -413,10 +416,15 @@ function submitReport(reason) {
                                     <Link
                                         :href="
                                             visitor
-                                                ? route(
-                                                      'jobsearch.show',
-                                                      job.id,
-                                                  )
+                                                ? adminVisit
+                                                    ? route(
+                                                          'admin.show-job-post',
+                                                          job.id,
+                                                      )
+                                                    : route(
+                                                          'jobsearch.show',
+                                                          job.id,
+                                                      )
                                                 : route(
                                                       'employer.jobpost.show',
                                                       job.id,

@@ -20,6 +20,7 @@ let props = defineProps({
         type: null,
     },
     currentlyEmployedByMeProp: null,
+    adminVisit: null,
 });
 
 let { appContext } = getCurrentInstance();
@@ -532,7 +533,7 @@ function fireWorker() {
                         <div class="mb-3 flex items-center justify-between">
                             <p class="text-[20px] font-bold">Overview</p>
                             <button
-                                v-if="visitor"
+                                v-if="visitor && !adminVisit"
                                 @click="isShowReportModal = true"
                             >
                                 <i
@@ -701,7 +702,14 @@ function fireWorker() {
                             class="appearance-none outline-none hover:underline"
                         /> -->
                     </div>
-                    <div class="mb-2">
+                    <div
+                        :class="[
+                            'mb-2',
+                            {
+                                'pointer-events-none': adminVisit || visitor,
+                            },
+                        ]"
+                    >
                         <label class="text-sm" for="">Address</label>
                         <input
                             @focus="showAddressSaveButton = true"
@@ -717,7 +725,14 @@ function fireWorker() {
                             Save
                         </button>
                     </div>
-                    <div class="mb-2">
+                    <div
+                        :class="[
+                            'mb-2',
+                            {
+                                'pointer-events-none': adminVisit || visitor,
+                            },
+                        ]"
+                    >
                         <label class="text-sm" s for=""
                             >Website / Account</label
                         >
@@ -737,7 +752,13 @@ function fireWorker() {
                     </div>
                     <div class="mb-2">
                         <label class="text-sm" for="">Resume</label>
-                        <label for="resume" class="cursor-pointer">
+                        <label
+                            for="resume"
+                            :class="[
+                                'cursor-pointer',
+                                { 'pointer-events-none': adminVisit },
+                            ]"
+                        >
                             <p
                                 class="hover:underline"
                                 v-if="!workerProfile.resume"
@@ -749,11 +770,10 @@ function fireWorker() {
                                     {{ workerProfile.resume }}
                                 </p>
                                 <a
-                                    v-if="!visitor"
                                     target="_blank"
                                     :href="'/' + workerProfile.resume_path"
                                     as="button"
-                                    class="rounded bg-orange-500 px-2 py-1 text-white"
+                                    class="pointer-events-auto rounded bg-orange-500 px-2 py-1 text-white"
                                 >
                                     <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
