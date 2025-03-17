@@ -127,18 +127,18 @@ const courseTitle = computed(() => {
                             <Link
                                 :href="route('learning.health')"
                                 class="font-bold hover:text-blue-400"
-                                ><u>health and awareness, </u></Link
+                                >health and awareness, </Link
                             >
                             <Link
                                 :href="route('learning.creative')"
                                 class="font-bold hover:text-blue-400"
-                                ><u>creative and design,</u></Link
+                                >creative and design,</Link
                             >
                             and
                             <Link
                                 :href="route('learning.jobseeking')"
                                 class="font-bold hover:text-blue-400"
-                                ><u>job seeking-powered</u></Link
+                                >job seeking-powered</Link
                             >
                             by a platform that connects you to real
                             opportunities.
