@@ -15,6 +15,26 @@ const props = defineProps({
     type: Object,
     required: false,
   },
+  course4: {
+    type: Object,
+    required: false,
+  },
+  course5: {
+    type: Object,
+    required: false,
+  },
+  course6: {
+    type: Object,
+    required: false,
+  },
+  course7: {
+    type: Object,
+    required: false,
+  },
+  course8: {
+    type: Object,
+    required: false,
+  },
 });
 
 // Check if the image URL is a YouTube link
@@ -30,7 +50,7 @@ const getYouTubeEmbedUrl = (url) => {
 
 // Determine which course to display
 const activeCourse = computed(() => {
-  return props.course || props.course2 || props.course3;
+  return props.course || props.course2 || props.course3 || props.course4 || props.course5 || props.course6 || props.course7 || props.course8;
 });
 
 // State for expanding/collapsing the description
@@ -106,4 +126,5 @@ const formattedDescription = computed(() => {
         </button>
       </div>
     </div>
+  
   </template>

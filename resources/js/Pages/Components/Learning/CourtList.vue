@@ -18,7 +18,13 @@ onMounted(async () => {
     allCourses.value = [
       ...(courseComponent.value.courses || []),
       ...(courseComponent.value.courses2 || []),
-      ...(courseComponent.value.courses3 || [])
+      ...(courseComponent.value.courses3 || []),
+      ...(courseComponent.value.courses4 || []),
+      ...(courseComponent.value.courses5 || []),
+      ...(courseComponent.value.courses6 || []),
+      ...(courseComponent.value.courses7 || []),
+      ...(courseComponent.value.courses8 || []),
+      
     ];
   }
 });

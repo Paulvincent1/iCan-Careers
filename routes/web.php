@@ -216,4 +216,8 @@ Route::get('/learning', [LearningController::class, 'learning'])->name('learning
 Route::get('/health', [LearningController::class, 'learningHealth'])->name('learning.health');
 Route::get('/creative', [LearningController::class, 'learningCreative'])->name('learning.creative');
 Route::get('/jobseeking', [LearningController::class, 'learningJobseeking'])->name('learning.jobseeking');
-
+Route::get('/technology', [LearningController::class, 'learningTechnology'])->name('learning.technology');
+Route::get('/business', [LearningController::class, 'learningBusiness'])->name('learning.business');
+Route::get('/education', [LearningController::class, 'learningEducation'])->name('learning.education');
+Route::get('/finance', [LearningController::class, 'learningFinance'])->name('learning.finance');
+Route::get('/personal', [LearningController::class, 'learningPersonal'])->name('learning.personal');

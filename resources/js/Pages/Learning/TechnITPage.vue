@@ -9,6 +9,7 @@ import Carousel from "../Components/Learning/Carousel.vue";
 import CourtList from "../Components/Learning/CourtList.vue";
 
 
+
 // Reference to the UseCourses component
 const useCoursesComponent = ref(null);
 
@@ -18,6 +19,7 @@ const activeTab = ref("all"); // Default to "all"
 const courses = ref([]);
 const courses2 = ref([]);
 const courses3 = ref([]);
+const courses4 = ref([]);
 const preview = ref([]);
 
 const tabs = [
@@ -25,6 +27,7 @@ const tabs = [
     { id: "health", label: "Health and Wellness" },
     { id: "creative", label: "Creative Arts and Hobbies" },
     { id: "job", label: "Job-Ready Skills" },
+    { id: "tech", label: "Technology and IT" },
 ];
 
 // Fetch courses data from UseCourses component when mounted
@@ -33,6 +36,7 @@ onMounted(() => {
     courses.value = useCoursesComponent.value.courses;
     courses2.value = useCoursesComponent.value.courses2;
     courses3.value = useCoursesComponent.value.courses3;
+    courses4.value = useCoursesComponent.value.courses4;
     preview.value = useCoursesComponent.value.preview;
   }
 });
@@ -47,7 +51,10 @@ const filteredCourses = computed(() => {
     allCourses = courses2.value; // Individual courses
   } else if (activeTab.value === "job") {
     allCourses = courses3.value; // Individual courses // Individual courses
+  }else if (activeTab.value === "tech") {
+    allCourses = courses4.value; // Individual courses // Individual courses
   }
+
 
   return allCourses.filter(
     (course) =>
@@ -61,19 +68,20 @@ const courseTitle = computed(() => {
   if (activeTab.value === "health") return "Health and Wellness";
   if (activeTab.value === "creative") return "Creative Arts and Hobbies";
   if (activeTab.value === "job") return "Job-Ready Skills";
+  if (activeTab.value === "tech") return "Technology and IT";
   return "Featured Courses"; // Default title
 });
 </script>
 
 <template>
-  <Head title="Health and Awareness| iCan Careers" />
+  <Head title="Technology and IT | iCan Careers" />
 
   <div class="max-h-screen bg-gray-50 p-6">
     <div class="max-w-6xl mx-auto">
 
       <!-- 🔍 Search Bar -->
       <SearchBar v-model="searchQuery" class="mb-6 p-8" />
-    <div><h1 class="text-[50px] font-bold">Trending Searches</h1></div>
+      <div><h1 class="text-[50px] font-bold">Trending Searches</h1></div>
       <!-- 📌 Tabs for Course Type Filters -->
       <nav class="mb-6">
         <ul class="flex space-x-4 border-b overflow-x-auto">
@@ -98,10 +106,10 @@ const courseTitle = computed(() => {
 
   </div>
     <div class="max-w-6xl mx-auto">
-      <div><h1 class="text-[20px] text-gray-400">Results for "Health and Awareness"</h1></div>
-        <CourtList category="health" />
+      <div><h1 class="text-[20px] text-gray-400">Results for "Technology and IT"</h1></div>
+        <CourtList category="tech" />
     </div>
-  <Footer />
+  <Footer />=
   <!-- Include the UseCourses component -->
   <UseCourses ref="useCoursesComponent" />
 </template>

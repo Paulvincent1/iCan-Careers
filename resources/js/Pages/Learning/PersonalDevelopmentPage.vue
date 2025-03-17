@@ -9,6 +9,7 @@ import Carousel from "../Components/Learning/Carousel.vue";
 import CourtList from "../Components/Learning/CourtList.vue";
 
 
+
 // Reference to the UseCourses component
 const useCoursesComponent = ref(null);
 
@@ -17,14 +18,14 @@ const activeTab = ref("all"); // Default to "all"
 
 const courses = ref([]);
 const courses2 = ref([]);
-const courses3 = ref([]);
+const courses8 = ref([]);
 const preview = ref([]);
 
 const tabs = [
     { id: "all", label: "All Courses" },
     { id: "health", label: "Health and Wellness" },
     { id: "creative", label: "Creative Arts and Hobbies" },
-    { id: "job", label: "Job-Ready Skills" },
+    { id: "personal", label: "Personal Development" },
 ];
 
 // Fetch courses data from UseCourses component when mounted
@@ -32,21 +33,21 @@ onMounted(() => {
   if (useCoursesComponent.value) {
     courses.value = useCoursesComponent.value.courses;
     courses2.value = useCoursesComponent.value.courses2;
-    courses3.value = useCoursesComponent.value.courses3;
+    courses8.value = useCoursesComponent.value.courses8;
     preview.value = useCoursesComponent.value.preview;
   }
 });
 
 // 🔍 Filter courses based on search query and selected tab
 const filteredCourses = computed(() => {
-  let allCourses = [...courses.value, ...courses2.value, ...courses3.value, ...preview.value];
+  let allCourses = [...courses.value, ...courses2.value, ...courses8.value, ...preview.value];
 
   if (activeTab.value === "health") {
-    allCourses = courses.value; // Business courses
+    allCourses = courses.value; 
   } else if (activeTab.value === "creative") {
-    allCourses = courses2.value; // Individual courses
-  } else if (activeTab.value === "job") {
-    allCourses = courses3.value; // Individual courses // Individual courses
+    allCourses = courses2.value; 
+  } else if (activeTab.value === "personal") {
+    allCourses = courses8.value; 
   }
 
   return allCourses.filter(
@@ -60,20 +61,20 @@ const filteredCourses = computed(() => {
 const courseTitle = computed(() => {
   if (activeTab.value === "health") return "Health and Wellness";
   if (activeTab.value === "creative") return "Creative Arts and Hobbies";
-  if (activeTab.value === "job") return "Job-Ready Skills";
+  if (activeTab.value === "personal") return "Personal Development";
   return "Featured Courses"; // Default title
 });
 </script>
 
 <template>
-  <Head title="Health and Awareness| iCan Careers" />
+  <Head title="Personal Development | iCan Careers" />
 
   <div class="max-h-screen bg-gray-50 p-6">
     <div class="max-w-6xl mx-auto">
 
       <!-- 🔍 Search Bar -->
       <SearchBar v-model="searchQuery" class="mb-6 p-8" />
-    <div><h1 class="text-[50px] font-bold">Trending Searches</h1></div>
+      <div><h1 class="text-[50px] font-bold">Trending Searches</h1></div>
       <!-- 📌 Tabs for Course Type Filters -->
       <nav class="mb-6">
         <ul class="flex space-x-4 border-b overflow-x-auto">
@@ -98,8 +99,8 @@ const courseTitle = computed(() => {
 
   </div>
     <div class="max-w-6xl mx-auto">
-      <div><h1 class="text-[20px] text-gray-400">Results for "Health and Awareness"</h1></div>
-        <CourtList category="health" />
+      <div><h1 class="text-[20px] text-gray-400">Results for "Personal Development"</h1></div>
+        <CourtList category="personal" />
     </div>
   <Footer />
   <!-- Include the UseCourses component -->

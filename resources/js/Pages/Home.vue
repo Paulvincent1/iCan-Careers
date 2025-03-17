@@ -11,11 +11,6 @@ import Footer from "./Components/Admin/Footer.vue";
 
 
 
-const images = [
-    "/assets/hero.jpg",
-    "/assets/hero1.png",
-    "/assets/hero4.png",
-];
 
 
 const jobs = [
@@ -80,11 +75,10 @@ const testimonials = [
     <Head title="Home | iCan Careers" />
     <section class="overflow-hidden bg-[#FEFBF9]">
         <div class="container mx-auto h-[607px] px-[0.5rem] py-4 md:max-w-7xl">
-            
             <div
                 class="container mx-auto flex h-full w-full flex-col items-center justify-center gap-8 sm:flex-row"
             >
-                <div class="2xl:w-[500px] text-center lg:text-left">
+                <div class="2xl:w-[500px]">
                     <p class="my-7 text-center text-[32px]">
                         Where Others Can't, We Do.
                     </p>
@@ -105,29 +99,18 @@ const testimonials = [
                     </div>
                 </div>
 
-                <!-- Swiper Carousel (Hidden on Small Screens) -->
                 <div
-                    class="relative hidden md:hidden lg:flex 2xl:left-[-20px] 2xl:top-[-300px] 2xl:w-[500px]"
+                    class="relative 2xl:left-[-20px] 2xl:top-[-300px] 2xl:w-[500px]"
                 >
-                    <Swiper
-                        class="absolute left-0 top-0 h-[600px] w-[800px] max-w-none"
-                        :slides-per-view="1"
-                        :loop="true"
-                        :autoplay="{ delay: 3000 }"
-                    >
-                        <SwiperSlide v-for="(image, index) in images" :key="index">
-                            <img
-                                :src="image"
-                                :alt="`hero-section-${index}`"
-                                class="h-full w-full object-cover"
-                            />
-                        </SwiperSlide>
-                    </Swiper>
+                    <img
+                        class="absolute left-0 top-0 h-[600px] w-[1000px] max-w-none"
+                        src="/assets/hero.jpg"
+                        alt="hero-section"
+                    />
                 </div>
             </div>
         </div>
     </section>
-
     <Statistic :stats="stats" />
     <Joblisting :jobs="jobs" />
     <Testimonials :testimonials="testimonials" />

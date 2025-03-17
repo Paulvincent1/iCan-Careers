@@ -74,7 +74,7 @@ const courseTitle = computed(() => {
 
       <!-- 🔍 Search Bar -->
       <SearchBar v-model="searchQuery" class="mb-6 p-8" />
-
+      <div><h1 class="text-[50px] font-bold">Trending Searches</h1></div>
       <!-- 📌 Tabs for Course Type Filters -->
       <nav class="mb-6">
         <ul class="flex space-x-4 border-b overflow-x-auto">
@@ -99,6 +99,7 @@ const courseTitle = computed(() => {
 
   </div>
     <div class="max-w-6xl mx-auto">
+      <div><h1 class="text-[20px] text-gray-400">Results for "Jobseeking"</h1></div>
         <CourtList category="job" />
     </div>
   <Footer />
