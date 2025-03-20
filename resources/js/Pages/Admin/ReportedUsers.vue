@@ -5,7 +5,15 @@ import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
 import DataTable from "vue3-easy-data-table";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faSearch, faUser, faBan } from "@fortawesome/free-solid-svg-icons";
+import StatsCard from "../Components/Admin/StatsCard.vue";
+import {
+    faSearch,
+    faUser,
+    faBan,
+    faExclamationTriangle,
+    faUsers,
+    faUserSlash,
+} from "@fortawesome/free-solid-svg-icons";
 
 // Dark mode logic
 const darkMode = ref(localStorage.getItem("theme") === "dark");
@@ -28,9 +36,27 @@ library.add(faSearch, faUser, faBan);
 // Define Layout
 defineOptions({ layout: AdminLayout });
 
-// Get reported users data from backend
 const reportedUsers = ref(usePage().props.reports || []);
 
+// Function to count reports per day (last 7 days)
+const generateReportData = () => {
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return date.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+    }).reverse();
+
+    const reportCounts = last7Days.map((day) => {
+        return reportedUsers.value.filter((report) => {
+            return report.created_at.startsWith(day);
+        }).length;
+    });
+
+    return { labels: last7Days, data: reportCounts };
+};
+
+// Computed properties to update chart dynamically
+const reportGraph = computed(() => generateReportData());
 // Tabs for filtering users
 const tabs = [
     { id: "all", label: "All" },
@@ -68,7 +94,7 @@ const filteredUsers = computed(() => {
 
     return filtered;
 });
-console.log(filteredUsers.value);
+
 
 // Table Headers
 const headers = [
@@ -98,7 +124,51 @@ const toggleBan = (reportedUserId) => {
 
 <template>
     <Head title="Reported Users | iCan Careers" />
-    <div :class="['p-4', darkMode ? 'bg-gray-700' : 'bg-white']">
+    <div :class="['h-full p-4', darkMode ? 'bg-gray-700' : 'bg-white']">
+        <!-- Search Bar -->
+        <div class="w-[500px] mb-4 flex items-center gap-2 rounded-md bg-gray-100 p-3">
+            <font-awesome-icon
+                :icon="['fas', 'search']"
+                class="text-gray-500"
+            />
+            <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search by reporter, reported user, or reason..."
+                class="w-full bg-transparent outline-none"
+            />
+        </div>
+        <h1 class="mb-4 flex items-center gap-2 text-xl font-bold">
+            <font-awesome-icon :icon="['fas', 'user-slash']" class="text-[#fa8334]" />
+            <p :class="textSrc">Reported Users Management</p>
+        </h1>
+        <hr class="my-4 border-t-2 border-gray-200 dark:border-gray-600">
+
+        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <StatsCard
+                title="Total Reports"
+                :value="reportedUsers.length"
+                :icon="{ prefix: 'fas', iconName: 'exclamation-triangle' }"
+                :chartData="reportGraph.data"
+                :labels="reportGraph.labels"
+            />
+            <StatsCard
+                title="No. of Reporter Users"
+                :value="reportedUsers.length"
+                :icon="faUsers"
+                :chartData="reportGraph.data"
+                :labels="reportGraph.labels"
+            />
+            <StatsCard
+                title="No. of Reported Users"
+                :value="filteredUsers.length"
+                :icon="faUserSlash"
+                :chartData="reportGraph.data"
+                :labels="reportGraph.labels"
+            />
+        </div>
+
+        <hr class="my-4 border-t-2 border-gray-200 dark:border-gray-600">
         <!-- Tabs Navigation -->
         <nav class="mb-6">
             <ul class="flex space-x-4 overflow-x-auto border-b">
@@ -120,25 +190,6 @@ const toggleBan = (reportedUserId) => {
                 </li>
             </ul>
         </nav>
-
-        <h1 class="mb-4 flex items-center gap-2 text-xl font-bold">
-            <font-awesome-icon :icon="['fas', 'user']" class="text-[#fa8334]" />
-            <p :class="textSrc">Reported Users Management</p>
-        </h1>
-
-        <!-- Search Bar -->
-        <div class="mb-4 flex items-center gap-2 rounded-md bg-gray-100 p-3">
-            <font-awesome-icon
-                :icon="['fas', 'search']"
-                class="text-gray-500"
-            />
-            <input
-                v-model="searchQuery"
-                type="text"
-                placeholder="Search by reporter, reported user, or reason..."
-                class="w-full bg-transparent outline-none"
-            />
-        </div>
 
         <!-- DataTable for Larger Screens -->
         <div class="relative z-0 hidden sm:block">
@@ -171,7 +222,7 @@ const toggleBan = (reportedUserId) => {
                             })
                         "
                         class="text-blue-500"
-                        >visit profile</Link
+                        >View Profile</Link
                     >
                 </template>
 

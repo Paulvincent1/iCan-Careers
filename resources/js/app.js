@@ -10,6 +10,10 @@ import { register } from "swiper/element/bundle";
 // register Swiper custom elements
 register();
 
+// 🔹 FontAwesome Setup
+
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
 createInertiaApp({
     resolve: (name) => {
         const pages = import.meta.glob("./Pages/**/*.vue", { eager: true });
@@ -19,6 +23,7 @@ createInertiaApp({
     },
     setup({ el, App, props, plugin }) {
         const app = createApp({ render: () => h(App, props) });
+        app.component("font-awesome-icon", FontAwesomeIcon);
         app.config.globalProperties.formatCurrency = function (value) {
             return new Intl.NumberFormat("en-PH", {
                 style: "currency",

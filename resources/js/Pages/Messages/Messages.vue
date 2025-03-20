@@ -621,7 +621,7 @@ watch(
                                 <img
                                     :src="
                                             chatHead.user.profile_img ??
-                                            '/assets/images.png'
+                                            '/assets/profile_placeholder.jpg'
                                         "
                                         alt=""
                                     class="h-full w-full rounded-full"

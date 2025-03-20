@@ -16,22 +16,23 @@ const props = defineProps({
     type: String,
 });
 
-// Check if it's the earnings chart
 const isEarningsChart = computed(() => props.type === "earnings");
 
-// 📊 ApexCharts (For Earnings Chart) - Unchanged
 const earningsChartOptions = ref({
     chart: { type: "line", height: 350 },
     stroke: { curve: "smooth" },
     colors: ["#34D399"],
-    xaxis: { categories: props.earningsData?.months || [] },
-    title: { text: "Earnings Over Time", align: "center" },
+    xaxis: {
+        categories: props.earningsData?.days || [], // FIXED: Use `days`
+        title: { text: "Days" },
+    },
+    title: { text: "Daily Earnings Over Time", align: "center" },
 });
+
 const earningsSeries = ref([
     { name: "Earnings", data: props.earningsData?.earnings || [] },
 ]);
 
-// 🎨 Improved Aesthetic Design for General Stats Chart
 const statsChartOptions = ref({
     tooltip: {
         trigger: "axis",
@@ -63,29 +64,29 @@ const statsChartOptions = ref({
             data: [
                 props.chartData?.users || 0,
                 props.chartData?.jobs || 0,
-                props.chartData?.applications || 0
+                props.chartData?.applications || 0,
             ],
             type: "bar",
             barWidth: "50%",
             itemStyle: {
                 color: (params) => {
-    const gradients = [
-        new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: "red" }, // Bright Red
-            { offset: 1, color: "orange" }, // Dark Red
-        ]),
-        new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: "#00308F" }, // Orange
-            { offset: 1, color: "#007FFF" }, // Darker Orange
-        ]),
-        new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: "#10B981" }, // Green
-            { offset: 1, color: "teal" }, // Dark Green
-        ]),
-    ];
-    return gradients[params.dataIndex]; // Assign different gradients to each bar
-},
-                borderRadius: [8, 8, 0, 0], // Rounded top edges
+                    const gradients = [
+                        new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: "red" },
+                            { offset: 1, color: "orange" },
+                        ]),
+                        new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: "#00308F" },
+                            { offset: 1, color: "#007FFF" },
+                        ]),
+                        new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: "#10B981" },
+                            { offset: 1, color: "teal" },
+                        ]),
+                    ];
+                    return gradients[params.dataIndex];
+                },
+                borderRadius: [8, 8, 0, 0],
                 shadowColor: "rgba(0,0,0,0.2)",
                 shadowBlur: 5,
             },
@@ -95,31 +96,44 @@ const statsChartOptions = ref({
     ],
 });
 
-// 🔄 Watch for data changes and update charts
-watch(() => props.earningsData, (newData) => {
-    earningsSeries.value = [{ name: "Earnings", data: newData?.earnings || [] }];
-    earningsChartOptions.value.xaxis.categories = newData?.months || [];
-}, { deep: true });
+watch(
+    () => props.earningsData,
+    (newData) => {
+        earningsSeries.value = [
+            { name: "Earnings", data: newData?.earnings || [] },
+        ];
+        earningsChartOptions.value.xaxis.categories = newData?.days || []; // FIXED
+    },
+    { deep: true }
+);
 
-watch(() => props.chartData, (newData) => {
-    statsChartOptions.value.series[0].data = [
-        newData?.users || 0,
-        newData?.jobs || 0,
-        newData?.applications || 0
-    ];
-}, { deep: true });
+watch(
+    () => props.chartData,
+    (newData) => {
+        statsChartOptions.value.series[0].data = [
+            newData?.users || 0,
+            newData?.jobs || 0,
+            newData?.applications || 0,
+        ];
+    },
+    { deep: true }
+);
 </script>
 
 <template>
     <div class="w-full">
         <!-- Earnings Chart -->
         <div v-if="isEarningsChart" class="relative h-[350px] w-full">
-            <VueApexCharts :options="earningsChartOptions" :series="earningsSeries" height="350" />
+            <VueApexCharts
+                :options="earningsChartOptions"
+                :series="earningsSeries"
+                height="350"
+            />
         </div>
 
         <!-- General Stats Chart (Improved) -->
         <div v-else class="relative h-[350px] w-full">
-            <VChart class="w-full h-64" :option="statsChartOptions" />
+            <VChart class="h-64 w-full" :option="statsChartOptions" />
         </div>
     </div>
 </template>

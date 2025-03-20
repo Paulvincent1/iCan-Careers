@@ -29,7 +29,7 @@ onMounted(() => {
     });
 });
 const textSrc = computed(() =>
-    darkMode.value ? 'text-white' : 'text-gray-900'
+    darkMode.value ? "text-white" : "text-gray-900",
 );
 
 // State for dropdowns
@@ -85,9 +85,17 @@ onUnmounted(() => {
 
 <template>
     <!-- Navbar Wrapper -->
-    <div :class="['fixed relative sticky left-0 top-0 border-gray-300/20 bg-white', darkMode ? 'dark:bg-gray-800' : 'bg-white']">
+    <div
+        :class="[
+            'fixed relative sticky left-0 top-0 border-gray-300/20  z-50',
+            darkMode ? 'bg-gray-800' : 'bg-white',
+        ]"
+    >
         <nav
-            class="mx-auto flex max-w-screen-xl items-center justify-between p-3"
+            :class="[
+                'mx-auto flex max-w-screen-xl items-center justify-between p-3',
+                
+            ]"
         >
             <!-- Sidebar Toggle Button (Mobile) -->
             <div class="flex-start flex md:hidden lg:hidden">
@@ -111,8 +119,6 @@ onUnmounted(() => {
                 </button>
             </div>
 
-
-
             <!-- Profile & Notifications -->
             <div class="ml-auto flex items-center gap-3">
                 <!-- Notification Bell -->
@@ -125,11 +131,15 @@ onUnmounted(() => {
                     "
                     class="relative flex flex-col"
                 >
+                
                     <div class="relative">
                         <i :class="['bi bi-bell text-lg', textSrc]"></i>
                         <i
                             v-if="notifications?.length"
-                            :class="['bi bi-circle-fill absolute right-0 top-0 text-[8px] text-red-500', darkMode ? 'text-red' : 'text-red-500']"
+                            :class="[
+                                'bi bi-circle-fill absolute right-0 top-0 text-[8px] text-red-500',
+                                darkMode ? 'text-red' : 'text-red-500',
+                            ]"
                         ></i>
                     </div>
                     <div
@@ -170,7 +180,7 @@ onUnmounted(() => {
                                     <img
                                         class="h-full w-full rounded-full object-cover"
                                         :src="
-                                            notifications.image ??
+                                            notification.data.image ??
                                             '/assets/images.png'
                                         "
                                         alt=""
@@ -217,7 +227,7 @@ onUnmounted(() => {
                     >
                         <Link
                             :href="route('admin.dashboard')"
-                            class="flex item-center px-4 py-2 text-black hover:bg-gray-100 w-full"
+                            class="item-center flex w-full px-4 py-2 text-black hover:bg-gray-100"
                             @click="profileDropdown = false"
                         >
                             <i class="bi bi-person"></i> Dashboard
@@ -226,7 +236,7 @@ onUnmounted(() => {
                             :href="route('logout')"
                             method="post"
                             as="button"
-                            class="flex item-center px-4 py-2 text-black hover:bg-gray-100 w-full"
+                            class="item-center flex w-full px-4 py-2 text-black hover:bg-gray-100"
                             @click="profileDropdown = false"
                         >
                             <i class="bi bi-box-arrow-left"></i> Logout
