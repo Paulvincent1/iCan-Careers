@@ -1,20 +1,40 @@
 <script setup>
-import { computed, getCurrentInstance ,onMounted, ref} from "vue";
+import { computed, getCurrentInstance, onMounted, ref } from "vue";
+import { usePage } from "@inertiajs/vue3";
 import { Link } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
 import DashboardChart from "../Components/Admin/DashboardChart.vue";
+import LineChartCard from "../Components/Admin/LineChartCard.vue";
+import BarChartCard from "../Components/Admin/BarChartCard.vue";
+import PieChartCard from "../Components/Admin/PieChartCard.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faUsers, faBriefcase, faFileAlt } from "@fortawesome/free-solid-svg-icons";
 
-library.add(faUsers, faBriefcase, faFileAlt);
+import {
+    faUsers,
+    faBriefcase,
+    faFileAlt,
+    faUserTie,
+    faUserSlash,
+    faTriangleExclamation,
+} from "@fortawesome/free-solid-svg-icons";
+library.add(
+    faUsers,
+    faBriefcase,
+    faFileAlt,
+    faUserTie,
+    faUserSlash,
+    faTriangleExclamation,
+);
 
 const darkMode = ref(localStorage.getItem("theme") === "dark");
+const workers = ref(usePage().props.workers || []);
+const employers = ref(usePage().props.employers || []);
+const reportedUsers = ref(usePage().props.reportedUsers || 0);
+const reportedPosts = ref(usePage().props.reportedPosts || 0);
 
 onMounted(() => {
     // Apply theme on mount
     document.documentElement.classList.toggle("dark", darkMode.value);
-
     // Listen for changes from other components
     window.addEventListener("theme-changed", () => {
         darkMode.value = localStorage.getItem("theme") === "dark";
@@ -22,7 +42,7 @@ onMounted(() => {
     });
 });
 const textSrc = computed(() =>
-    darkMode.value ? 'text-white' : 'text-gray-900'
+    darkMode.value ? "text-white" : "text-gray-900",
 );
 
 // Props
@@ -47,71 +67,104 @@ const todayDate = new Date().toLocaleDateString("en-US", {
 const formatCurrency =
     getCurrentInstance().appContext.config.globalProperties.formatCurrency;
 
-// Chart Data
-const chartData = computed(() => ({
-    users: props.userCountProps ?? 0,
-    jobs: props.jobProps?.id ?? 0,
-    applications: props.applicationProps ? props.applicationProps.length : 0,
-}));
-
 // Earnings Data
 const earningsData = computed(() => ({
-    months: props.salaryProps?.months ?? [],
-    earnings: props.salaryProps?.monthlyEarnings ?? [],
+    days: props.salaryProps?.days ?? [], // Use days instead of months
+    earnings: props.salaryProps?.dailyEarnings ?? [], // Fetch daily earnings
 }));
+const isEarningsChart = computed(() => props.type === "earnings");
+// **Data for EarningsCards**
+// Sample data transformation for line graphs
+const jobData = computed(() => [
+    { name: "Total Jobs", value: props.jobProps || 0 },
+]);
+
+const applicationData = computed(() => [
+    { name: "Total Applications", value: props.applicationProps || 0 },
+]);
+
+const workerData = computed(() => [
+    { name: "Total Workers", value: workers.value },
+]);
+
+const employerData = computed(() => [
+    { name: "Total Employers", value: employers.value },
+]);
+
+const reportedUsersData = computed(() => [
+    { name: "Reported Users", value: reportedUsers.value },
+]);
+
+const reportedPostsData = computed(() => [
+    { name: "Reported Jobs", value: reportedPosts.value },
+]);
 </script>
 
 <template>
     <Head title="Dashboard | iCan Careers" />
 
     <div :class="['p-4', darkMode ? 'bg-gray-700' : 'bg-white']">
-
-
+        <h1 class="mb-4 flex items-center gap-2 text-xl font-bold">
+            <font-awesome-icon
+                :icon="['fas', 'chart-bar']"
+                class="text-[#fa8334]"
+            />
+            <p :class="textSrc">Dashboard</p>
+        </h1>
+        <hr class="border-t-2 border-gray-200 dark:border-gray-600" />
         <!-- Grouped Main Chart & Key Statistics -->
-        <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
-            <!-- Main Chart (Users, Jobs, Applications) -->
-            <div class="col-span-1 md:col-span-2 bg-white p-4 rounded-lg shadow-lg w-full">
-                <h2 class="mb-4 text-lg md:text-xl font-bold text-center md:text-left">
-                    User, Job & Application Statistics
-                </h2>
-                <div class="h-[250px] sm:h-[300px] md:h-[350px]">
-                    <DashboardChart :chartData="chartData" />
-                </div>
+        <div :class="['p-4', darkMode ? 'bg-gray-700' : 'bg-white']">
+            <!-- Key Statistics Cards (Displayed in rows of 3) -->
+            <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
+                <PieChartCard
+                    title="Total Jobs"
+                    :data="jobData"
+                    :icon="['fas', 'briefcase']"
+                    :link="route('admin.job.approvals')"
+                    linkText="View Jobs→"
+                />
+                <PieChartCard
+                    title="Total Applications"
+                    :data="applicationData"
+                    :icon="['fas', 'file-alt']"
+                />
+                <LineChartCard
+                    title="Total Workers"
+                    :data="workerData"
+                    :icon="['fas', 'users']"
+                    :link="route('admin.job.approvals')"
+                    linkText="View Workers→"
+                />
             </div>
+            <hr class="my-4 border-t-2 border-gray-200 dark:border-gray-600" />
 
-            <!-- Key Statistics Cards (Users, Jobs, Applications) -->
-            <div class="col-span-1 space-y-5">
-                <!-- Total Users Card -->
-                <div class="flex items-center justify-between rounded-lg border border-gray-200 bg-gradient-to-b from-red-500 to-orange-500 p-10 shadow-lg">
-                    <div>
-                        <h2 class="text-md font-semibold text-black">Total Users</h2>
-                        <p class="text-4xl font-bold text-gray-800">{{ userCountProps ?? 0 }}</p>
-                    </div>
-                    <font-awesome-icon :icon="['fas', 'users']" :class="['text-5xl mr-4', darkMode ? 'text-yellow-300' : 'text-black']" />
-                </div>
-
-                <!-- Total Jobs Card -->
-                <div class="flex items-center justify-between rounded-lg border border-gray-200 bg-gradient-to-b from-blue-400 to-blue-900 p-10 shadow-lg">
-                    <div>
-                        <h2 class="text-md font-semibold text-gray-100">Total Jobs</h2>
-                        <p class="text-4xl font-bold text-gray-100">{{ jobProps?.id ?? 0 }}</p>
-                    </div>
-                    <font-awesome-icon :icon="['fas', 'briefcase']" class="text-white text-5xl mr-4" />
-                </div>
-
-                <!-- New Applications Card -->
-                <div class="flex items-center justify-between rounded-lg border border-gray-200 bg-gradient-to-r from-green-700 to-teal-500 p-10 shadow-lg">
-                    <div>
-                        <h2 class="text-md font-semibold text-white">New Applications</h2>
-                        <p class="text-4xl font-bold text-white">{{ applicationProps ? applicationProps.length : 0 }}</p>
-                    </div>
-                    <font-awesome-icon :icon="['fas', 'file-alt']" class="text-white text-5xl mr-4" />
-                </div>
+            <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
+                <LineChartCard
+                    title="Total Employers"
+                    :data="employerData"
+                    :icon="['fas', 'user-tie']"
+                    :link="route('admin.job.approvals')"
+                    linkText="View Employers→"
+                />
+                <BarChartCard
+                    title="Reported Users"
+                    :data="reportedUsersData"
+                    :icon="['fas', 'user-slash']"
+                    :link="route('admin.reported.users')"
+                    linkText="View Reports→"
+                />
+                <BarChartCard
+                    title="Reported Jobs"
+                    :data="reportedPostsData"
+                    :icon="['fas', 'triangle-exclamation']"
+                    :link="route('admin.reported.posts')"
+                    linkText="View Reports→"
+                />
             </div>
         </div>
-
+        <hr class="my-4 border-t-2 border-gray-200 dark:border-gray-600" />
         <!-- Total Earnings Card (Standalone at the Bottom) -->
-        <div class="mt-8 rounded-lg border border-gray-200 bg-white p-6 shadow-lg">
+        <div class="mt-8 rounded-lg bg-white p-6">
             <h2 class="text-lg font-bold text-gray-700 md:text-xl">
                 Total Earnings
             </h2>

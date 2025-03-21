@@ -22,42 +22,77 @@ use Illuminate\Support\Facades\Redirect;
 class AdminDashboardController extends Controller
 {
     public function index()
-    {
-        $salary = Salary::sum('total_earnings'); // Total earnings
-        $job = JobPost::find(1);
-        $application = DB::table('application')->get();
-        $date = EmployerSubscription::find(1);
+{
+    $salary = Salary::sum('total_earnings'); // Total earnings
+    $job = JobPost::find(1);
+    $application = DB::table('application')->get();
+    $date = EmployerSubscription::find(1);
 
-        // Count users except admins
-        $userCount = User::whereDoesntHave('roles', function ($query) {
-            $query->where('name', 'Admin');
-        })->count();
-
-        // Earnings grouped by month
-        $monthlyEarnings = Salary::selectRaw('MONTH(created_at) as month, SUM(total_earnings) as total')
-            ->groupBy('month')
-            ->orderBy('month')
+     // Fetch all workers (Seniors or PWDs) with verification data
+        $workers = User::with('workerVerification') // Eager load workerVerification
+            ->whereHas('roles', function ($query) {
+                $query->where('name', 'Senior')->orWhere('name', 'PWD');
+            })
             ->get();
-
-        // Convert month numbers to names (e.g., 1 -> Jan, 2 -> Feb)
-        $months = $monthlyEarnings->map(function ($item) {
-            return Carbon::create()->month($item->month)->format('M'); // "Jan", "Feb", etc.
+        // Map through workers to include worker_verification id
+        $workers->map(function ($worker) {
+            // Add the worker_verification ID to the worker model
+            $worker->verification_id = $worker->workerVerification ? $worker->workerVerification->id : null;
+            return $worker;
         });
+        $employers = EmployerProfile::with(['user', 'businessInformation'])->whereHas('user.roles', function ($query) {
+            $query->where('name', '!=', 'Admin');
+        })
+            ->select('id', 'user_id', 'full_name', 'employer_type', 'business_id')
+            ->get()
+            ->map(function ($employer) {
+                return [
+                    'id' => $employer->id,
+                    'user' => [
+                        'username' => $employer->user->name ?? 'N/A',
+                        'email' => $employer->user->email ?? 'N/A',
+                    ],
+                    'employer_type' => $employer->employer_type,
+                    'business_information' => [
+                        'business_name' => $employer->businessInformation->business_name ?? 'N/A',
+                    ],
+                ];
+            });
 
-        $earnings = $monthlyEarnings->pluck('total');
+        $reports = Report::with(['reported', 'reporter'])->latest()->get();
 
-        return Inertia::render('Admin/Dashboard', [
-            'salaryProps' => [
-                'total_earnings' => $salary,
-                'months' => $months,
-                'monthlyEarnings' => $earnings,
-            ],
-            'userCountProps' => $userCount,
-            'applicationProps' => $application,
-            'jobProps' => $job,
-            'dateProps' => $date,
-        ]);
-    }
+        $reportPosts = ReportJobPost::with(['reporter', 'reportedJobPost'])->latest()->get();
+        
+
+// Calculate total earnings
+            $totalEarnings = SubscriptionPaymentHistory::sum('amount'); // Adjust column if needed
+
+            // Calculate daily earnings for the Pie Chart
+            $dailyEarnings = SubscriptionPaymentHistory::selectRaw('DATE(created_at) as day, SUM(amount) as total')
+                ->where('created_at', '>=', \Carbon\Carbon::now()->subDays(30))
+                ->groupBy('day')
+                ->orderBy('day')
+                ->get();
+
+            // Extract days and earnings values
+            $days = $dailyEarnings->pluck('day')->map(fn($date) => \Carbon\Carbon::parse($date)->format('M d'));
+            $earnings = $dailyEarnings->pluck('total');
+
+    return Inertia::render('Admin/Dashboard', [
+    'salaryProps' => [
+        'total_earnings' => $salary,
+        'days' => $days,
+        'dailyEarnings' => $earnings,
+    ],
+    'applicationProps' => $application->count(),
+    'jobProps' => JobPost::count(), // Send count instead of a single job
+    'dateProps' => $date,
+    'workers' => $workers->count(), // Send count instead of list
+    'employers' => $employers->count(),
+    'reportedUsers' => $reports->count(),
+    'reportedPosts' => $reportPosts->count(),
+]);
+}
 
     public function workers()
     {
@@ -298,13 +333,48 @@ class AdminDashboardController extends Controller
 
 
 
-    public function paymentHistory()
-    {
-        $subscriptionPaymentHistory = SubscriptionPaymentHistory::query()->with('employer')->latest()->get();
+         public function paymentHistory()
+        {
+            // Fetch payment history with employer details
+            $subscriptionPaymentHistory = SubscriptionPaymentHistory::query()
+                ->with('employer')
+                ->latest()
+                ->get();
 
-        // dd($subscriptionPaymentHistory);
-        return Inertia::render('Admin/PaymentHistory', ['subscriptionPaymentHistoryProps' => $subscriptionPaymentHistory]);
-    }
+            // Calculate total earnings
+            $totalEarnings = SubscriptionPaymentHistory::sum('amount'); // Adjust column if needed
+
+            // Calculate daily earnings for the Pie Chart
+            $dailyEarnings = SubscriptionPaymentHistory::selectRaw('DATE(created_at) as day, SUM(amount) as total')
+                ->where('created_at', '>=', \Carbon\Carbon::now()->subDays(30))
+                ->groupBy('day')
+                ->orderBy('day')
+                ->get();
+
+            // Extract days and earnings values
+            $days = $dailyEarnings->pluck('day')->map(fn($date) => \Carbon\Carbon::parse($date)->format('M d'));
+            $earnings = $dailyEarnings->pluck('total');
+
+                // Count employers with at least one subscription
+    $subscribedEmployersCount = User::whereHas('subscriptionPaymentHistory')->count();
+    
+    // Count employers without any subscriptions
+    $nonSubscribedEmployersCount = User::doesntHave('subscriptionPaymentHistory')->count();
+
+            return Inertia::render('Admin/PaymentHistory', [
+                'subscriptionPaymentHistoryProps' => $subscriptionPaymentHistory,
+                'salaryProps' => [
+                    'total_earnings' => $totalEarnings,
+                    'days' => $days,
+                    'dailyEarnings' => $earnings,
+                ],
+                 'subscribedUsersData' => [
+            ['name' => 'Subscribed Employers', 'value' => $subscribedEmployersCount],
+            ['name' => 'Non-Subscribed Employers', 'value' => $nonSubscribedEmployersCount],
+            ]
+            ]);
+        }
+
 
     public function subscribeUsers()
     {

@@ -18,7 +18,8 @@ import {
     faUserSlash,
     faFileCircleExclamation,
     faSun,
-    faMoon
+    faMoon,
+    faUserTie
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -36,7 +37,8 @@ library.add(
     faUserSlash,
     faFileCircleExclamation,
     faSun,
-    faMoon
+    faMoon,
+    faUserTie
 );
 
 const isMobile = ref(window.innerWidth < 768);
@@ -115,9 +117,9 @@ const textSrc = computed(() =>
         ]"
         >
         <!-- Sidebar Header with Logo & Close Button -->
-            <div :class="['flex items-center justify-center p-1', darkMode ? 'border-b' : 'border-b']">
+            <div :class="['flex items-center justify-center p-1', darkMode ? '' : '']">
                 <!-- Logo (Hidden on Mobile, Centered on Larger Screens) -->
-                 <div :class="['w-full flex justify-center p-1 m-1', darkMode ? 'bg-gray-700' : 'bg-white' ]">
+                 <div :class="['w-full flex justify-center p-1 m-1', darkMode ? '' : 'bg-white' ]">
                      <Link href="/admin">
                  <img :src="logoSrc" alt="Logo" class="h-14" />
                      </Link>
@@ -130,7 +132,7 @@ const textSrc = computed(() =>
                 @click="closeSidebarOnMobile"
                 class="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
             >
-                <font-awesome-icon :icon="['fas', 'times']" class="text-2xl" />
+                <font-awesome-icon :icon="['fas', 'times']" :class="'text-2xl',darkMode ?'text-white':'text-black' " />
             </button>
 
 
@@ -146,7 +148,7 @@ const textSrc = computed(() =>
                 <p :class="textSrc">Workers</p>
             </Link>
             <Link @click="closeSidebarOnMobile" href="/admin/employers" class="nav-link">
-                <font-awesome-icon :icon="['fas', 'building']" class="nav-icon" />
+                <font-awesome-icon :icon="['fas', 'user-tie']" class="nav-icon" />
                 <p :class="textSrc">Employers</p>
             </Link>
 

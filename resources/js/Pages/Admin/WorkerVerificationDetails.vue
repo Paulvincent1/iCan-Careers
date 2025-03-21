@@ -163,7 +163,7 @@ const deleteWorker = () => {
     class="flex items-center gap-2 rounded bg-red-600 px-4 py-2 text-white transition hover:bg-red-800"
 >
     <TrashIcon class="h-5 w-5" />
-    Delete Worker
+    Delete Verification
 </button>
             </div>
         </div>

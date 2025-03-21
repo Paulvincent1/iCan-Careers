@@ -71,7 +71,7 @@ let datePosted = computed(() => {
                         job.employer.employer_profile.business_information
                             ? job.employer.employer_profile.business_information
                                   .business_logo
-                            : '/assets/images.png'
+                            : '/assets/logo-placeholder-image.png'
                     "
                     alt=""
                     class="h-full w-full rounded object-cover"

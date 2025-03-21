@@ -833,7 +833,7 @@ const formatCurrency =
                                                                   .employer_profile
                                                                   .business_information
                                                                   .business_logo
-                                                            : '/assets/images.png'
+                                                            : '/assets/logo-placeholder-image.png'
                                                     "
                                                     alt=""
                                                 />
@@ -920,7 +920,7 @@ const formatCurrency =
                                                                   .employer_profile
                                                                   .business_information
                                                                   .business_logo
-                                                            : '/assets/images.png'
+                                                            : '/assets/logo-placeholder-image.png'
                                                     "
                                                     alt=""
                                                 />
