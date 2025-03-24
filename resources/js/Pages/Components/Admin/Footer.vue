@@ -3,14 +3,14 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
     faFacebook,
-    faInstagram,
+    faYoutube,
     faLinkedin,
     faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 import { Link } from "@inertiajs/vue3";
 
 // Add the icons only for this component
-library.add(faFacebook, faInstagram, faLinkedin, faTwitter);
+library.add(faFacebook, faYoutube, faLinkedin, faTwitter);
 </script>
 
 <template>
@@ -38,7 +38,9 @@ library.add(faFacebook, faInstagram, faLinkedin, faTwitter);
                         >
                     </li>
                     <li>
-                        <Link :href="route('jobsearch')" class="text-gray-400 hover:text-white"
+                        <Link
+                            :href="route('jobsearch')"
+                            class="text-gray-400 hover:text-white"
                             >Find Jobs
                         </Link>
                     </li>
@@ -86,27 +88,25 @@ library.add(faFacebook, faInstagram, faLinkedin, faTwitter);
             <div>
                 <h3 class="text-lg font-bold">Follow Us</h3>
                 <div class="mt-3 flex space-x-4">
-                    <a href="#" class="text-gray-400 hover:text-white">
+                    <a
+                        href="https://www.facebook.com/profile.php?id=61574488294916"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-gray-400 hover:text-white"
+                    >
                         <font-awesome-icon
                             :icon="['fab', 'facebook']"
                             size="lg"
                         />
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
+                    <a
+                        href="https://www.youtube.com/@ICanCareers-d3l"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-gray-400 hover:text-white"
+                    >
                         <font-awesome-icon
-                            :icon="['fab', 'instagram']"
-                            size="lg"
-                        />
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <font-awesome-icon
-                            :icon="['fab', 'linkedin']"
-                            size="lg"
-                        />
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <font-awesome-icon
-                            :icon="['fab', 'twitter']"
+                            :icon="['fab', 'youtube']"
                             size="lg"
                         />
                     </a>
@@ -119,8 +119,6 @@ library.add(faFacebook, faInstagram, faLinkedin, faTwitter);
             class="mt-8 border-t border-gray-700 pt-4 text-center text-sm text-gray-500"
         >
             <p>© 2025 iCan Careers. All rights reserved.</p>
-            <a href="/privacy" class="hover:text-white">Privacy Policy</a> |
-            <a href="/terms" class="hover:text-white">Terms & Conditions</a>
         </div>
     </footer>
 </template>

@@ -96,9 +96,9 @@ console.log(page.props.auth.user.unreadNotifications);
             <p class="">
                 <Link :href="route('home')"
                     ><img
-                        src="/assets/iCanLogoDark.png"
+                        src="/assets/2.png"
                         alt=""
-                        class="h-10 w-auto object-contain md:h-14 lg:h-16"
+                        class="h-10 w-auto object-contain md:h-13 lg:h-[50px]"
                 /></Link>
             </p>
             <nav

@@ -1,11 +1,10 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
 import VueApexCharts from "vue3-apexcharts";
-import { Link } from "@inertiajs/vue3";
 
 const props = defineProps({
     title: String,
-    data: Array, // Array of { name: "Day", value: number }
+    data: Array, // Array of { name: "Category", value: number }
     icon: Array,
     link: String, // ✅ Added link prop
     linkText: String,
@@ -13,41 +12,25 @@ const props = defineProps({
 
 const chartOptions = ref({
     chart: {
-        type: "bar",
-        height: 160,
-        toolbar: { show: false },
+        type: "pie",
+        height: 200,
     },
-    xaxis: {
-        categories: [],
-        labels: { style: { colors: "#4B5563" } }, // Dark gray for readability
+    labels: [],
+    legend: {
+        position: "bottom",
+        labels: { colors: "#374151" },
     },
-    yaxis: {
-        labels: { style: { colors: "#4B5563" } },
+    colors: ["#2563eb", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6"], // Custom colors
+    tooltip: {
+        theme: "light",
     },
-    plotOptions: {
-        bar: {
-            borderRadius: 4, // Rounded bars
-            horizontal: false, // Vertical bars
-            columnWidth: "60%", // Adjust bar width
-        },
-    },
-    dataLabels: {
-        enabled: false, // Hide data labels on bars
-    },
-    colors: ["#2563eb"], // Blue color for bars
-    grid: { borderColor: "#E5E7EB" }, // Light gray grid
 });
 
-const chartSeries = ref([
-    {
-        name: "Value",
-        data: [],
-    },
-]);
+const chartSeries = ref([]);
 
 const updateChartData = () => {
-    chartOptions.value.xaxis.categories = props.data.map((d) => d.name);
-    chartSeries.value[0].data = props.data.map((d) => d.value);
+    chartOptions.value.labels = props.data.map((d) => d.name);
+    chartSeries.value = props.data.map((d) => d.value);
 };
 
 onMounted(updateChartData);
@@ -59,7 +42,7 @@ watch(() => props.data, updateChartData, { deep: true });
         <div class="flex items-center justify-between text-center">
             <div>
                 <h2 class="text-md font-semibold text-gray-700">{{ title }}</h2>
-                
+            
             </div>
             <div class="flex items-center space-x-3">
                 <font-awesome-icon
@@ -68,17 +51,15 @@ watch(() => props.data, updateChartData, { deep: true });
                 />
             </div>
         </div>
-        
         <VueApexCharts
-            type="bar"
-            height="160"
+            type="pie"
+            height="200"
             :options="chartOptions"
             :series="chartSeries"
             class="mt-4"
         />
-
-        <!-- Link at the Bottom Right -->
-        <div class="flex justify-end mt-4">
+        <!-- Link placed beside the title and count -->
+        <div class="flex justify-end">
             <Link
                 v-if="link"
                 :href="link"

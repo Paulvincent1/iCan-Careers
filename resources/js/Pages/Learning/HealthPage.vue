@@ -8,7 +8,6 @@ import Developers from "../Components/Learning/Developers.vue";
 import Carousel from "../Components/Learning/Carousel.vue";
 import CourtList from "../Components/Learning/CourtList.vue";
 
-
 // Reference to the UseCourses component
 const useCoursesComponent = ref(null);
 
@@ -22,86 +21,97 @@ const preview = ref([]);
 
 const tabs = [
     { id: "all", label: "All Courses" },
-    { id: "health", label: "Health and Wellness" },
+    { id: "health", label: "Jobseeking" },
     { id: "creative", label: "Creative Arts and Hobbies" },
     { id: "job", label: "Job-Ready Skills" },
 ];
 
 // Fetch courses data from UseCourses component when mounted
 onMounted(() => {
-  if (useCoursesComponent.value) {
-    courses.value = useCoursesComponent.value.courses;
-    courses2.value = useCoursesComponent.value.courses2;
-    courses3.value = useCoursesComponent.value.courses3;
-    preview.value = useCoursesComponent.value.preview;
-  }
+    if (useCoursesComponent.value) {
+        courses.value = useCoursesComponent.value.courses;
+        courses2.value = useCoursesComponent.value.courses2;
+        courses3.value = useCoursesComponent.value.courses3;
+        preview.value = useCoursesComponent.value.preview;
+    }
 });
 
 // 🔍 Filter courses based on search query and selected tab
 const filteredCourses = computed(() => {
-  let allCourses = [...courses.value, ...courses2.value, ...courses3.value, ...preview.value];
+    let allCourses = [
+        ...courses.value,
+        ...courses2.value,
+        ...courses3.value,
+        ...preview.value,
+    ];
 
-  if (activeTab.value === "health") {
-    allCourses = courses.value; // Business courses
-  } else if (activeTab.value === "creative") {
-    allCourses = courses2.value; // Individual courses
-  } else if (activeTab.value === "job") {
-    allCourses = courses3.value; // Individual courses // Individual courses
-  }
+    if (activeTab.value === "health") {
+        allCourses = courses.value; // Business courses
+    } else if (activeTab.value === "creative") {
+        allCourses = courses2.value; // Individual courses
+    } else if (activeTab.value === "job") {
+        allCourses = courses3.value; // Individual courses // Individual courses
+    }
 
-  return allCourses.filter(
-    (course) =>
-      course.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
+    return allCourses.filter(
+        (course) =>
+            course.title
+                .toLowerCase()
+                .includes(searchQuery.value.toLowerCase()) ||
+            course.description
+                .toLowerCase()
+                .includes(searchQuery.value.toLowerCase()),
+    );
 });
 
 // 🔄 Dynamic title based on the selected tab
 const courseTitle = computed(() => {
-  if (activeTab.value === "health") return "Health and Wellness";
-  if (activeTab.value === "creative") return "Creative Arts and Hobbies";
-  if (activeTab.value === "job") return "Job-Ready Skills";
-  return "Featured Courses"; // Default title
+    if (activeTab.value === "health") return "Health and Wellness";
+    if (activeTab.value === "creative") return "Creative Arts and Hobbies";
+    if (activeTab.value === "job") return "Job-Ready Skills";
+    return "Featured Courses"; // Default title
 });
 </script>
 
 <template>
-  <Head title="Health and Awareness| iCan Careers" />
+    <Head title="Jobseeking | iCan Careers" />
 
-  <div class="max-h-screen bg-gray-50 p-6">
-    <div class="max-w-6xl mx-auto">
+    <div class="max-h-screen bg-gray-50 p-6">
+        <div class="mx-auto max-w-6xl">
+            <!-- 🔍 Search Bar -->
+            <SearchBar v-model="searchQuery" class="mb-6 p-8" />
+            <div><h1 class="text-[50px] font-bold">Trending Searches</h1></div>
+            <!-- 📌 Tabs for Course Type Filters -->
+            <nav class="mb-6">
+                <ul class="flex space-x-4 overflow-x-auto border-b">
+                    <li
+                        v-for="tab in tabs"
+                        :key="tab.id"
+                        @click="activeTab = tab.id"
+                        :class="{
+                            'border-b-2 border-yellow-300 font-semibold':
+                                activeTab === tab.id,
+                            'text-yellow-300': activeTab === tab.id,
+                            'text-gray-500': activeTab !== tab.id,
+                        }"
+                        class="cursor-pointer whitespace-nowrap px-4 py-2"
+                    >
+                        {{ tab.label }}
+                    </li>
+                </ul>
+            </nav>
 
-      <!-- 🔍 Search Bar -->
-      <SearchBar v-model="searchQuery" class="mb-6 p-8" />
-    <div><h1 class="text-[50px] font-bold">Trending Searches</h1></div>
-      <!-- 📌 Tabs for Course Type Filters -->
-      <nav class="mb-6">
-        <ul class="flex space-x-4 border-b overflow-x-auto">
-          <li v-for="tab in tabs" :key="tab.id"
-              @click="activeTab = tab.id"
-              :class="{
-                'border-b-2 border-yellow-300 font-semibold': activeTab === tab.id,
-                'text-yellow-300': activeTab === tab.id,
-                'text-gray-500': activeTab !== tab.id
-              }"
-              class="cursor-pointer px-4 py-2 whitespace-nowrap">
-            {{ tab.label }}
-          </li>
-        </ul>
-      </nav>
-
-      <!-- 📚 Course Slider (Changes based on selected tab) -->
-      <CourseSlider :courses="filteredCourses" :title="courseTitle" />
-
-
+            <!-- 📚 Course Slider (Changes based on selected tab) -->
+            <CourseSlider :courses="filteredCourses" :title="courseTitle" />
+        </div>
     </div>
-
-  </div>
-    <div class="max-w-6xl mx-auto">
-      <div><h1 class="text-[20px] text-gray-400">Results for "Health and Awareness"</h1></div>
+    <div class="mx-auto max-w-6xl">
+        <div>
+            <h1 class="text-[20px] text-gray-400">Results for "Jobseeking"</h1>
+        </div>
         <CourtList category="health" />
     </div>
-  <Footer />
-  <!-- Include the UseCourses component -->
-  <UseCourses ref="useCoursesComponent" />
+    <Footer />
+    <!-- Include the UseCourses component -->
+    <UseCourses ref="useCoursesComponent" />
 </template>

@@ -1,12 +1,11 @@
 <script setup>
 import { computed, getCurrentInstance, onMounted, ref } from "vue";
-import { usePage } from "@inertiajs/vue3";
 import { Link } from "@inertiajs/vue3";
 import AdminLayout from "../Layouts/Admin/AdminLayout.vue";
 import DashboardChart from "../Components/Admin/DashboardChart.vue";
 import LineChartCard from "../Components/Admin/LineChartCard.vue";
 import BarChartCard from "../Components/Admin/BarChartCard.vue";
-import PieChartCard from "../Components/Admin/PieChartCard.vue";
+import PieChartsDashboard from "../Components/Admin/PieChartsDashboard.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 
 import {
@@ -27,10 +26,7 @@ library.add(
 );
 
 const darkMode = ref(localStorage.getItem("theme") === "dark");
-const workers = ref(usePage().props.workers || []);
-const employers = ref(usePage().props.employers || []);
-const reportedUsers = ref(usePage().props.reportedUsers || 0);
-const reportedPosts = ref(usePage().props.reportedPosts || 0);
+
 
 onMounted(() => {
     // Apply theme on mount
@@ -49,8 +45,12 @@ const textSrc = computed(() =>
 const props = defineProps({
     salaryProps: Object,
     userCountProps: Number,
-    applicationProps: Array,
+    applicationProps: Object,
     jobProps: Object,
+    workerProps: Object,
+    employerProps: Object,
+    reportedUsersData: Array,
+    reportedPostsData: Array,
 });
 
 // Define Layout
@@ -76,28 +76,40 @@ const isEarningsChart = computed(() => props.type === "earnings");
 // **Data for EarningsCards**
 // Sample data transformation for line graphs
 const jobData = computed(() => [
-    { name: "Total Jobs", value: props.jobProps || 0 },
+    { name: "Total Jobs", value: props.jobProps.total || 0 },
+    { name: "Today’s Jobs", value: props.jobProps.daily || 0 },
 ]);
 
 const applicationData = computed(() => [
-    { name: "Total Applications", value: props.applicationProps || 0 },
+    { name: "Total Applications", value: props.applicationProps.total || 0 },
+    { name: "Today’s Applications", value: props.applicationProps.daily || 0 },
 ]);
 
 const workerData = computed(() => [
-    { name: "Total Workers", value: workers.value },
+    { name: "Total Workers", value: props.workerProps.total || 0 },
+    { name: "Today’s Workers", value: props.workerProps.daily || 0 },
 ]);
 
 const employerData = computed(() => [
-    { name: "Total Employers", value: employers.value },
+    { name: "Total Employers", value: props.employerProps.total || 0 },
+    { name: "Today’s Employers", value: props.employerProps.daily || 0 },
 ]);
 
-const reportedUsersData = computed(() => [
-    { name: "Reported Users", value: reportedUsers.value },
-]);
+// Format Reported Users Data for Bar Chart
+const reportedUsersData = computed(() => {
+    return props.reportedUsersData.map(report => ({
+        name: report.date,
+        value: report.count,
+    }));
+});
 
-const reportedPostsData = computed(() => [
-    { name: "Reported Jobs", value: reportedPosts.value },
-]);
+// Format Reported Job Posts Data for Bar Chart
+const reportedPostsData = computed(() => {
+    return props.reportedPostsData.map(report => ({
+        name: report.date,
+        value: report.count,
+    }));
+});
 </script>
 
 <template>
@@ -116,23 +128,23 @@ const reportedPostsData = computed(() => [
         <div :class="['p-4', darkMode ? 'bg-gray-700' : 'bg-white']">
             <!-- Key Statistics Cards (Displayed in rows of 3) -->
             <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
-                <PieChartCard
+                <PieChartsDashboard
                     title="Total Jobs"
                     :data="jobData"
                     :icon="['fas', 'briefcase']"
                     :link="route('admin.job.approvals')"
                     linkText="View Jobs→"
                 />
-                <PieChartCard
+                <PieChartsDashboard
                     title="Total Applications"
                     :data="applicationData"
                     :icon="['fas', 'file-alt']"
                 />
                 <LineChartCard
-                    title="Total Workers"
+                    title="Today's Workers"
                     :data="workerData"
                     :icon="['fas', 'users']"
-                    :link="route('admin.job.approvals')"
+                    :link="route('admin.workers')"
                     linkText="View Workers→"
                 />
             </div>
@@ -140,21 +152,21 @@ const reportedPostsData = computed(() => [
 
             <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
                 <LineChartCard
-                    title="Total Employers"
+                    title="Today's Employers"
                     :data="employerData"
                     :icon="['fas', 'user-tie']"
-                    :link="route('admin.job.approvals')"
+                    :link="route('admin.employers')"
                     linkText="View Employers→"
                 />
                 <BarChartCard
-                    title="Reported Users"
+                    title="Latest Reported Users"
                     :data="reportedUsersData"
                     :icon="['fas', 'user-slash']"
                     :link="route('admin.reported.users')"
                     linkText="View Reports→"
                 />
                 <BarChartCard
-                    title="Reported Jobs"
+                    title="Latest Reported Jobs"
                     :data="reportedPostsData"
                     :icon="['fas', 'triangle-exclamation']"
                     :link="route('admin.reported.posts')"

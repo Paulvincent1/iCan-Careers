@@ -109,7 +109,7 @@ const headers = [
     <Head title="Subscribed Users | iCan Careers" />
     <div :class="['p-4', darkMode ? 'bg-gray-700' : 'bg-white']">
         <!-- Search Bar -->
-        <div class="mb-4 flex items-center gap-2 rounded-md bg-gray-100 p-3">
+        <div class="w-[500px] mb-4 flex items-center gap-2 rounded-md bg-gray-100 p-3">
             <font-awesome-icon
                 :icon="['fas', 'search']"
                 class="text-gray-500"
