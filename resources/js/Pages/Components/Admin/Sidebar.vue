@@ -100,7 +100,7 @@ const toggleDarkMode = () => {
 };
 // Compute the correct image source based on dark mode
 const logoSrc = computed(() =>
-    darkMode.value ? "/assets/iCanLogoLight.png" : "/assets/iCanLogoDark.png"
+    darkMode.value ? "/assets/4.png" : "/assets/2.png"
 );
 
 const textSrc = computed(() =>
@@ -117,11 +117,11 @@ const textSrc = computed(() =>
         ]"
         >
         <!-- Sidebar Header with Logo & Close Button -->
-            <div :class="['flex items-center justify-center p-1', darkMode ? '' : '']">
+            <div :class="['flex items-center justify-center', darkMode ? '' : '']">
                 <!-- Logo (Hidden on Mobile, Centered on Larger Screens) -->
-                 <div :class="['w-full flex justify-center p-1 m-1', darkMode ? '' : 'bg-white' ]">
+                 <div :class="['ms-2 mt-2 flex justify-center']">
                      <Link href="/admin">
-                 <img :src="logoSrc" alt="Logo" class="h-14" />
+                    <img :src="logoSrc" alt="Logo" class="h-10 w-[100px] object-contain md:h-13 lg:h-[50px]" />
                      </Link>
                  </div>
             </div>
@@ -137,7 +137,7 @@ const textSrc = computed(() =>
 
 
        <div>
-            <nav class=" p-5 space-y-0">
+            <nav class="p-2 mt-3  space-y-0">
             <Link @click="closeSidebarOnMobile" href="/admin" class="nav-link">
                 <font-awesome-icon :icon="['fas', 'chart-bar']" class="nav-icon" />
                 <p :class="textSrc">Dashboard</p>

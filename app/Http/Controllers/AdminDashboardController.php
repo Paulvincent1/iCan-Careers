@@ -24,48 +24,50 @@ class AdminDashboardController extends Controller
     public function index()
 {
     $salary = Salary::sum('total_earnings'); // Total earnings
-    $job = JobPost::find(1);
-    $application = DB::table('application')->get();
+     
     $date = EmployerSubscription::find(1);
-
-     // Fetch all workers (Seniors or PWDs) with verification data
-        $workers = User::with('workerVerification') // Eager load workerVerification
-            ->whereHas('roles', function ($query) {
-                $query->where('name', 'Senior')->orWhere('name', 'PWD');
-            })
-            ->get();
-        // Map through workers to include worker_verification id
-        $workers->map(function ($worker) {
-            // Add the worker_verification ID to the worker model
-            $worker->verification_id = $worker->workerVerification ? $worker->workerVerification->id : null;
-            return $worker;
-        });
-        $employers = EmployerProfile::with(['user', 'businessInformation'])->whereHas('user.roles', function ($query) {
+ // Get today's date
+    $today = \Carbon\Carbon::today();
+     // Count total entities
+    $totalWorkers = User::whereHas('roles', function ($query) {
+        $query->where('name', 'Senior')->orWhere('name', 'PWD');
+    })->count();
+     // Count daily entities (records created today)
+    $dailyWorkers = User::whereHas('roles', function ($query) {
+        $query->where('name', 'Senior')->orWhere('name', 'PWD');
+    })->whereDate('created_at', $today)->count();
+       
+    $totalEmployers = EmployerProfile::with('user')
+    ->whereHas('user.roles', function ($query) {
             $query->where('name', '!=', 'Admin');
-        })
-            ->select('id', 'user_id', 'full_name', 'employer_type', 'business_id')
-            ->get()
-            ->map(function ($employer) {
-                return [
-                    'id' => $employer->id,
-                    'user' => [
-                        'username' => $employer->user->name ?? 'N/A',
-                        'email' => $employer->user->email ?? 'N/A',
-                    ],
-                    'employer_type' => $employer->employer_type,
-                    'business_information' => [
-                        'business_name' => $employer->businessInformation->business_name ?? 'N/A',
-                    ],
-                ];
-            });
+    })->count();
+         $dailyEmployers = EmployerProfile::with('user')
+     ->whereHas('user.roles', function ($query) {
+            $query->where('name', '!=', 'Admin');
+    })->whereDate('created_at', $today)->count();
+    $totalJobs = JobPost::count();
+    $dailyJobs = JobPost::whereDate('created_at', $today)->count();
 
-        $reports = Report::with(['reported', 'reporter'])->latest()->get();
+     $dailyApplications = DB::table('application')
+        ->whereDate('created_at', $today)
+        ->count();
+        $totalApplications = DB::table('application')->count();
 
-        $reportPosts = ReportJobPost::with(['reporter', 'reportedJobPost'])->latest()->get();
+     // Group reported users by date
+    $reportedUsers = Report::selectRaw('DATE(created_at) as date, COUNT(*) as count')
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get();
+
+    // Group reported job posts by date
+    $reportedPosts = ReportJobPost::selectRaw('DATE(created_at) as date, COUNT(*) as count')
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get();
         
 
 // Calculate total earnings
-            $totalEarnings = SubscriptionPaymentHistory::sum('amount'); // Adjust column if needed
+            // Adjust column if needed
 
             // Calculate daily earnings for the Pie Chart
             $dailyEarnings = SubscriptionPaymentHistory::selectRaw('DATE(created_at) as day, SUM(amount) as total')
@@ -84,13 +86,25 @@ class AdminDashboardController extends Controller
         'days' => $days,
         'dailyEarnings' => $earnings,
     ],
-    'applicationProps' => $application->count(),
-    'jobProps' => JobPost::count(), // Send count instead of a single job
+    'applicationProps' => [
+            'total' => $totalApplications,
+            'daily' => $dailyApplications,
+        ],
+    'jobProps' => [
+            'total' => $totalJobs,
+            'daily' => $dailyJobs,
+        ], // Send count instead of a single job
     'dateProps' => $date,
-    'workers' => $workers->count(), // Send count instead of list
-    'employers' => $employers->count(),
-    'reportedUsers' => $reports->count(),
-    'reportedPosts' => $reportPosts->count(),
+    'workerProps' => [
+            'total' => $totalWorkers,
+            'daily' => $dailyWorkers,
+        ], // Send count instead of list
+    'employerProps' => [
+            'total' => $totalEmployers,
+            'daily' => $dailyEmployers,
+        ],
+     'reportedUsersData' => $reportedUsers,
+        'reportedPostsData' => $reportedPosts,
 ]);
 }
 

@@ -3,8 +3,8 @@ import { computed } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 
 const links = [
-  { name: "Job Seeking", url: "/jobseeking" },
-  { name: "Health & Awareness", url: "/health" },
+  { name: "Job Seeking", url: "/health" },
+  { name: "Health & Awareness", url: "/jobseeking" },
   { name: "Creative & Design", url: "/creative" },
   { name: "Technology & IT", url: "/technology" },
   { name: "Business & Marketing", url: "/business" },

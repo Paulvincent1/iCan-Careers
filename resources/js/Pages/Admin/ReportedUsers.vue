@@ -153,7 +153,7 @@ const toggleBan = (reportedUserId) => {
                 :labels="reportGraph.labels"
             />
             <StatsCard
-                title="No. of Reporter Users"
+                title="No. of Reporters"
                 :value="reportedUsers.length"
                 :icon="faUsers"
                 :chartData="reportGraph.data"

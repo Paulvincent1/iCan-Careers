@@ -30,38 +30,60 @@ const courses = ref([
   {
     id: 1,
     category: "health",
-    title: "Disability Hiring Playbook",
-    description: `Play video to learn more about disability hiring. <a href="https://www.youtube.com/watch?v=PgFhjcu_SLM" target="_blank" class="text-blue-500 underline">Watch here</a>`,
-    image: "https://www.youtube.com/watch?v=PgFhjcu_SLM",
+    title: "Create Your Employer Profile",
+    description: `"Create your job profile to post openings." <a href="https://www.youtube.com/watch?v=eBFkca9Hi-I" target="_blank" class="text-blue-500 underline">Watch here</a>`,
+    image: "https://www.youtube.com/watch?v=eBFkca9Hi-I",
   },
   {
     id: 2,
     category: "health",
-    title: "Yoga Full Body Stretch",
-    description: `Yoga is a great way to relax and stretch your body. <a href="https://www.youtube.com/watch?v=4pKly2JojMw" target="_blank" class="text-blue-500 underline">Watch here</a>`,
-    image: "https://www.youtube.com/watch?v=4pKly2JojMw",
+    title: "Accepted, Under Review, Rejected",
+    description: `Applications Management. <a href="https://www.youtube.com/watch?v=DOrI7YjLavw" target="_blank" class="text-blue-500 underline">Watch here</a>`,
+    image: "https://www.youtube.com/watch?v=DOrI7YjLavw",
   },
   {
     id: 3,
     category: "health",
-    title: "Interview Preparation",
-    description: "Tips and tricks to ace your job interview.<a href='https://www.youtube.com/watch?v=LCWr-TJrc0k' target='_blank' class='text-blue-500 underline'>Watch here</a>",
-    image: "https://www.youtube.com/watch?v=LCWr-TJrc0k",
+    title: "Apply Job Employer",
+    description: "How to Appy Jobs.<a href='https://www.youtube.com/watch?v=eejACD9tE4E' target='_blank' class='text-blue-500 underline'>Watch here</a>",
+    image: "https://www.youtube.com/watch?v=eejACD9tE4E",
   },
   {
     id: 4,
     category: "health",
-    title: "Supervisor Health & Safety Awareness Training",
-    description: "Tips and tricks to ace your job interview.",
-    image: "https://www.youtube.com/watch?v=S_GF3Kf3Nrs",
+    title: "Buying plans to accept worker",
+    description: "Pricing Management<a href='https://www.youtube.com/watch?v=MGQqF_V69pM' target='_blank' class='text-blue-500 underline'>Watch here</a>",
+    image: "https://www.youtube.com/watch?v=MGQqF_V69pM",
   },
   {
     id: 5,
     category: "health",
-    title: "Mental Health & Wellbeing",
-    description: "Tips and tricks to ace your job interview.<a href='https://www.iamlearningcontent.com/get-started' target='_blank' class='text-blue-500 underline'>Watch here</a>",
-    image: "https://www.youtube.com/watch?v=DAglPr_kaeU&t=36s",
+    title: "Create Invoice Worker",
+    description: "Generate invoices for workers to track payments.<a href='https://www.youtube.com/watch?v=jdnHHJT6z4o' target='_blank' class='text-blue-500 underline'>Watch here</a>",
+    image: "https://www.youtube.com/watch?v=jdnHHJT6z4o",
   },
+  {
+    id: 6,
+    category: "health",
+    title: "Paying the Worker Employer",
+    description: "Enable employers to process and manage worker payments.<a href='https://www.youtube.com/watch?v=DDHhOSjMGgE' target='_blank' class='text-blue-500 underline'>Watch here</a>",
+    image: "https://www.youtube.com/watch?v=L9gyoljHr5c",
+  },
+  {
+    id: 7,
+    category: "health",
+    title: "PayoutWorker",
+    description: "Facilitate seamless and secure payouts for workers.<a href='https://www.youtube.com/watch?v=9wf--mgQ8bQ' target='_blank' class='text-blue-500 underline'>Watch here</a>",
+    image: "https://www.youtube.com/watch?v=9wf--mgQ8bQ",
+  },
+  {
+    id: 7,
+    category: "health",
+    title: "Posting a Job Employer",
+    description: "Create and publish job postings to connect with qualified workers.<a href='https://www.youtube.com/watch?v=Jpdh9nJU9bI' target='_blank' class='text-blue-500 underline'>Watch here</a>",
+    image: "https://www.youtube.com/watch?v=Jpdh9nJU9bI",
+  },
+
 
 ]);
 
@@ -101,9 +123,9 @@ const courses3 = ref([
   {
     id: 2,
     category: "job",
-    title: "Resume Writing 101",
+    title: "IT Support Training",
     description: "Create a professional resume to get noticed.",
-    image: "https://www.youtube.com/watch?v=4SyKG7ijWjI",
+    image: "https://www.youtube.com/watch?v=4bYduTucOQM&list=PLxo6mf-dQ33hxxhyQ2VctHlxAHnkhxcKL",
   },
   {
     id: 3,
@@ -125,9 +147,9 @@ const courses4 = ref([
   {
     id: 2,
     category: "tech",
-    title: "Resume Writing 101",
+    title: "IT Skills Training for beginners",
     description: "Create a professional resume to get noticed.",
-    image: "https://www.youtube.com/watch?v=4SyKG7ijWjI",
+    image: "https://www.youtube.com/watch?v=On6dsIp5yw0",
   },
   {
     id: 3,
@@ -150,9 +172,9 @@ const courses5 = ref([
   {
     id: 2,
     category: "business",
-    title: "Resume Writing 101",
-    description: "Create a professional resume to get noticed.",
-    image: "https://www.youtube.com/watch?v=4SyKG7ijWjI",
+    title: "Digital Marketing",
+    description: "The digital marketing concept has its roots in traditional marketing methods but has a lot of online-specific aspects.",
+    image: "https://www.youtube.com/watch?v=bixR-KIJKYM&list=PLEiEAq2VkUULa5aOQmO_al2VVmhC-eqeI",
   },
   {
     id: 3,

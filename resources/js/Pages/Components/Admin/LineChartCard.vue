@@ -59,9 +59,7 @@ watch(() => props.data, updateChartData, { deep: true });
             <div>
                 <h2 class="text-md font-semibold text-gray-700">{{ title }}</h2>
 
-                <p class="text-3xl font-bold text-gray-900">
-                    {{ data.length ? data[data.length - 1].value : 0 }}
-                </p>
+                
             </div>
             <div class="flex items-center space-x-3">
                 <!-- Link placed beside the title and count -->

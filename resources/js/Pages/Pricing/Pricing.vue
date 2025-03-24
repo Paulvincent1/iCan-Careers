@@ -20,8 +20,13 @@ const pricingPlans = [
             { text: "Communicate with Workers", strike: true },
             { text: "Hire Workers", strike: true },
             { text: "Create up to 3 jobs per month" },
+            { text: "2 days Job Post approval" },
+            { text: "View Job Applications" },
+            { text: "Bookmark Workers" },
+            { text: "Easypay" },
         ],
-        borderColor: "border-green-500",
+        borderColor: "border-t-green-500 border-t-8 rounded",
+        priceColor: "text-green-500"
     },
     {
         title: "Pro Tier",
@@ -32,9 +37,13 @@ const pricingPlans = [
             { text: "Communicate with Workers" },
             { text: "Hire Workers" },
             { text: "Create up to 3 jobs per month" },
-            { text: "Contact 75 workers / month" },
+            { text: "Instant Job Approvals" },
+            { text: "View Job Applications" },
+            { text: "Bookmark Workers" },
+            { text: "Easypay" },
         ],
-        borderColor: "border-blue-500",
+        borderColor: "border-t-blue-500 border-t-8 rounded",
+        priceColor: "text-blue-500"
     },
     {
         title: "Premium Tier",
@@ -45,11 +54,14 @@ const pricingPlans = [
             { text: "Communicate with Workers" },
             { text: "Hire Workers" },
             { text: "Create up to 3 jobs per month" },
-            { text: "Contact 75 workers / month" },
-            { text: "Workers Mentoring System", link: true },
-            { text: "Unlimited Background Data Check", link: true },
+            { text: "Instant Job Approval" },
+            { text: "View Job Applications" },
+            { text: "Bookmark Workers" },
+            { text: "Easypay" },
+            { text: "Unlimited Background Data Checks" },
         ],
-        borderColor: "border-red-500",
+        borderColor: "border-t-red-500 border-t-8 rounded",
+        priceColor: "text-red-500"
     },
 ];
 
@@ -141,12 +153,8 @@ function openInvoiceModal(e) {
 }
 
 function closeInvoiceModal() {
-    
-
     isOpenInvoiceModal.value = false;
 }
-
-
 </script>
 
 <template>
@@ -178,18 +186,23 @@ function closeInvoiceModal() {
                 </p>
             </div>
 
-            <div class="my-5 grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3">
-                <PricingPlan
-                    @buyNow="openInvoiceModal"
-                    v-for="(plan, index) in pricingPlans"
-                    :key="index"
-                    :title="plan.title"
-                    :subtitle="plan.subtitle"
-                    :price="plan.price"
-                    :features="plan.features"
-                    :borderColor="plan.borderColor"
-                    :tag="plan.tag"
-                />
+            <div class="mx-auto my-10 max-w-screen-lg">
+                <div
+                    class="grid grid-cols-1 justify-center gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                >
+                    <PricingPlan
+                        @buyNow="openInvoiceModal"
+                        v-for="(plan, index) in pricingPlans"
+                        :key="index"
+                        :title="plan.title"
+                        :subtitle="plan.subtitle"
+                        :price="plan.price"
+                        :features="plan.features"
+                        :borderColor="plan.borderColor"
+                        :priceColor="plan.priceColor"
+                        :tag="plan.tag"
+                    />
+                </div>
             </div>
         </div>
 

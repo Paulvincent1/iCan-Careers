@@ -28,6 +28,10 @@ onMounted(() => {
         document.documentElement.classList.toggle("dark", darkMode.value);
     });
 });
+// Compute the correct image source based on dark mode
+const logoSrc = computed(() =>
+    darkMode.value ? "/assets/4.png" : "/assets/2.png"
+);
 const textSrc = computed(() =>
     darkMode.value ? "text-white" : "text-gray-900",
 );
@@ -97,6 +101,7 @@ onUnmounted(() => {
                 
             ]"
         >
+        
             <!-- Sidebar Toggle Button (Mobile) -->
             <div class="flex-start flex md:hidden lg:hidden">
                 <button
@@ -117,6 +122,15 @@ onUnmounted(() => {
                         ></path>
                     </svg>
                 </button>
+            </div>
+
+             <div :class="['lg:hidden md:hidden flex items-center ', darkMode ? '' : '']">
+                <!-- Logo (Hidden on Mobile, Centered on Larger Screens) -->
+                 <div :class="['ms-2 mt-2 flex justify-center']">
+                     <Link href="/admin">
+                    <img :src="logoSrc" alt="Logo" class="h-10 w-[100px] object-contain md:h-13 lg:h-[50px]" />
+                     </Link>
+                 </div>
             </div>
 
             <!-- Profile & Notifications -->
@@ -181,7 +195,7 @@ onUnmounted(() => {
                                         class="h-full w-full rounded-full object-cover"
                                         :src="
                                             notification.data.image ??
-                                            '/assets/images.png'
+                                            '/assets/profile_placeholder.jpg'
                                         "
                                         alt=""
                                     />
