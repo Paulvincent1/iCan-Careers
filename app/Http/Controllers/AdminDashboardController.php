@@ -24,7 +24,7 @@ class AdminDashboardController extends Controller
     public function index()
 {
     $salary = Salary::sum('total_earnings'); // Total earnings
-     
+
     $date = EmployerSubscription::find(1);
  // Get today's date
     $today = \Carbon\Carbon::today();
@@ -36,7 +36,7 @@ class AdminDashboardController extends Controller
     $dailyWorkers = User::whereHas('roles', function ($query) {
         $query->where('name', 'Senior')->orWhere('name', 'PWD');
     })->whereDate('created_at', $today)->count();
-       
+
     $totalEmployers = EmployerProfile::with('user')
     ->whereHas('user.roles', function ($query) {
             $query->where('name', '!=', 'Admin');
@@ -64,7 +64,7 @@ class AdminDashboardController extends Controller
         ->groupBy('date')
         ->orderBy('date')
         ->get();
-        
+
 
 // Calculate total earnings
             // Adjust column if needed
@@ -157,9 +157,9 @@ class AdminDashboardController extends Controller
     public function toggleVerification($id)
     {
         $worker = User::findOrFail($id);
-      
+
         if(!$worker->verified){
-          
+
             $worker->notify(new WorkerVerificationNotification(worker:$worker,verified:true));
             broadcast(new WorkerVerificationNotification(worker:$worker,verified:true));
 
@@ -370,10 +370,12 @@ class AdminDashboardController extends Controller
             $earnings = $dailyEarnings->pluck('total');
 
                 // Count employers with at least one subscription
-    $subscribedEmployersCount = User::whereHas('subscriptionPaymentHistory')->count();
-    
+    $subscribedEmployersCount = SubscriptionPaymentHistory::query()
+    ->with('employer')->count();
+
     // Count employers without any subscriptions
-    $nonSubscribedEmployersCount = User::doesntHave('subscriptionPaymentHistory')->count();
+    $nonSubscribedEmployersCount = SubscriptionPaymentHistory::query()
+    ->with('employer')->count();
 
             return Inertia::render('Admin/PaymentHistory', [
                 'subscriptionPaymentHistoryProps' => $subscriptionPaymentHistory,
@@ -384,7 +386,6 @@ class AdminDashboardController extends Controller
                 ],
                  'subscribedUsersData' => [
             ['name' => 'Subscribed Employers', 'value' => $subscribedEmployersCount],
-            ['name' => 'Non-Subscribed Employers', 'value' => $nonSubscribedEmployersCount],
             ]
             ]);
         }
@@ -429,7 +430,7 @@ class AdminDashboardController extends Controller
         }
 
         //employer
-        if($id->roles()->first()->name === 'Employer'){  
+        if($id->roles()->first()->name === 'Employer'){
 
             if(!$id->employerProfile){
                 return redirect()->back();
@@ -439,7 +440,7 @@ class AdminDashboardController extends Controller
             $jobsPosted = JobPost::where('employer_id', $id->id)->get();
             $business = $id->employerProfile?->businessInformation;
             $subscription = EmployerSubscription::where('employer_id', $id->id)->first();
-    
+
             return inertia('Employer/Profile', [
             "user" => $id,
             'employerProfileProp' => $employerProfile,
@@ -451,7 +452,7 @@ class AdminDashboardController extends Controller
             'adminVisit' => true,
             ]);
         }
-        
+
 
     }
 }

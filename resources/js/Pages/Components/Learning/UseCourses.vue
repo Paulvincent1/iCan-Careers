@@ -196,15 +196,15 @@ const courses6 = ref([
   {
     id: 2,
     category: "education",
-    title: "Resume Writing 101",
+    title: "Excel Beginner Tutorial",
     description: "Create a professional resume to get noticed.",
-    image: "https://www.youtube.com/watch?v=4SyKG7ijWjI",
+    image: "https://www.youtube.com/watch?v=310z5K14JXw&list=PLoyECfvEFOjbdwpIOtm_8PFzB_CPAD2_H",
   },
   {
     id: 3,
     category: "education",
     title: "Job Readiness Skills",
-    description: "Learn the skills needed to get a job.<a href='https://www.youtube.com/watch?v=-vk-99seC_I&list=PLje7yAIv6jIn-JEdT2mcyLg8aeinxELlN' target='_blank' class='text-blue-500 underline'>Watch here</a>",
+    description: "Microsoft’s spreadsheet application used to organize and analyze data.<a href='https://www.youtube.com/watch?v=-vk-99seC_I&list=PLje7yAIv6jIn-JEdT2mcyLg8aeinxELlN' target='_blank' class='text-blue-500 underline'>Watch here</a>",
     image: "https://www.youtube.com/watch?v=-vk-99seC_I&list=PLje7yAIv6jIn-JEdT2mcyLg8aeinxELlN",
   },
 

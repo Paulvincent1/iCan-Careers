@@ -413,7 +413,7 @@ const formatCurrency =
                                     <img
                                         :src="
                                             chatHead.user.profile_img ??
-                                            '/assets/images.png'
+                                            '/assets/profile_placeholder.jpg'
                                         "
                                         alt=""
                                         class="h-full w-full rounded-full"
@@ -839,7 +839,7 @@ const formatCurrency =
                                                 />
                                             </td>
                                             <td class="p-2">
-                                                Lorem ipsum dolor lorem
+                                                {{job.job_title}}
                                             </td>
                                             <td class="p-2">
                                                 <Link

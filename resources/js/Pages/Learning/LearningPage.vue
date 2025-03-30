@@ -27,7 +27,7 @@ const preview = ref([]);
 
 const tabs = [
     { id: "all", label: "All Courses" },
-    { id: "health", label: "Health and Wellness" },
+    { id: "jobseeking", label: "Jobseeking" },
     { id: "creative", label: "Creative Arts and Hobbies" },
     { id: "job", label: "Job-Ready Skills" },
     { id: "tech", label: "Technology And IT" },
@@ -66,7 +66,7 @@ const filteredCourses = computed(() => {
         ...preview.value,
     ];
 
-    if (activeTab.value === "health") {
+    if (activeTab.value === "jobseeking") {
         allCourses = courses.value;
     } else if (activeTab.value === "creative") {
         allCourses = courses2.value;
@@ -97,7 +97,7 @@ const filteredCourses = computed(() => {
 
 // 🔄 Dynamic title based on the selected tab
 const courseTitle = computed(() => {
-    if (activeTab.value === "health") return "Health and Wellness";
+    if (activeTab.value === "jobseeking") return "Jobseeking";
     if (activeTab.value === "creative") return "Creative Arts and Hobbies";
     if (activeTab.value === "job") return "Job-Ready Skills";
     if (activeTab.value === "tech") return "Technology And IT";
@@ -127,7 +127,7 @@ const courseTitle = computed(() => {
                             <Link
                                 :href="route('learning.health')"
                                 class="font-bold hover:text-blue-400"
-                                >health and awareness, </Link
+                                >jobseeking, </Link
                             >
                             <Link
                                 :href="route('learning.creative')"
@@ -135,16 +135,12 @@ const courseTitle = computed(() => {
                                 >creative and design,</Link
                             >
                             and
-                            <Link
-                                :href="route('learning.jobseeking')"
-                                class="font-bold hover:text-blue-400"
-                                >job seeking-powered</Link
-                            >
+
                             by a platform that connects you to real
                             opportunities.
                         </p>
                         <div class="flex flex-col">
-                        <p class="mt-6">  
+                        <p class="mt-6">
                             <Link
                                 class="rounded-3xl bg-[#fa8334] px-7 py-2 font-medium text-white hover:bg-gray-600"
                                 :href="route('pricing')"
@@ -154,7 +150,7 @@ const courseTitle = computed(() => {
                     </div>
                     </div>
 
-                    
+
                 </div>
 
                 <div

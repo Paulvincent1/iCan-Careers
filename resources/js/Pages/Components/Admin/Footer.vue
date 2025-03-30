@@ -6,11 +6,12 @@ import {
     faYoutube,
     faLinkedin,
     faTwitter,
+    faGithub
 } from "@fortawesome/free-brands-svg-icons";
 import { Link } from "@inertiajs/vue3";
 
 // Add the icons only for this component
-library.add(faFacebook, faYoutube, faLinkedin, faTwitter);
+library.add(faFacebook, faYoutube, faLinkedin, faTwitter,faGithub);
 </script>
 
 <template>
@@ -107,6 +108,17 @@ library.add(faFacebook, faYoutube, faLinkedin, faTwitter);
                     >
                         <font-awesome-icon
                             :icon="['fab', 'youtube']"
+                            size="lg"
+                        />
+                    </a>
+                    <a
+                        href="https://github.com/Paulvincent1/iCan-Careers.git"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-gray-400 hover:text-white"
+                    >
+                        <font-awesome-icon
+                            :icon="['fab', 'github']"
                             size="lg"
                         />
                     </a>

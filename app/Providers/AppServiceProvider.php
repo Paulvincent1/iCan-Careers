@@ -13,15 +13,15 @@ use Illuminate\Support\Facades\Auth;
 class AppServiceProvider extends ServiceProvider
 {
 
-    
+
     /**
      * Register any application services.
      */
     public function register(): void
     {
-     
+
        // set this for production when you need https.
-    //    $this->app['request']->server->set('HTTPS', true);
+       $this->app['request']->server->set('HTTPS', true);
         //check that app is local
         if ($this->app->isLocal()) {
         //if local register your services you require for development
@@ -70,5 +70,5 @@ class AppServiceProvider extends ServiceProvider
             ]
         ]);
     }
-    
+
 }

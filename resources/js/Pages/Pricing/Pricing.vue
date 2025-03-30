@@ -25,7 +25,7 @@ const pricingPlans = [
             { text: "Bookmark Workers" },
             { text: "Easypay" },
         ],
-        borderColor: "border-t-green-500 border-t-8 rounded",
+        borderColor: "border-green-500 border-t-8 rounded",
         priceColor: "text-green-500"
     },
     {
@@ -42,7 +42,7 @@ const pricingPlans = [
             { text: "Bookmark Workers" },
             { text: "Easypay" },
         ],
-        borderColor: "border-t-blue-500 border-t-8 rounded",
+        borderColor: "border-blue-500 border-t-8 rounded",
         priceColor: "text-blue-500"
     },
     {
@@ -60,7 +60,7 @@ const pricingPlans = [
             { text: "Easypay" },
             { text: "Unlimited Background Data Checks" },
         ],
-        borderColor: "border-t-red-500 border-t-8 rounded",
+        borderColor: "border-red-500 border-t-8 rounded",
         priceColor: "text-red-500"
     },
 ];
