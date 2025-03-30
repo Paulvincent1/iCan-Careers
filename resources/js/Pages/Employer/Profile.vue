@@ -361,7 +361,7 @@ function submitReport(reason) {
                                     "
                                     v-model:hourPay="workerProfile.hour_pay"
                                     v-model:monthPay="workerProfile.month_pay"
-                                /> 
+                                />
                                 <button
                                     class="rounded bg-green-500 p-1 text-white"
                                 >
@@ -515,10 +515,7 @@ function submitReport(reason) {
                             <label class="text-sm">Employer Type:</label>
                             <p>{{ employerProfile.employer_type }}</p>
                         </div>
-                        <div class="mb-2">
-                            <label class="text-sm">Website / Account:</label>
-                            <!-- <p>{{ employerProfile.website }}</p> -->
-                        </div>
+                        
                     </div>
 
                     <form

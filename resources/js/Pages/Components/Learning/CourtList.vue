@@ -24,7 +24,7 @@ onMounted(async () => {
       ...(courseComponent.value.courses6 || []),
       ...(courseComponent.value.courses7 || []),
       ...(courseComponent.value.courses8 || []),
-      
+
     ];
   }
 });
@@ -50,7 +50,7 @@ const playVideo = (course) => {
 <template>
   <UseCourses ref="courseComponent" /> <!-- Fetch courses -->
 
-  <div class="overflow-y-auto max-h-[500px] p-4   space-y-4 p-5">
+  <div class="  space-y-4 p-5">
     <!-- Course List -->
     <div v-for="course in filteredCourses" :key="course.id"
       class="flex items-center bg-white rounded-lg shadow-md p-4 cursor-pointer transition-transform transform hover:scale-105"

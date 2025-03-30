@@ -652,7 +652,7 @@ watch(
                                         class="h-full w-full"
                                         :src="
                                             userDirectMessageProps.profile_img ??
-                                            '/assets/images.png'
+                                            '/assets/profile_placeholder.jpg'
                                         "
                                         alt=""
                                     />

@@ -62,7 +62,7 @@ class WorkerBasicInfoController extends Controller
                 'address' => $request->address
             ]);
         }
-        
+
         if($request->input('website_link')){
 
             $user->workerBasicInfo()->update([

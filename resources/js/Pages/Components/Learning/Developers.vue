@@ -26,7 +26,7 @@ const cards = ref([
     {
         title: "Draven Troy Coloma",
         description: "Wordsmith Document Writer",
-        image: "/assets/Draven.jpg",
+        image: "/assets/Draven_prof.jpg",
         backText: `"I am a Documentation Expert of Tarlac and Perfectionist. ${plainText}`, // Use backticks here
     },
     {

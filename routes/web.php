@@ -141,6 +141,8 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::cla
     Route::put('/applicants/{pivotId}', [EmployerDashboardController::class, 'updateStatus'])->name('job.applicants.update.status');
     Route::put('/applicants/{pivotId}/add-interview-schedule', [EmployerDashboardController::class, 'addInterview'])->name('job.applicants.addinterview');
 
+    Route::put('/myprofile/updateBasicInfoEmployer', [WorkerBasicInfoController::class, 'updateEmployer'])->name('update.basicInfoEmployer.put');
+
     // fire worker
     Route::put('/fire-worker/{workerId}', [JobPostController::class, 'fireWorker'])->name('fireworker');
 });
