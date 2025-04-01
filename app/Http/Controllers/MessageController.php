@@ -22,14 +22,14 @@ class MessageController extends Controller
 
         if($request->user()->roles()->first()->name === 'Employer'){
             if(!Gate::allows('employer-profile-check')) {
-                return redirect()->route('reate.profile.employer');
+                return redirect()->route('create.profile.employer');
 
             }
         }
         if($request->user()->roles()->first()->name != 'Employer'){
             if(!Gate::allows('worker-profile-check')){
                 return redirect()->route('create.profile');
-            }    
+            }
         }
 
         // this code is used when theres a query params user in the url.
@@ -127,7 +127,7 @@ class MessageController extends Controller
             'profile_photo_path' => $user->profile_img ?? null, // Ensure it's included
         ], 'firstMessageChatHeadProps' => $firstMessageChatHead, 'chatHeadProps' => $chatHeads, 'messageProps' => $messages, 'userDirectMessageProps' => $userDirectMessage]);
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
