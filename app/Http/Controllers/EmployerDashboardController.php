@@ -25,7 +25,7 @@ class EmployerDashboardController extends Controller
 
         $hiredWorkers = $jobs->pluck('employedWorkers')->flatten()->unique('id');
         // dd($hiredWorkers);
-        $subscription = EmployerSubscription::where('employer_id', $user->id)->first(); 
+        $subscription = EmployerSubscription::where('employer_id', $user->id)->first();
 
         $invoices =  $user->employerInvoices()->with('worker')->get();
         // dd($invoices);
@@ -82,7 +82,7 @@ class EmployerDashboardController extends Controller
 
         return inertia('Employer/Dashboard',['user' => [
             'name' => $user->name,
-            
+
             'profile_photo_path' => $user->profile_img ?? null, // Ensure it's included
         ],'subscriptionProps' => $subscription,'jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices, 'successMessage' => session()->get('successMessage'), 'chatHeadsProps' => $chatHeads]);
     }
