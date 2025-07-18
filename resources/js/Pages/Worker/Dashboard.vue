@@ -839,7 +839,7 @@ const formatCurrency =
                                                 />
                                             </td>
                                             <td class="p-2">
-                                                {{job.job_title}}
+                                                {{ job.job_title }}
                                             </td>
                                             <td class="p-2">
                                                 <Link
@@ -877,11 +877,18 @@ const formatCurrency =
                             </div>
                         </div>
                         <div class="col-span-1 rounded-lg bg-white p-2">
-                            <p
-                                class="mb-3 border-b-[1px] border-gray-100 p-2 text-lg font-bold text-[#171816]"
+                            <div
+                                class="mb-3 flex items-center justify-between border-b-[1px] border-gray-100 p-2"
                             >
-                                Applied Jobs
-                            </p>
+                                <p class="text-lg font-bold text-[#171816]">
+                                    Applied Jobs
+                                </p>
+
+                                <Link :href="route('worker.previous.emplyer')" class="underline"
+                                    >Previous Employer
+                                    <i class="bi bi-caret-right"></i
+                                ></Link>
+                            </div>
 
                             <div class="h-[350px] overflow-y-auto">
                                 <table

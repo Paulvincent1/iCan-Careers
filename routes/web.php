@@ -95,6 +95,10 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::clas
     Route::post('/send-invoice', [WorkerDashboard::class, 'sendInvoice'])->name('worker.send.invoice');
 
 
+    //prev employers
+    Route::get('/prev-employers',[WorkerDashboard::class,'prevEmployers'])->name('worker.previous.emplyer');
+
+
 
     Route::get('/myprofile', [WorkerProfileController::class, 'myProfile'])->name('worker.profile');
     Route::put('/myprofile/updateprofile', [WorkerProfileController::class, 'updateProfile'])->name('update.profile.put');
