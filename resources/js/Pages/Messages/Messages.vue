@@ -558,14 +558,14 @@ watch(
                         <div class="flex items-center gap-2 border-b p-4">
                             <div class="h-10 w-10">
                                 <img
-                                :src="
-                                    user.profile_photo_path
-                                        ? user.profile_photo_path
-                                        : 'assets/profile_placeholder.jpg'
-                                "
-                                alt="User Profile"
-                                class="h-full w-full rounded-full object-cover"
-                            />
+                                    :src="
+                                        user.profile_photo_path
+                                            ? user.profile_photo_path
+                                            : 'assets/profile_placeholder.jpg'
+                                    "
+                                    alt="User Profile"
+                                    class="h-full w-full rounded-full object-cover"
+                                />
                             </div>
                             <div>
                                 <p>
@@ -620,10 +620,10 @@ watch(
                             <div class="h-12 w-12">
                                 <img
                                     :src="
-                                            chatHead.user.profile_img ??
-                                            '/assets/profile_placeholder.jpg'
-                                        "
-                                        alt=""
+                                        chatHead.user.profile_img ??
+                                        '/assets/profile_placeholder.jpg'
+                                    "
+                                    alt=""
                                     class="h-full w-full rounded-full"
                                 />
                             </div>

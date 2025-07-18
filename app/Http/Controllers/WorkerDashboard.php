@@ -185,6 +185,14 @@ class WorkerDashboard extends Controller
         ]);
     }
 
+    public function prevEmployers()
+    {
+        $user = Auth::user();
+
+        return inertia('Worker/PreviousEmployer',['jobsProps' =>  $user->myJobs->load('employer')]);
+
+    }
+
     public function sendInvoice(Request $request){
 
         $user = Auth::user();

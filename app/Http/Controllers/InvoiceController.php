@@ -21,7 +21,7 @@ class InvoiceController extends Controller
 
     public function __construct(public InvoiceService $invoiceService)
     {
-        
+
     }
     /**
      * Display a listing of the resource.
@@ -52,7 +52,7 @@ class InvoiceController extends Controller
 
         if($request->header('X-CALLBACK-TOKEN') === env('XENDIT_WEBHOOK_KEY')){
 
-     
+
 
             if($employerSubscriptionInvoice = EmployerSubscriptionInvoice::where('external_id', $request['external_id'])->with('employer')->first()){
 
@@ -63,15 +63,15 @@ class InvoiceController extends Controller
 
                     if($employer->employerSubscription->expiry_date){
                         if(Carbon::parse($employer->employerSubscription->expiry_date)->isBefore(Carbon::now())){
- 
+
                          $employer->employerSubscription->update([
                              'subscription_type'=> 'Pro',
                              'start_date' => Carbon::now(),
                              'expiry_date' => Carbon::now()->addMonth(),
                          ]);
-     
+
                         }else{
-                     
+
                             //if on going
                          $employer->employerSubscription->update([
                              'subscription_type'=> 'Pro',
@@ -79,7 +79,7 @@ class InvoiceController extends Controller
                              'expiry_date' => Carbon::parse($employer->employerSubscription->expiry_date)->addMonth(),
                          ]);
 
- 
+
                         }
                     }else{
 
@@ -88,7 +88,7 @@ class InvoiceController extends Controller
                             'start_date' => Carbon::now(),
                             'expiry_date' => Carbon::now()->addMonth(),
                         ]);
-    
+
                     }
 
 
@@ -100,7 +100,7 @@ class InvoiceController extends Controller
                         Salary::create([
                             'total_earnings'=> 3797.4504,
                          ]);
-    
+
                     }
 
 
@@ -108,16 +108,16 @@ class InvoiceController extends Controller
                         'amount' => 3797.4504,
                         'subscription_type' => 'Pro',
                     ]);
-                    
-                  
+
+
                     $employerSubscriptionInvoice->delete();
 
                     DB::beginTransaction();
 
                     try {
-    
+
                         $externalIdProTier =  'INV-'.uniqid();
-                    
+
                         // creating pro tier invoice
                         $proTierInvoice = $this->invoiceService
                         ->createInvoice(
@@ -129,8 +129,8 @@ class InvoiceController extends Controller
                             'rate' => 3999,
                             'hours' => 1,
                             ]
-                          ],                  
-                        duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0)) 
+                          ],
+                        duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0))
                         );
     
                         $employer->employerSubscriptionInvoices()->create([
@@ -141,16 +141,16 @@ class InvoiceController extends Controller
                             'subscription_type' => 'Pro',
                             'duration' => now(),
                         ]);
-                    
+
                         DB::commit();
-    
+
                     }catch(Exception $e){
-    
+
                         DB::rollBack();
                         dd($e->getMessage());
-    
+
                     }
-    
+
                 }
 
                 if($employerSubscriptionInvoice->subscription_type === 'Premium'){
@@ -163,7 +163,7 @@ class InvoiceController extends Controller
                             'start_date' => Carbon::now(),
                             'expiry_date' => Carbon::now()->addYear(),
                         ]);
-    
+
                        }else{
                             // if on going
                         $employer->employerSubscription->update([
@@ -175,7 +175,7 @@ class InvoiceController extends Controller
                        }
                     }else{
 
-                        
+
                         $employer->employerSubscription->update([
                             'subscription_type'=> 'Premium',
                             'start_date' => Carbon::now(),
@@ -183,11 +183,11 @@ class InvoiceController extends Controller
                         ]);
                     }
 
-                    
+
                     if($salary = Salary::find(1)){
 
                         $salary->increment('total_earnings',5411.7704);
-                        
+
                     }else{
                         Salary::create([
                             'total_earnings'=> 5411.7704,
@@ -204,10 +204,10 @@ class InvoiceController extends Controller
                     DB::beginTransaction();
 
                     try {
-    
+
                         $externalIdPremiumTier =  'INV-'.uniqid();
-        
-            
+
+
                             // creating premium tier invoice
                         $premiumTierInvoice = $this->invoiceService
                         ->createInvoice(
@@ -220,9 +220,9 @@ class InvoiceController extends Controller
                             'hours' => 1,
                             ]
                           ],
-                        duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0))           
+                        duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0))
                         );
-                     
+
                         $employer->employerSubscriptionInvoices()->create([
                             'external_id' =>  $externalIdPremiumTier,
                             'invoice_id' =>  $premiumTierInvoice->getId(),
@@ -231,14 +231,14 @@ class InvoiceController extends Controller
                             'subscription_type' => 'Premium',
                             'duration' => now(),
                         ]);
-    
+
                         DB::commit();
-    
+
                     }catch(Exception $e){
-    
+
                         DB::rollBack();
                         dd($e->getMessage());
-    
+
                     }
 
 

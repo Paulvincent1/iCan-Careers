@@ -1,7 +1,13 @@
 <script setup>
 import { Link, router, usePage } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
-import { onMounted, ref, computed, onBeforeUnmount } from "vue";
+import {
+    onMounted,
+    ref,
+    computed,
+    onBeforeUnmount,
+    getCurrentInstance,
+} from "vue";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 
