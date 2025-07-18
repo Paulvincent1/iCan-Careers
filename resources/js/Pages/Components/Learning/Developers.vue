@@ -20,7 +20,7 @@ const cards = ref([
     {
         title: "Lloyd Jacky Mirasol",
         description: "Enthusiast Game Developer",
-        image: "/assets/Mirasol.jpg",
+        image: "/assets/Jacky.jpg",
         backText: `${plainTextLloyd}`,
     },
     {
