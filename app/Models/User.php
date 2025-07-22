@@ -97,6 +97,8 @@ class User extends Authenticatable
         ->withTimestamps();
     }
 
+    
+
     public function workerInvoices(){
         return $this->hasMany(Invoice::class,'worker_id');
     }
