@@ -160,6 +160,30 @@ class EmployerDashboardController extends Controller
         return redirect()->back()->with('message','Successfully updated.');
     }
 
+        public function prevWorkers()
+    {
+        $user = Auth::user();
+
+        // Eager load 'employedWorkers' on each job post
+        $jobPosts = $user->employerJobPosts()->with('employedWorkers')->get();
+
+        $workers = collect();
+
+        foreach ($jobPosts as $jobPost) {
+            foreach ($jobPost->employedWorkers as $worker) {
+                // Include pivot data and job_post_id
+                $worker->job_post_id = $jobPost->id;
+                $worker->pivot = $worker->pivot; // make sure it's included
+                $workers->push($worker);
+            }
+        }
+
+        return inertia('Employer/PreviousWorker', [
+            'jobsProps' => $workers,
+        ]);
+    }
+
+
     public function addInterview(Request $request, int $pivotId) {
         // dd( Carbon::parse("$request->date $request->time"));
         $fields = $request->validate(

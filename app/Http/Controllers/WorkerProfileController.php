@@ -262,6 +262,7 @@ class WorkerProfileController extends Controller
         $workerSkills = $applicantId->workerSkills;
         $workerProfile = $applicantId->workerProfile;
 
+        
         return inertia('Worker/Profile',['userProp' => $applicantId,
          'workerSkillsProp' => $workerSkills,
          'workerProfileProp' => $workerProfile,
