@@ -313,7 +313,7 @@ class WorkerProfileController extends Controller
         }
 
 
-        $appliedJobs = $applicantId->appliedJobs()->with([
+        $appliedJobs = $id->appliedJobs()->with([
         'employer.employerProfile.businessInformation'
         ])->get();
 

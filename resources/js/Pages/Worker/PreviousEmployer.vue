@@ -22,8 +22,8 @@ console.log(props.jobsProps);
                         <th class="p-3 text-center font-normal">
                             Employer Name
                         </th>
-                        <th class="p-3 text-center font-normal">Status</th>
-                        <th class="p-3 text-center font-normal">View Profile</th>
+                        <th class="p-3 text-center font-normal">Current</th>
+                        <th class="p-3 text-center font-normal">View</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,8 +43,7 @@ console.log(props.jobsProps);
                                     alt=""
                                 />
                             </div>
-                        </td> 
-                        
+                        </td>
                         <td class="p-3 text-center">{{ job.employer.name }}</td>
                         <td class="p-3">
                             <div
@@ -60,10 +59,10 @@ console.log(props.jobsProps);
                                     v-if="job.pivot.current != 1"
                                     class="font-bold text-white"
                                 >
-                                    Previous
+                                    previous
                                 </p>
                                 <p v-else class="font-bold text-white">
-                                    Current
+                                    current
                                 </p>
                             </div>
                         </td>
@@ -72,7 +71,6 @@ console.log(props.jobsProps);
                                 :href="
                                     route('visit.employer.profile', {
                                         id: job.employer.id,
-
                                     })
                                 "
                             >

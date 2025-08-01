@@ -21,7 +21,9 @@ console.log(props.jobsProps);
                         <th class="p-3 text-center font-normal">Image</th>
                         <th class="p-3 text-center font-normal">Worker Name</th>
                         <th class="p-3 text-center font-normal">Status</th>
-                        <th class="p-3 text-center font-normal">View Profile</th>
+                        <th class="p-3 text-center font-normal">
+                            View Profile
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,8 +62,8 @@ console.log(props.jobsProps);
                         <td class="p-3 text-center">
                             <Link
                                 :href="
-                                    route('visit.worker.profile', {
-                                        applicantId: worker.id,
+                                    route('worker.show.profile', {
+                                        id: worker.id,
                                     })
                                 "
                             >
