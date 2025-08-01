@@ -79,11 +79,32 @@ class WorkerProfileController extends Controller
         $workerProfile = $user->workerProfile;
         $workerBasicInfo = $user->workerBasicInfo;
 
+        $recentReview = $user->receivedReviews()->with('reviewer')->orderBy('created_at', 'desc')->first();
+
+        $sumStars = 0;
+        $receivedReviews = $user->receivedReviews()->get();
+        $reviewCount = $receivedReviews->count();
+
+        $receivedReviews->pluck('star')
+        ->each(function ($e) use(&$sumStars) {
+            $sumStars+=$e;
+        });
+
+        if($sumStars){
+            $averageStar = $sumStars / $reviewCount;
+
+            $roundedAverageStar = round($averageStar,2);
+        }
+
+
+
         return inertia('Worker/Profile',['userProp' => $user,
          'workerSkillsProp' => $workerSkills,
          'workerProfileProp' => $workerProfile,
          'workerBasicInfoProp' => $workerBasicInfo,
          'messageProp' => session()->get('message'),
+         'averageStar'=> $roundedAverageStar?? 0.00,
+         'recentReview' => $recentReview
         ]);
     }
 
@@ -155,10 +176,10 @@ class WorkerProfileController extends Controller
 
             $existingResumePath = $user->workerProfile->resume_path;
 
-            if($existingResumePath){    
+            if($existingResumePath){
                 if(Storage::disk('local')->exists($existingResumePath)){
                     Storage::disk('local')->delete($existingResumePath);
-                }    
+                }
             }
 
             $resumePath = Storage::disk('local')->put('resume', $request->resume);
@@ -247,27 +268,55 @@ class WorkerProfileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $applicantId)
+    public function show(User $id)
     {
 
         $user = Auth::user();
         $isEmployed = null;
         if($user->roles()->first()->name === 'Employer'){
-            $isEmployed = $applicantId->myJobs()->where('current' ,true)->whereHas('employer', function ($query) use($user) {
+            $isEmployed = $id->myJobs()->where('current' ,true)->whereHas('employer', function ($query) use($user) {
                 $query->where('id', $user->id);
-            })->first();
+            })->get();
+        }
+        // dd($isEmployed);
+
+
+        $workerSkills = $id->workerSkills;
+        $workerProfile = $id->workerProfile;
+
+        if($id->id === $user->id){
+            $visitor = false;
+        }else{
+            $visitor = true;
         }
 
-        
-        $workerSkills = $applicantId->workerSkills;
-        $workerProfile = $applicantId->workerProfile;
+        $recentReview = $id->receivedReviews()->with('reviewer')->orderBy('created_at', 'desc')->first();
 
-        return inertia('Worker/Profile',['userProp' => $applicantId,
+        $sumStars = 0;
+        $receivedReviews = $id->receivedReviews()->get();
+        $reviewCount = $receivedReviews->count();
+
+        $receivedReviews->pluck('star')
+        ->each(function ($e) use(&$sumStars) {
+            $sumStars+=$e;
+        });
+
+        if($sumStars){
+            $averageStar = $sumStars / $reviewCount;
+
+            $roundedAverageStar = round($averageStar,2);
+        }
+
+
+
+        return inertia('Worker/Profile',['userProp' => $id,
          'workerSkillsProp' => $workerSkills,
          'workerProfileProp' => $workerProfile,
          'messageProp' => session('message'),
-         'visitor' => true,
-         'currentlyEmployedByMeProp' => $isEmployed
+         'visitor' => $visitor,
+         'currentlyEmployedByMeProp' => $isEmployed,
+         'recentReview' => $recentReview,
+         'averageStar'=> $roundedAverageStar ?? 0.00
         ]);
     }
 

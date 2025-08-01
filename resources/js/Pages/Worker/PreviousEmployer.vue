@@ -1,5 +1,5 @@
 <script setup>
-import { route } from '../../../../vendor/tightenco/ziggy/src/js';
+import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 
 let props = defineProps({
     jobsProps: null,
@@ -10,7 +10,7 @@ console.log(props.jobsProps);
 <template>
     <div class="h-[calc(100vh-4.625rem)] bg-[#eff2f6] pt-5 text-[#171816]">
         <div
-            class="container mx-auto flex h-[90%] flex-col rounded bg-white p-5 xl:max-w-7xl"
+            class="container mx-auto flex h-[90%] flex-col overflow-auto rounded bg-white p-5 xl:max-w-7xl"
         >
             <h2 class="mb-3 text-[20px]">
                 Previous Employers ({{ jobsProps.length }})
@@ -67,9 +67,13 @@ console.log(props.jobsProps);
                             </div>
                         </td>
                         <td class="p-3 text-center">
-                            <Link :href="route('visit.employer.profile',{
-                                'employerId': job.employer.id
-                            })">
+                            <Link
+                                :href="
+                                    route('visit.employer.profile', {
+                                        id: job.employer.id,
+                                    })
+                                "
+                            >
                                 <i class="bi bi-arrow-right"></i>
                             </Link>
                         </td>

@@ -8,6 +8,7 @@ import AddSkillModal from "../Components/Modal/AddSkillModal.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
+import ProfilePage from "../Components/Reviews/ProfilePage.vue";
 
 let props = defineProps({
     userProp: Object,
@@ -21,6 +22,8 @@ let props = defineProps({
     },
     currentlyEmployedByMeProp: null,
     adminVisit: null,
+    averageStar: null,
+    recentReview: null,
 });
 
 let { appContext } = getCurrentInstance();
@@ -250,8 +253,6 @@ let showWebsiteLinkSaveButton = ref(false);
 let showAddressSaveButton = ref(false);
 
 function updateWebsiteLink() {
-    
-
     if (websiteLink.value != "" && websiteLink.value != "N/A") {
         router.put(
             route("update.basicInfo.put"),
@@ -377,11 +378,12 @@ function submitReport(reason) {
     );
 }
 
-function fireWorker() {
+function fireWorker(jobPostId) {
     if (confirm("Are you sure you want to end the contract?")) {
         router.put(
             route("fireworker", {
-                workerId: route().params.applicantId,
+                workerId: route().params.id,
+                jobPostId: jobPostId,
             }),
             {},
             {
@@ -512,13 +514,21 @@ function fireWorker() {
                 <div v-if="isPending">
                     <p class="text-yellow-400">{{ isPending }}</p>
                 </div>
-                <div v-if="currentlyEmployedByMeProp">
-                    <button
-                        @click="fireWorker"
-                        class="rounded-full bg-red-500 px-4 py-1 font-bold text-white"
+                <div
+                    v-if="currentlyEmployedByMeProp"
+                    class="flex flex-col items-center justify-center gap-3"
+                >
+                    <div
+                        v-for="currentJob in currentlyEmployedByMeProp"
+                        :key="currentJob.id"
                     >
-                        End Contract
-                    </button>
+                        <button
+                            @click="fireWorker(currentJob.id)"
+                            class="rounded-full bg-red-500 px-4 py-1 font-bold text-white"
+                        >
+                            {{ currentJob.job_title }} (End Contract)
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -680,117 +690,129 @@ function fireWorker() {
                         />
                     </div>
                 </div>
-                <div
-                    class="self-start rounded-lg bg-white p-8 text-gray-600 shadow"
-                >
-                    <p class="mb-3 text-[20px] font-bold">Basic Information</p>
-                    <div class="mb-2">
-                        <label class="text-sm" for="">Age</label>
-                        <p>{{ age }}</p>
-                        <!-- <input
+
+                <div>
+                    <div
+                        class="mb-5 self-start rounded-lg bg-white p-8 text-gray-600 shadow"
+                    >
+                        <p class="mb-3 text-[20px] font-bold">
+                            Basic Information
+                        </p>
+                        <div class="mb-2">
+                            <label class="text-sm" for="">Age</label>
+                            <p>{{ age }}</p>
+                            <!-- <input
                             type="number"
                             value="2025"
                             class="appearance-none outline-none hover:underline"
                         /> -->
-                    </div>
-                    <div class="mb-2">
-                        <label class="text-sm" for="">Gender</label>
-                        <p>{{ workerProfile.gender }}</p>
-                        <!-- <input
+                        </div>
+                        <div class="mb-2">
+                            <label class="text-sm" for="">Gender</label>
+                            <p>{{ workerProfile.gender }}</p>
+                            <!-- <input
                             type="number"
                             value="2025"
                             class="appearance-none outline-none hover:underline"
                         /> -->
-                    </div>
-                    <div
-                        :class="[
-                            'mb-2',
-                            {
-                                'pointer-events-none': adminVisit || visitor,
-                            },
-                        ]"
-                    >
-                        <label class="text-sm" for="">Address</label>
-                        <input
-                            @focus="showAddressSaveButton = true"
-                            type="text"
-                            v-model="address"
-                            class="outline-none hover:underline"
-                        />
-                        <button
-                            v-show="showAddressSaveButton"
-                            @click="updateAdress()"
-                            class="rounded bg-orange-500 p-1 text-white"
-                        >
-                            Save
-                        </button>
-                    </div>
-                    <div
-                        :class="[
-                            'mb-2',
-                            {
-                                'pointer-events-none': adminVisit || visitor,
-                            },
-                        ]"
-                    >
-                        <label class="text-sm" s for=""
-                            >Website / Account</label
-                        >
-                        <input
-                            @focus="showWebsiteLinkSaveButton = true"
-                            type="text"
-                            v-model="websiteLink"
-                            class="outline-none hover:underline"
-                        />
-                        <button
-                            v-show="showWebsiteLinkSaveButton"
-                            @click="updateWebsiteLink()"
-                            class="rounded bg-orange-500 p-1 text-white"
-                        >
-                            Save
-                        </button>
-                    </div>
-                    <div class="mb-2">
-                        <label class="text-sm" for="">Resume</label>
-                        <label
-                            for="resume"
+                        </div>
+                        <div
                             :class="[
-                                'cursor-pointer',
-                                { 'pointer-events-none': adminVisit },
+                                'mb-2',
+                                {
+                                    'pointer-events-none':
+                                        adminVisit || visitor,
+                                },
                             ]"
                         >
-                            <p
-                                class="hover:underline"
-                                v-if="!workerProfile.resume"
-                            >
-                                N/A
-                            </p>
-                            <div v-else class="flex items-center gap-2">
-                                <p class="hover:underline">
-                                    {{ workerProfile.resume }}
-                                </p>
-                                <a
-                                    target="_blank"
-                                    :href="'/' + workerProfile.resume_path"
-                                    as="button"
-                                    class="pointer-events-auto rounded bg-orange-500 px-2 py-1 text-white"
-                                >
-                                    <i class="bi bi-box-arrow-up-right"></i>
-                                </a>
-                            </div>
+                            <label class="text-sm" for="">Address</label>
                             <input
-                                @change="updateResume"
-                                type="file"
-                                id="resume"
-                                class="hidden"
+                                @focus="showAddressSaveButton = true"
+                                type="text"
+                                v-model="address"
+                                class="outline-none hover:underline"
                             />
-                            <InputFlashMessage
-                                class="mt-3 text-sm"
-                                :message="inputResumeError"
-                                type="error"
-                            ></InputFlashMessage>
-                        </label>
+                            <button
+                                v-show="showAddressSaveButton"
+                                @click="updateAdress()"
+                                class="rounded bg-orange-500 p-1 text-white"
+                            >
+                                Save
+                            </button>
+                        </div>
+                        <div
+                            :class="[
+                                'mb-2',
+                                {
+                                    'pointer-events-none':
+                                        adminVisit || visitor,
+                                },
+                            ]"
+                        >
+                            <label class="text-sm" s for=""
+                                >Website / Account</label
+                            >
+                            <input
+                                @focus="showWebsiteLinkSaveButton = true"
+                                type="text"
+                                v-model="websiteLink"
+                                class="outline-none hover:underline"
+                            />
+                            <button
+                                v-show="showWebsiteLinkSaveButton"
+                                @click="updateWebsiteLink()"
+                                class="rounded bg-orange-500 p-1 text-white"
+                            >
+                                Save
+                            </button>
+                        </div>
+                        <div class="mb-2">
+                            <label class="text-sm" for="">Resume</label>
+                            <label
+                                for="resume"
+                                :class="[
+                                    'cursor-pointer',
+                                    { 'pointer-events-none': adminVisit },
+                                ]"
+                            >
+                                <p
+                                    class="hover:underline"
+                                    v-if="!workerProfile.resume"
+                                >
+                                    N/A
+                                </p>
+                                <div v-else class="flex items-center gap-2">
+                                    <p class="hover:underline">
+                                        {{ workerProfile.resume }}
+                                    </p>
+                                    <a
+                                        target="_blank"
+                                        :href="'/' + workerProfile.resume_path"
+                                        as="button"
+                                        class="pointer-events-auto rounded bg-orange-500 px-2 py-1 text-white"
+                                    >
+                                        <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>
+                                </div>
+                                <input
+                                    @change="updateResume"
+                                    type="file"
+                                    id="resume"
+                                    class="hidden"
+                                />
+                                <InputFlashMessage
+                                    class="mt-3 text-sm"
+                                    :message="inputResumeError"
+                                    type="error"
+                                ></InputFlashMessage>
+                            </label>
+                        </div>
                     </div>
+                    <ProfilePage
+                        :recentReview="recentReview"
+                        :visitor="visitor"
+                        :averageStar="averageStar"
+                    ></ProfilePage>
                 </div>
             </div>
         </div>

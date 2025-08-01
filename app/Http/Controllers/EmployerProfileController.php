@@ -34,7 +34,7 @@ class EmployerProfileController extends Controller
         return inertia('EmployerAccountSetup/CreateProfile', ['bussinessProps' => $businesses]);
     }
 
- 
+
 
     public function createCompanyInformation(){
         return inertia('EmployerAccountSetup/CompanyInformation');
@@ -50,20 +50,20 @@ class EmployerProfileController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */
+     */ // this function is not used.
     public function show(User $applicantId)
     {
-       
+
         $employerProfile = $applicantId->employerProfile;
-        
+
         return inertia('Employer/Profile',['userProp' => $applicantId,
-         'employerProfileProp' => $employerProfile, 
+         'employerProfileProp' => $employerProfile,
          'messageProp' => session('message'),
          'visitor' => true
         ]);
     }
 
-    
+
 
      public function myProfile(Request $request)
     {
@@ -71,11 +71,29 @@ class EmployerProfileController extends Controller
             return redirect()->route('create.profile.employer');
         }
 
-        $user = Auth::user();          
+        $user = Auth::user();
         $employerProfile = $user->employerProfile;
         $jobsPosted = JobPost::where('employer_id', $user->id)->get();
         $business = $user->employerProfile?->businessInformation;
         $subscription = EmployerSubscription::where('employer_id', $user->id)->first();
+
+        $recentReview = $user->receivedReviews()->with('reviewer')->orderBy('created_at', 'desc')->first();
+
+        $sumStars = 0;
+        $reviewCount = $user->receivedReviews()->get()->count();
+        $user->receivedReviews()->get()->pluck('star')
+        ->each(
+            function ($e) use(&$sumStars){
+                $sumStars+=$e;
+            }
+        );
+
+        if($sumStars){
+            $average = $sumStars / $reviewCount;
+
+            $roundedAverageStar = round($average,2);
+        }
+
 
         return inertia('Employer/Profile', [
         "user" => $user,
@@ -84,28 +102,52 @@ class EmployerProfileController extends Controller
         'messageProp' => session('message'),
         'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
         'subscriptionProps' => $subscription,
+        'recentReview' => $recentReview,
+        'averageStar' => $roundedAverageStar ?? 0.00
         ]);
     }
 
-    public function showEmployerProfile(User $employerId)
+    public function showEmployerProfile(User $id)
     {
-        if(!$employerId->employerProfile){
+        if(!$id->employerProfile){
             return redirect()->back();
         }
-        
-        $employerProfile = $employerId->employerProfile;
-        $jobsPosted = JobPost::where('employer_id', $employerId->id)->get();
-        $business = $employerId->employerProfile?->businessInformation;
-        $subscription = EmployerSubscription::where('employer_id', $employerId->id)->first();
+
+        $employerProfile = $id->employerProfile;
+        $jobsPosted = JobPost::where('employer_id', $id->id)->get();
+        $business = $id->employerProfile?->businessInformation;
+        $subscription = EmployerSubscription::where('employer_id', $id->id)->first();
+
+
+        $recentReview = $id->receivedReviews()->with('reviewer')->orderBy('created_at', 'desc')->first();
+
+        $sumStars = 0;
+        $reviewCount = $id->receivedReviews()->get()->count();
+        $id->receivedReviews()->get()->pluck('star')
+        ->each(
+            function ($e) use(&$sumStars){
+                $sumStars+=$e;
+            }
+        );
+
+
+        if($sumStars){
+            $average = $sumStars / $reviewCount;
+
+            $roundedAverageStar = round($average,2);
+        }
+
 
         return inertia('Employer/Profile', [
-            "user" => $employerId,
+            "user" => $id,
             'employerProfileProp' => $employerProfile,
             'businessProps' => $business ?? null,
             'messageProp' => session('message'),
             'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
             'subscriptionProps' => $subscription,
             'visitor' => true,
+            'recentReview' => $recentReview,
+            'averageStar' => $roundedAverageStar ?? 0.00
             ]);
     }
 
@@ -164,7 +206,7 @@ class EmployerProfileController extends Controller
     return redirect()->back()->with(['message' => 'Successfully Updated!']);
 }
 
-    
+
     public function storeProfile(Request $request){
         // dd($request);
         $user = Auth::user();
@@ -172,16 +214,16 @@ class EmployerProfileController extends Controller
             'full_name' => 'required|max:255',
             'phone_number' => 'required|numeric|min_digits:1',
             'birth_year' => 'required|numeric|min:1900',
-            'gender' => 'required', 
+            'gender' => 'required',
             'employer_type' => 'required'
         ]);
-        
-        
+
+
         if($fields['employer_type'] === 'business'){
 
             if($request->business_id){
                 $business =  BusinessInformation::where('id', $request->business_id)->first();
-                
+
                 if($business){
 
                     $user->employerProfile()->create([
@@ -190,7 +232,7 @@ class EmployerProfileController extends Controller
                         'birth_year' => $fields['birth_year'],
                         'gender' => $fields['gender'],
                         'employer_type' => $fields['employer_type'],
-                        'business_id' => $business->id,                       
+                        'business_id' => $business->id,
                     ]);
 
                     return redirect()->route('employer.dashboard');
@@ -198,7 +240,7 @@ class EmployerProfileController extends Controller
 
                 return redirect()->back()->withErrors(['business' => 'business found']);
             }
-           
+
             $business = $request->validate([
                 'business_name' => 'required|max:255',
                 'business_logo' => 'required|image',
@@ -206,8 +248,8 @@ class EmployerProfileController extends Controller
                 'business_description' => 'required',
                 'business_location' =>'required',
             ]);
-            // dd($request);    
-  
+            // dd($request);
+
             $logo = Storage::disk('public')->put('images', $request->business_logo);
 
 
@@ -217,7 +259,7 @@ class EmployerProfileController extends Controller
                 'industry' =>  $business['industry'],
                 'business_description' =>  $business['business_description'],
                 'business_location' =>  $business['business_location'],
-                
+
             ]);
 
 
@@ -234,17 +276,17 @@ class EmployerProfileController extends Controller
             return redirect()->route('employer.dashboard');
         }
 
-       
+
         $user->employerProfile()->create($fields);
-        
+
         return redirect()->route('employer.dashboard');
     }
 
     /**
      * Display the specified resource.
      */
-   
-    
+
+
     public function edit(EmployerProfile $employerProfile)
     {
         //

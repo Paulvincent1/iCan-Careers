@@ -13,6 +13,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportJobPostController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WorkerBasicInfoController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
@@ -117,7 +118,8 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::clas
 
         Route::post('/showjob/{id}', [JobSearchController::class, 'apply'])->name('jobsearch.apply');
 
-        Route::get('/profile/{employerId}', [EmployerProfileController::class, 'showEmployerProfile'])->name('visit.employer.profile');
+        // employer profile
+        Route::get('/profile/{id}', [EmployerProfileController::class, 'showEmployerProfile'])->name('visit.employer.profile');
     });
 });
 
@@ -148,7 +150,17 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::cla
     Route::put('/myprofile/updateBasicInfoEmployer', [WorkerBasicInfoController::class, 'updateEmployer'])->name('update.basicInfoEmployer.put');
 
     // fire worker
-    Route::put('/fire-worker/{workerId}', [JobPostController::class, 'fireWorker'])->name('fireworker');
+    Route::put('/fire-worker/{workerId}/{jobPostId}', [JobPostController::class, 'fireWorker'])->name('fireworker');
+});
+
+// Reviews
+Route::middleware(['auth'])->group(function() {
+    Route::get('myprofile/reviews',[ReviewController::class,'index'])->name('review.my-profile');
+
+    Route::get('/reviews/{id}',[ReviewController::class,'visitProfile'])->name('review.view-profile');
+
+    // store review
+    Route::post('/reviews/{id}/store',[ReviewController::class, 'store'])->name('review.store');
 });
 
 
@@ -212,7 +224,7 @@ Route::middleware([ForceGetRedirect::class])->group(function () {
 
 
 
-    Route::get('/view/applicant-profile/{applicantId}', [WorkerProfileController::class, 'show'])->name('worker.show.profile');
+    Route::get('/view/applicant-profile/{id}', [WorkerProfileController::class, 'show'])->name('worker.show.profile');
 
 
     Route::get('/{path}/{workerId?}', [WorkerProfileController::class, 'showResume'])->where('path', '^[^\/]+\/[^\/]+$')->where('workerId', '[0-9]+')->name('show.resume');

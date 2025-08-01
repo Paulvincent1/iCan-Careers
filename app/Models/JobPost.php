@@ -78,4 +78,9 @@ class JobPost extends Model
     {
         return $this->hasMany(ReportJobPost::class,'reported_job_post_id');
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class,'job_post_id');
+    }
 }
