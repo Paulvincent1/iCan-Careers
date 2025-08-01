@@ -75,6 +75,7 @@ class WorkerProfileController extends Controller
         if(!$user->workerProfile){
             return redirect()->route('create.profile');
         }
+        $appliedJobs = $user->appliedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
         $workerSkills = $user->workerSkills;
         $workerProfile = $user->workerProfile;
         $workerBasicInfo = $user->workerBasicInfo;
@@ -101,6 +102,7 @@ class WorkerProfileController extends Controller
         return inertia('Worker/Profile',['userProp' => $user,
          'workerSkillsProp' => $workerSkills,
          'workerProfileProp' => $workerProfile,
+         'appliedJobsProps' => $appliedJobs,
          'workerBasicInfoProp' => $workerBasicInfo,
          'messageProp' => session()->get('message'),
          'averageStar'=> $roundedAverageStar?? 0.00,
@@ -273,6 +275,9 @@ class WorkerProfileController extends Controller
 
         $user = Auth::user();
         $isEmployed = null;
+
+
+
         if($user->roles()->first()->name === 'Employer'){
             $isEmployed = $id->myJobs()->where('current' ,true)->whereHas('employer', function ($query) use($user) {
                 $query->where('id', $user->id);
@@ -308,8 +313,14 @@ class WorkerProfileController extends Controller
         }
 
 
+        $appliedJobs = $applicantId->appliedJobs()->with([
+        'employer.employerProfile.businessInformation'
+        ])->get();
+
+
         return inertia('Worker/Profile',['userProp' => $id,
          'workerSkillsProp' => $workerSkills,
+         'appliedJobsProps' => $appliedJobs,
          'workerProfileProp' => $workerProfile,
          'messageProp' => session('message'),
          'visitor' => $visitor,

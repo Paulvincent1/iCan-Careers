@@ -22,10 +22,15 @@ let props = defineProps({
     },
     currentlyEmployedByMeProp: null,
     adminVisit: null,
+    appliedJobsProps: {
+        type: Array,
+        default: () => [],
+    },
     averageStar: null,
     recentReview: null,
 });
 
+console.log("Applied Jobs:", props.appliedJobsProps);
 let { appContext } = getCurrentInstance();
 let formatCurrency = appContext.config.globalProperties.formatCurrency;
 
@@ -639,6 +644,7 @@ function fireWorker(jobPostId) {
                         >
                             {{ workerProfile.profile_description }}
                         </p>
+
                         <form
                             v-if="isEditDescription"
                             @submit.prevent="
@@ -658,6 +664,68 @@ function fireWorker(jobPostId) {
                             </button>
                         </form>
                     </div>
+
+                    <div class="col-span-1 rounded-lg bg-white p-4 shadow-sm">
+                        <p class="mb-4 text-xl font-bold text-gray-800">
+                            Job History
+                        </p>
+
+                        <div
+                            v-if="props.appliedJobsProps.length === 0"
+                            class="text-center text-gray-500"
+                        >
+                            No applied jobs found.
+                        </div>
+
+                        <ul v-else class="space-y-4">
+                            <li
+                                v-for="job in props.appliedJobsProps"
+                                :key="job.id"
+                                class="flex items-center gap-4 rounded-md border p-4 shadow transition hover:shadow-md"
+                            >
+                                <!-- Company Logo -->
+                                <img
+                                    class="h-16 w-16 flex-shrink-0 rounded border object-cover"
+                                    :src="
+                                        job.employer?.employer_profile
+                                            ?.business_information
+                                            ?.business_logo ||
+                                        '/assets/logo-placeholder-image.png'
+                                    "
+                                    alt="Company Logo"
+                                />
+
+                                <!-- Job Info -->
+                                <div class="flex-1">
+                                    <p
+                                        class="text-lg font-semibold text-blue-600"
+                                    >
+                                        {{ job.job_title }}
+                                    </p>
+                                    <p class="text-sm text-gray-700">
+                                        Employer:
+                                        {{ job.employer?.name || "N/A" }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Status:
+                                        {{ job.pivot?.status || "Pending" }}
+                                    </p>
+                                </div>
+
+                                <!-- View Button -->
+                                <Link
+                                    v-if="!props.visitor"
+                                    :href="route('jobsearch.show', job.id)"
+                                    as="button"
+                                    class="rounded-full bg-blue-100 p-2 text-blue-700 hover:bg-blue-200"
+                                    aria-label="View Job"
+                                >
+                                    <i class="bi bi-arrow-right text-xl"></i>
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
                     <div
                         class="mb-8 rounded-lg bg-white p-8 text-gray-600 shadow"
                     >
@@ -690,7 +758,6 @@ function fireWorker(jobPostId) {
                         />
                     </div>
                 </div>
-
                 <div>
                     <div
                         class="mb-5 self-start rounded-lg bg-white p-8 text-gray-600 shadow"

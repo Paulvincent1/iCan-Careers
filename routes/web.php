@@ -99,6 +99,10 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::clas
     //prev employers
     Route::get('/prev-employers',[WorkerDashboard::class,'prevEmployers'])->name('worker.previous.emplyer');
 
+    Route::get('/worker/job-history', [WorkerProfileController::class, 'jobHistory'])->name('worker.job.history');
+
+
+
 
 
     Route::get('/myprofile', [WorkerProfileController::class, 'myProfile'])->name('worker.profile');
