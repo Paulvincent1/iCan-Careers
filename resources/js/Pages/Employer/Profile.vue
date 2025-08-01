@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { Link, router } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
+import ProfilePage from "../Components/Reviews/ProfilePage.vue";
 
 let props = defineProps({
     user: Object,
@@ -34,6 +35,8 @@ let props = defineProps({
     adminVisit: {
         default: null,
     },
+    averageStar: null,
+    recentReview: null,
 });
 
 const memberSince = computed(() => {
@@ -480,77 +483,79 @@ function submitReport(reason) {
                         />
                     </div> -->
                 </div>
-                <div
-                    class="self-start rounded-lg bg-white p-8 text-gray-600 shadow"
-                >
-                    <p class="mb-3 text-[20px] font-bold">Basic Information</p>
-
+                <div>
                     <div
-                        v-if="!isEditingBasicInfo"
-                        @click="
-                            visitor
-                                ? (isEditingBasicInfo = false)
-                                : (isEditingBasicInfo = true)
-                        "
-                        :class="[
-                            'cursor-pointer',
-                            {
-                                'pointer-events-none': visitor,
-                            },
-                        ]"
+                        class="mb-3 self-start rounded-lg bg-white p-8 text-gray-600 shadow"
                     >
-                        <div class="mb-2">
-                            <label class="text-sm">Birth Year:</label>
-                            <p>{{ age }}</p>
-                        </div>
-                        <div class="mb-2">
-                            <label class="text-sm">Gender:</label>
-                            <p>{{ employerProfile.gender }}</p>
-                        </div>
-                        <div class="mb-2">
-                            <label class="text-sm">Phone Number:</label>
-                            <p>{{ employerProfile.phone_number }}</p>
-                        </div>
-                        <div class="mb-2">
-                            <label class="text-sm">Employer Type:</label>
-                            <p>{{ employerProfile.employer_type }}</p>
-                        </div>
-                        
-                    </div>
+                        <p class="mb-3 text-[20px] font-bold">
+                            Basic Information
+                        </p>
 
-                    <form
-                        v-if="isEditingBasicInfo"
-                        @submit.prevent="updateBasicInfo"
-                    >
-                        <div class="mb-2">
-                            <label class="text-sm">Birth Year:</label>
-                            <input
-                                type="number"
-                                v-model="employerProfile.birth_year"
-                                class="w-full border p-1"
-                                min="1925"
-                                max="2007"
-                            />
+                        <div
+                            v-if="!isEditingBasicInfo"
+                            @click="
+                                visitor
+                                    ? (isEditingBasicInfo = false)
+                                    : (isEditingBasicInfo = true)
+                            "
+                            :class="[
+                                'cursor-pointer',
+                                {
+                                    'pointer-events-none': visitor,
+                                },
+                            ]"
+                        >
+                            <div class="mb-2">
+                                <label class="text-sm">Birth Year:</label>
+                                <p>{{ age }}</p>
+                            </div>
+                            <div class="mb-2">
+                                <label class="text-sm">Gender:</label>
+                                <p>{{ employerProfile.gender }}</p>
+                            </div>
+                            <div class="mb-2">
+                                <label class="text-sm">Phone Number:</label>
+                                <p>{{ employerProfile.phone_number }}</p>
+                            </div>
+                            <div class="mb-2">
+                                <label class="text-sm">Employer Type:</label>
+                                <p>{{ employerProfile.employer_type }}</p>
+                            </div>
                         </div>
-                        <div class="mb-2">
-                            <label class="text-sm">Gender:</label>
-                            <select
-                                v-model="employerProfile.gender"
-                                class="w-full border p-1"
-                            >
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-                        <div class="mb-2">
-                            <label class="text-sm">Phone #:</label>
-                            <input
-                                type="text"
-                                v-model="employerProfile.phone_number"
-                                class="w-full border p-1"
-                            />
-                        </div>
-                        <!-- <div class="mb-2">
+
+                        <form
+                            v-if="isEditingBasicInfo"
+                            @submit.prevent="updateBasicInfo"
+                        >
+                            <div class="mb-2">
+                                <label class="text-sm">Birth Year:</label>
+                                <input
+                                    type="number"
+                                    v-model="employerProfile.birth_year"
+                                    class="w-full border p-1"
+                                    min="1925"
+                                    max="2007"
+                                />
+                            </div>
+                            <div class="mb-2">
+                                <label class="text-sm">Gender:</label>
+                                <select
+                                    v-model="employerProfile.gender"
+                                    class="w-full border p-1"
+                                >
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="text-sm">Phone #:</label>
+                                <input
+                                    type="text"
+                                    v-model="employerProfile.phone_number"
+                                    class="w-full border p-1"
+                                />
+                            </div>
+                            <!-- <div class="mb-2">
                             <label class="text-sm">Employer Type:</label>
                             <input
                                 type="text"
@@ -558,7 +563,7 @@ function submitReport(reason) {
                                 class="w-full border p-1"
                             />
                         </div> -->
-                        <!-- <div class="mb-2">
+                            <!-- <div class="mb-2">
                             <label class="text-sm">Website / Account:</label>
                             <input
                                 type="url"
@@ -566,19 +571,25 @@ function submitReport(reason) {
                                 class="w-full border p-1"
                             />
                         </div> -->
-                        <button
-                            class="mt-2 rounded bg-green-500 p-2 text-white"
-                        >
-                            Save
-                        </button>
-                        <button
-                            type="button"
-                            @click="isEditingBasicInfo = false"
-                            class="ml-2 rounded bg-gray-500 p-2 text-white"
-                        >
-                            Cancel
-                        </button>
-                    </form>
+                            <button
+                                class="mt-2 rounded bg-green-500 p-2 text-white"
+                            >
+                                Save
+                            </button>
+                            <button
+                                type="button"
+                                @click="isEditingBasicInfo = false"
+                                class="ml-2 rounded bg-gray-500 p-2 text-white"
+                            >
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
+                    <ProfilePage
+                        :recentReview="recentReview"
+                        :averageStar="averageStar"
+                        :visitor="visitor"
+                    ></ProfilePage>
                 </div>
             </div>
         </div>

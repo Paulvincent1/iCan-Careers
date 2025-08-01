@@ -113,12 +113,12 @@ class JobPostController extends Controller
 
                 $admin->notify(new AdminFreeJobPostNotification(admin:$admin,employer:$user));
                 broadcast(new AdminFreeJobPostNotification(admin:$admin,employer:$user));
-               
-               
+
+
             }else{
 
                 return redirect()->back()->withErrors(['message' => 'You can post up to 3 jobs per month(Free tier)']);
-              
+
             }
 
         } else {
@@ -144,7 +144,7 @@ class JobPostController extends Controller
                     // 'job_image' => $
                 ]);
             }else {
-           
+
                 return redirect()->back()->withErrors(['message' => 'You can post up to 5 jobs per month(Pro and Premium tier)']);
             }
         }
@@ -294,12 +294,12 @@ class JobPostController extends Controller
         return redirect()->route('employer.dashboard');
     }
 
-    public function fireWorker(User $workerId){
+    public function fireWorker(User $workerId, JobPost $jobPostId){
 
         // dd($workerId);
         $employer = Auth::user();
 
-        $currentJob = $workerId->myJobs()->where('current', true)-> whereHas('employer', function ($query) use($employer) {
+        $currentJob = $workerId->myJobs()->where('current', true)->where('job_post_id', $jobPostId->id)->whereHas('employer', function ($query) use($employer) {
             $query->where('id', $employer->id);
         })->first();
 

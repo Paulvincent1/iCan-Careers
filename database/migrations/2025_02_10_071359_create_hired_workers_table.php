@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('worker_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('job_post_id')->constrained('job_posts')->cascadeOnDelete();
             $table->boolean('current')->default(true);
+            $table->boolean('reviewed_by_employer')->default(false);
+            $table->boolean('reviewed_by_worker')->default(false);
             $table->timestamps();
         });
     }

@@ -151,4 +151,14 @@ class User extends Authenticatable
     public function reportsMadeToJobPost(){
         return $this->hasMany(ReportJobPost::class , 'complainant_user_id');
     }
+
+     public function receivedReviews(){
+        return $this->hasMany(Review::class,'reviewee_id');
+    }
+
+    public function myReviews(){
+        return $this->hasMany(Review::class,'reviewer_id');
+    }
+
+
 }
