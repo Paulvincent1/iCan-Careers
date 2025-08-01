@@ -51,7 +51,7 @@ function switchInvoiceTag(tag) {
     });
     invoiceTag.value = tag;
 }
-
+console.log(props.jobsAppliedProps);
 console.log(props.balanceProps);
 let balance = ref(props.balanceProps);
 let invoiceTransactions = ref(props.invoiceTransactionsProps);

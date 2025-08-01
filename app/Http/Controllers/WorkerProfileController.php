@@ -75,6 +75,7 @@ class WorkerProfileController extends Controller
         if(!$user->workerProfile){
             return redirect()->route('create.profile');
         }
+        $appliedJobs = $user->appliedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
         $workerSkills = $user->workerSkills;
         $workerProfile = $user->workerProfile;
         $workerBasicInfo = $user->workerBasicInfo;
@@ -82,6 +83,7 @@ class WorkerProfileController extends Controller
         return inertia('Worker/Profile',['userProp' => $user,
          'workerSkillsProp' => $workerSkills,
          'workerProfileProp' => $workerProfile,
+         'appliedJobsProps' => $appliedJobs,
          'workerBasicInfoProp' => $workerBasicInfo,
          'messageProp' => session()->get('message'),
         ]);
@@ -247,11 +249,28 @@ class WorkerProfileController extends Controller
     /**
      * Display the specified resource.
      */
+
+    // public function jobHistory()
+    // {
+    //     $user = Auth::user();
+    //     $appliedJobs = $user->appliedJobs()->with(['employer.employerProfile.businessInformation'])->latest()->get();
+
+    //     // dd($workerJobHistory);
+
+    //     return inertia('Worker/Profile', [
+    //         'appliedJobsProps' => $appliedJobs
+    //     ]);
+    // }
+
+
     public function show(User $applicantId)
     {
 
         $user = Auth::user();
         $isEmployed = null;
+
+
+
         if($user->roles()->first()->name === 'Employer'){
             $isEmployed = $applicantId->myJobs()->where('current' ,true)->whereHas('employer', function ($query) use($user) {
                 $query->where('id', $user->id);
@@ -262,9 +281,14 @@ class WorkerProfileController extends Controller
         $workerSkills = $applicantId->workerSkills;
         $workerProfile = $applicantId->workerProfile;
 
-        
+        $appliedJobs = $applicantId->appliedJobs()->with([
+        'employer.employerProfile.businessInformation'
+        ])->get();
+
+
         return inertia('Worker/Profile',['userProp' => $applicantId,
          'workerSkillsProp' => $workerSkills,
+         'appliedJobsProps' => $appliedJobs,
          'workerProfileProp' => $workerProfile,
          'messageProp' => session('message'),
          'visitor' => true,
