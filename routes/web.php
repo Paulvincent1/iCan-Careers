@@ -142,6 +142,9 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::cla
     Route::put('/jobpost/{jobid}/update', [JobPostController::class, 'update'])->name('employer.jobpost.update');
     Route::put('/jobpost/{jobid}', [JobPostController::class, 'closeJob'])->name('employer.jobpost.close');
 
+    //prev workers
+    Route::get('/prev-workers',[EmployerDashboardController::class,'prevWorkers'])->name('employer.previous.workers');
+    
 
     Route::get('/applicants/{jobid}', [EmployerDashboardController::class, 'showJobApplicants'])->name('job.applicants');
     Route::put('/applicants/{pivotId}', [EmployerDashboardController::class, 'updateStatus'])->name('job.applicants.update.status');

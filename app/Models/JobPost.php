@@ -57,6 +57,14 @@ class JobPost extends Model
         return $this->belongsTo(User::class, 'employer_id');
     }
 
+    
+    //     public function hiredWorkers()
+    // {
+    //     return $this->belongsToMany(User::class, 'hired_workers', 'job_post_id', 'worker_id')
+    //         ->withPivot('current', 'id')
+    //         ->withTimestamps();
+    // }
+
 
     public function usersWhoSaved(){
         return $this->belongsToMany(User::class, 'job_post_user','job_post_id','user_id');

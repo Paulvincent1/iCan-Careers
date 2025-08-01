@@ -565,10 +565,17 @@ onBeforeUnmount(() => {
                     <div
                         class="col-span-2 mb-8 flex h-[400px] flex-col rounded-lg bg-white p-3"
                     >
-                        <div>
+                        <div class="flex items-center justify-between">
                             <p class="p-1 text-lg font-bold text-[#171816]">
                                 Currently hired workers
                             </p>
+                            <Link
+                                :href="route('employer.previous.workers')"
+                                class="text-sm text-[#171816] underline"
+                            >
+                                Previous Worker
+                                <i class="bi bi-caret-right"></i>
+                            </Link>
                         </div>
                         <div class="flex-1 overflow-auto">
                             <table class="w-full min-w-[500px] table-fixed">

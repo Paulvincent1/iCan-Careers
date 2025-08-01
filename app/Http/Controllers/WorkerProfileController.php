@@ -308,7 +308,6 @@ class WorkerProfileController extends Controller
         }
 
 
-
         return inertia('Worker/Profile',['userProp' => $id,
          'workerSkillsProp' => $workerSkills,
          'workerProfileProp' => $workerProfile,
