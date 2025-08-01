@@ -18,10 +18,15 @@ let props = defineProps({
         default: true,
     },
     disabled: null,
+    starSize: {
+        type: [Number, String],
+        required: false,
+    },
 });
 
+const starSizeClass = ref(`text-[${props.starSize}px]`);
+
 function addStar(star) {
-  
     emit("addstar", star);
 }
 
@@ -53,7 +58,7 @@ function disabeldBtn() {
             :for="`star5_${id}`"
             :class="{ 'pointer-events-none': disabeldBtn() }"
         >
-            <i class="bi bi-star-fill"></i>
+            <i :class="['bi bi-star-fill', starSizeClass]"></i>
         </label>
 
         <input
@@ -70,7 +75,7 @@ function disabeldBtn() {
             :for="`star4_${id}`"
             :class="{ 'pointer-events-none': disabeldBtn() }"
         >
-            <i class="bi bi-star-fill"></i>
+            <i :class="['bi bi-star-fill', starSizeClass]"></i>
         </label>
 
         <input
@@ -87,7 +92,7 @@ function disabeldBtn() {
             :for="`star3_${id}`"
             :class="{ 'pointer-events-none': disabeldBtn() }"
         >
-            <i class="bi bi-star-fill"></i>
+            <i :class="['bi bi-star-fill', starSizeClass]"></i>
         </label>
 
         <input
@@ -104,7 +109,7 @@ function disabeldBtn() {
             :for="`star2_${id}`"
             :class="{ 'pointer-events-none': disabeldBtn() }"
         >
-            <i class="bi bi-star-fill"></i>
+            <i :class="['bi bi-star-fill', starSizeClass]"></i>
         </label>
 
         <input
@@ -121,7 +126,7 @@ function disabeldBtn() {
             :for="`star1_${id}`"
             :class="{ 'pointer-events-none': disabeldBtn() }"
         >
-            <i class="bi bi-star-fill"></i>
+            <i :class="['bi bi-star-fill', starSizeClass]"></i>
         </label>
     </div>
 </template>

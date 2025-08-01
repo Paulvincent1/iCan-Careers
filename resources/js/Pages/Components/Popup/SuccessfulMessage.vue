@@ -4,7 +4,7 @@ import { Teleport, Transition } from "vue";
 let props = defineProps({
     messageShow: false,
     messageProp: null,
-    type: "Success",
+    type: { type: String, default: "Success" },
 });
 </script>
 <template>
