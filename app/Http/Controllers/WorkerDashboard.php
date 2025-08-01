@@ -187,6 +187,7 @@ class WorkerDashboard extends Controller
 
     public function prevEmployers()
     {
+        // TODO: fix this
         $user = Auth::user();
 
         return inertia('Worker/PreviousEmployer',['jobsProps' =>  $user->myJobs->load('employer')]);

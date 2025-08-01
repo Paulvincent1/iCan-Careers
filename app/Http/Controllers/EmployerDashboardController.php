@@ -164,22 +164,30 @@ class EmployerDashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Eager load 'employedWorkers' on each job post
-        $jobPosts = $user->employerJobPosts()->with('employedWorkers')->get();
+        $previousEmployerWithJobtitle = [];
+        $user->employerJobPosts
+            ->each(function ($job) use(&$previousEmployerWithJobtitle) {
+               $job->employedWorkers()
+                    ->orderBy('created_at', 'desc')
+                    ->get()->each(
+                    function($worker) use(&$previousEmployerWithJobtitle, $job) {
+                        $previousEmployerWithJobtitle[] = [
+                            'job' => [
+                                'worker' => $worker,
+                                'jobDetails' => $job
+                            ]
 
-        $workers = collect();
+                        ];
+                    }
+                );
 
-        foreach ($jobPosts as $jobPost) {
-            foreach ($jobPost->employedWorkers as $worker) {
-                // Include pivot data and job_post_id
-                $worker->job_post_id = $jobPost->id;
-                $worker->pivot = $worker->pivot; // make sure it's included
-                $workers->push($worker);
-            }
-        }
+            });
+
+            // dd($previousEmployerWithJobtitle);
+
 
         return inertia('Employer/PreviousWorker', [
-            'jobsProps' => $workers,
+            'jobsProps' => $previousEmployerWithJobtitle ,
         ]);
     }
 

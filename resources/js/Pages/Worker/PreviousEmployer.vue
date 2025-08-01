@@ -19,6 +19,7 @@ console.log(props.jobsProps);
                 <thead>
                     <tr class="text-sm text-slate-500">
                         <th class="p-3 text-center font-normal">Image</th>
+                        <th class="p-3 text-center font-normal">Job Title</th>
                         <th class="p-3 text-center font-normal">
                             Employer Name
                         </th>
@@ -44,6 +45,7 @@ console.log(props.jobsProps);
                                 />
                             </div>
                         </td>
+                        <td class="p-3 text-center">{{ job.job_title }}</td>
                         <td class="p-3 text-center">{{ job.employer.name }}</td>
                         <td class="p-3">
                             <div

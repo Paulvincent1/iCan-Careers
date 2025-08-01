@@ -19,6 +19,7 @@ console.log(props.jobsProps);
                 <thead>
                     <tr class="text-sm text-slate-500">
                         <th class="p-3 text-center font-normal">Image</th>
+                        <th class="p-3 text-center font-normal">Job Title</th>
                         <th class="p-3 text-center font-normal">Worker Name</th>
                         <th class="p-3 text-center font-normal">Status</th>
                         <th class="p-3 text-center font-normal">
@@ -27,32 +28,37 @@ console.log(props.jobsProps);
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(worker, index) in jobsProps" :key="index">
+                    <tr v-for="(job, index) in jobsProps" :key="index">
                         <td class="p-3">
                             <div class="mx-auto h-14 w-14">
                                 <img
                                     class="h-full w-full rounded-full"
                                     :src="
-                                        worker.profile_img ??
+                                        job.job.worker.profile_img ??
                                         '/assets/profile_placeholder.jpg'
                                     "
                                     alt="Profile"
                                 />
                             </div>
                         </td>
-                        <td class="p-3 text-center">{{ worker.name }}</td>
+                        <td class="p-3 text-center">
+                            {{ job.job.jobDetails.job_title }}
+                        </td>
+                        <td class="p-3 text-center">
+                            {{ job.job.worker.name }}
+                        </td>
                         <td class="p-3">
                             <div
                                 :class="[
                                     'mx-auto w-fit rounded-full px-3 py-2',
-                                    worker.pivot?.current === 1
+                                    job.job.worker.pivot?.current === 1
                                         ? 'bg-green-600'
                                         : 'bg-orange-600',
                                 ]"
                             >
                                 <p class="font-bold text-white">
                                     {{
-                                        worker.pivot?.current === 1
+                                        job.job.worker.pivot.current === 1
                                             ? "Current"
                                             : "Previous"
                                     }}
@@ -63,7 +69,7 @@ console.log(props.jobsProps);
                             <Link
                                 :href="
                                     route('worker.show.profile', {
-                                        id: worker.id,
+                                        id: job.job.worker.id,
                                     })
                                 "
                             >
