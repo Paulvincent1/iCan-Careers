@@ -807,7 +807,7 @@ const formatCurrency =
                                     <thead class="text-sm">
                                         <tr class="text-gray-500">
                                             <th class="px-7 py-2 font-normal">
-                                                Logo
+                                                Company Logo
                                             </th>
                                             <th class="px-7 py-2 font-normal">
                                                 Job Title
@@ -898,7 +898,7 @@ const formatCurrency =
                                     <thead class="text-sm">
                                         <tr class="text-gray-500">
                                             <th class="px-7 py-2 font-normal">
-                                                Logo
+                                                Company Logo
                                             </th>
                                             <th class="px-7 py-2 font-normal">
                                                 Job Title
