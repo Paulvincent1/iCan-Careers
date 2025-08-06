@@ -23,7 +23,7 @@ console.log(props.jobsProps);
                         <th class="p-3 text-center font-normal">
                             Employer Name
                         </th>
-                        <th class="p-3 text-center font-normal">Current</th>
+                        <th class="p-3 text-center font-normal">Status</th>
                         <th class="p-3 text-center font-normal">View</th>
                     </tr>
                 </thead>
@@ -61,10 +61,10 @@ console.log(props.jobsProps);
                                     v-if="job.pivot.current != 1"
                                     class="font-bold text-white"
                                 >
-                                    previous
+                                    Previous
                                 </p>
                                 <p v-else class="font-bold text-white">
-                                    current
+                                    Current
                                 </p>
                             </div>
                         </td>

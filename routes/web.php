@@ -168,6 +168,7 @@ Route::middleware(['auth'])->group(function() {
 
     // store review
     Route::post('/reviews/{id}/store',[ReviewController::class, 'store'])->name('review.store');
+    
 });
 
 

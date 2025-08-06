@@ -239,7 +239,7 @@ console.log(page.props.auth.user.unreadNotifications);
                                                 class="h-full w-full rounded-full object-cover"
                                                 :src="
                                                     notification.data.image ??
-                                                    '/assets/images.png'
+                                                    '/assets/SHORTS.svg'
                                                 "
                                                 alt=""
                                             />

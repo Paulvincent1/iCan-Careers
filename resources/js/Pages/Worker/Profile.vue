@@ -710,6 +710,17 @@ function fireWorker(jobPostId) {
                                         Status:
                                         {{ job.pivot?.status || "Pending" }}
                                     </p>
+                                    <p class="text-sm text-gray-500">
+                                        Started:
+                                        {{
+                                            job.pivot?.created_at
+                                                ? new Date(
+                                                      job.pivot.created_at,
+                                                  ).toLocaleDateString()
+                                                : "N/A"
+                                        }}
+                                    </p>
+                                    
                                 </div>
 
                                 <!-- View Button -->
