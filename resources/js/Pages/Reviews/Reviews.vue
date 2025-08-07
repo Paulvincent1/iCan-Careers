@@ -159,7 +159,7 @@ function deleteReview(id) {
             </p>
             <Rating
                 :disabled="true"
-                :id="uniqueId()"
+                :id="`${$page.props.auth.user.authenticated.id ?? 0}_user`"
                 :starValue="round(averageStar)"
                 class="mt-2"
             />

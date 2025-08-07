@@ -41,7 +41,7 @@ if (props.visitor) {
                 v-if="recentReview"
                 disabled="true"
                 :starValue="round(averageStar)"
-                :id="recentReview.reviewer.id"
+                :id="`${recentReview.reviewer.id}_user`"
             ></Rating>
         </div>
         <div v-if="recentReview">
