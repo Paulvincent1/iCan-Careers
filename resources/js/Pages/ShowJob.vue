@@ -7,10 +7,14 @@ import ReusableModal from "./Components/Modal/ReusableModal.vue";
 import SuccessfulMessage from "./Components/Popup/SuccessfulMessage.vue";
 import InputFlashMessage from "./Components/InputFlashMessage.vue";
 import { route } from "../../../vendor/tightenco/ziggy/src/js";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 let props = defineProps({
     jobPostProps: null,
     workerProfileProps: null,
+    interviewDetails: null,
     messageProp: null,
 });
 
@@ -176,6 +180,12 @@ function submitReport(reason) {
         },
     );
 }
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// get the timezone of the user
+const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 </script>
 <template>
     <Head title="Show Job | iCan Careers" />
@@ -258,7 +268,7 @@ function submitReport(reason) {
                 "
             >
                 <div
-                    class="mb-3 mt-3 flex justify-center gap-2"
+                    class="mb-3 mt-3 flex flex-col items-center justify-center gap-2"
                     v-if="jobPostProps.job_status === 'Open'"
                 >
                     <button
@@ -278,6 +288,15 @@ function submitReport(reason) {
                     </button>
                     <p v-else class="font-bold text-orange-500">
                         Your account is not yet verified.
+                    </p>
+                    <p>
+                        Interview Date & Time:
+                        {{
+                            dayjs
+                                .utc(interviewDetails.interview_schedule)
+                                .tz(userTz)
+                                .format("YYYY-MM-DD h:mmA")
+                        }}
                     </p>
                 </div>
                 <div v-else class="mx-auto mb-3 mt-3 w-fit">
