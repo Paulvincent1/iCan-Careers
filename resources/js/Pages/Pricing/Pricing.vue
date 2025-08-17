@@ -22,8 +22,6 @@ const pricingPlans = [
             { text: "Create up to 3 jobs per month" },
             { text: "2 days Job Post approval" },
             { text: "View Job Applications" },
-            { text: "Bookmark Workers" },
-            { text: "Easypay" },
         ],
         borderColor: "border-green-500 border-t-8 rounded",
         priceColor: "text-green-500"
@@ -36,11 +34,9 @@ const pricingPlans = [
         features: [
             { text: "Communicate with Workers" },
             { text: "Hire Workers" },
-            { text: "Create up to 3 jobs per month" },
+            { text: "Create up to 5 jobs per month" },
             { text: "Instant Job Approvals" },
             { text: "View Job Applications" },
-            { text: "Bookmark Workers" },
-            { text: "Easypay" },
         ],
         borderColor: "border-blue-500 border-t-8 rounded",
         priceColor: "text-blue-500"
@@ -53,12 +49,9 @@ const pricingPlans = [
         features: [
             { text: "Communicate with Workers" },
             { text: "Hire Workers" },
-            { text: "Create up to 3 jobs per month" },
+            { text: "Create up to 5 jobs per month" },
             { text: "Instant Job Approval" },
             { text: "View Job Applications" },
-            { text: "Bookmark Workers" },
-            { text: "Easypay" },
-            { text: "Unlimited Background Data Checks" },
         ],
         borderColor: "border-red-500 border-t-8 rounded",
         priceColor: "text-red-500"
