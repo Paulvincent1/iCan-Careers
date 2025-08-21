@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BusinessInformationController;
 use App\Http\Controllers\EmployerDashboardController;
 use App\Http\Controllers\EmployerProfileController;
 use App\Http\Controllers\EmployerSubscriptionController;
@@ -24,6 +25,7 @@ use App\Http\Middleware\isAdmin;
 use App\Http\Middleware\isBan;
 use App\Http\Middleware\isEmployer;
 use App\Http\Middleware\isWorker;
+use App\Models\BusinessInformation;
 use App\Models\EmployerProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -125,6 +127,8 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::clas
         // employer profile
         Route::get('/profile/{id}', [EmployerProfileController::class, 'showEmployerProfile'])->name('visit.employer.profile');
     });
+
+    
 });
 
 
@@ -158,6 +162,9 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::cla
 
     // fire worker
     Route::put('/fire-worker/{workerId}/{jobPostId}', [JobPostController::class, 'fireWorker'])->name('fireworker');
+    Route::get('/profile/{id}', [EmployerProfileController::class, 'showEmployerProfile'])->name('visit.employer.profile');
+
+
 });
 
 // Reviews
@@ -233,6 +240,8 @@ Route::middleware([ForceGetRedirect::class])->group(function () {
 
 
     Route::get('/view/applicant-profile/{id}', [WorkerProfileController::class, 'show'])->name('worker.show.profile');
+
+    Route::get('/businessinfo/{id}', [BusinessInformationController::class, 'show'])->name('businessinfo.show');
 
 
     Route::get('/{path}/{workerId?}', [WorkerProfileController::class, 'showResume'])->where('path', '^[^\/]+\/[^\/]+$')->where('workerId', '[0-9]+')->name('show.resume');

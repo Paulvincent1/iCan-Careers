@@ -13,6 +13,7 @@ class BusinessInformation extends Model
         'industry',
         'business_description',
         'business_location',
+        'user_id',
     ];
 
     protected $casts = [
@@ -24,6 +25,17 @@ class BusinessInformation extends Model
             $query->where('business_name','like', '%' . request('business_name') . '%');
         }
     }
+
+    public function employer()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function employers()
+    {
+        return $this->belongsToMany(User::class, 'business_user', 'business_information_id', 'user_id');
+    }
+
 
     // public function user(){
     //     return $this->belongsTo(User::class,'user_id');

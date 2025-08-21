@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BusinessInformation;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class BusinessInformationController extends Controller
 {
@@ -34,10 +35,20 @@ class BusinessInformationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(BusinessInformation $businessInformation)
-    {
-        //
-    }
+    public function show($id)
+        {
+            $business = BusinessInformation::with('employer', 'employers')->findOrFail($id);
+
+            $user = auth()->user();
+            $role = $user?->role ?? 'guest';
+
+            return Inertia::render('BusinessInformation/BusinessInformation', [
+                'business' => $business,
+                'employer' => $business->employer,
+                'employers' => $business->employers,
+                'viewerRole' => auth()->user()->role ?? null, // if you want to show employer info too
+            ]);
+        }
 
     /**
      * Show the form for editing the specified resource.
