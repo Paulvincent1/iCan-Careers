@@ -132,7 +132,7 @@ class InvoiceController extends Controller
                           ],
                         duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0))
                         );
-    
+
                         $employer->employerSubscriptionInvoices()->create([
                             'external_id' =>  $externalIdProTier,
                             'invoice_id' =>  $proTierInvoice->getId(),

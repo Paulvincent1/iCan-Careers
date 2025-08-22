@@ -16,6 +16,8 @@ import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import dayjs from "dayjs";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import Maps from "../Components/Maps.vue";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 let props = defineProps({
     jobProps: null,
@@ -294,6 +296,15 @@ function openModal(e) {
     event = e;
     showModal.value = true;
 }
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// get the timezone of the user
+const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+// console.log(userTz);
+
+// console.log(dayjs().tz(userTz).format("YYYY-MM-DD"));
 </script>
 <template>
     <Head title="Applicants| iCan Careers" />
@@ -583,7 +594,12 @@ function openModal(e) {
                         <label for="" class="text-gray-500">Date</label>
                         <input
                             type="date"
-                            :min="dayjs().format('YYYY-MM-DD')"
+                            :min="
+                                dayjs()
+                                    .tz(userTz)
+                                    .add(12, 'hour')
+                                    .format('YYYY-MM-DD')
+                            "
                             class="rounded border p-2"
                             v-model="date"
                         />

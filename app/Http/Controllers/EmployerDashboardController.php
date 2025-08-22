@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Stevebauman\Location\Facades\Location;
 
 class EmployerDashboardController extends Controller
 {
@@ -203,9 +204,13 @@ class EmployerDashboardController extends Controller
                 'coordinates' => 'nullable|array',
             ]
         );
+        $location = Location::get($request->ip());
+        $timezone = $location ? $location->timezone : config('app.timezone', 'UTC');
 
-        if(Carbon::parse("$request->date $request->time")->isPast()){
-            return redirect()->back()->withErrors(['message'=>'Please select a time valid time.']);
+        $interviewTime = Carbon::parse("$request->date $request->time", $timezone)->setTimezone('UTC');
+
+        if ($interviewTime->lt(now()->addHours(12))) {
+            return redirect()->back()->withErrors(['message' => 'Please select a time at least 12 hours from now.']);
         }
 
         DB::table('application')->where('id',$pivotId)

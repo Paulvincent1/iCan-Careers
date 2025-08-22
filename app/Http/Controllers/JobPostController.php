@@ -84,6 +84,8 @@ class JobPostController extends Controller
             $jobImage = Storage::disk('public')->put('images', $request->job_image);
         }
 
+        $startOfMonthUserTZ = $user->timezone;
+
         if ($user->employerSubscription->subscription_type === 'Free') {
 
             if (

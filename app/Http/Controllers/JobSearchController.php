@@ -6,6 +6,7 @@ use App\Models\JobPost;
 use App\Notifications\WokerAppliesToJobPostNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class JobSearchController extends Controller
 {
@@ -22,7 +23,7 @@ class JobSearchController extends Controller
         $jobs = JobPost::with(['employer.employerProfile','employer.employerProfile.businessInformation','usersWhoSaved' => function ($query) use ($user) {
             $query->where('user_id',  $user->id)->first();
         }])->filter(request(['job_type','work_arrangement','experience','job_title']))->where('job_status','Open')->latest()->get();
-      
+
 
         // dd($jobs);
         // $jobs = JobPost::whereIn('job_type',$jobType)->orWhereIn('work_arrangement', $workArrangement)
@@ -37,8 +38,8 @@ class JobSearchController extends Controller
         // dd($jobs);
 
         // dd(session()->get('messageProp'));
-      
-       
+
+
         return inertia('Worker/FindJobs',['jobsProps' => $jobs, 'messageProp' => session()->get('messageProp')]);
     }
 
@@ -49,8 +50,8 @@ class JobSearchController extends Controller
 
         $user = Auth::user();
         $job = $user->savedJobs()->where('job_post_id',$id->id)->first();
-       
-      
+
+
         if($job){
             $user->savedJobs()->detach($id);
             return redirect()->back()->with(['messageProp' => 'Successfuly saved!']);
@@ -91,8 +92,13 @@ class JobSearchController extends Controller
         }])->where('id', $id->id)->first();
 
         // dd($job);
- 
-        return inertia('ShowJob',['jobPostProps' =>  $job, 'workerProfileProps' => $user->workerProfile, 'messageProp' => session()->get('messageProp')]);
+
+        $interviewDetails = DB::table('application')->where('worker_id',$user->id)->where('job_post_id',$id->id)
+        ->where('status','Interview Scheduled')->first();
+        // dd($interviewDetails);
+
+        return inertia('ShowJob',['jobPostProps' =>  $job, 'workerProfileProps' => $user->workerProfile,
+        'interviewDetails' => $interviewDetails, 'messageProp' => session()->get('messageProp')]);
     }
 
     public function apply(JobPost $id){
@@ -100,7 +106,7 @@ class JobSearchController extends Controller
 
         if(!$id->usersWhoApplied()->where('worker_id',$user->id)->first() && $id->job_status != 'Closed'){
             $user->appliedJobs()->attach($id->id);
-            
+
             $id->employer->notify(new WokerAppliesToJobPostNotification(applicant:$user,employer:$id->employer,jobPost:$id));
             broadcast(new WokerAppliesToJobPostNotification(applicant:$user,employer:$id->employer,jobPost:$id));
 
@@ -109,7 +115,7 @@ class JobSearchController extends Controller
         // else{
         //     $user->appliedJobs()->detach($id->id);
         // }
-        
+
         return redirect()->back();
 
     }
