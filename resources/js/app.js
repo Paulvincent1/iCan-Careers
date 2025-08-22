@@ -7,6 +7,7 @@ import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import Layout from "./Pages/Layouts/Layout.vue";
 import VueMaplibreGl from "@indoorequal/vue-maplibre-gl";
 import { register } from "swiper/element/bundle";
+import 'vue3-easy-data-table/dist/style.css';
 // register Swiper custom elements
 register();
 

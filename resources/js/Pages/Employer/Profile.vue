@@ -233,6 +233,7 @@ function submitReport(reason) {
 
                     <!-- Camera Icon (Positioned at Bottom-Right) -->
                     <div
+                        v-if="!visitor"
                         class="absolute bottom-1 right-1 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 shadow-md"
                     >
                         <i class="bi bi-camera text-lg text-gray-600"></i>
@@ -373,21 +374,22 @@ function submitReport(reason) {
                             </form> -->
                         </div>
                         <div
-                            class="mb-4 flex items-center gap-4"
                             v-if="businessProps"
+                            class="mb-4 flex items-center gap-4"
                         >
                             <div
                                 class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200"
                             >
                                 <i class="bi bi-building"></i>
                             </div>
-                            <p>
-                                {{
-                                    businessProps?.industry ||
-                                    "No business information available"
-                                }}
-                            </p>
+                            <Link
+                                :href="route('businessinfo.show', businessProps.id)"
+                                class="text-blue-600 hover:underline"
+                            >
+                                {{ businessProps.industry }}
+                            </Link>
                         </div>
+
                         <p v-else class="mb-1 text-gray-500">
                             No business information available
                         </p>
@@ -414,7 +416,7 @@ function submitReport(reason) {
                                 <div
                                     v-for="job in jobsPostedProps"
                                     :key="job.id"
-                                    class="mb-4 border bg-white text-[#fa8334] rounded-lg "
+                                    class="mb-4 rounded-lg border bg-white text-[#fa8334]"
                                 >
                                     <Link
                                         :href="

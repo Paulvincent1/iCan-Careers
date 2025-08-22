@@ -225,6 +225,7 @@ class EmployerProfileController extends Controller
                 $business =  BusinessInformation::where('id', $request->business_id)->first();
 
                 if($business){
+                    $business->employers()->syncWithoutDetaching([$user->id]);
 
                     $user->employerProfile()->create([
                         'full_name' => $fields['full_name'],
@@ -254,6 +255,7 @@ class EmployerProfileController extends Controller
 
 
            $businessInformation =  BusinessInformation::create([
+                'user_id' => $user->id,
                 'business_name' => $business['business_name'],
                 'business_logo' => '/storage/' . $logo,
                 'industry' =>  $business['industry'],
@@ -262,6 +264,8 @@ class EmployerProfileController extends Controller
 
             ]);
 
+
+            $businessInformation->employers()->attach($user->id);
 
            $user->employerProfile()->create([
             'full_name' => $fields['full_name'],

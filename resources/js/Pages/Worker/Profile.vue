@@ -429,9 +429,10 @@ function fireWorker(jobPostId) {
                     />
 
                     <!-- Camera Icon (Positioned at Bottom-Right) -->
-                    <div
+                                        <div
+                        v-if="!visitor"
                         class="absolute bottom-1 right-1 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 shadow-md"
-                    >
+                        >
                         <i class="bi bi-camera text-lg text-gray-600"></i>
                     </div>
                 </div>
@@ -720,7 +721,7 @@ function fireWorker(jobPostId) {
                                                 : "N/A"
                                         }}
                                     </p>
-                                    
+
                                 </div>
 
                                 <!-- View Button -->

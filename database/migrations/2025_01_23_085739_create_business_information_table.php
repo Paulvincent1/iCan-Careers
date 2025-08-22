@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('industry');
             $table->string('business_description');
             $table->json('business_location');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
