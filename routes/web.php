@@ -162,7 +162,7 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::cla
 
     // fire worker
     Route::put('/fire-worker/{workerId}/{jobPostId}', [JobPostController::class, 'fireWorker'])->name('fireworker');
-    Route::get('/profile/{id}', [EmployerProfileController::class, 'showEmployerProfile'])->name('visit.employer.profile');
+    // Route::get('/profile/{id}', [EmployerProfileController::class, 'showEmployerProfile'])->name('visit.employer.profile');
 
 
 });
@@ -216,6 +216,10 @@ Route::prefix('admin')->middleware([isAdmin::class])->group(function () {
 
 //shared route for authenticated users
 Route::middleware([ForceGetRedirect::class])->group(function () {
+
+
+    Route::get('/employer/profile/{id}', [EmployerProfileController::class, 'showEmployerProfile'])
+        ->name('visit.employer.profile');
 
     //chat routes
     Route::prefix('/messages')->group(function () {
