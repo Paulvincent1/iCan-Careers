@@ -546,6 +546,7 @@ watch(
 );
 </script>
 <template>
+    <Head title="Message | iCan Careers" />
     <div class="bg-[#eff2f6]">
         <div
             class="mx-auto min-h-[calc(100vh-4.625rem)] max-w-7xl p-8 px-[0.5rem]"

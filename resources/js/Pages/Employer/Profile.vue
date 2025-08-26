@@ -189,7 +189,7 @@ function selectReason(report) {
 
 function submitReport(reason) {
     router.post(
-        route("report.user", { userId: route().params.employerId }),
+        route("report.user", { userId: route().params.id }),
         {
             reason,
         },

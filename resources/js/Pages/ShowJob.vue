@@ -289,11 +289,11 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     <p v-else class="font-bold text-orange-500">
                         Your account is not yet verified.
                     </p>
-                    <p>
+                    <p v-if ="interviewDetails?.interview_schedule" >
                         Interview Date & Time:
                         {{
                             dayjs
-                                .utc(interviewDetails.interview_schedule)
+                                .utc(interviewDetails?.interview_schedule)
                                 .tz(userTz)
                                 .format("YYYY-MM-DD h:mmA")
                         }}

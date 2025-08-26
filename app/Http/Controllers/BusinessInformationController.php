@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\BusinessInformation;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+
 
 class BusinessInformationController extends Controller
 {
@@ -36,19 +38,26 @@ class BusinessInformationController extends Controller
      * Display the specified resource.
      */
     public function show($id)
-        {
-            $business = BusinessInformation::with('employer', 'employers')->findOrFail($id);
+    {
+        $business = BusinessInformation::with(['employer', 'employers'])->findOrFail($id);
 
-            $user = auth()->user();
-            $role = $user?->role ?? 'guest';
+        // get the authenticated user
+        $viewer = Auth::user();
 
-            return Inertia::render('BusinessInformation/BusinessInformation', [
-                'business' => $business,
-                'employer' => $business->employer,
-                'employers' => $business->employers,
-                'viewerRole' => auth()->user()->role ?? null, // if you want to show employer info too
-            ]);
+        // get viewer role (check the roles relationship)
+        $viewerRole = null;
+        if ($viewer) {
+            $viewerRole = $viewer->roles()->pluck('name')->first(); 
+            // this assumes your Role model has a `name` field
         }
+
+        return Inertia::render('BusinessInformation/BusinessInformation', [
+            'business' => $business,
+            'employer' => $business->employer,
+            'employers' => $business->employers, // if you have many-to-many
+            'viewerRole' => $viewerRole,     // send viewer role
+        ]);
+    }
 
     /**
      * Show the form for editing the specified resource.
