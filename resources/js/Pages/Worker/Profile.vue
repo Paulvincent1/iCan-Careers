@@ -368,7 +368,7 @@ function selectReason(report) {
 
 function submitReport(reason) {
     router.post(
-        route("report.user", { userId: route().params.applicantId }),
+        route("report.user", { userId: route().params.id }),
         {
             reason,
         },

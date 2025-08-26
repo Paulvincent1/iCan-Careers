@@ -218,8 +218,6 @@ Route::prefix('admin')->middleware([isAdmin::class])->group(function () {
 Route::middleware([ForceGetRedirect::class])->group(function () {
 
 
-    Route::get('/employer/profile/{id}', [EmployerProfileController::class, 'showEmployerProfile'])
-        ->name('visit.employer.profile');
 
     //chat routes
     Route::prefix('/messages')->group(function () {

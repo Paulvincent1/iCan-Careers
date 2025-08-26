@@ -150,114 +150,113 @@ function deleteReview(id) {
 </script>
 
 <template>
-    <div class="container mx-auto max-w-7xl px-4 pt-20">
-        <!-- Header with Rating -->
-        <div class="flex flex-col items-center text-center">
-            <p class="text-sm font-medium text-gray-500">Overall Rating</p>
-            <p class="mt-1 text-6xl font-extrabold text-orange-500">
-                {{ averageStar.toFixed(1) }} out of 5
+    <Head title="Reviews | iCan Careers" />
+    <div class="container mx-auto max-w-6xl px-4 pt-20">
+        <!-- Overall Rating -->
+        <div class="flex flex-col items-center text-center bg-white rounded-xl p-8 shadow-sm">
+            <p class="text-gray-500 text-sm">Overall Rating</p>
+            <p class="mt-2 text-6xl font-extrabold text-orange-500">
+                {{ averageStar.toFixed(1) }}
             </p>
             <Rating
                 :disabled="true"
-                :id="`${$page.props.auth.user.authenticated.id ?? 0}_user`"
+                :id="`rating_${$page.props.auth.user.authenticated.id ?? 0}`"
                 :starValue="round(averageStar)"
                 class="mt-2"
             />
-            <!-- Star Breakdown Filter -->
-            <div
-                v-if="Object.keys(starBreakdown).length"
-                class="mt-10 flex flex-wrap justify-center gap-3"
-            >
+            <p class="text-gray-600 mt-1 text-sm">out of 5</p>
+
+            <!-- Star Breakdown Bars -->
+            <div class="mt-6 w-full max-w-md space-y-3">
+                <div
+                    v-for="star in [5,4,3,2,1]"
+                    :key="star"
+                    class="flex items-center gap-3"
+                >
+                    <span class="w-10 text-sm text-gray-700">{{ star }}★</span>
+                    <div class="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden">
+                        <div
+                            class="h-full bg-orange-500"
+                            :style="{ width: (starBreakdown[star] / props.sortedReviews.length * 100 || 0) + '%' }"
+                        ></div>
+                    </div>
+                    <span class="w-6 text-sm text-gray-500">{{ starBreakdown[star] }}</span>
+                </div>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="mt-6 flex flex-wrap justify-center gap-2">
                 <button
-                    v-for="star in [5, 4, 3, 2, 1]"
+                    v-for="star in [5,4,3,2,1]"
                     :key="star"
                     @click="selectedStarFilter = star"
-                    class="flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium shadow transition"
-                    :class="
-                        selectedStarFilter === star
-                            ? 'border-orange-500 bg-orange-500 text-white'
-                            : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
-                    "
+                    class="px-4 py-1.5 rounded-full text-sm font-medium border transition"
+                    :class="selectedStarFilter === star 
+                        ? 'bg-orange-500 text-white border-orange-500'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'"
                 >
-                    {{ star }}★ — {{ starBreakdown[star] }}
+                    {{ star }}★ ({{ starBreakdown[star] }})
                 </button>
-
                 <button
                     v-if="selectedStarFilter"
                     @click="selectedStarFilter = null"
-                    class="flex items-center gap-2 rounded-full bg-gray-200 px-4 py-1.5 text-sm text-gray-800 hover:bg-gray-300"
+                    class="px-4 py-1.5 rounded-full bg-gray-200 text-sm text-gray-700 hover:bg-gray-300"
                 >
-                    ✕ Clear Filter
+                    ✕ Clear
                 </button>
             </div>
 
             <button
                 v-if="visitor && owedReviews"
                 @click="isShowReportModal = true"
-                class="mt-6 flex items-center gap-2 rounded-md bg-orange-500 px-6 py-2.5 text-sm font-medium text-white shadow-lg transition hover:bg-orange-600"
+                class="mt-6 px-6 py-2.5 rounded-md bg-orange-500 text-sm font-semibold text-white shadow hover:bg-orange-600"
             >
-                <i class="bi bi-plus-lg"></i>
-                Add Review
+                + Write a Review
             </button>
         </div>
 
-        <!-- Reviews Section -->
+        <!-- Review List -->
         <div class="mt-12">
-            <h2 class="mb-6 text-xl font-semibold text-gray-800">
-                Recent Reviews
-            </h2>
+            <h2 class="text-lg font-semibold text-gray-800 mb-6">Recent Reviews</h2>
 
-            <p
-                class="mt-4 text-center text-sm text-gray-600"
-                v-if="selectedStarFilter"
-            >
-                Showing only
-                <strong>{{ selectedStarFilter }}-star</strong> reviews
+            <p v-if="selectedStarFilter" class="text-sm text-gray-600 mb-4">
+                Showing only <strong>{{ selectedStarFilter }}-star</strong> reviews
             </p>
 
-            <div
-                v-if="averageStar"
-                class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            >
+            <div v-if="averageStar" class="space-y-6">
                 <div
                     v-for="review in sortedReviews"
                     :key="review.id"
-                    class="rounded-xl border border-gray-100 bg-white p-5 shadow-md transition hover:shadow-lg"
+                    class="p-5 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition"
                 >
-                    <div class="flex items-center gap-4">
-                        <div class="flex-shrink-0">
+                    <!-- Reviewer Info -->
+                    <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden">
+                            <img
+                                v-if="review.reviewer.profile_img"
+                                :src="review.reviewer.profile_img"
+                                alt="Reviewer photo"
+                                class="h-full w-full object-cover"
+                            />
                             <div
-                                class="h-10 w-10 overflow-hidden rounded-full bg-gray-200"
+                                v-else
+                                class="flex h-full w-full items-center justify-center bg-orange-500 font-bold text-white"
                             >
-                                <img
-                                    v-if="review.reviewer.profile_img"
-                                    :src="review.reviewer.profile_img"
-                                    alt="Reviewer photo"
-                                    class="h-full w-full object-cover"
-                                />
-                                <div
-                                    v-else
-                                    class="flex h-full w-full items-center justify-center bg-orange-500 font-bold text-white"
-                                >
-                                    {{ review.reviewer.name.charAt(0) }}
-                                </div>
+                                {{ review.reviewer.name.charAt(0) }}
                             </div>
                         </div>
                         <div>
-                            <p class="text-base font-bold text-gray-900">
+                            <p class="font-semibold text-gray-900 text-sm">
                                 {{ review.reviewer.name }}
                             </p>
                             <p class="text-xs text-gray-500">
-                                {{
-                                    dayjs(review.created_at).format(
-                                        "MMMM DD, YYYY",
-                                    )
-                                }}
+                                {{ dayjs(review.created_at).format("MMM DD, YYYY") }}
                             </p>
                         </div>
                     </div>
 
-                    <div class="mt-4">
+                    <!-- Star Rating -->
+                    <div class="mt-2">
                         <Rating
                             :starSize="14"
                             :disabled="true"
@@ -266,13 +265,25 @@ function deleteReview(id) {
                         />
                     </div>
 
-                    <p class="mt-3 text-sm leading-relaxed text-gray-700">
+                    <!-- Comment -->
+                    <p class="mt-3 text-sm text-gray-700 leading-relaxed">
                         {{ review.comment }}
                     </p>
+
+                    <!-- Review Images (Shopee style thumbnail grid) -->
+                    <div v-if="review.images && review.images.length" class="mt-3 flex flex-wrap gap-2">
+                        <img
+                            v-for="(img, index) in review.images"
+                            :key="index"
+                            :src="img"
+                            alt="Review photo"
+                            class="h-20 w-20 object-cover rounded-md border border-gray-200"
+                        />
+                    </div>
                 </div>
             </div>
 
-            <div v-else class="mt-10 text-center text-gray-500">
+            <div v-else class="text-center text-gray-500 mt-10">
                 <p>No reviews yet. Be the first to leave one!</p>
             </div>
         </div>
@@ -285,70 +296,47 @@ function deleteReview(id) {
     />
 
     <!-- Modal -->
-    <ReusableModal
-        v-if="isShowReportModal"
-        @closeModal="isShowReportModal = false"
-    >
-        <div
-            class="mx-auto w-full rounded-2xl bg-white p-8 shadow-2xl transition-all sm:w-[95%] lg:w-[800px]"
-        >
-            <!-- Header -->
-            <div class="mb-6 flex items-center justify-between border-b pb-4">
-                <h3 class="text-2xl font-bold text-gray-800">Leave a Review</h3>
-                <button @click="isShowReportModal = false">
-                    <i
-                        class="bi bi-x-lg text-lg text-gray-600 hover:text-gray-900"
-                    ></i>
+    <ReusableModal v-if="isShowReportModal" @closeModal="isShowReportModal = false">
+        <div class="mx-auto w-full rounded-xl bg-white p-6 sm:w-[95%] lg:w-[600px]">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800">Write a Review</h3>
+                <button @click="isShowReportModal = false" class="text-gray-600 hover:text-gray-900">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
-            <!-- Form -->
-            <form @submit.prevent="submitReview" class="space-y-6">
-                <!-- Star Rating + Label -->
+            <form @submit.prevent="submitReview" class="mt-5 space-y-5">
+                <!-- Star Rating -->
                 <div class="flex items-center gap-4">
                     <Rating :id="nanoid()" @addstar="form.star = $event" />
-                    <p
-                        v-if="form.star"
-                        class="whitespace-nowrap text-sm font-medium text-orange-600"
-                    >
+                    <p v-if="form.star" class="text-orange-600 text-sm font-medium">
                         {{ starFeedback }}
                     </p>
                 </div>
-
                 <InputFlashMessage
                     v-if="starError"
                     message="Please select a star rating."
                     type="error"
-                    class="-mt-2"
                 />
 
                 <!-- Comment -->
-                <div>
-                    <textarea
-                        v-model="form.comment"
-                        name="comment"
-                        rows="5"
-                        class="w-full resize-none rounded-md border border-gray-300 p-4 text-sm placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-orange-500"
-                        placeholder="Write your thoughts about this experience..."
-                    ></textarea>
-                </div>
+                <textarea
+                    v-model="form.comment"
+                    rows="4"
+                    class="w-full resize-none rounded-md border border-gray-300 p-3 text-sm focus:border-orange-500 focus:ring-orange-500"
+                    placeholder="Share details of your experience..."
+                ></textarea>
 
-                <!-- Submit Button -->
+                <!-- Submit -->
                 <div class="flex justify-end">
                     <button
                         type="submit"
-                        class="rounded-md bg-orange-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-orange-600"
+                        class="px-6 py-2 rounded-md bg-orange-500 text-sm font-semibold text-white hover:bg-orange-600"
                     >
-                        Submit Review
+                        Submit
                     </button>
                 </div>
             </form>
         </div>
     </ReusableModal>
 </template>
-
-<style scoped>
-textarea::placeholder {
-    color: #a0aec0;
-}
-</style>

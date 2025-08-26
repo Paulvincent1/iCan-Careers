@@ -34,6 +34,8 @@ class ReportJobPostController extends Controller
             'reason' => 'required'
         ]);
 
+        dd('s');
+
         $user = $request->user();
         $user->reportsMadeToJobPost()->create([
             'reason' => $request->reason,
