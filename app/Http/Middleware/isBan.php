@@ -24,7 +24,9 @@ class isBan
 
            $request->session()->regenerateToken();
 
-           return redirect('/')->with('error', 'Your account has been banned.');
+           return redirect('/login')->withErrors([
+                    'email' => 'Your account is banned, contact our team to appeal if you are innocent',
+                ])->onlyInput('email');
         }
         return $next($request);
     }

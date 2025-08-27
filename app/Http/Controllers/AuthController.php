@@ -24,7 +24,7 @@ class AuthController extends Controller
 
     public function __construct(public InvoiceService $invoiceService)
     {
-        
+
     }
 
     public function registerCreate(Request $request){
@@ -45,10 +45,10 @@ class AuthController extends Controller
             if($fields['role'] === 'Employer'){
 
                 DB::beginTransaction();
-                                
+
                 $user = User::create($fields);
                 $role = Role::where('name', $fields['role'])->first();
-                
+
 
                 $user->roles()->attach($role->id);
                 // creating a free tier subscription if the user is employer
@@ -57,10 +57,10 @@ class AuthController extends Controller
                     'start_date' => Carbon::now(),
                 ]);
 
-            
+
                 try {
 
-               
+
                     $externalIdProTier =  'INV-'.uniqid();
                     $externalIdPremiumTier =  'INV-'.uniqid();
 
@@ -77,7 +77,7 @@ class AuthController extends Controller
                             'hours' => 1,
                             ]
                             ],
-                        duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0)) 
+                        duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0))
                         );
                         // dd($proTierInvoice->getInvoiceUrl());
 
@@ -92,7 +92,7 @@ class AuthController extends Controller
 
 
 
-                        
+
                         // creating premium tier invoice
                     $premiumTierInvoice = $this->invoiceService
                     ->createInvoice(
@@ -105,7 +105,7 @@ class AuthController extends Controller
                             'hours' => 1,
                             ]
                             ],
-                            duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0))           
+                            duration: Carbon::now()->diffInSeconds(Carbon::now()->addMonth()->setTime(23,59,0))
                         );
 
                     $user->employerSubscriptionInvoices()->create([
@@ -122,21 +122,21 @@ class AuthController extends Controller
                 }catch(Exception $e){
 
                     DB::rollBack();
-                    
+
                     return redirect()->back()->withErrors(['message' => 'Error creating account, Please try again.']);
 
                 }
 
-                   
+
             }
 
-            
+
 
             if($fields['role'] === 'PWD' || $fields['role'] === 'Senior'){
-                
+
                 $user = User::create($fields);
                 $role = Role::where('name', $fields['role'])->first();
-                
+
 
                 $user->roles()->attach($role->id);
 
@@ -166,15 +166,13 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            
-            
             $userRole = '';
             foreach($user->roles as $role){
                 $userRole = $role->name;
             }
 
             if($userRole === 'Senior' || $userRole === 'PWD'){
-                if(!$user->workerProfile){  
+                if(!$user->workerProfile){
                     return redirect()->route('create.profile');
                 }
                 return redirect()->route('worker.dashboard');
@@ -208,11 +206,11 @@ class AuthController extends Controller
 
     public function forgotPasswordSendVerification(Request $request){
         $request->validate(['email' => 'required|email']);
- 
+
         $status = Password::sendResetLink(
             $request->only('email')
         );
-     
+
         return $status === Password::RESET_LINK_SENT
                     ? back()->with(['status' => __($status)])
                     : back()->withErrors(['email' => __($status)]);
@@ -221,7 +219,7 @@ class AuthController extends Controller
     public function resetPasswordIndex(Request $request){
 
         return inertia('Authentication/ResetPassword', ['token' => $request->route('token'), 'email' => $request->email, 'status' => $request->session()->get('status')]);
-    }   
+    }
 
     public function resetPassword(Request $request) {
         $request->validate([
@@ -229,20 +227,20 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|min:8|confirmed',
         ]);
-     
+
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {
                 $user->forceFill([
                     'password' => Hash::make($password)
                 ])->setRememberToken(Str::random(60));
-     
+
                 $user->save();
-     
+
                 event(new PasswordReset($user));
             }
         );
-     
+
         return $status === Password::PASSWORD_RESET
                     ? redirect()->route('login')->with('status', __($status))
                     : back()->withErrors(['email' => [__($status)]]);

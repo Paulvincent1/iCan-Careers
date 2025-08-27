@@ -34,7 +34,7 @@ class ReportJobPostController extends Controller
             'reason' => 'required'
         ]);
 
-        dd('s');
+        // dd('s');
 
         $user = $request->user();
         $user->reportsMadeToJobPost()->create([
@@ -48,7 +48,7 @@ class ReportJobPostController extends Controller
 
         $admin->notify(new AdminReportJobPostNotification(admin:$admin,user:$user));
         broadcast(new AdminReportJobPostNotification(admin:$admin,user:$user));
-        
+
 
 
         return redirect()->back()->with('messageProp','Thank you for reporting this user! We will review the behaviour of this user.');
