@@ -39,6 +39,10 @@ const control = new MapLibreSearchControl();
 watch(
     () => map.isLoaded,
     () => {
+        map.map.setMaxBounds([
+            [116.0, 4.5], // Southwest
+            [127.0, 21.0], // Northeast
+        ]);
         if (props.disableSearch) {
             return;
         }

@@ -30,7 +30,7 @@ class JobPostController extends Controller
     public function create()
     {
         if(!Gate::allows('employer-profile-check')) {
-            return redirect()->route('reate.profile.employer');
+            return redirect()->route('create.profile.employer');
         }
         $user = Auth::user();
         // dd($user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->count());
@@ -84,7 +84,7 @@ class JobPostController extends Controller
             $jobImage = Storage::disk('public')->put('images', $request->job_image);
         }
 
-        $startOfMonthUserTZ = $user->timezone;
+
 
         if ($user->employerSubscription->subscription_type === 'Free') {
 

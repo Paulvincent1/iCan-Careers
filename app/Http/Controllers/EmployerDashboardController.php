@@ -217,7 +217,7 @@ class EmployerDashboardController extends Controller
         ->update(
             [
                 'status' => 'Interview Scheduled',
-                'interview_schedule'=> Carbon::parse("$request->date $request->time"),
+                'interview_schedule'=> $interviewTime,
                 'interview_mode'=> $fields['interview_mode'],
                 'coordinates'=>  $fields['coordinates'],
             ]
