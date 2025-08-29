@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Spatie\LaravelPdf\Facades\Pdf;
+use Stevebauman\Location\Facades\Location;
 
 class WorkerDashboard extends Controller
 {
@@ -221,8 +222,12 @@ class WorkerDashboard extends Controller
             $externalId = 'INV-' . strtoupper(uniqid());
 
 
-            $secondsDuration = Carbon::now()->diffInSeconds(Carbon::parse($fields['dueDate'] . ' 23:59:00'));
-            // dd(Carbon::now());
+            $location = Location::get($request->ip());
+
+            $timezone = $location ? $location->timezone : config('app.timezone', 'UTC');
+            $dueDate = Carbon::parse($fields['dueDate'] . ' 23:59:00',  $timezone)
+                ->setTimezone('UTC');
+            $secondsDuration = Carbon::now()->diffInSeconds($dueDate);
 
 
             $xenditTransactionFee = (($fields['totalAmount'] / 0.955) * 0.045);
@@ -249,7 +254,7 @@ class WorkerDashboard extends Controller
                     'items' => $fields['items'],
                     'invoice_url' => $resultInvoice->getInvoiceUrl(),
                     'status' => 'pending',
-                    'due_date' => Carbon::parse($fields['dueDate'] .' 23:59:00'),
+                    'due_date' => $dueDate,
                     'paid_at' => null,
                     'employer_id' => $employer->id,
                 ]
@@ -279,6 +284,10 @@ class WorkerDashboard extends Controller
 
             DB::rollBack();
             dd($e->getMessage());
+
+            // TODO: error handling same date.
+
+            // return redirect()->back()->withErrors(['duedate' => 'The due date must be at least 24 hours from now.']);
 
         }
 
