@@ -99,7 +99,7 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::clas
 
 
     //prev employers
-    Route::get('/prev-employers',[WorkerDashboard::class,'prevEmployers'])->name('worker.previous.emplyer');
+    Route::get('/prev-employers', [WorkerDashboard::class, 'prevEmployers'])->name('worker.previous.emplyer');
 
     Route::get('/worker/job-history', [WorkerProfileController::class, 'jobHistory'])->name('worker.job.history');
 
@@ -127,8 +127,6 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::clas
         // employer profile
         Route::get('/profile/{id}', [EmployerProfileController::class, 'showEmployerProfile'])->name('visit.employer.profile');
     });
-
-    
 });
 
 
@@ -151,7 +149,7 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::cla
     Route::put('/jobpost/{jobid}', [JobPostController::class, 'closeJob'])->name('employer.jobpost.close');
 
     //prev workers
-    Route::get('/prev-workers',[EmployerDashboardController::class,'prevWorkers'])->name('employer.previous.workers');
+    Route::get('/prev-workers', [EmployerDashboardController::class, 'prevWorkers'])->name('employer.previous.workers');
 
 
     Route::get('/applicants/{jobid}', [EmployerDashboardController::class, 'showJobApplicants'])->name('job.applicants');
@@ -168,14 +166,15 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::cla
 });
 
 // Reviews
-Route::middleware(['auth'])->group(function() {
-    Route::get('myprofile/reviews',[ReviewController::class,'index'])->name('review.my-profile');
+Route::middleware(['auth'])->group(function () {
+    Route::get('myprofile/reviews', [ReviewController::class, 'index'])->name('review.my-profile');
 
-    Route::get('/reviews/{id}',[ReviewController::class,'visitProfile'])->name('review.view-profile');
+    Route::get('/reviews/{id}', [ReviewController::class, 'visitProfile'])->name('review.view-profile');
 
     // store review
-    Route::post('/reviews/{id}/store',[ReviewController::class, 'store'])->name('review.store');
-
+    Route::post('/reviews/{id}/store', [ReviewController::class, 'store'])->name('review.store');
+    Route::put('/reviews/{review}/update', [ReviewController::class, 'update'])->name('review.update');
+    Route::delete('/reviews/{review}/destroy', [ReviewController::class, 'destroy'])->name('review.destroy');
 });
 
 
@@ -209,7 +208,7 @@ Route::prefix('admin')->middleware([isAdmin::class])->group(function () {
 
 
     // view profile user
-    Route::get('/user/{id}',[AdminDashboardController::class, 'viewProfile'])->name('admin.view-profile-user');
+    Route::get('/user/{id}', [AdminDashboardController::class, 'viewProfile'])->name('admin.view-profile-user');
 });
 
 

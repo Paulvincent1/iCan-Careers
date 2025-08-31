@@ -710,7 +710,7 @@ const formatCurrency =
                                     <div class="flex gap-2">
                                         <div class="h-10 w-10">
                                             <img
-                                                src="/assets/profile_placeholder.jpg"
+                                                :src="transaction.employer.profile_img ?? '/assets/profile_placeholder.jpg'"
                                                 alt=""
                                                 class="h-full w-full rounded-full"
                                             />

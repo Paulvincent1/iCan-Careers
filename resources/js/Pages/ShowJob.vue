@@ -196,7 +196,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     class="absolute left-[50%] top-[50px] flex h-32 w-32 translate-x-[-50%] flex-col items-center"
                 >
                     <img
-                        class="h-full w-full rounded-lg object-cover"
+                        class="h-full w-full rounded-lg object-obtain"
                         :src="
                             jobPostProps.employer.employer_profile
                                 .business_information

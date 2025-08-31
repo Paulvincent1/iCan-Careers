@@ -17,7 +17,7 @@ const pricingPlans = [
         subtitle: "Why No Free Trial?",
         price: "Free",
         features: [
-            { text: "Communicate with Workers", strike: true },
+            { text: "Communicate with Workers"},
             { text: "Hire Workers", strike: true },
             { text: "Create up to 3 jobs per month" },
             { text: "2 days Job Post approval" },

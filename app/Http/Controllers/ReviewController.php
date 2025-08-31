@@ -16,20 +16,20 @@ class ReviewController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $myReviews = $user->receivedReviews()->with('reviewer')->orderBy('created_at','desc')->get();
+        $myReviews = $user->receivedReviews()->with('reviewer')->orderBy('created_at', 'desc')->get();
 
         $reviewCount = $myReviews->count();
 
         $sumStars = 0;
         $myReviews->pluck('star')
-        ->each( function($e) use(&$sumStars) {
-            $sumStars+=$e;
-        });
+            ->each(function ($e) use (&$sumStars) {
+                $sumStars += $e;
+            });
 
-        if($sumStars){
+        if ($sumStars) {
             $averageStar = $sumStars / $reviewCount;
 
-            $roundedAverageStar = round($averageStar,2);
+            $roundedAverageStar = round($averageStar, 2);
         }
 
 
@@ -41,34 +41,38 @@ class ReviewController extends Controller
         ]);
     }
 
-    public function visitProfile(User $id){
+    public function visitProfile(User $id)
+    {
         $user = Auth::user();
 
-        if($user->id === $id->id){
+        if ($user->id === $id->id) {
             return redirect()->route('review.my-profile');
         }
 
         $owedReviews = null;
-        if($user->roles->first()->name === 'Employer'
-           && ($id->roles->first()->name === 'Senior' || $id->roles->first()->name === 'PWD')){
-            foreach($user->employerJobPosts as $job){
-                if($job->employedWorkers()->where('worker_id',$id->id)->where('reviewed_by_employer', false)->exists()) {
+        if (
+            $user->roles->first()->name === 'Employer'
+            && ($id->roles->first()->name === 'Senior' || $id->roles->first()->name === 'PWD')
+        ) {
+            foreach ($user->employerJobPosts as $job) {
+                if ($job->employedWorkers()->where('worker_id', $id->id)->where('reviewed_by_employer', false)->exists()) {
                     $owedReviews++;
                 }
-
             }
-        }elseif($id->roles->first()->name === 'Employer'
-           && ($user->roles->first()->name === 'Senior' || $user->roles->first()->name === 'PWD')){
-            foreach($id->employerJobPosts as $job){
-                if($job->employedWorkers()->where('worker_id',$user->id)->where('reviewed_by_worker', false)->exists()) {
+        } elseif (
+            $id->roles->first()->name === 'Employer'
+            && ($user->roles->first()->name === 'Senior' || $user->roles->first()->name === 'PWD')
+        ) {
+            foreach ($id->employerJobPosts as $job) {
+                if ($job->employedWorkers()->where('worker_id', $user->id)->where('reviewed_by_worker', false)->exists()) {
                     $owedReviews++;
                 }
             }
         }
 
-        $myReviews = $id->receivedReviews()->with('reviewer')->where('reviewer_id', $user->id)->orderBy('created_at','desc')->get();
+        $myReviews = $id->receivedReviews()->with('reviewer')->where('reviewer_id', $user->id)->orderBy('created_at', 'desc')->get();
 
-        $otherReviews = $id->receivedReviews()->with('reviewer')->where('reviewer_id', '!=', $user->id)->orderBy('created_at','desc')->get();
+        $otherReviews = $id->receivedReviews()->with('reviewer')->where('reviewer_id', '!=', $user->id)->orderBy('created_at', 'desc')->get();
 
         $sortedReviews = $myReviews->merge($otherReviews);
 
@@ -78,19 +82,23 @@ class ReviewController extends Controller
         $sortedReviews->pluck('star')->each(
             function ($e) use (&$sumStars) {
 
-                $sumStars+=$e;
+                $sumStars += $e;
             }
         );
 
-        if($sumStars){
+        if ($sumStars) {
             $averageStar = $sumStars / $reviewCount;
 
-            $roundedAverageStar = round($averageStar,2);
+            $roundedAverageStar = round($averageStar, 2);
         }
 
 
-        return inertia('Reviews/Reviews',['visitor' => true,
-         'owedReviews' => $owedReviews, 'sortedReviews' => $sortedReviews, 'averageStar' => $roundedAverageStar ?? 0.00]);
+        return inertia('Reviews/Reviews', [
+            'visitor' => true,
+            'owedReviews' => $owedReviews,
+            'sortedReviews' => $sortedReviews,
+            'averageStar' => $roundedAverageStar ?? 0.00
+        ]);
     }
 
     /**
@@ -108,28 +116,28 @@ class ReviewController extends Controller
     {
         $fields = $request->validate([
             'comment' => 'nullable|string|max:1000',
-            'star' =>'required|integer|min:1|max:5'
+            'star' => 'required|integer|min:1|max:5'
         ]);
 
         $user = Auth::user();
 
         $user->myReviews()->create([
-            'star'=> $fields['star'],
+            'star' => $fields['star'],
             'comment' => $fields['comment'],
-            'reviewee_id'=> $id->id
+            'reviewee_id' => $id->id
         ]);
 
         // just find the first row in the table and update it.
-        if($user->roles->first()->name === 'Employer'){
-            foreach($user->employerJobPosts as $job){
-                if($job->employedWorkers()->where('worker_id',$id->id)->where('reviewed_by_employer', false)->exists()) {
-                   $record = DB::table('hired_workers')->where('job_post_id',$job->id)
-                    ->where('worker_id',$id->id)->where('reviewed_by_employer', false)->first();
+        if ($user->roles->first()->name === 'Employer') {
+            foreach ($user->employerJobPosts as $job) {
+                if ($job->employedWorkers()->where('worker_id', $id->id)->where('reviewed_by_employer', false)->exists()) {
+                    $record = DB::table('hired_workers')->where('job_post_id', $job->id)
+                        ->where('worker_id', $id->id)->where('reviewed_by_employer', false)->first();
 
-                    if($record){
+                    if ($record) {
                         DB::table('hired_workers')
-                        ->where('id', $record->id)
-                        ->update(['reviewed_by_employer' => true]);
+                            ->where('id', $record->id)
+                            ->update(['reviewed_by_employer' => true]);
                     }
 
                     break;
@@ -137,19 +145,19 @@ class ReviewController extends Controller
             }
         }
 
-        if($user->roles->first()->name === 'Senior' || $user->roles->first()->name === 'PWD'){
-             foreach($id->employerJobPosts as $job){
-                if($job->employedWorkers()->where('worker_id',$user->id)->where('reviewed_by_worker', false)->exists()) {
-                     $record = DB::table('hired_workers')->where('job_post_id',$job->id)
-                     ->where('worker_id',$user->id)->where('reviewed_by_worker', false)->first();
+        if ($user->roles->first()->name === 'Senior' || $user->roles->first()->name === 'PWD') {
+            foreach ($id->employerJobPosts as $job) {
+                if ($job->employedWorkers()->where('worker_id', $user->id)->where('reviewed_by_worker', false)->exists()) {
+                    $record = DB::table('hired_workers')->where('job_post_id', $job->id)
+                        ->where('worker_id', $user->id)->where('reviewed_by_worker', false)->first();
 
-                     if($record){
+                    if ($record) {
                         DB::table('hired_workers')
-                        ->where('id',$record->id)
-                        ->update([
+                            ->where('id', $record->id)
+                            ->update([
                                 'reviewed_by_worker' => true
                             ]);
-                     }
+                    }
 
                     break;
                 }
@@ -180,14 +188,28 @@ class ReviewController extends Controller
      */
     public function update(Request $request, Review $review)
     {
-        //
+        $fields = $request->validate([
+            'comment' => 'nullable|string|max:1000',
+            'star' => 'required|integer|min:1|max:5',
+        ]);
+
+        if ($review->reviewer_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $review->update($fields);
+
+        return redirect()->back()->with('success', 'Review updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Review $review)
     {
-        //
+        if ($review->reviewer_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $review->delete();
+
+        return redirect()->back()->with('success', 'Review deleted successfully.');
     }
 }

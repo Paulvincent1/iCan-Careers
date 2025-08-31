@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\JobPost;
 use App\Models\ReportJobPost;
 use App\Models\User;
 use App\Notifications\AdminReportJobPostNotification;
@@ -28,7 +29,7 @@ class ReportJobPostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, User $jobpostId)
+    public function store(Request $request, JobPost $jobpostId)
     {
         $request->validate([
             'reason' => 'required'
