@@ -128,7 +128,7 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::clas
         Route::get('/profile/{id}', [EmployerProfileController::class, 'showEmployerProfile'])->name('visit.employer.profile');
     });
 
-    
+
 });
 
 

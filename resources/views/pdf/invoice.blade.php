@@ -31,7 +31,7 @@
                 </div>
                 <div>
                     <h3 class="font-semibold text-gray-700">Due Date:</h3>
-                    <p class="text-gray-500">{{ $dueDate }} at 11:59 PM</p>
+                    <p class="text-gray-500">{{ $dueDate }} at 11:59 PM UTC</p>
                 </div>
             </div>
 
@@ -71,7 +71,7 @@
                 </table>
             </div>
 
-            
+
         <!-- Footer -->
         <div class="mt-6 text-gray-600 text-sm text-center">
             <p>Thank you for using iCan Careers!</p>

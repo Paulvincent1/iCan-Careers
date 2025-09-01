@@ -2,8 +2,11 @@
 import { Link, router, useForm, usePage } from "@inertiajs/vue3";
 import dayjs from "dayjs";
 import { uniqueId } from "lodash";
-import { getCurrentInstance, ref, useTemplateRef } from "vue";
+import { getCurrentInstance, ref, useTemplateRef, watchEffect } from "vue";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 
 let props = defineProps({
     employersProps: null,
@@ -100,7 +103,8 @@ function validateFields() {
         form.items.rate === 0 ||
         form.items.rate < 1
     ) {
-        errorMessage.value.items = "Please complete this field or enter correct value";
+        errorMessage.value.items =
+            "Please complete this field or enter correct value";
         return false;
     }
 
@@ -192,6 +196,30 @@ const { appContext } = getCurrentInstance();
 const formatCurrency = appContext.config.globalProperties.formatCurrency;
 
 console.log(getCurrentInstance());
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// get the timezone of the user
+const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+// console.log(userTz);
+
+// console.log($page.props.errors.dueDate);
+
+let messageShow = ref(false);
+function showMessage() {
+    messageShow.value = true;
+
+    setTimeout(() => {
+        messageShow.value = false;
+    }, 2000);
+}
+
+watchEffect(() => {
+    if (page.props.errors && Object.keys(page.props.errors).length) {
+        showMessage();
+    }
+});
 </script>
 <template>
     <Head title="Create Invoice | iCan Careers" />
@@ -231,10 +259,18 @@ console.log(getCurrentInstance());
                                     v-model="form.dueDate"
                                     type="date"
                                     class="rounded-lg border p-2 focus:outline-orange-200"
-                                    :min="dayjs().format('YYYY-MM-DD')"
+                                    :min="
+                                        dayjs()
+                                            .tz(userTz)
+                                            .add(1, 'day')
+                                            .format('YYYY-MM-DD')
+                                    "
                                 />
                                 <InputFlashMessage
-                                    :message="errorMessage.dueDate"
+                                    :message="
+                                        errorMessage.dueDate ??
+                                        $page.props.errors.duedate
+                                    "
                                     type="error"
                                 ></InputFlashMessage>
                             </div>
@@ -457,5 +493,13 @@ console.log(getCurrentInstance());
                 </div>
             </div>
         </div>
+        <SuccessfulMessage
+            :messageShow="messageShow"
+            :messageProp="
+                $page.props.errors?.totalAmount ??
+                'Please input all required fields'
+            "
+            type="Error"
+        ></SuccessfulMessage>
     </div>
 </template>
