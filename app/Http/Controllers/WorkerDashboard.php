@@ -211,6 +211,11 @@ class WorkerDashboard extends Controller
         ]);
 
 
+        if ($fields['totalAmount'] < 500) {
+            return redirect()->back()
+            ->withErrors(['totalAmount' => 'The total amount must be at least 500.']);
+        }
+
 
         DB::beginTransaction();
         try{
@@ -227,8 +232,9 @@ class WorkerDashboard extends Controller
             $timezone = $location ? $location->timezone : config('app.timezone', 'UTC');
             $dueDate = Carbon::parse($fields['dueDate'] . ' 23:59:00',  $timezone)
                 ->setTimezone('UTC');
-            $secondsDuration = Carbon::now()->diffInSeconds($dueDate);
-
+                // dd($dueDate);
+            $secondsDuration = Carbon::now('UTC')->diffInSeconds($dueDate);
+            //  dd($secondsDuration);
 
             $xenditTransactionFee = (($fields['totalAmount'] / 0.955) * 0.045);
             $vatTransactionFee = $xenditTransactionFee * 0.12;
@@ -283,11 +289,11 @@ class WorkerDashboard extends Controller
         }catch(\Exception $e){
 
             DB::rollBack();
-            dd($e->getMessage());
+            // dd($e->getMessage());
 
             // TODO: error handling same date.
 
-            // return redirect()->back()->withErrors(['duedate' => 'The due date must be at least 24 hours from now.']);
+            return redirect()->back()->withErrors(['duedate' => 'The due date and time must be in the future (UTC).']);
 
         }
 
