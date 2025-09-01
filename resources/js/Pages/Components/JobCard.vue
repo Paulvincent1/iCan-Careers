@@ -74,7 +74,7 @@ let datePosted = computed(() => {
                             : '/assets/logo-placeholder-image.png'
                     "
                     alt=""
-                    class="h-full w-full rounded object-cover"
+                    class="h-full w-full rounded object-obtain"
                 />
             </div>
             <div>

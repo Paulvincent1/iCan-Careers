@@ -28,6 +28,10 @@ const isShowSuccessfulMessage = ref(false);
 const selectedSort = ref("highest");
 const selectedStarFilter = ref(null);
 const SORT_KEY = "review_sort";
+const isShowEditModal = ref(false);
+const editStarFeedback = computed(() => (editForm.star ? starLabels[editForm.star] : ""));
+
+
 
 // Label text for stars
 const starLabels = {
@@ -124,11 +128,14 @@ function startEdit(review) {
     editingReviewId.value = review.id;
     editForm.star = review.star;
     editForm.comment = review.comment;
+    isShowEditModal.value = true; // show modal
 }
+
 
 function cancelEdit() {
     editingReviewId.value = null;
     editForm.reset();
+    isShowEditModal.value = false;
 }
 
 function updateReview(id) {
@@ -136,14 +143,20 @@ function updateReview(id) {
         preserveScroll: true,
         onSuccess: () => {
             editingReviewId.value = null;
+            isShowEditModal.value = false; // close modal
+            showSuccessMessage("Review updated successfully!");
         },
     });
 }
+
 
 function deleteReview(id) {
     if (confirm("Are you sure you want to delete this review?")) {
         form.delete(route("review.destroy", id), {
             preserveScroll: true,
+            onSuccess: () => {
+                showSuccessMessage("Review deleted successfully!");
+            },
         });
     }
 }
@@ -191,7 +204,7 @@ function deleteReview(id) {
                     :key="star"
                     @click="selectedStarFilter = star"
                     class="px-4 py-1.5 rounded-full text-sm font-medium border transition"
-                    :class="selectedStarFilter === star 
+                    :class="selectedStarFilter === star
                         ? 'bg-orange-500 text-white border-orange-500'
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'"
                 >
@@ -244,7 +257,26 @@ function deleteReview(id) {
                             >
                                 {{ review.reviewer.name.charAt(0) }}
                             </div>
+
                         </div>
+                        <div v-if="review.reviewer.id === $page.props.auth.user.id" class="flex gap-3">
+                            <button
+                                v-if="editingReviewId !== review.id"
+                                @click="startEdit(review)"
+                                class="text-blue-600 hover:text-blue-800"
+                                title="Edit"
+                            >
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button
+                                @click="deleteReview(review.id)"
+                                class="text-red-600 hover:text-red-800"
+                                title="Delete"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+
                         <div>
                             <p class="font-semibold text-gray-900 text-sm">
                                 {{ review.reviewer.name }}
@@ -265,21 +297,11 @@ function deleteReview(id) {
                         />
                     </div>
 
-                    <!-- Comment -->
                     <p class="mt-3 text-sm text-gray-700 leading-relaxed">
                         {{ review.comment }}
                     </p>
 
-                    <!-- Review Images (Shopee style thumbnail grid) -->
-                    <div v-if="review.images && review.images.length" class="mt-3 flex flex-wrap gap-2">
-                        <img
-                            v-for="(img, index) in review.images"
-                            :key="index"
-                            :src="img"
-                            alt="Review photo"
-                            class="h-20 w-20 object-cover rounded-md border border-gray-200"
-                        />
-                    </div>
+
                 </div>
             </div>
 
@@ -339,4 +361,55 @@ function deleteReview(id) {
             </form>
         </div>
     </ReusableModal>
+    <ReusableModal v-if="isShowEditModal" @closeModal="cancelEdit">
+    <div class="mx-auto w-full rounded-xl bg-white p-6 sm:w-[95%] lg:w-[600px]">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="text-lg font-bold text-gray-800">Edit Review</h3>
+            <button @click="cancelEdit" class="text-gray-600 hover:text-gray-900">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <form @submit.prevent="updateReview(editingReviewId)" class="mt-5 space-y-5">
+            <!-- Star Rating -->
+            <div class="flex items-center gap-4">
+                <Rating
+                    :id="`edit_${editingReviewId}`"
+                    :starValue="editForm.star"
+                    @addstar="editForm.star = $event"
+                />
+                <p v-if="editForm.star" class="text-orange-600 text-sm font-medium">
+                    {{ editStarFeedback }}
+                </p>
+            </div>
+
+            <!-- Comment -->
+            <textarea
+                v-model="editForm.comment"
+                rows="4"
+                class="w-full resize-none rounded-md border border-gray-300 p-3 text-sm focus:border-orange-500 focus:ring-orange-500"
+                placeholder="Update your review..."
+            ></textarea>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-2">
+                <button
+                    type="button"
+                    @click="cancelEdit"
+                    class="px-4 py-2 rounded-md bg-gray-300 text-sm"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    class="px-6 py-2 rounded-md bg-green-500 text-sm font-semibold text-white hover:bg-green-600"
+                    :disabled="editForm.processing"
+                >
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</ReusableModal>
+
 </template>

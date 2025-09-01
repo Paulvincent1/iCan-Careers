@@ -40,7 +40,7 @@ const showAllEmployers = ref(false);
                                 '/assets/profile_placeholder.jpg'
                             "
                             alt="Business Logo"
-                            class="h-full w-full rounded-md object-cover"
+                            class="h-full w-full rounded-md object-obtain"
                         />
                     </div>
                 </div>

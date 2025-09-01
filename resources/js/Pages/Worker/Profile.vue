@@ -70,6 +70,9 @@ const age = dayjs().format("YYYY") - workerProfile.value.birth_year;
 
 let hourPay = ref(formatCurrency(workerProfile.value.hour_pay));
 let monthPay = ref(formatCurrency(workerProfile.value.month_pay));
+let isShowContractModal = ref(false);
+let selectedContract = ref("");
+
 
 function updateJobTitle() {
     router.put(
@@ -520,22 +523,16 @@ function fireWorker(jobPostId) {
                 <div v-if="isPending">
                     <p class="text-yellow-400">{{ isPending }}</p>
                 </div>
-                <div
-                    v-if="currentlyEmployedByMeProp"
-                    class="flex flex-col items-center justify-center gap-3"
-                >
-                    <div
-                        v-for="currentJob in currentlyEmployedByMeProp"
-                        :key="currentJob.id"
+                <!-- Manage Contracts Button -->
+                <div v-if="currentlyEmployedByMeProp && currentlyEmployedByMeProp.length > 0" class="flex justify-center my-4">
+                    <button
+                        @click="isShowContractModal = true"
+                        class="rounded-md bg-red-500 px-4 py-2 text-white font-bold shadow hover:bg-red-600"
                     >
-                        <button
-                            @click="fireWorker(currentJob.id)"
-                            class="rounded-full bg-red-500 px-4 py-1 font-bold text-white"
-                        >
-                            {{ currentJob.job_title }} (End Contract)
-                        </button>
-                    </div>
+                        Manage Contracts
+                    </button>
                 </div>
+
             </div>
         </div>
         <div
@@ -686,7 +683,7 @@ function fireWorker(jobPostId) {
                             >
                                 <!-- Company Logo -->
                                 <img
-                                    class="h-16 w-16 flex-shrink-0 rounded border object-cover"
+                                    class="h-16 w-16 flex-shrink-0 rounded border object-obtain"
                                     :src="
                                         job.employer?.employer_profile
                                             ?.business_information
@@ -965,6 +962,56 @@ function fireWorker(jobPostId) {
             </div>
         </div>
     </ReusableModal>
+
+    <ReusableModal
+    v-if="isShowContractModal"
+    @closeModal="isShowContractModal = false"
+>
+    <div class="w-[350px] sm:w-[500px] max-w-full rounded bg-white px-4 py-6">
+        <div class="mb-4 flex justify-between items-center">
+            <h2 class="text-xl font-bold">End Contract</h2>
+            <button @click="isShowContractModal = false">
+                <i class="bi bi-x-circle text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Dropdown to select job -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-600 mb-1">Select Contract</label>
+            <select
+                v-model="selectedContract"
+                class="w-full rounded border px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400"
+            >
+                <option disabled value="">-- Choose a job contract --</option>
+                <option
+                    v-for="job in currentlyEmployedByMeProp"
+                    :key="job.id"
+                    :value="job.id"
+                >
+                    {{ job.job_title }}
+                </option>
+            </select>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3">
+            <button
+                @click="isShowContractModal = false"
+                class="rounded bg-gray-300 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-400"
+            >
+                Cancel
+            </button>
+            <button
+                :disabled="!selectedContract"
+                @click="fireWorker(selectedContract)"
+                class="rounded bg-red-500 px-4 py-2 text-sm font-bold text-white hover:bg-red-600 disabled:opacity-50"
+            >
+                End Contract
+            </button>
+        </div>
+    </div>
+</ReusableModal>
+
 </template>
 
 <style scoped>
