@@ -9,6 +9,7 @@ import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import { uniqueId, round, countBy } from "lodash";
 import dayjs from "dayjs";
+import ProfileHoverCard from "../Components/ProfileHoverCard.vue";
 
 // Props from Laravel backend
 const props = defineProps({
@@ -244,21 +245,13 @@ function deleteReview(id) {
                 >
                     <!-- Reviewer Info -->
                     <div class="flex items-center gap-3">
-                        <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden">
+                        <ProfileHoverCard :user-id="review.reviewer.id">
                             <img
-                                v-if="review.reviewer.profile_img"
-                                :src="review.reviewer.profile_img"
-                                alt="Reviewer photo"
-                                class="h-full w-full object-cover"
+                                :src="review.reviewer.profile_img ?? '/assets/profile_placeholder.jpg'"
+                                alt="Reviewer"
+                                class="h-10 w-10 rounded-full object-cover border-2 border-gray-200 shadow-sm cursor-pointer"
                             />
-                            <div
-                                v-else
-                                class="flex h-full w-full items-center justify-center bg-orange-500 font-bold text-white"
-                            >
-                                {{ review.reviewer.name.charAt(0) }}
-                            </div>
-
-                        </div>
+                        </ProfileHoverCard>
                         <div v-if="review.reviewer.id === $page.props.auth.user.id" class="flex gap-3">
                             <button
                                 v-if="editingReviewId !== review.id"
@@ -278,9 +271,11 @@ function deleteReview(id) {
                         </div>
 
                         <div>
-                            <p class="font-semibold text-gray-900 text-sm">
-                                {{ review.reviewer.name }}
-                            </p>
+                            <ProfileHoverCard   :user-id="review.reviewer.id">
+                                <p class="font-semibold text-gray-800 cursor-pointer hover:underline">
+                                    {{ review.reviewer.name }}
+                                </p>
+                            </ProfileHoverCard>
                             <p class="text-xs text-gray-500">
                                 {{ dayjs(review.created_at).format("MMM DD, YYYY") }}
                             </p>

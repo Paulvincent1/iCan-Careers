@@ -5,6 +5,7 @@ import { Link, router } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import ProfilePage from "../Components/Reviews/ProfilePage.vue";
+import ProfileJobHover from "../Components/ProfileJobHover.vue";
 
 let props = defineProps({
     user: Object,
@@ -209,6 +210,16 @@ function submitReport(reason) {
     <Head title="Profile | iCan Careers" />
     <div class="min-h-[calc(100vh-4.625rem)] bg-[#f3f7fa]">
         <div class="relative h-32 bg-[#FAFAFA]">
+            <!-- Report Button - Top Right -->
+                <div class="absolute right-9 top-4">
+                    <button 
+                        @click="isShowReportModal = true" 
+                        class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-gray-50"
+                    >
+                        <i class="bi bi-exclamation-diamond-fill"></i>
+                        <span>Report</span>
+                    </button>
+                </div>
             <label
                 for="profileimg"
                 :class="[
@@ -316,7 +327,7 @@ function submitReport(reason) {
             >
                 <div class="flex flex-col gap-4 text-[16px] text-gray-600">
                     <div class="rounded-lg bg-white p-8">
-                        <div class="mb-3 flex items-center justify-between">
+                        <!-- <div class="mb-3 flex items-center justify-between">
                             <p class="text-[20px] font-bold">Overview</p>
                             <button
                                 v-if="visitor && !adminVisit"
@@ -326,7 +337,7 @@ function submitReport(reason) {
                                     class="bi bi-exclamation-diamond-fill text-red-600"
                                 ></i>
                             </button>
-                        </div>
+                        </div> -->
                         <div class="mb-4 flex items-center gap-4">
                             <!-- <div
                                 class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200"
@@ -437,11 +448,18 @@ function submitReport(reason) {
                                         "
                                         class="block h-full w-full p-4"
                                     >
-                                        <p
+                                        <ProfileJobHover
+                                            :job-id="job.id"
+                                            class="absolute right-4 top-4">
+                                            <i
+                                                class="bi bi-info-circle text-2xl text-gray-400 hover:cursor-pointer hover:text-gray-600"
+                                            ></i>
+                                            <p
                                             class="text-green- x00 text-xl font-bold hover:underline"
                                         >
                                             {{ job.job_title }}
                                         </p>
+                                        </ProfileJobHover>
                                         <p class="text-gray-600">
                                             {{ job.job_type }} -
                                             {{ job.work_arrangement }}

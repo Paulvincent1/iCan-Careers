@@ -128,15 +128,19 @@ console.log(page.props.auth.user.unreadNotifications);
                             >Pricing</Link
                         >
                     </li>
-                    <!-- <li class="md:my-auto">
+                    <li
+                        v-if="$page.props.auth.user?.role?.name === 'Employer'"
+                        class="md:my-auto"
+                    >
                         <Link
-                            href="/"
-                            class="rounded-3xl bg-[#024570] px-7 py-2 font-medium text-white"
+                            :href="route('create.job')"
+                            class="rounded-3xl bg-[#fa8334] px-7 py-2 font-medium text-white"
                             @click="isActive = false"
                         >
                             POST A JOB
                         </Link>
-                    </li> -->
+                    </li>
+
                     <li
                         v-if="
                             !(

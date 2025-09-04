@@ -190,13 +190,22 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 <template>
     <Head title="Show Job | iCan Careers" />
     <div class="flex min-h-[calc(100vh-4.625rem)] flex-col text-[#171816]">
-        <div class="relative h-32 bg-[#FAFAFA]">
+        <div class="relative h-40 bg-[#FAFAFA]">
             <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
-                <div
-                    class="absolute left-[50%] top-[50px] flex h-32 w-32 translate-x-[-50%] flex-col items-center"
-                >
+                <!-- Report Button - Top Right -->
+                <div class="absolute right-9 top-4">
+                    <button 
+                        @click="isShowReportModal = true" 
+                        class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-gray-50"
+                    >
+                        <i class="bi bi-exclamation-diamond-fill"></i>
+                        <span>Report Job</span>
+                    </button>
+                </div>
+                
+                <div class="absolute left-[50%] top-[60px] flex w-32 translate-x-[-50%] flex-col items-center">
                     <img
-                        class="h-full w-full rounded-lg object-obtain"
+                        class="h-24 w-24 mt-5 rounded-lg object-contain border-2 border-white shadow-md"
                         :src="
                             jobPostProps.employer.employer_profile
                                 .business_information
@@ -204,63 +213,105 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                       .business_information.business_logo
                                 : '/assets/logo-placeholder-image.png'
                         "
-                        alt=""
+                        alt="Company logo"
                     />
-                    <Link
-                        v-if="
-                            page.props.auth.user.role.name === 'Senior' ||
-                            page.props.auth.user.role.name === 'PWD'
-                        "
-                        @click="saveJob"
-                        as="button"
-                        method="post"
-                        preserve-scroll
-                        :href="route('jobsearch.save.job', jobPostProps.id)"
-                        class=""
-                    >
-                        <i
-                            :class="[
-                                'bi absolute bottom-[-5px] right-[-10px] text-lg text-orange-500',
-                                {
-                                    'bi-bookmark-dash': !isSaved,
-                                    'bi-bookmark-dash-fill': isSaved,
-                                },
-                            ]"
-                        ></i>
-                    </Link>
-                    <Link
-                        v-else
-                        v-if="!isClosed"
-                        as="button"
-                        method="get"
-                        preserve-scroll
-                        :href="route('employer.jobpost.edit', jobPostProps.id)"
-                        class=""
-                    >
-                        <i
-                            class="bi bi-pencil-fill absolute bottom-[-5px] right-[-10px] text-lg text-orange-500"
-                        ></i>
-                    </Link>
+                    
+                    <!-- Bookmark Button - Under Company Logo -->
+                    <div class="mt-4 flex justify-center">
+                        <Link
+                            v-if="
+                                page.props.auth.user.role.name === 'Senior' ||
+                                page.props.auth.user.role.name === 'PWD'
+                            "
+                            @click="saveJob"
+                            as="button"
+                            method="post"
+                            preserve-scroll
+                            :href="route('jobsearch.save.job', jobPostProps.id)"
+                            class="flex items-center gap-1 rounded-md bg-white px-1 py-1 text-sm font-medium shadow-sm hover:bg-gray-50 border border-gray-300"
+                        >
+                            <i
+                                :class="[
+                                    'bi',
+                                    {
+                                        'bi-bookmark': !isSaved,
+                                        'bi-bookmark-fill text-orange-500': isSaved,
+                                    },
+                                ]"
+                            ></i>
+                            <span>{{ isSaved ? 'Saved' : 'Save Job' }}</span>
+                        </Link>
+                        <Link
+                            v-else
+                            v-if="!isClosed"
+                            as="button"
+                            method="get"
+                            preserve-scroll
+                            :href="route('employer.jobpost.edit', jobPostProps.id)"
+                            class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-gray-50 border border-gray-300"
+                        >
+                            <i class="bi bi-pencil-fill text-orange-500"></i>
+                            <span>Edit Job</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="xs container mx-auto mt-12 px-[0.5rem] xl:max-w-7xl">
-            <p
-                class="my-2 break-words text-center text-[18px] font-medium md:text-[24px]"
-            >
+        
+        <div class="xs container mx-auto mt-16 px-[0.5rem] xl:max-w-7xl">
+            <p class="my-2 break-words text-center text-[22px] font-bold md:text-[26px]">
                 {{ jobPostProps.job_title }}
             </p>
             <Link
                 :href="
                     route('visit.employer.profile', jobPostProps.employer.id)
                 "
-                class="flex items-center justify-center gap-2"
+                class="flex items-center justify-center gap-2 mb-6"
             >
-                <p class="text-center text-sm text-gray-500 underline">
+                <p class="text-center text-base text-gray-600 hover:text-orange-500 transition-colors">
                     {{ jobPostProps.employer.name }}
                 </p>
                 <i class="bi bi-arrow-right"></i>
             </Link>
+            
+            <!-- Overview Section - Highlighted in the Middle -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
+                <h2 class="text-xl font-bold mb-4 text-center">Job Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Open To -->
+                    <div class="text-center p-3 bg-blue-50 rounded-lg">
+                        <p class="text-sm font-medium text-gray-600 mb-1">Open To</p>
+                        <p class="text-base font-semibold">
+                            {{ preferredWorkers.join(', ') }}
+                        </p>
+                    </div>
+                    
+                    <!-- Working Mode -->
+                    <div class="text-center p-3 bg-green-50 rounded-lg">
+                        <p class="text-sm font-medium text-gray-600 mb-1">Working Mode</p>
+                        <p class="text-base font-semibold">
+                            {{ jobPostProps.work_arrangement }}
+                        </p>
+                    </div>
+                    
+                    <!-- Job Type -->
+                    <div class="text-center p-3 bg-yellow-50 rounded-lg">
+                        <p class="text-sm font-medium text-gray-600 mb-1">Job Type</p>
+                        <p class="text-base font-semibold">
+                            {{ jobPostProps.job_type }}
+                        </p>
+                    </div>
+                    
+                    <!-- Salary -->
+                    <div class="text-center p-3 bg-purple-50 rounded-lg">
+                        <p class="text-sm font-medium text-gray-600 mb-1">Salary</p>
+                        <p class="text-base font-semibold">
+                            {{ jobPostProps.salary }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
             <div
                 v-if="
                     page.props.auth.user.role.name === 'Senior' ||
@@ -268,29 +319,27 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 "
             >
                 <div
-                    class="mb-3 mt-3 flex flex-col items-center justify-center gap-2"
+                    class="mb-6 mt-3 flex flex-col items-center justify-center gap-2"
                     v-if="jobPostProps.job_status === 'Open'"
                 >
                     <button
                         v-if="page.props.auth?.wokerIsVerified"
                         @click="showModal = true"
                         :class="[
-                            'job w-fit rounded-full border border-[#171816] p-2 px-8 text-sm font-bold text-[#171816]',
+                            'flex items-center gap-2 w-fit rounded-full bg-orange-500 p-3 px-8 text-sm font-bold text-white hover:bg-orange-600 transition-colors',
                             {
-                                'pointer-events-none bg-[#171816] text-white':
-                                    isApplied,
+                                'bg-gray-400 pointer-events-none': isApplied,
                             },
                         ]"
                     >
-                        {{ isApplied ? "Applied!" : "Apply" }}
-                        <!-- <i class="bi bi-patch-check-fill"></i> -->
                         <i class="bi bi-file-person"></i>
+                        {{ isApplied ? "Applied!" : "Apply Now" }}
                     </button>
                     <p v-else class="font-bold text-orange-500">
                         Your account is not yet verified.
                     </p>
-                    <p v-if ="interviewDetails?.interview_schedule" >
-                        Interview Date & Time:
+                    <p v-if ="interviewDetails?.interview_schedule" class="mt-2 text-sm text-gray-600">
+                        Interview Scheduled: 
                         {{
                             dayjs
                                 .utc(interviewDetails?.interview_schedule)
@@ -299,16 +348,16 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                         }}
                     </p>
                 </div>
-                <div v-else class="mx-auto mb-3 mt-3 w-fit">
+                <div v-else class="mx-auto mb-6 mt-3 w-fit">
                     <p
-                        class="rounded border border-[#171816] bg-[#171816] p-2 px-5 text-[12px] font-bold text-white"
+                        class="flex items-center gap-1 rounded-full bg-gray-600 p-2 px-5 text-sm font-bold text-white"
                     >
-                        CLOSED
                         <i class="bi bi-x-circle-fill"></i>
+                        JOB CLOSED
                     </p>
                 </div>
             </div>
-            <div v-else class="mb-3 mt-3 flex justify-center gap-2">
+            <div v-else class="mb-6 mt-3 flex justify-center gap-2">
                 <Link
                     @click="closeJob"
                     as="button"
@@ -316,92 +365,54 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     preserve-scroll
                     :href="route('employer.jobpost.close', jobPostProps.id)"
                     :class="[
-                        'rounded border border-[#171816] p-2 px-5 text-[12px] font-bold text-[#171816]',
+                        'flex items-center gap-1 rounded-full p-2 px-5 text-sm font-bold',
                         {
-                            'pointer-events-none bg-[#171816] text-white':
-                                isClosed,
+                            'bg-gray-600 text-white pointer-events-none': isClosed,
+                            'bg-red-500 text-white hover:bg-red-600': !isClosed,
                         },
                     ]"
                 >
-                    {{ isClosed ? "CLOSED" : "CLOSE THIS JOB" }}
                     <i class="bi bi-x-circle-fill"></i>
+                    {{ isClosed ? "JOB CLOSED" : "CLOSE THIS JOB" }}
                 </Link>
-                <!-- <Link
-                    v-if="!isClosed"
-                    as="button"
-                    method="get"
-                    preserve-scroll
-                    :href="route('employer.jobpost.edit', jobPostProps.id)"
-                    class="w-44 rounded border border-blue-400 p-2 px-8 font-bold text-blue-400"
-                >
-                    Edit
-                </Link> -->
             </div>
         </div>
+        
         <div class="flex-1 bg-[#f3f7fa]">
             <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
                 <div class="grid gap-5 pt-5 lg:grid-cols-[1fr,300px]">
-                    <div class="self-start rounded-lg bg-white px-8 py-5">
-                        <div class="mb-3">
-                            <div class="flex justify-between">
-                                <p class="text-[20px] font-bold">Description</p>
-                                <button @click="isShowReportModal = true">
-                                    <i
-                                        class="bi bi-exclamation-diamond-fill text-red-600"
-                                    ></i>
-                                </button>
-                            </div>
-                            <p class="whitespace-pre-wrap break-words text-sm">
+                    <div class="self-start rounded-lg bg-white px-8 py-5 shadow-sm">
+                        <div class="mb-6">
+                            <p class="text-[20px] font-bold mb-3">Job Description</p>
+                            <p class="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-gray-700">
                                 {{ jobPostProps.description }}
                             </p>
                         </div>
 
-                        <div class="mb-3">
-                            <p class="text-lg font-bold">Open to</p>
-                            <div
-                                v-for="(worker, index) in preferredWorkers"
-                                :key="index"
-                            >
-                                <p
-                                    :class="[
-                                        'text-sm',
-                                        {
-                                            'ml-5 list-item list-inside':
-                                                worker !== 'PWD' &&
-                                                worker !== 'Seniors Citizens',
-                                        },
-                                    ]"
-                                >
-                                    {{ worker }}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <p class="text-lg font-bold">
-                                Preferred educational attainment
-                            </p>
-                            <p class="text-sm">
-                                {{
-                                    jobPostProps.preferred_educational_attainment
-                                }}
+                        <div class="mb-6">
+                            <p class="text-lg font-bold mb-2">Preferred Educational Attainment</p>
+                            <p class="text-sm text-gray-700">
+                                {{ jobPostProps.preferred_educational_attainment }}
                             </p>
                         </div>
-                        <div class="mb-3">
-                            <p class="text-lg font-bold">Required Skills</p>
-                            <div>
-                                <p
-                                    class="mb-1 w-fit rounded bg-slate-300 px-2 text-sm font-bold"
+                        
+                        <div class="mb-6">
+                            <p class="text-lg font-bold mb-2">Required Skills</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium"
                                     v-for="(
                                         skill, index
                                     ) in jobPostProps.skills"
                                     :key="index"
                                 >
                                     {{ skill }}
-                                </p>
+                                </span>
                             </div>
                         </div>
+                        
                         <div v-if="jobPostProps.work_arrangement != 'Remote'">
-                            <p class="text-lg font-bold">Location</p>
+                            <p class="text-lg font-bold mb-3">Location</p>
                             <Maps
                                 v-if="jobPostProps.location"
                                 :disableSearch="true"
@@ -411,44 +422,27 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                             ></Maps>
                         </div>
                     </div>
+                    
                     <div
-                        class="row-start-1 self-start rounded-lg bg-white px-8 py-5 lg:row-start-auto"
+                        class="row-start-1 self-start rounded-lg bg-white px-8 py-5 shadow-sm lg:row-start-auto"
                     >
-                        <p class="mb-1 text-[20px] font-bold">Overview</p>
-                        <div class="text-[16px]">
-                            <div class="mb-2">
-                                <p class="">Job type</p>
-                                <p class="text-sm text-gray-500">
-                                    {{ jobPostProps.job_type }}
-                                </p>
-                            </div>
-                            <div class="mb-2">
-                                <p class="">Working Mode</p>
-                                <p class="text-sm text-gray-500">
-                                    {{ jobPostProps.work_arrangement }}
-                                </p>
-                            </div>
-                            <div class="mb-2">
-                                <p class="">Hour per day</p>
-                                <p class="text-sm text-gray-500">
+                        <p class="mb-4 text-[20px] font-bold">Additional Details</p>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Hours per day</p>
+                                <p class="text-base font-semibold">
                                     {{ jobPostProps.hour_per_day }}
                                 </p>
                             </div>
-                            <div class="mb-2">
-                                <p class="">Hourly rate</p>
-                                <p class="text-sm text-gray-500">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Hourly rate</p>
+                                <p class="text-base font-semibold">
                                     {{ jobPostProps.hourly_rate }}
                                 </p>
                             </div>
-                            <div class="mb-2">
-                                <p class="">Salary</p>
-                                <p class="text-sm text-gray-500">
-                                    {{ jobPostProps.salary }}
-                                </p>
-                            </div>
-                            <div class="mb-2">
-                                <p class="">Experience required</p>
-                                <p class="text-sm text-gray-500">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Experience required</p>
+                                <p class="text-base font-semibold">
                                     {{ jobPostProps.experience }}
                                 </p>
                             </div>
@@ -457,6 +451,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 </div>
             </div>
         </div>
+        
         <Teleport defer to="body">
             <ReusableModal
                 v-if="
@@ -520,12 +515,14 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 </div>
             </ReusableModal>
         </Teleport>
+        
         <SuccessfulMessage
             :messageProp="messageProp"
             :messageShow="messageShow"
             type="Success"
         ></SuccessfulMessage>
     </div>
+    
     <ReusableModal
         v-if="isShowReportModal"
         @closeModal="isShowReportModal = false"
@@ -554,7 +551,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     v-for="(report, index) in reports"
                     :key="index"
                     @click="selectReason(report)"
-                    class="flex items-center justify-between py-2 transition-all"
+                    class="flex items-center justify-between py-2 transition-all hover:bg-gray-50 px-2 rounded"
                 >
                     <p>{{ report.reason }}</p>
                     <i class="bi bi-caret-right font-bold"></i>
@@ -564,7 +561,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     v-for="(description, index) in descriptions"
                     :key="index"
                     @click="submitReport(description)"
-                    class="flex items-center justify-between py-2 transition-all"
+                    class="flex items-center justify-between py-2 transition-all hover:bg-gray-50 px-2 rounded"
                 >
                     <p>{{ description }}</p>
                     <i class="bi bi-caret-right font-bold"></i>

@@ -1,7 +1,7 @@
 <script setup>
 import { Link, usePage } from "@inertiajs/vue3";
 import dayjs from "dayjs";
-import { computed, onUpdated, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 let props = defineProps({
     job: {
@@ -12,128 +12,167 @@ let props = defineProps({
 
 let emit = defineEmits(["saveJob"]);
 
-// watch(
-//     () => props.job,
-//     () => {
-//         console.log("hi");
-//     },
-// );
-
 let isSaved = ref(props.job.users_who_saved.length);
 
 function saveJob() {
     emit("saveJob");
-    if (isSaved.value === 0) {
-        isSaved.value = 1;
-        console.log("hui");
-    } else {
-        console.log("hello");
-
-        isSaved.value = 0;
-    }
+    isSaved.value = isSaved.value ? 0 : 1;
 }
-
-onUpdated(() => {
-    console.log("his");
-});
 
 let datePosted = computed(() => {
     return dayjs(props.job.created_at).format("MMMM DD, YYYY");
 });
+
+// Check if job is specifically for Seniors or PWD
+const isForSeniors = computed(() => {
+    return props.job.preferred_worker_types.includes("Seniors Citizens");
+});
+
+const isForPWD = computed(() => {
+    return props.job.preferred_worker_types.includes("PWD");
+});
+
+// Get company name
+const companyName = computed(() => {
+    return props.job.employer.employer_profile.business_information
+        ? props.job.employer.employer_profile.business_information.business_name
+        : props.job.employer.name;
+});
+
+// Truncate description
+const truncatedDescription = computed(() => {
+    const maxLength = 120;
+    return props.job.description.length > maxLength
+        ? props.job.description.substring(0, maxLength) + '...'
+        : props.job.description;
+});
 </script>
 <template>
-    <div class="rounded-lg bg-white p-3 shadow-lg ring-1 ring-gray-50">
-        <div class="mb-3 flex justify-between">
-            <p class="text-gray-500">{{ datePosted }}</p>
+    <div class="rounded-lg bg-white p-4 shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100 flex flex-col h-full">
+        <!-- Header with date and save button -->
+        <div class="flex justify-between items-start mb-3">
+            <p class="text-sm text-gray-500">{{ datePosted }}</p>
             <Link
                 @click="saveJob"
                 as="button"
                 method="post"
                 preserve-scroll
                 :href="route('jobsearch.save.job', job.id)"
+                class="text-orange-500 hover:text-orange-600 transition-colors"
+                :title="isSaved ? 'Remove from saved jobs' : 'Save this job'"
             >
                 <i
-                    @click=""
                     :class="[
-                        'bi bi-bookmark-dash-fill text-orange-500 hover:cursor-pointer',
+                        'text-xl',
                         {
-                            'bi-bookmark-dash-fill': isSaved,
-                            'bi-bookmark-dash': !isSaved,
+                            'bi-bookmark-fill': isSaved,
+                            'bi-bookmark': !isSaved,
                         },
                     ]"
                 ></i>
             </Link>
         </div>
-        <div class="mb-4 flex gap-3">
-            <div class="h-14 min-h-14 w-14 min-w-14">
+
+        <!-- Company info and job title -->
+        <div class="mb-4 flex gap-3 items-start">
+            <div class="h-14 w-14 flex-shrink-0 rounded-md overflow-hidden border border-gray-200">
                 <img
                     :src="
                         job.employer.employer_profile.business_information
-                            ? job.employer.employer_profile.business_information
-                                  .business_logo
+                            ? job.employer.employer_profile.business_information.business_logo
                             : '/assets/logo-placeholder-image.png'
                     "
-                    alt=""
-                    class="h-full w-full rounded object-obtain"
+                    :alt="companyName + ' logo'"
+                    class="h-full w-full object-cover"
                 />
             </div>
-            <div>
-                <p
-                    class="h-[28px] w-full overflow-hidden text-ellipsis text-lg font-bold"
-                >
+            <div class="min-w-0 flex-1">
+                <h3 class="font-bold text-lg truncate" :title="job.job_title">
                     {{ job.job_title }}
-                </p>
-                <p>
-                    {{
-                        job.employer.employer_profile.business_information
-                            ? job.employer.employer_profile.business_information
-                                  .business_name
-                            : job.employer.name
-                    }}
+                </h3>
+                <p class="text-gray-600 truncate" :title="companyName">
+                    {{ companyName }}
                 </p>
             </div>
         </div>
-        <div class="mb-4 flex justify-around text-gray-600">
-            <p><i class="bi bi-briefcase"></i> {{ job.job_type }}</p>
-            <p><i class="bi bi-layers"></i> {{ job.work_arrangement }}</p>
-            <p><i class="bi bi-cash"></i> {{ job.hourly_rate }}</p>
-            <p><i class="bi bi-person"></i> {{ job.experience }}</p>
+
+        <!-- Special badges for Senior/PWD -->
+        <div class="mb-3 flex flex-wrap gap-2">
+            <span 
+                v-if="isForSeniors" 
+                class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full flex items-center gap-1"
+            >
+                <i class="bi bi-person-check-fill"></i>
+                Senior-Friendly
+            </span>
+            <span 
+                v-if="isForPWD" 
+                class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full flex items-center gap-1"
+            >
+                <i class="bi bi-wheelchair"></i>
+                PWD-Friendly
+            </span>
         </div>
-        <div class="mb-5">
-            <p class="mb-2">Job Description</p>
-            <p class="h-20 overflow-hidden text-sm text-gray-600">
-                {{ job.description }}
+
+        <!-- Job details icons -->
+        <div class="grid grid-cols-2 gap-3 mb-4 text-sm">
+            <div class="flex items-center gap-2 text-gray-600">
+                <i class="bi bi-briefcase text-orange-500"></i>
+                <span>{{ job.job_type }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-gray-600">
+                <i class="bi bi-layers text-orange-500"></i>
+                <span>{{ job.work_arrangement }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-gray-600">
+                <i class="bi bi-cash-coin text-orange-500"></i>
+                <span>{{ job.hourly_rate }}/hr</span>
+            </div>
+            <div class="flex items-center gap-2 text-gray-600">
+                <i class="bi bi-person text-orange-500"></i>
+                <span>{{ job.experience }}</span>
+            </div>
+        </div>
+
+        <!-- Job description -->
+        <div class="mb-4 flex-1">
+            <p class="text-sm text-gray-700 line-clamp-3">
+                {{ truncatedDescription }}
             </p>
         </div>
 
-        <div
-            class="mb-3 flex max-h-[64px] flex-wrap gap-2 overflow-hidden text-sm"
-        >
-            <p
-                v-for="skill in job.skills"
-                class="w-fit rounded bg-gray-300 p-1 text-center font-bold"
+        <!-- Skills -->
+        <div class="mb-4 flex flex-wrap gap-2">
+            <span
+                v-for="(skill, index) in job.skills.slice(0, 3)"
+                :key="index"
+                class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded"
             >
                 {{ skill }}
-            </p>
-        </div>
-        <div class="mt-auto flex justify-center gap-3">
-            <Link
-                :href="route('jobsearch.show', job.id)"
-                as="button"
-                class="flex-1 rounded-lg border border-orange-500 p-3 text-orange-500"
+            </span>
+            <span 
+                v-if="job.skills.length > 3" 
+                class="px-2 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded"
             >
-                Details
-            </Link>
-            <Link
-                @click="saveJob"
-                as="button"
-                method="post"
-                preserve-scroll
-                :href="route('jobsearch.save.job', job.id)"
-                class="flex-1 rounded-lg border bg-orange-500 p-3 text-white"
-            >
-                {{ isSaved === 1 ? "Saved" : "Save for later" }}
-            </Link>
+                +{{ job.skills.length - 3 }} more
+            </span>
         </div>
+
+       
     </div>
 </template>
+
+<style scoped>
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>

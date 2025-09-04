@@ -11,6 +11,8 @@ import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
+import ProfileJobHover from "../Components/ProfileJobHover.vue";
+import ProfileBusinessCard from "../Components/ProfileBusinessCard.vue";
 import dayjs from "dayjs";
 
 const props = defineProps({
@@ -331,10 +333,19 @@ const formatCurrency =
                         <Link
                             :href="route('worker.profile')"
                             as="button"
-                            class="mb-3 flex cursor-pointer items-center gap-2 font-bold text-gray-500 hover:underline"
+                            class="group relative mb-3 flex cursor-pointer items-center gap-2 font-bold text-gray-500 hover:underline"
                         >
                             <p class="">{{ user.name }}</p>
                             <i class="bi bi-arrow-right"></i>
+                            <span
+                                class="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                            >
+                                View Profile
+                                <!-- Tooltip Arrow -->
+                                <span
+                                    class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
+                                ></span>
+                            </span>
                         </Link>
                         <!-- <Link
                             :href="route('worker.profile')"
@@ -390,9 +401,19 @@ const formatCurrency =
                             </p>
                             <Link
                                 :href="route('messages')"
-                                class="text-sm text-[#171816] underline"
-                                >See All
+                                class="group relative flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
+                            >
+                                <span>See All</span>
                                 <i class="bi bi-caret-right"></i>
+                                <span
+                                    class="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                >
+                                    See all messages
+                                    <!-- Tooltip Arrow -->
+                                    <span
+                                        class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
+                                    ></span>
+                                </span>
                             </Link>
                         </div>
                         <div>
@@ -442,10 +463,19 @@ const formatCurrency =
                                 </p>
                                 <Link
                                     :href="route('worker.create.invoice')"
-                                    class="flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
+                                    class="group relative mb-3 cursor-pointer items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
                                 >
                                     <span>Create Invoice</span>
                                     <i class="bi bi-plus-lg"></i>
+                                    <span
+                                        class="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                    >
+                                        Click to create invoice
+                                        <!-- Tooltip Arrow -->
+                                        <span
+                                            class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
+                                        ></span>
+                                    </span>
                                 </Link>
                             </div>
                             <swiper-container
@@ -710,7 +740,11 @@ const formatCurrency =
                                     <div class="flex gap-2">
                                         <div class="h-10 w-10">
                                             <img
-                                                :src="transaction.employer.profile_img ?? '/assets/profile_placeholder.jpg'"
+                                                :src="
+                                                    transaction.employer
+                                                        .profile_img ??
+                                                    '/assets/profile_placeholder.jpg'
+                                                "
                                                 alt=""
                                                 class="h-full w-full rounded-full"
                                             />
@@ -822,24 +856,63 @@ const formatCurrency =
                                             v-for="job in savedJobsProps"
                                             class="text-center"
                                         >
-                                            <td class="p-2">
-                                                <img
-                                                    class="mx-auto w-12 object-cover"
-                                                    :src="
+                                            <td class="py-2 text-center">
+                                                <ProfileBusinessCard
+                                                    v-if="
+                                                        job.employer
+                                                            ?.employer_profile
+                                                            ?.business_information
+                                                    "
+                                                    :business-id="
                                                         job.employer
                                                             .employer_profile
                                                             .business_information
-                                                            ? job.employer
-                                                                  .employer_profile
-                                                                  .business_information
-                                                                  .business_logo
-                                                            : '/assets/logo-placeholder-image.png'
+                                                            .id
                                                     "
-                                                    alt=""
-                                                />
+                                                >
+                                                    <img
+                                                        class="mx-auto w-12 object-cover"
+                                                        :src="
+                                                            job.employer
+                                                                .employer_profile
+                                                                .business_information
+                                                                .business_logo ??
+                                                            '/assets/logo-placeholder-image.png'
+                                                        "
+                                                        alt="Business Logo"
+                                                    />
+                                                </ProfileBusinessCard>
+
+                                                <!-- Fallback if no business info -->
+                                                <div v-else>
+                                                    <img
+                                                        class="mx-auto w-12 object-cover"
+                                                        src="/assets/logo-placeholder-image.png"
+                                                        alt="No Business"
+                                                    />
+                                                </div>
                                             </td>
-                                            <td class="p-2">
-                                                {{ job.job_title }}
+
+                                            <td class="py-2 text-center">
+                                                <Link
+                                                    as="button"
+                                                    :href="
+                                                        route(
+                                                            'jobsearch.show',
+                                                            job.id,
+                                                        )
+                                                    "
+                                                    class=""
+                                                    ><ProfileJobHover
+                                                        :job-id="job.id"
+                                                    >
+                                                        <span
+                                                            class="cursor-pointer text-blue-600 hover:underline"
+                                                        >
+                                                            {{ job.job_title }}
+                                                        </span>
+                                                    </ProfileJobHover>
+                                                </Link>
                                             </td>
                                             <td class="p-2">
                                                 <Link
@@ -884,10 +957,21 @@ const formatCurrency =
                                     Applied Jobs
                                 </p>
 
-                                <Link :href="route('worker.previous.emplyer')" class="underline"
+                                <Link
+                                    :href="route('worker.previous.emplyer')"
+                                    class="group relative flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
                                     >Previous Employer
                                     <i class="bi bi-caret-right"></i
-                                ></Link>
+                                    ><span
+                                        class="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                    >
+                                        Employers you've worked with
+                                        <!-- Tooltip Arrow -->
+                                        <span
+                                            class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
+                                        ></span>
+                                    </span>
+                                </Link>
                             </div>
 
                             <div class="h-[350px] overflow-y-auto">
@@ -916,24 +1000,63 @@ const formatCurrency =
                                             v-for="job in jobsAppliedProps"
                                             class="text-center"
                                         >
-                                            <td class="p-2">
-                                                <img
-                                                    class="mx-auto w-12 object-cover"
-                                                    :src="
+                                            <td class="py-2 text-center">
+                                                <ProfileBusinessCard
+                                                    v-if="
+                                                        job.employer
+                                                            ?.employer_profile
+                                                            ?.business_information
+                                                    "
+                                                    :business-id="
                                                         job.employer
                                                             .employer_profile
                                                             .business_information
-                                                            ? job.employer
-                                                                  .employer_profile
-                                                                  .business_information
-                                                                  .business_logo
-                                                            : '/assets/logo-placeholder-image.png'
+                                                            .id
                                                     "
-                                                    alt=""
-                                                />
+                                                >
+                                                    <img
+                                                        class="mx-auto w-12 object-cover"
+                                                        :src="
+                                                            job.employer
+                                                                .employer_profile
+                                                                .business_information
+                                                                .business_logo ??
+                                                            '/assets/logo-placeholder-image.png'
+                                                        "
+                                                        alt="Business Logo"
+                                                    />
+                                                </ProfileBusinessCard>
+
+                                                <!-- Fallback if no business info -->
+                                                <div v-else>
+                                                    <img
+                                                        class="mx-auto w-12 object-cover"
+                                                        src="/assets/logo-placeholder-image.png"
+                                                        alt="No Business"
+                                                    />
+                                                </div>
                                             </td>
-                                            <td class="p-2">
-                                                {{ job.job_title }}
+
+                                            <td class="py-2 text-center">
+                                                <Link
+                                                    as="button"
+                                                    :href="
+                                                        route(
+                                                            'jobsearch.show',
+                                                            job.id,
+                                                        )
+                                                    "
+                                                    class=""
+                                                    ><ProfileJobHover
+                                                        :job-id="job.id"
+                                                    >
+                                                        <span
+                                                            class="cursor-pointer text-blue-600 hover:underline"
+                                                        >
+                                                            {{ job.job_title }}
+                                                        </span>
+                                                    </ProfileJobHover>
+                                                </Link>
                                             </td>
                                             <td class="p-2">
                                                 <p
