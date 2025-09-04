@@ -9,6 +9,7 @@ import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import ProfilePage from "../Components/Reviews/ProfilePage.vue";
+import ProfileJobHover from "../Components/ProfileJobHover.vue";
 
 let props = defineProps({
     userProp: Object,
@@ -409,6 +410,16 @@ function fireWorker(jobPostId) {
     <Head title="Profile | iCan Careers" />
     <div class="min-h-[calc(100vh-4.625rem)] bg-[#f3f7fa]">
         <div class="relative h-32 bg-[#FAFAFA]">
+             <!-- Report Button - Top Right -->
+                <div class="absolute right-9 top-4">
+                    <button 
+                        @click="isShowReportModal = true" 
+                        class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-gray-50"
+                    >
+                        <i class="bi bi-exclamation-diamond-fill"></i>
+                        <span>Report</span>
+                    </button>
+                </div>
             <label
                 for="profileimg"
                 :class="[
@@ -543,17 +554,7 @@ function fireWorker(jobPostId) {
             >
                 <div class="flex flex-col gap-4 text-[16px] text-gray-600">
                     <div class="rounded-lg bg-white p-8">
-                        <div class="mb-3 flex items-center justify-between">
-                            <p class="text-[20px] font-bold">Overview</p>
-                            <button
-                                v-if="visitor && !adminVisit"
-                                @click="isShowReportModal = true"
-                            >
-                                <i
-                                    class="bi bi-exclamation-diamond-fill text-red-600"
-                                ></i>
-                            </button>
-                        </div>
+                        
                         <div class="mb-4 flex items-center gap-4">
                             <div
                                 class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200"
@@ -682,7 +683,8 @@ function fireWorker(jobPostId) {
                                 class="flex items-center gap-4 rounded-md border p-4 shadow transition hover:shadow-md"
                             >
                                 <!-- Company Logo -->
-                                <img
+                               <ProfileJobHover :job-id="job.id">
+                                 <img
                                     class="h-16 w-16 flex-shrink-0 rounded border object-obtain"
                                     :src="
                                         job.employer?.employer_profile
@@ -692,14 +694,17 @@ function fireWorker(jobPostId) {
                                     "
                                     alt="Company Logo"
                                 />
+                               </ProfileJobHover>
 
                                 <!-- Job Info -->
                                 <div class="flex-1">
-                                    <p
-                                        class="text-lg font-semibold text-blue-600"
-                                    >
-                                        {{ job.job_title }}
-                                    </p>
+                                    <ProfileJobHover :job-id="job.id">
+                                        <h3
+                                            class="cursor-pointer text-lg font-semibold text-gray-900 hover:underline"
+                                        >
+                                            {{ job.job_title }}
+                                        </h3>
+                                    </ProfileJobHover>
                                     <p class="text-sm text-gray-700">
                                         Employer:
                                         {{ job.employer?.name || "N/A" }}

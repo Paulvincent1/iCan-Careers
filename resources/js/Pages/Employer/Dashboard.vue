@@ -10,6 +10,8 @@ import {
 } from "vue";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
+import ProfileHoverCard from "../Components/ProfileHoverCard.vue";
+import ProfileJobHover from "../Components/ProfileJobHover.vue";
 
 let props = defineProps({
     user: {
@@ -197,12 +199,21 @@ onBeforeUnmount(() => {
                         <Link
                             :href="route('employer.profile')"
                             as="button"
-                            class="mb-3 flex cursor-pointer items-center gap-2 font-bold text-gray-500 hover:underline"
+                            class="group relative mb-3 flex cursor-pointer items-center gap-2 rounded-full p-2 font-bold text-gray-500 hover:underline"
                         >
                             <p class="">
                                 {{ $page.props.auth.user.authenticated.name }}
                             </p>
                             <i class="bi bi-arrow-right"></i>
+                            <span
+                                class="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                            >
+                                View Profile
+                                <!-- Tooltip Arrow -->
+                                <span
+                                    class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
+                                ></span>
+                            </span>
                         </Link>
                         <div class="flex flex-col items-center">
                             <div v-if="subscriptionProps">
@@ -223,9 +234,19 @@ onBeforeUnmount(() => {
                             </p>
                             <Link
                                 :href="route('messages')"
-                                class="text-sm text-[#171816] underline"
-                                >See All
+                                class="group relative flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
+                            >
+                                <span>See All</span>
                                 <i class="bi bi-caret-right"></i>
+                                <span
+                                    class="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                >
+                                    See all messages
+                                    <!-- Tooltip Arrow -->
+                                    <span
+                                        class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
+                                    ></span>
+                                </span>
                             </Link>
                         </div>
                         <div>
@@ -273,14 +294,24 @@ onBeforeUnmount(() => {
                                 <p class="p-1 text-lg font-bold text-[#171816]">
                                     Job Status
                                 </p>
-                                <Link
+                                <!-- <Link
                                     :href="route('create.job')"
-                                    class="flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
+                                    class="group relative flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
                                 >
                                     <span>Post Job</span>
                                     <i class="bi bi-plus-lg"></i>
-                                    <!-- Add Plus Icon -->
-                                </Link>
+
+                                    
+                                    <span
+                                        class="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                    >
+                                        Click to post a job
+                                        
+                                        <span
+                                            class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
+                                        ></span>
+                                    </span>
+                                </Link> -->
                             </div>
 
                             <swiper-container
@@ -346,8 +377,8 @@ onBeforeUnmount(() => {
                             <table class="w-full min-w-[500px] table-fixed">
                                 <thead class="text-sm text-slate-500">
                                     <tr>
-                                        <th class="font-normal">Job Title</th>
                                         <th class="font-normal">Job Type</th>
+                                        <th class="font-normal">Job Title</th>
                                         <th class="font-normal">Salary</th>
                                         <th class="font-normal">
                                             Applications
@@ -361,10 +392,28 @@ onBeforeUnmount(() => {
                                         :key="job.id"
                                     >
                                         <td class="py-5 text-center">
-                                            {{ job.job_title }}
+                                            {{ job.job_type }}
                                         </td>
                                         <td class="py-5 text-center">
-                                            {{ job.job_type }}
+                                            <Link
+                                                as="button"
+                                                :href="
+                                                    route(
+                                                        'employer.jobpost.show',
+                                                        job.id,
+                                                    )
+                                                "
+                                                class=""
+                                                ><ProfileJobHover
+                                                    :job-id="job.id"
+                                                >
+                                                    <span
+                                                        class="cursor-pointer text-blue-600 hover:underline"
+                                                    >
+                                                        {{ job.job_title }}
+                                                    </span>
+                                                </ProfileJobHover>
+                                            </Link>
                                         </td>
                                         <td class="py-5 text-center">
                                             {{ job.salary }}
@@ -571,10 +620,19 @@ onBeforeUnmount(() => {
                             </p>
                             <Link
                                 :href="route('employer.previous.workers')"
-                                class="text-sm text-[#171816] underline"
+                                class="group relative flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
                             >
                                 Previous Worker
                                 <i class="bi bi-caret-right"></i>
+                                <span
+                                    class="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                >
+                                    Workers you've hired in the past
+                                    <!-- Tooltip Arrow -->
+                                    <span
+                                        class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
+                                    ></span>
+                                </span>
                             </Link>
                         </div>
                         <div class="flex-1 overflow-auto">
@@ -602,20 +660,55 @@ onBeforeUnmount(() => {
                                         ) in currentWorkerProps"
                                         :key="index"
                                     >
-                                        <td class="p-2">
-                                            <img
-                                                class="mx-auto h-12 w-12 rounded-full"
-                                                :src="
-                                                    worker.profile_img
-                                                        ? worker.profile_img
-                                                        : '/assets/profile_placeholder.jpg'
+                                        <td class="p-2 text-center">
+                                            <Link
+                                                as="button"
+                                                :href="
+                                                    route(
+                                                        'worker.show.profile',
+                                                        worker.id,
+                                                    )
                                                 "
-                                                alt=""
-                                            />
+                                                class=""
+                                            >
+                                                <ProfileHoverCard
+                                                    :user-id="worker.id"
+                                                >
+                                                    <img
+                                                        class="mx-auto h-12 w-12 rounded-full"
+                                                        :src="
+                                                            worker.profile_img
+                                                                ? worker.profile_img
+                                                                : '/assets/profile_placeholder.jpg'
+                                                        "
+                                                        alt=""
+                                                    />
+                                                </ProfileHoverCard>
+                                            </Link>
                                         </td>
                                         <td class="p-2 text-center">
-                                            {{ worker.name }}
+                                            <Link
+                                                as="button"
+                                                :href="
+                                                    route(
+                                                        'worker.show.profile',
+                                                        worker.id,
+                                                    )
+                                                "
+                                                class=""
+                                            >
+                                                <ProfileHoverCard
+                                                    :user-id="worker.id"
+                                                >
+                                                    <span
+                                                        class="cursor-pointer text-blue-600 hover:underline"
+                                                    >
+                                                        {{ worker.name }}
+                                                    </span>
+                                                </ProfileHoverCard>
+                                            </Link>
                                         </td>
+
                                         <td class="p-2 text-center">
                                             {{ worker.email }}
                                         </td>

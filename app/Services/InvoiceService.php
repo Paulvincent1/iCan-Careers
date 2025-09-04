@@ -49,6 +49,8 @@ class InvoiceService {
             'invoice_duration' => $duration,
             'success_redirect_url' => 'http://127.0.0.1:8000/',
             'failure_redirect_url' => 'http://127.0.0.1:8000/',
+            //http://127.0.0.1:8000/
+            //should be https in production
             'currency' => 'PHP',
             'reminder_time' => 1,
             'items' => $invoicesItems,

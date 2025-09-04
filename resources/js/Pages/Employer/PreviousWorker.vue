@@ -1,5 +1,8 @@
 <script setup>
+import { Link } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
+import ProfileHoverCard from "../Components/ProfileHoverCard.vue";
+import ProfileJobHover from "../Components/ProfileJobHover.vue";
 
 let props = defineProps({
     jobsProps: null,
@@ -8,9 +11,10 @@ let props = defineProps({
 console.log(props.jobsProps);
 </script>
 <template>
+    <Head title="Previous Workers | iCan Careers" />
     <div class="h-[calc(100vh-4.625rem)] bg-[#eff2f6] pt-5 text-[#171816]">
         <div
-            class="container mx-auto flex h-[90%] flex-col rounded bg-white p-5 xl:max-w-7xl"
+            class="container mx-auto flex h-[90%] flex-col overflow-auto rounded bg-white p-5 xl:max-w-7xl"
         >
             <h2 class="mb-3 text-[20px]">
                 Previous Workers ({{ jobsProps.length }})
@@ -31,21 +35,64 @@ console.log(props.jobsProps);
                     <tr v-for="(job, index) in jobsProps" :key="index">
                         <td class="p-3">
                             <div class="mx-auto h-14 w-14">
-                                <img
-                                    class="h-full w-full rounded-full"
-                                    :src="
-                                        job.job.worker.profile_img ??
-                                        '/assets/profile_placeholder.jpg'
+                                <Link
+                                    :href="
+                                        route('worker.show.profile', {
+                                            id: job.job.worker.id,
+                                        })
                                     "
-                                    alt="Profile"
-                                />
+                                >
+                                    <ProfileHoverCard
+                                        :user-id="job.job.worker.id"
+                                    >
+                                        <img
+                                            :src="
+                                                job.job.worker.profile_img
+                                                    ? job.job.worker.profile_img
+                                                    : '/assets/profile_placeholder.jpg'
+                                            "
+                                            class="h-14 w-14 rounded-full object-cover"
+                                            alt="profile"
+                                        />
+                                    </ProfileHoverCard>
+                                </Link>
                             </div>
                         </td>
                         <td class="p-3 text-center">
-                            {{ job.job.jobDetails.job_title }}
+                            <Link
+                                :href="
+                                    route('employer.jobpost.show', {
+                                        id: job.job.jobDetails.id,
+                                    })
+                                "
+                            >
+                                <ProfileJobHover
+                                    :job-id="job.job.jobDetails.id"
+                                >
+                                    <span
+                                        class="cursor-pointer font-bold text-blue-600 hover:underline"
+                                    >
+                                        {{ job.job.jobDetails.job_title }}
+                                    </span>
+                                </ProfileJobHover>
+                            </Link>
                         </td>
                         <td class="p-3 text-center">
-                            {{ job.job.worker.name }}
+                            <Link
+                                :href="
+                                    route('worker.show.profile', {
+                                        id: job.job.worker.id,
+                                    })
+                                "
+                            >
+                                <ProfileHoverCard :user-id="job.job.worker.id">
+                                    <span
+                                        class="cursor-pointer font-bold text-blue-600 hover:underline"
+                                    >
+                                        {{ job.job.worker.name }}
+                                    </span>
+                                </ProfileHoverCard>
+                            </Link>
                         </td>
                         <td class="p-3">
                             <div

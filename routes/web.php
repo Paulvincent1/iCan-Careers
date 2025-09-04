@@ -219,6 +219,16 @@ Route::prefix('admin')->middleware([isAdmin::class])->group(function () {
 Route::middleware([ForceGetRedirect::class])->group(function () {
 
 
+    Route::get('/user/{id}/preview', [EmployerDashboardController::class, 'preview'])
+    ->name('user.preview')
+    ->middleware(['auth']);
+        
+    Route::get('/job/{id}/preview', [EmployerDashboardController::class, 'previewJob'])
+    ->name('job.preview');
+
+    Route::get('/business/{id}/preview', [EmployerDashboardController::class, 'previewBusiness'])
+    ->name('business.preview');
+
 
     //chat routes
     Route::prefix('/messages')->group(function () {

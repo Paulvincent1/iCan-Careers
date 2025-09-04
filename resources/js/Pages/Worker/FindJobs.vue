@@ -45,15 +45,6 @@ onMounted(() => {
     });
 });
 
-// onUpdated(() => {
-//     console.log('hello');
-
-//     nextTick(() => {
-//         swiperContainer.value.swiper.update();
-//         updateStyleArrow();
-//     });
-// });
-
 function updateStyleArrow() {
     if (swiperContainer.value.swiper.isEnd) {
         next.value.classList.add("text-orange-100", "pointer-events-none");
@@ -512,15 +503,19 @@ watch(search, debounce(submit, 500));
                 <TransitionGroup
                     tag="div"
                     name="jobcard"
-                    class="grid gap-2 lg:grid-cols-2"
+                    class="grid gap-4 lg:grid-cols-2"
                 >
-                    <JobCard
+                    <Link
                         v-for="job in jobs"
                         :key="job.id"
-                        :job="job"
-                        @saveJob="showMessage"
-                    ></JobCard>
-                    <!-- <JobCard></JobCard> -->
+                        :href="route('jobsearch.show', job.id)"
+                        class="block transition-transform duration-300 hover:scale-[1.02]"
+                    >
+                        <JobCard
+                            :job="job"
+                            @saveJob="showMessage"
+                        ></JobCard>
+                    </Link>
                 </TransitionGroup>
             </div>
         </div>
@@ -528,18 +523,6 @@ watch(search, debounce(submit, 500));
             :messageProp="messageProp"
             :messageShow="messageShow"
         ></SuccessfulMessage>
-        <!-- <Teleport defer to="body">
-            <Transition name="message">
-                <div v-if="messageShow" class="">
-                    <div
-                        class="fixed left-[50%] top-20 flex translate-x-[-50%] items-center gap-2 rounded bg-green-200 p-4 text-green-600"
-                    >
-                        <i class="bi bi-check-circle-fill"></i>
-                        <p class="text-center">{{ props.messageProp }}</p>
-                    </div>
-                </div>
-            </Transition>
-        </Teleport> -->
     </div>
 </template>
 <style scoped>
@@ -568,5 +551,10 @@ watch(search, debounce(submit, 500));
 .list-enter-from,
 .list-leave-to {
     opacity: 0;
+}
+
+/* Make the entire card clickable */
+.block {
+    cursor: pointer;
 }
 </style>
