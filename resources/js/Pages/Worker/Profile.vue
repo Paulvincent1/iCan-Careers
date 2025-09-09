@@ -413,6 +413,7 @@ function fireWorker(jobPostId) {
              <!-- Report Button - Top Right -->
                 <div class="absolute right-9 top-4">
                     <button 
+                        v-if="visitor"
                         @click="isShowReportModal = true" 
                         class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-gray-50"
                     >
@@ -470,7 +471,7 @@ function fireWorker(jobPostId) {
                         v-if="visitor"
                         :href="route('messages')"
                         :data="{ user: userProp.id }"
-                        class="bi bi-chat-dots text-lg text-blue-500 hover:cursor-pointer"
+                        class="bi bi-chat-dots text-[30px] text-blue-500 hover:cursor-pointer"
                     ></Link>
                 </div>
                 <div class="mb-3">

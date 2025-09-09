@@ -137,6 +137,11 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::cla
     Route::get('/createprofile', [EmployerProfileController::class, 'createProfile'])->name('create.profile.employer');
     Route::post('/createprofile', [EmployerProfileController::class, 'storeProfile'])->name('create.profile.employer.post');
     Route::get('/myprofile', [EmployerProfileController::class, 'myProfile'])->name('employer.profile');
+
+    Route::get('/profile/edit', [EmployerProfileController::class, 'edit'])->name('employer.profile.edit');
+    Route::post('/profile/update', [EmployerProfileController::class, 'update'])->name('employer.profile.update');
+    Route::post('/business/update', [EmployerProfileController::class, 'updateBusiness'])->name('employer.business.update');
+    
     Route::put('/myprofile/updateprofile', [EmployerProfileController::class, 'updateProfile'])->name('update.profile.put');
 
 

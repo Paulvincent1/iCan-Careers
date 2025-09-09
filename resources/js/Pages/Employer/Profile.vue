@@ -5,7 +5,6 @@ import { Link, router } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import ProfilePage from "../Components/Reviews/ProfilePage.vue";
-import ProfileJobHover from "../Components/ProfileJobHover.vue";
 
 let props = defineProps({
     user: Object,
@@ -213,6 +212,7 @@ function submitReport(reason) {
             <!-- Report Button - Top Right -->
                 <div class="absolute right-9 top-4">
                     <button 
+                        v-if="visitor"
                         @click="isShowReportModal = true" 
                         class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-gray-50"
                     >
@@ -270,7 +270,7 @@ function submitReport(reason) {
                         v-if="visitor"
                         :href="route('messages')"
                         :data="{ user: user.id }"
-                        class="bi bi-chat-dots text-lg text-blue-500 hover:cursor-pointer"
+                        class="bi bi-chat-dots text-[30px] text-blue-500 hover:cursor-pointer"
                     ></Link>
                 </div>
                 <div class="mb-3">
@@ -327,17 +327,19 @@ function submitReport(reason) {
             >
                 <div class="flex flex-col gap-4 text-[16px] text-gray-600">
                     <div class="rounded-lg bg-white p-8">
-                        <!-- <div class="mb-3 flex items-center justify-between">
+                        <div class="mb-3 flex items-center justify-between">
                             <p class="text-[20px] font-bold">Overview</p>
-                            <button
-                                v-if="visitor && !adminVisit"
-                                @click="isShowReportModal = true"
-                            >
-                                <i
-                                    class="bi bi-exclamation-diamond-fill text-red-600"
-                                ></i>
-                            </button>
-                        </div> -->
+
+                            <div v-if="!visitor" class="">
+                                <Link
+                                    :href="route('employer.profile.edit')"
+                                    class="flex items-center gap-1 text-blue-600 underline hover:text-blue-800"
+                                >
+                                    Edit Business Info
+                                    <i class="bi bi-arrow-right"></i>
+                                </Link>
+                            </div>
+                        </div>
                         <div class="mb-4 flex items-center gap-4">
                             <!-- <div
                                 class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200"
@@ -394,14 +396,30 @@ function submitReport(reason) {
                                 <i class="bi bi-building"></i>
                             </div>
                             <Link
-                                :href="route('businessinfo.show', businessProps.id)"
-                                class="text-blue-600 hover:underline"
+                                :href="
+                                    route('businessinfo.show', businessProps.id)
+                                "
+                                class="group relative mb-3 text-blue-600 hover:underline"
                             >
                                 {{ businessProps.industry }}
+                                <span
+                                class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                            >
+                                View Business Information
+                                <!-- Tooltip Arrow -->
+                                <span
+                                    class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
+                                ></span>
+                            </span>
                             </Link>
                         </div>
 
-                        <p v-else class="mb-1 text-gray-500">
+                        <p v-else class="mb-4 flex items-center gap-4">
+                            <div
+                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200"
+                            >
+                                <i class="bi bi-building"></i>
+                            </div>
                             No business information available
                         </p>
                         <div class="mb-4 flex items-center gap-4">
@@ -448,18 +466,11 @@ function submitReport(reason) {
                                         "
                                         class="block h-full w-full p-4"
                                     >
-                                        <ProfileJobHover
-                                            :job-id="job.id"
-                                            class="absolute right-4 top-4">
-                                            <i
-                                                class="bi bi-info-circle text-2xl text-gray-400 hover:cursor-pointer hover:text-gray-600"
-                                            ></i>
-                                            <p
+                                        <p
                                             class="text-green- x00 text-xl font-bold hover:underline"
                                         >
                                             {{ job.job_title }}
                                         </p>
-                                        </ProfileJobHover>
                                         <p class="text-gray-600">
                                             {{ job.job_type }} -
                                             {{ job.work_arrangement }}
@@ -519,12 +530,19 @@ function submitReport(reason) {
                                     : (isEditingBasicInfo = true)
                             "
                             :class="[
-                                'cursor-pointer',
+                                'relative group cursor-pointer',
                                 {
                                     'pointer-events-none': visitor,
                                 },
                             ]"
+                            title="Click to edit your info"
                         >
+                        <!-- Tooltip -->
+                            <span
+                                class="absolute -top-6 left-0 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
+                            >
+                                Click to edit your info
+                            </span>
                             <div class="mb-2">
                                 <label class="text-sm">Birth Year:</label>
                                 <p>{{ age }}</p>

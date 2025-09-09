@@ -55,33 +55,41 @@ onMounted(() => {
     });
 });
 const subscriptionDetails = computed(() => {
-  if (!props.subscriptionProps) return null;
+    if (!props.subscriptionProps) return null;
 
-  const plans = {
-    Free: {
-      name: "Free Plan",
-      icon: "bi-coin",
-      color: "gray",
-      features: ["3 job posting", "Basic profile", "Limited applications"],
-      upgradeTo: "Pro"
-    },
-    Pro: {
-      name: "Pro Plan",
-      icon: "bi-star",
-      color: "blue",
-      features: ["5 job postings", "Featured listings", "Priority support"],
-      upgradeTo: "Premium"
-    },
-    Premium: {
-      name: "Premium Plan",
-      icon: "bi-award",
-      color: "yellow",
-      features: ["5 job postings", "Top visibility", "Direct messaging"],
-      upgradeTo: null
-    }
-  };
+    const plans = {
+        Free: {
+            name: "Free Plan",
+            icon: "bi-coin",
+            color: "gray",
+            features: [
+                "3 job posting",
+                "Basic profile",
+                "Limited applications",
+            ],
+            upgradeTo: "Pro",
+        },
+        Pro: {
+            name: "Pro Plan",
+            icon: "bi-star",
+            color: "blue",
+            features: [
+                "5 job postings",
+                "Featured listings",
+                "Priority support",
+            ],
+            upgradeTo: "Premium",
+        },
+        Premium: {
+            name: "Premium Plan",
+            icon: "bi-award",
+            color: "yellow",
+            features: ["5 job postings", "Top visibility", "Direct messaging"],
+            upgradeTo: null,
+        },
+    };
 
-  return plans[props.subscriptionProps.subscription_type] || null;
+    return plans[props.subscriptionProps.subscription_type] || null;
 });
 
 // Computed property for dynamic styling
@@ -175,7 +183,7 @@ function listenChannelChatHeads() {
 }
 
 function unshiftLatestChatHead(userId, newChatHead) {
-    const index = chatHeads.value.find((ch) => {
+    const index = chatHeads.value.findIndex((ch) => {
         return Number(ch?.user.id) === Number(userId);
     });
 
@@ -235,7 +243,7 @@ onBeforeUnmount(() => {
                             </p>
                             <i class="bi bi-arrow-right"></i>
                             <span
-                                class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                class="absolute left-1/2 top-full z-[9999] mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
                             >
                                 View Profile
                                 <!-- Tooltip Arrow -->
@@ -245,92 +253,164 @@ onBeforeUnmount(() => {
                             </span>
                         </Link>
                         <!-- Enhanced Subscription Card -->
-    <div v-if="subscriptionDetails" class="w-full mt-2">
-      <div :class="[
-        'relative rounded-xl p-4 border-2 transition-all shadow-sm hover:shadow-md',
-        {
-          'border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100': subscriptionDetails.color === 'gray',
-          'border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100': subscriptionDetails.color === 'blue',
-          'border-yellow-200 bg-gradient-to-br from-yellow-50 to-yellow-100': subscriptionDetails.color === 'yellow'
-        }
-      ]">
-        <div class="flex items-start justify-between">
-          <div class="flex items-center">
-            <div :class="[
-              'p-3 rounded-full mr-3',
-              {
-                'bg-gray-200 text-gray-700': subscriptionDetails.color === 'gray',
-                'bg-blue-200 text-blue-700': subscriptionDetails.color === 'blue',
-                'bg-yellow-200 text-yellow-700': subscriptionDetails.color === 'yellow'
-              }
-            ]">
-              <i class="bi text-xl" :class="subscriptionDetails.icon"></i>
-            </div>
-            <div>
-              <h3 class="font-bold text-lg">{{ subscriptionDetails.name }}</h3>
-              <p class="text-sm text-gray-600">Active Plan</p>
-            </div>
-          </div>
+                        <div v-if="subscriptionDetails" class="mt-2 w-full">
+                            <div
+                                :class="[
+                                    'relative rounded-xl border-2 p-4 shadow-sm transition-all hover:shadow-md',
+                                    {
+                                        'border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100':
+                                            subscriptionDetails.color ===
+                                            'gray',
+                                        'border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100':
+                                            subscriptionDetails.color ===
+                                            'blue',
+                                        'border-yellow-200 bg-gradient-to-br from-yellow-50 to-yellow-100':
+                                            subscriptionDetails.color ===
+                                            'yellow',
+                                    },
+                                ]"
+                            >
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-center">
+                                        <div
+                                            :class="[
+                                                'mr-3 rounded-full p-3',
+                                                {
+                                                    'bg-gray-200 text-gray-700':
+                                                        subscriptionDetails.color ===
+                                                        'gray',
+                                                    'bg-blue-200 text-blue-700':
+                                                        subscriptionDetails.color ===
+                                                        'blue',
+                                                    'bg-yellow-200 text-yellow-700':
+                                                        subscriptionDetails.color ===
+                                                        'yellow',
+                                                },
+                                            ]"
+                                        >
+                                            <i
+                                                class="bi text-xl"
+                                                :class="
+                                                    subscriptionDetails.icon
+                                                "
+                                            ></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-bold">
+                                                {{ subscriptionDetails.name }}
+                                            </h3>
+                                            <p class="text-sm text-gray-600">
+                                                Active Plan
+                                            </p>
+                                        </div>
+                                    </div>
 
-          <div :class="[
-            'px-3 py-1 rounded-full text-xs font-semibold',
-            {
-              'bg-gray-200 text-gray-800': subscriptionDetails.color === 'gray',
-              'bg-blue-200 text-blue-800': subscriptionDetails.color === 'blue',
-              'bg-yellow-200 text-yellow-800': subscriptionDetails.color === 'yellow'
-            }
-          ]">
-            {{ props.subscriptionProps.subscription_type }}
-          </div>
-        </div>
+                                    <div
+                                        :class="[
+                                            'rounded-full px-3 py-1 text-xs font-semibold',
+                                            {
+                                                'bg-gray-200 text-gray-800':
+                                                    subscriptionDetails.color ===
+                                                    'gray',
+                                                'bg-blue-200 text-blue-800':
+                                                    subscriptionDetails.color ===
+                                                    'blue',
+                                                'bg-yellow-200 text-yellow-800':
+                                                    subscriptionDetails.color ===
+                                                    'yellow',
+                                            },
+                                        ]"
+                                    >
+                                        {{
+                                            props.subscriptionProps
+                                                .subscription_type
+                                        }}
+                                    </div>
+                                </div>
 
-        <div class="mt-4">
-          <h4 class="text-sm font-semibold mb-2">Plan Features:</h4>
-          <ul class="text-sm space-y-1">
-            <li v-for="(feature, index) in subscriptionDetails.features" :key="index" class="flex items-start">
-              <i class="bi bi-check2 mr-2 mt-0.5" :class="{
-                'text-gray-600': subscriptionDetails.color === 'gray',
-                'text-blue-600': subscriptionDetails.color === 'blue',
-                'text-yellow-600': subscriptionDetails.color === 'yellow'
-              }"></i>
-              <span>{{ feature }}</span>
-            </li>
-          </ul>
-        </div>
+                                <div class="mt-4">
+                                    <h4 class="mb-2 text-sm font-semibold">
+                                        Plan Features:
+                                    </h4>
+                                    <ul class="space-y-1 text-sm">
+                                        <li
+                                            v-for="(
+                                                feature, index
+                                            ) in subscriptionDetails.features"
+                                            :key="index"
+                                            class="flex items-start"
+                                        >
+                                            <i
+                                                class="bi bi-check2 mr-2 mt-0.5"
+                                                :class="{
+                                                    'text-gray-600':
+                                                        subscriptionDetails.color ===
+                                                        'gray',
+                                                    'text-blue-600':
+                                                        subscriptionDetails.color ===
+                                                        'blue',
+                                                    'text-yellow-600':
+                                                        subscriptionDetails.color ===
+                                                        'yellow',
+                                                }"
+                                            ></i>
+                                            <span>{{ feature }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
 
-        <div v-if="subscriptionDetails.upgradeTo" class="mt-4 pt-3 border-t border-gray-200">
-          <Link
-            :href="route('pricing')"
-            :class="[
-              'block text-center py-2 px-4 rounded-lg text-sm font-semibold transition-colors',
-              {
-                'bg-gray-800 text-white hover:bg-gray-900': subscriptionDetails.color === 'gray',
-                'bg-blue-600 text-white hover:bg-blue-700': subscriptionDetails.color === 'blue',
-                'bg-yellow-500 text-gray-900 hover:bg-yellow-600': subscriptionDetails.color === 'yellow'
-              }
-            ]"
-          >
-            Upgrade your Plan to {{ subscriptionDetails.upgradeTo }}
-          </Link>
-        </div>
-      </div>
-    </div>
+                                <div
+                                    v-if="subscriptionDetails.upgradeTo"
+                                    class="mt-4 border-t border-gray-200 pt-3"
+                                >
+                                    <Link
+                                        :href="route('pricing')"
+                                        :class="[
+                                            'block rounded-lg px-4 py-2 text-center text-sm font-semibold transition-colors',
+                                            {
+                                                'bg-gray-800 text-white hover:bg-gray-900':
+                                                    subscriptionDetails.color ===
+                                                    'gray',
+                                                'bg-blue-600 text-white hover:bg-blue-700':
+                                                    subscriptionDetails.color ===
+                                                    'blue',
+                                                'bg-yellow-500 text-gray-900 hover:bg-yellow-600':
+                                                    subscriptionDetails.color ===
+                                                    'yellow',
+                                            },
+                                        ]"
+                                    >
+                                        Upgrade your Plan to
+                                        {{ subscriptionDetails.upgradeTo }}
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
 
-    <div v-else class="w-full mt-2">
-      <div class="rounded-xl p-4 border-2 border-dashed border-gray-300 bg-gray-50 text-center">
-        <div class="p-2 rounded-full bg-gray-200 text-gray-600 inline-block mb-2">
-          <i class="bi bi-exclamation-circle"></i>
-        </div>
-        <h3 class="font-semibold">No Active Subscription</h3>
-        <p class="text-sm text-gray-600 mb-3">Get started with a plan to access all features</p>
-        <Link
-          :href="route('subscription.plans')"
-          class="inline-block py-2 px-4 bg-gray-800 text-white rounded-lg text-sm font-semibold hover:bg-gray-900 transition-colors"
-        >
-          View Plans
-        </Link>
-      </div>
-    </div>
+                        <div v-else class="mt-2 w-full">
+                            <div
+                                class="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-4 text-center"
+                            >
+                                <div
+                                    class="mb-2 inline-block rounded-full bg-gray-200 p-2 text-gray-600"
+                                >
+                                    <i class="bi bi-exclamation-circle"></i>
+                                </div>
+                                <h3 class="font-semibold">
+                                    No Active Subscription
+                                </h3>
+                                <p class="mb-3 text-sm text-gray-600">
+                                    Get started with a plan to access all
+                                    features
+                                </p>
+                                <Link
+                                    :href="route('subscription.plans')"
+                                    class="inline-block rounded-lg bg-gray-800 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-gray-900"
+                                >
+                                    View Plans
+                                </Link>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-6 h-[400px] rounded-lg bg-white p-4">
@@ -355,7 +435,7 @@ onBeforeUnmount(() => {
                                 </span>
                             </Link>
                         </div>
-                        <div>
+                        <div class="mt-4 h-[320px] overflow-y-auto">
                             <div
                                 v-for="(chatHead, index) in chatHeads"
                                 @click="goToChat(chatHead.user.id)"

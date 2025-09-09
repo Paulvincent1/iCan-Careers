@@ -1,24 +1,34 @@
 <script setup>
-import { MglMap, MglMarker } from "@indoorequal/vue-maplibre-gl";
+import { MglMap, MglMarker, MglNavigationControl } from "@indoorequal/vue-maplibre-gl";
 import { useMap } from "@indoorequal/vue-maplibre-gl";
 import { MapLibreSearchControl } from "@stadiamaps/maplibre-search-box";
-import { MglNavigationControl } from "@indoorequal/vue-maplibre-gl";
 import "@stadiamaps/maplibre-search-box/dist/style.css";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 
 let props = defineProps({
     centerProps: null,
     markedCoordinatesProps: null,
     disableSearch: null,
     disableSetMaker: null,
+    initialCoordinates: {
+        type: Array,
+        default: () => [120.9842, 14.5995]
+    }
 });
 
 let emit = defineEmits(["update:coordinates"]);
 
-let markCoordinates = ref(props.markedCoordinatesProps ?? [120.9842, 14.5995]);
+let markCoordinates = ref(props.initialCoordinates);
 const style = "https://tiles.openfreemap.org/styles/liberty";
-let center = props.centerProps ?? [120.9842, 14.5995];
+let center = props.centerProps ?? props.initialCoordinates;
 const zoom = 6;
+
+// Update markCoordinates when initialCoordinates prop changes
+watch(() => props.initialCoordinates, (newCoords) => {
+    if (newCoords && newCoords.length === 2) {
+        markCoordinates.value = newCoords;
+    }
+});
 
 function setPointerCursor(event) {
     event.event.target.getCanvas().style.cursor = "default";
@@ -39,17 +49,20 @@ const control = new MapLibreSearchControl();
 watch(
     () => map.isLoaded,
     () => {
-        map.map.setMaxBounds([
-            [116.0, 4.5], // Southwest
-            [127.0, 21.0], // Northeast
-        ]);
-        if (props.disableSearch) {
-            return;
+        if (map.map) {
+            map.map.setMaxBounds([
+                [116.0, 4.5], // Southwest
+                [127.0, 21.0], // Northeast
+            ]);
+            if (props.disableSearch) {
+                return;
+            }
+            map.map.addControl(control, "top-left");
         }
-        map.map.addControl(control, "top-left");
-    },
+    }
 );
 </script>
+
 <template>
     <mgl-map
         @map:mouseover="setPointerCursor"
@@ -64,6 +77,7 @@ watch(
         <mgl-navigation-control position="bottom-left"></mgl-navigation-control>
     </mgl-map>
 </template>
+
 <style>
 @import "maplibre-gl/dist/maplibre-gl.css";
 

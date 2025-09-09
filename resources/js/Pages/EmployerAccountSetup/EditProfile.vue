@@ -5,35 +5,54 @@ import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import dayjs from "dayjs";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import SubmitImage from "../Components/SubmitImage.vue";
 import Maps from "../Components/Maps.vue";
 import { debounce } from "lodash";
 
 defineOptions({ layout: [Layout, SetupProfileLayout] });
 
-const props = defineProps({ bussinessProps: Array });
+const props = defineProps({
+    employerProfile: Object,
+    businesses: Array,
+    currentBusiness: Object,
+    user: Object,
+});
 
 const searchBusiness = ref("");
 const isEditingExistingBusiness = ref(false);
 const hasSelectedBusinessOption = ref(false);
-const businessSelected = ref(null);
+const businessSelected = ref(props.currentBusiness || null);
 const otherIndustry = ref("");
 const showInput = ref(false);
-const showCompanyForm = ref(false);
+const showCompanyForm = ref(props.employerProfile.employer_type === "business");
 
 const form = useForm({
-    full_name: "",
-    phone_number: "",
-    birth_year: "",
-    gender: "",
-    employer_type: "",
-    business_id: null,
-    business_name: "",
+    full_name: props.employerProfile.full_name,
+    phone_number: props.employerProfile.phone_number,
+    birth_year: props.employerProfile.birth_year,
+    gender: props.employerProfile.gender,
+    employer_type: props.employerProfile.employer_type,
+    business_id: props.currentBusiness?.id || null,
+    business_name: props.currentBusiness?.business_name || "",
     business_logo: null,
-    industry: "",
-    business_description: "",
-    business_location: [120.9842, 14.5995],
+    industry: props.currentBusiness?.industry || "",
+    business_description: props.currentBusiness?.business_description || "",
+    business_location: props.currentBusiness?.business_location || [
+        120.9842, 14.5995,
+    ],
+});
+
+// Initialize values
+onMounted(() => {
+    if (props.currentBusiness) {
+        isEditingExistingBusiness.value = true;
+        hasSelectedBusinessOption.value = true;
+    }
+    if (props.currentBusiness?.industry === "Other") {
+        showInput.value = true;
+        otherIndustry.value = props.currentBusiness.industry;
+    }
 });
 
 // Search debounce
@@ -44,7 +63,7 @@ watch(
     }, 1000),
 );
 
-// Select business
+// Business selection
 const selectBusiness = (business) => {
     isEditingExistingBusiness.value = true;
     hasSelectedBusinessOption.value = true;
@@ -56,7 +75,7 @@ const selectBusiness = (business) => {
     businessSelected.value = business;
 };
 
-// Toggle between creating new and selecting existing
+// Toggle new/existing business form
 const toggleBusinessOption = () => {
     if (isEditingExistingBusiness.value) createNewBusiness();
     else selectExistingBusiness();
@@ -95,7 +114,6 @@ watch(
     () => form.industry,
     (val) => (showInput.value = val === "Other"),
 );
-
 watch(
     () => form.employer_type,
     (val) => {
@@ -108,7 +126,7 @@ const imageAdded = (image) => (form.business_logo = image);
 
 const search = () => {
     router.get(
-        "/employers/createprofile",
+        "/employers/profile/edit",
         { business_name: searchBusiness.value },
         { preserveScroll: true, preserveState: true },
     );
@@ -116,20 +134,20 @@ const search = () => {
 
 const submit = () => {
     if (form.industry === "Other") form.industry = otherIndustry.value;
-    form.post(route("create.profile.employer.post"));
+    form.post(route("employer.profile.update"));
 };
 </script>
 
 <template>
-    <Head title="Create Profile | iCan Careers" />
+    <Head title="Edit Profile | iCan Careers" />
 
     <div class="mb-4 flex justify-center">
         <div class="mt-5 w-full rounded-lg bg-white p-8">
             <h2 class="text-[24px] text-gray-900">
-                Create Your Employer Profile
+                Edit Your Employer Profile
             </h2>
             <p class="mb-6 text-lg text-gray-700">
-                Please provide your details to create your employer profile.
+                Update your employer profile information.
             </p>
 
             <hr class="my-4 border-gray-300" />
@@ -143,80 +161,6 @@ const submit = () => {
             </h3>
 
             <form @submit.prevent="submit" class="mt-4 space-y-6">
-                <!-- Full Name -->
-                <div class="my-7 flex flex-col">
-                    <label class="text-gray-500">Full Name</label>
-                    <input
-                        v-model.trim="form.full_name"
-                        type="text"
-                        class="mt-2 w-full rounded-lg border px-4 py-2 text-lg outline-orange-200"
-                        placeholder="ex: Draven Troy Coloma"
-                        required
-                    />
-                    <InputFlashMessage
-                        :message="form.errors.full_name"
-                        type="error"
-                    />
-                </div>
-
-                <div class="grid grid-cols-2 gap-5">
-                    <!-- Birth Year -->
-                    <div class="flex flex-col">
-                        <label class="text-gray-500">Birth Year</label>
-                        <input
-                            v-model.number="form.birth_year"
-                            type="number"
-                            min="1900"
-                            :max="dayjs().year() - 18"
-                            class="mt-2 w-full rounded-lg border px-4 py-2 text-lg outline-orange-200"
-                            placeholder="YYYY"
-                            required
-                        />
-                    </div>
-                    <!-- Phone Number -->
-                    <div class="flex flex-col">
-                        <label class="text-gray-500">Phone Number</label>
-                        <input
-                            v-model.trim="form.phone_number"
-                            type="number"
-                            class="mt-2 w-full rounded-lg border px-4 py-2 text-lg outline-orange-200"
-                            placeholder="09123456789"
-                            required
-                        />
-                        <InputFlashMessage
-                            :message="form.errors.phone_number"
-                            type="error"
-                        />
-                    </div>
-                </div>
-
-                <!-- Gender -->
-                <div class="flex flex-col">
-                    <p class="text-gray-500">Gender</p>
-                    <div class="mt-2 flex items-center gap-6">
-                        <label class="flex cursor-pointer items-center gap-2"
-                            ><input
-                                v-model="form.gender"
-                                type="radio"
-                                value="Male"
-                                class="h-4 w-4"
-                            /><span class="text-gray-700">Male</span></label
-                        >
-                        <label class="flex cursor-pointer items-center gap-2"
-                            ><input
-                                v-model="form.gender"
-                                type="radio"
-                                value="Female"
-                                class="h-4 w-4"
-                            /><span class="text-gray-700">Female</span></label
-                        >
-                    </div>
-                    <InputFlashMessage
-                        :message="form.errors.gender"
-                        type="error"
-                    />
-                </div>
-
                 <!-- Employer Type -->
                 <div class="flex flex-col">
                     <label class="text-gray-500"
@@ -227,9 +171,7 @@ const submit = () => {
                         class="mt-2 w-[300px] rounded-lg border px-4 py-2 text-lg outline-orange-200"
                         required
                     >
-                        <option value="" disabled selected>
-                            Select employer type
-                        </option>
+                        <option value="" disabled>Select employer type</option>
                         <option value="business">
                             Business / Company Employer
                         </option>
@@ -320,7 +262,7 @@ const submit = () => {
                                 class="mt-2 h-52 w-full overflow-y-auto rounded-lg border border-gray-400 p-2"
                             >
                                 <div
-                                    v-for="business in bussinessProps"
+                                    v-for="business in businesses"
                                     :key="business.id"
                                     @click="selectBusiness(business)"
                                     class="flex cursor-pointer items-center gap-3 rounded-lg p-2 hover:bg-gray-100"
@@ -328,7 +270,6 @@ const submit = () => {
                                     <img
                                         :src="business.business_logo"
                                         class="w-12 rounded object-cover"
-                                        alt="Company Logo"
                                     />
                                     <p class="text-lg">
                                         {{ business.business_name }}
@@ -344,7 +285,6 @@ const submit = () => {
                                     <img
                                         :src="businessSelected.business_logo"
                                         class="w-12 rounded object-cover"
-                                        alt="Selected Company Logo"
                                     />
                                     <p class="text-lg">
                                         {{ businessSelected.business_name }}
@@ -358,7 +298,6 @@ const submit = () => {
                         </div>
 
                         <!-- New Business Form -->
-                        <!-- New Business Form -->
                         <div
                             v-if="
                                 !isEditingExistingBusiness &&
@@ -366,7 +305,6 @@ const submit = () => {
                             "
                             class="space-y-6"
                         >
-                            <!-- Top Toggle Button -->
                             <div class="mt-4 flex items-center justify-between">
                                 <p class="text-lg font-semibold text-gray-800">
                                     Business Details
@@ -380,7 +318,6 @@ const submit = () => {
                                 </button>
                             </div>
 
-                            <!-- Business Name -->
                             <div class="flex flex-col">
                                 <label
                                     class="text-lg font-semibold text-gray-800"
@@ -398,7 +335,6 @@ const submit = () => {
                                 />
                             </div>
 
-                            <!-- Business Logo -->
                             <div class="my-7 flex flex-col">
                                 <label
                                     class="text-lg font-semibold text-gray-800"
@@ -406,12 +342,14 @@ const submit = () => {
                                 >
                                 <SubmitImage
                                     @imageAdded="imageAdded"
+                                    :initialImage="
+                                        currentBusiness?.business_logo
+                                    "
                                     description="<span class='text-blue-500'><u>Upload</u></span> the business logo here"
                                     :error="form.errors.business_logo"
                                 />
                             </div>
 
-                            <!-- Industry -->
                             <div class="flex w-full flex-col">
                                 <label
                                     class="text-lg font-semibold text-gray-800"
@@ -421,7 +359,7 @@ const submit = () => {
                                     v-model="form.industry"
                                     class="w-full max-w-md rounded-lg border px-4 py-2 text-lg outline-orange-200 md:max-w-sm"
                                 >
-                                    <option value="" disabled selected>
+                                    <option value="" disabled>
                                         Select industry
                                     </option>
                                     <option value="Technology and IT">
@@ -456,7 +394,6 @@ const submit = () => {
                                 />
                             </div>
 
-                            <!-- Company Description -->
                             <div class="my-7 flex flex-col">
                                 <label
                                     class="text-lg font-semibold text-gray-800"
@@ -473,13 +410,15 @@ const submit = () => {
                                 />
                             </div>
 
-                            <!-- Company Location -->
                             <div>
                                 <label
                                     class="mb-4 block text-lg font-semibold text-gray-800"
                                     >Company Location</label
                                 >
-                                <Maps @update:coordinates="setMarkLocation" />
+                                <Maps
+                                    :initialCoordinates="form.business_location"
+                                    @update:coordinates="setMarkLocation"
+                                />
                             </div>
                         </div>
                     </div>
@@ -489,17 +428,17 @@ const submit = () => {
                 <div class="mt-4 flex justify-end gap-3">
                     <button
                         type="button"
-                        @click="$inertia.visit(route('employer.dashboard'))"
-                        class="cursor-pointer rounded p-2 text-black"
+                        @click="$inertia.visit(route('employer.profile'))"
+                        class="cursor-pointer rounded bg-gray-300 p-2 text-black"
                     >
-                        <u>Skip for now</u>
+                        Cancel
                     </button>
                     <button
                         type="submit"
-                        class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
                         :disabled="form.processing"
+                        class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
                     >
-                        Save Profile
+                        Update Profile
                     </button>
                 </div>
             </form>
