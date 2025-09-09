@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import InputFlashMessage from "./InputFlashMessage.vue";
 
 let props = defineProps({
@@ -11,9 +11,21 @@ let props = defineProps({
     error: {
         type: String,
     },
+    initialImage: {
+        type: String,
+        default: null
+    }
 });
+
 let emit = defineEmits(["imageAdded"]);
 let avatarSelfieID = ref("");
+
+// Set initial image if provided
+onMounted(() => {
+    if (props.initialImage) {
+        avatarSelfieID.value = props.initialImage;
+    }
+});
 
 function imageChange(e) {
     if (e.target.files[0]) {
@@ -22,6 +34,7 @@ function imageChange(e) {
     }
 }
 </script>
+
 <template>
     <div class="w-full max-w-[400px]">
         <label
@@ -34,7 +47,7 @@ function imageChange(e) {
                 alt=""
                 class="absolute inset-0 h-[100%] w-[100%] object-cover"
             />
-            <div class="mt-9 flex flex-col items-center">
+            <div v-else class="mt-9 flex flex-col items-center">
                 <svg
                     class="mb-3"
                     xmlns="http://www.w3.org/2000/svg"

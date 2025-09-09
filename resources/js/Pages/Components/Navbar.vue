@@ -3,6 +3,7 @@ import { Link, usePage } from "@inertiajs/vue3";
 import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import { nanoid } from "nanoid";
+import { router } from "@inertiajs/vue3";
 
 let isActive = ref(false);
 let profileDropdown = ref(false);
@@ -41,14 +42,15 @@ window.addEventListener("resize", () => {
     }
 });
 
-// notfications
+// notifications
 let page = usePage();
-
 let notifications = computed(() => page.props.auth?.user.unreadNotifications);
+let unreadMessages = computed(() => page.props.auth?.user.unreadMessages || []);
 
 function unshiftLatestNotification(notif) {
     notifications.value.unshift(notif);
 }
+
 
 let channelNotif = null;
 watch(
@@ -86,27 +88,35 @@ onMounted(() => {
     }
 });
 
-console.log(page.props.auth.user.unreadNotifications);
+// Compute profile route based on user role
+const profileRoute = computed(() => {
+    if (page.props.auth.user.role?.name === "Employer") {
+        return route("employer.profile");
+    } else {
+        return route("worker.profile");
+    }
+});
 </script>
+
 <template>
     <div class="fixed top-0 z-50 w-full border-b bg-white shadow">
         <header
             class="xs container mx-auto flex h-[4.625rem] items-center justify-between px-[0.5rem] xl:max-w-7xl"
         >
-            <p class="">
-                <Link :href="route('home')"
-                    ><img
+            <p>
+                <Link :href="route('home')">
+                    <img
                         src="/assets/2.png"
                         alt=""
-                        class="h-10 w-auto object-contain md:h-13 lg:h-[50px]"
-                /></Link>
+                        class="md:h-13 h-10 w-auto object-contain lg:h-[50px]"
+                    />
+                </Link>
             </p>
+
             <nav
                 :class="[
                     'fixed inset-0 top-[4.626rem] z-[1000] flex h-[calc(100vh-4.625rem)] w-full flex-col items-center overflow-auto bg-white transition-all md:static md:inset-0 md:h-[100%] md:w-auto md:translate-x-0 md:flex-row md:overflow-visible',
-                    {
-                        'translate-x-[100%]': !isActive,
-                    },
+                    { 'translate-x-[100%]': !isActive },
                 ]"
             >
                 <ul
@@ -140,7 +150,6 @@ console.log(page.props.auth.user.unreadNotifications);
                             POST A JOB
                         </Link>
                     </li>
-
                     <li
                         v-if="
                             !(
@@ -157,6 +166,7 @@ console.log(page.props.auth.user.unreadNotifications);
                             FIND JOBS
                         </Link>
                     </li>
+
                     <div
                         v-if="!$page.props.auth.user?.authenticated"
                         class="flex items-center gap-5"
@@ -183,13 +193,36 @@ console.log(page.props.auth.user.unreadNotifications);
                         v-show="$page.props.auth.user?.authenticated"
                         class="relative flex items-center justify-center gap-3 hover:cursor-pointer"
                     >
+                        <!-- Message Icon -->
+                        <div
+                            class="group ml-3 flex cursor-pointer flex-col"
+                            @click="$inertia.visit(route('messages'))"
+                        >
+                            <div class="relative">
+                                <i class="bi bi-chat-dots text-lg"></i>
+                                
+                                <i
+                                    v-if="unreadMessages.length"
+                                    class="bi bi-circle-fill absolute right-0 top-0 text-[8px] text-red-500"
+                                ></i>
+                                <span
+                                class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                            >
+                                Messages
+                                <!-- Tooltip Arrow -->
+                                </span>
+                                
+                            </div>
+                            
+                        </div>
+                        <!-- Notification Icon -->
                         <div
                             ref="dropNotification"
                             @click="
                                 showNotificationDropDown =
                                     !showNotificationDropDown
                             "
-                            class="flex flex-col"
+                            class="group flex flex-col"
                         >
                             <div class="relative">
                                 <i class="bi bi-bell text-lg"></i>
@@ -197,6 +230,12 @@ console.log(page.props.auth.user.unreadNotifications);
                                     v-if="notifications?.length"
                                     class="bi bi-circle-fill absolute right-0 top-0 text-[8px] text-red-500"
                                 ></i>
+                                <span
+                                class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                            >
+                                Notifications
+                                <!-- Tooltip Arrow -->
+                                </span>
                             </div>
                             <div
                                 v-show="showNotificationDropDown"
@@ -265,6 +304,8 @@ console.log(page.props.auth.user.unreadNotifications);
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Profile Dropdown -->
                         <div
                             ref="drop"
                             @click="profileDropdown = !profileDropdown"
@@ -289,10 +330,18 @@ console.log(page.props.auth.user.unreadNotifications);
                             >
                                 <Link
                                     class="flex gap-2 p-2"
-                                    :href="route('home')"
+                                    :href="profileRoute"
                                     @click="isActive = false"
                                 >
                                     <i class="bi bi-person"></i>
+                                    <p>Profile</p>
+                                </Link>
+                                <Link
+                                    class="flex gap-2 p-2"
+                                    :href="route('home')"
+                                    @click="isActive = false"
+                                >
+                                    <i class="bi bi-house"></i>
                                     <p>Dashboard</p>
                                 </Link>
                                 <Link
@@ -310,14 +359,12 @@ console.log(page.props.auth.user.unreadNotifications);
                     </li>
                 </ul>
             </nav>
+
             <button class="md:hidden" @click="isActive = !isActive">
                 <i
                     :class="[
                         'bi text-2xl',
-                        {
-                            'bi-list': !isActive,
-                            'bi-x-lg': isActive,
-                        },
+                        { 'bi-list': !isActive, 'bi-x-lg': isActive },
                     ]"
                 ></i>
             </button>

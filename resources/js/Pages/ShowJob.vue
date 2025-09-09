@@ -194,18 +194,26 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
             <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
                 <!-- Report Button - Top Right -->
                 <div class="absolute right-9 top-4">
-                    <button 
-                        @click="isShowReportModal = true" 
+                    <button
+                        v-if="
+                            !visitor &&
+                            (page.props.auth.user.role.name === 'Senior' ||
+                                page.props.auth.user.role.name === 'PWD') &&
+                            !isClosed
+                        "
+                        @click="isShowReportModal = true"
                         class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-gray-50"
                     >
                         <i class="bi bi-exclamation-diamond-fill"></i>
                         <span>Report Job</span>
                     </button>
                 </div>
-                
-                <div class="absolute left-[50%] top-[60px] flex w-32 translate-x-[-50%] flex-col items-center">
+
+                <div
+                    class="absolute left-[50%] top-[40px] flex h-36 w-36 translate-x-[-50%] cursor-pointer flex-col items-center"
+                >
                     <img
-                        class="h-24 w-24 mt-5 rounded-lg object-contain border-2 border-white shadow-md"
+                        class="relative mb-3 h-full w-full"
                         :src="
                             jobPostProps.employer.employer_profile
                                 .business_information
@@ -215,103 +223,118 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                         "
                         alt="Company logo"
                     />
-                    
-                    <!-- Bookmark Button - Under Company Logo -->
-                    <div class="mt-4 flex justify-center">
-                        <Link
-                            v-if="
-                                page.props.auth.user.role.name === 'Senior' ||
-                                page.props.auth.user.role.name === 'PWD'
-                            "
-                            @click="saveJob"
-                            as="button"
-                            method="post"
-                            preserve-scroll
-                            :href="route('jobsearch.save.job', jobPostProps.id)"
-                            class="flex items-center gap-1 rounded-md bg-white px-1 py-1 text-sm font-medium shadow-sm hover:bg-gray-50 border border-gray-300"
-                        >
-                            <i
-                                :class="[
-                                    'bi',
-                                    {
-                                        'bi-bookmark': !isSaved,
-                                        'bi-bookmark-fill text-orange-500': isSaved,
-                                    },
-                                ]"
-                            ></i>
-                            <span>{{ isSaved ? 'Saved' : 'Save Job' }}</span>
-                        </Link>
-                        <Link
-                            v-else
-                            v-if="!isClosed"
-                            as="button"
-                            method="get"
-                            preserve-scroll
-                            :href="route('employer.jobpost.edit', jobPostProps.id)"
-                            class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-gray-50 border border-gray-300"
-                        >
-                            <i class="bi bi-pencil-fill text-orange-500"></i>
-                            <span>Edit Job</span>
-                        </Link>
-                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="xs container mx-auto mt-16 px-[0.5rem] xl:max-w-7xl">
-            <p class="my-2 break-words text-center text-[22px] font-bold md:text-[26px]">
+        <!-- Bookmark Button - Under Company Logo -->
+        <div class="mt-16 flex justify-center">
+            <Link
+                v-if="
+                    page.props.auth.user.role.name === 'Senior' ||
+                    page.props.auth.user.role.name === 'PWD'
+                "
+                @click="saveJob"
+                as="button"
+                method="post"
+                preserve-scroll
+                :href="route('jobsearch.save.job', jobPostProps.id)"
+                class="flex items-center gap-1 rounded-md border border-gray-300 bg-white px-1 py-1 text-sm font-medium shadow-sm hover:bg-gray-50"
+            >
+                <i
+                    :class="[
+                        'bi',
+                        {
+                            'bi-bookmark': !isSaved,
+                            'bi-bookmark-fill text-orange-500': isSaved,
+                        },
+                    ]"
+                ></i>
+                <span>{{ isSaved ? "Saved" : "Save Job" }}</span>
+            </Link>
+            <Link
+                v-else
+                v-if="!isClosed"
+                as="button"
+                method="get"
+                preserve-scroll
+                :href="route('employer.jobpost.edit', jobPostProps.id)"
+                class="flex items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-gray-50"
+            >
+                <i class="bi bi-pencil-fill text-orange-500"></i>
+                <span>Edit Job</span>
+            </Link>
+        </div>
+
+        <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
+            <p
+                class="my-2 break-words text-center text-[22px] font-bold md:text-[26px]"
+            >
                 {{ jobPostProps.job_title }}
             </p>
             <Link
                 :href="
                     route('visit.employer.profile', jobPostProps.employer.id)
                 "
-                class="flex items-center justify-center gap-2 mb-6"
+                class="mb-6 flex items-center justify-center gap-2"
             >
-                <p class="text-center text-base text-gray-600 hover:text-orange-500 transition-colors">
+                <p
+                    class="text-center text-base text-gray-600 transition-colors hover:text-orange-500"
+                >
                     {{ jobPostProps.employer.name }}
                 </p>
                 <i class="bi bi-arrow-right"></i>
             </Link>
-            
+
             <!-- Overview Section - Highlighted in the Middle -->
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
-                <h2 class="text-xl font-bold mb-4 text-center">Job Overview</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div
+                class="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+            >
+                <h2 class="mb-4 text-center text-xl font-bold">Job Overview</h2>
+                <div
+                    class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"
+                >
                     <!-- Open To -->
-                    <div class="text-center p-3 bg-blue-50 rounded-lg">
-                        <p class="text-sm font-medium text-gray-600 mb-1">Open To</p>
+                    <div class="rounded-lg bg-blue-50 p-3 text-center">
+                        <p class="mb-1 text-sm font-medium text-gray-600">
+                            Open To
+                        </p>
                         <p class="text-base font-semibold">
-                            {{ preferredWorkers.join(', ') }}
+                            {{ preferredWorkers.join(", ") }}
                         </p>
                     </div>
-                    
+
                     <!-- Working Mode -->
-                    <div class="text-center p-3 bg-green-50 rounded-lg">
-                        <p class="text-sm font-medium text-gray-600 mb-1">Working Mode</p>
+                    <div class="rounded-lg bg-green-50 p-3 text-center">
+                        <p class="mb-1 text-sm font-medium text-gray-600">
+                            Working Mode
+                        </p>
                         <p class="text-base font-semibold">
                             {{ jobPostProps.work_arrangement }}
                         </p>
                     </div>
-                    
+
                     <!-- Job Type -->
-                    <div class="text-center p-3 bg-yellow-50 rounded-lg">
-                        <p class="text-sm font-medium text-gray-600 mb-1">Job Type</p>
+                    <div class="rounded-lg bg-yellow-50 p-3 text-center">
+                        <p class="mb-1 text-sm font-medium text-gray-600">
+                            Job Type
+                        </p>
                         <p class="text-base font-semibold">
                             {{ jobPostProps.job_type }}
                         </p>
                     </div>
-                    
+
                     <!-- Salary -->
-                    <div class="text-center p-3 bg-purple-50 rounded-lg">
-                        <p class="text-sm font-medium text-gray-600 mb-1">Salary</p>
+                    <div class="rounded-lg bg-purple-50 p-3 text-center">
+                        <p class="mb-1 text-sm font-medium text-gray-600">
+                            Salary
+                        </p>
                         <p class="text-base font-semibold">
                             {{ jobPostProps.salary }}
                         </p>
                     </div>
                 </div>
             </div>
-            
+
             <div
                 v-if="
                     page.props.auth.user.role.name === 'Senior' ||
@@ -326,9 +349,9 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                         v-if="page.props.auth?.wokerIsVerified"
                         @click="showModal = true"
                         :class="[
-                            'flex items-center gap-2 w-fit rounded-full bg-orange-500 p-3 px-8 text-sm font-bold text-white hover:bg-orange-600 transition-colors',
+                            'flex w-fit items-center gap-2 rounded-full bg-orange-500 p-3 px-8 text-sm font-bold text-white transition-colors hover:bg-orange-600',
                             {
-                                'bg-gray-400 pointer-events-none': isApplied,
+                                'pointer-events-none bg-gray-400': isApplied,
                             },
                         ]"
                     >
@@ -338,8 +361,11 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     <p v-else class="font-bold text-orange-500">
                         Your account is not yet verified.
                     </p>
-                    <p v-if ="interviewDetails?.interview_schedule" class="mt-2 text-sm text-gray-600">
-                        Interview Scheduled: 
+                    <p
+                        v-if="interviewDetails?.interview_schedule"
+                        class="mt-2 text-sm text-gray-600"
+                    >
+                        Interview Scheduled:
                         {{
                             dayjs
                                 .utc(interviewDetails?.interview_schedule)
@@ -367,7 +393,8 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     :class="[
                         'flex items-center gap-1 rounded-full p-2 px-5 text-sm font-bold',
                         {
-                            'bg-gray-600 text-white pointer-events-none': isClosed,
+                            'pointer-events-none bg-gray-600 text-white':
+                                isClosed,
                             'bg-red-500 text-white hover:bg-red-600': !isClosed,
                         },
                     ]"
@@ -377,30 +404,42 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 </Link>
             </div>
         </div>
-        
+
         <div class="flex-1 bg-[#f3f7fa]">
             <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
                 <div class="grid gap-5 pt-5 lg:grid-cols-[1fr,300px]">
-                    <div class="self-start rounded-lg bg-white px-8 py-5 shadow-sm">
+                    <div
+                        class="self-start rounded-lg bg-white px-8 py-5 shadow-sm"
+                    >
                         <div class="mb-6">
-                            <p class="text-[20px] font-bold mb-3">Job Description</p>
-                            <p class="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-gray-700">
+                            <p class="mb-3 text-[20px] font-bold">
+                                Job Description
+                            </p>
+                            <p
+                                class="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-gray-700"
+                            >
                                 {{ jobPostProps.description }}
                             </p>
                         </div>
 
                         <div class="mb-6">
-                            <p class="text-lg font-bold mb-2">Preferred Educational Attainment</p>
+                            <p class="mb-2 text-lg font-bold">
+                                Preferred Educational Attainment
+                            </p>
                             <p class="text-sm text-gray-700">
-                                {{ jobPostProps.preferred_educational_attainment }}
+                                {{
+                                    jobPostProps.preferred_educational_attainment
+                                }}
                             </p>
                         </div>
-                        
+
                         <div class="mb-6">
-                            <p class="text-lg font-bold mb-2">Required Skills</p>
+                            <p class="mb-2 text-lg font-bold">
+                                Required Skills
+                            </p>
                             <div class="flex flex-wrap gap-2">
                                 <span
-                                    class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium"
+                                    class="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800"
                                     v-for="(
                                         skill, index
                                     ) in jobPostProps.skills"
@@ -410,9 +449,9 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                 </span>
                             </div>
                         </div>
-                        
+
                         <div v-if="jobPostProps.work_arrangement != 'Remote'">
-                            <p class="text-lg font-bold mb-3">Location</p>
+                            <p class="mb-3 text-lg font-bold">Location</p>
                             <Maps
                                 v-if="jobPostProps.location"
                                 :disableSearch="true"
@@ -422,26 +461,34 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                             ></Maps>
                         </div>
                     </div>
-                    
+
                     <div
                         class="row-start-1 self-start rounded-lg bg-white px-8 py-5 shadow-sm lg:row-start-auto"
                     >
-                        <p class="mb-4 text-[20px] font-bold">Additional Details</p>
+                        <p class="mb-4 text-[20px] font-bold">
+                            Additional Details
+                        </p>
                         <div class="space-y-4">
                             <div>
-                                <p class="text-sm font-medium text-gray-600">Hours per day</p>
+                                <p class="text-sm font-medium text-gray-600">
+                                    Hours per day
+                                </p>
                                 <p class="text-base font-semibold">
                                     {{ jobPostProps.hour_per_day }}
                                 </p>
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-gray-600">Hourly rate</p>
+                                <p class="text-sm font-medium text-gray-600">
+                                    Hourly rate
+                                </p>
                                 <p class="text-base font-semibold">
                                     {{ jobPostProps.hourly_rate }}
                                 </p>
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-gray-600">Experience required</p>
+                                <p class="text-sm font-medium text-gray-600">
+                                    Experience required
+                                </p>
                                 <p class="text-base font-semibold">
                                     {{ jobPostProps.experience }}
                                 </p>
@@ -451,7 +498,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 </div>
             </div>
         </div>
-        
+
         <Teleport defer to="body">
             <ReusableModal
                 v-if="
@@ -515,14 +562,14 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 </div>
             </ReusableModal>
         </Teleport>
-        
+
         <SuccessfulMessage
             :messageProp="messageProp"
             :messageShow="messageShow"
             type="Success"
         ></SuccessfulMessage>
     </div>
-    
+
     <ReusableModal
         v-if="isShowReportModal"
         @closeModal="isShowReportModal = false"
@@ -551,7 +598,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     v-for="(report, index) in reports"
                     :key="index"
                     @click="selectReason(report)"
-                    class="flex items-center justify-between py-2 transition-all hover:bg-gray-50 px-2 rounded"
+                    class="flex items-center justify-between rounded px-2 py-2 transition-all hover:bg-gray-50"
                 >
                     <p>{{ report.reason }}</p>
                     <i class="bi bi-caret-right font-bold"></i>
@@ -561,7 +608,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     v-for="(description, index) in descriptions"
                     :key="index"
                     @click="submitReport(description)"
-                    class="flex items-center justify-between py-2 transition-all hover:bg-gray-50 px-2 rounded"
+                    class="flex items-center justify-between rounded px-2 py-2 transition-all hover:bg-gray-50"
                 >
                     <p>{{ description }}</p>
                     <i class="bi bi-caret-right font-bold"></i>
