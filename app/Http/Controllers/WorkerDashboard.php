@@ -64,8 +64,8 @@ class WorkerDashboard extends Controller
         $chatHeads = [];
 
         foreach($users as $userchat){
-            $sent = $userchat->sentMessages()->latest()->first();
-            $received = $userchat->receivedMessages()->latest()->first();
+            $sent = $userchat->sentMessages()->where('sender_id', $user->id)->latest()->first();
+            $received = $userchat->receivedMessages()->where('receiver_id', $user->id)->latest()->first();
 
             $latestMessage = null;
             if($sent && $received){
