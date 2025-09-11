@@ -274,7 +274,7 @@ function listenChannelChatHeads() {
 }
 
 function unshiftLatestChatHead(userId, newChatHead) {
-    const index = chatHeads.value.find((ch) => {
+    const index = chatHeads.value.findIndex((ch) => {
         return Number(ch?.user.id) === Number(userId);
     });
 
@@ -286,7 +286,7 @@ function unshiftLatestChatHead(userId, newChatHead) {
             chatHeads.value[index] = newChatHead;
         }
     } else {
-        chatHeads.value.unshift(newChatHead);
+        chatHeads.value[index] = newChatHead;
     }
 }
 
