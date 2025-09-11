@@ -183,7 +183,7 @@ function listenChannelChatHeads() {
 }
 
 function unshiftLatestChatHead(userId, newChatHead) {
-    const index = chatHeads.value.findIndex((ch) => {
+    const index = chatHeads.value.find((ch) => {
         return Number(ch?.user.id) === Number(userId);
     });
 

@@ -42,8 +42,8 @@ class EmployerDashboardController extends Controller
         $chatHeads = [];
 
         foreach($users as $userchat){
-            $sent = $userchat->sentMessages()->latest()->first();
-            $received = $userchat->receivedMessages()->latest()->first();
+            $sent = $userchat->sentMessages()->where('receiver_id',$user->id)->latest()->first();
+            $received = $userchat->receivedMessages('sender_id',$user->id)->latest()->first();
 
             $latestMessage = null;
             if($sent && $received){
@@ -323,8 +323,8 @@ class EmployerDashboardController extends Controller
                 'hourly_rate' => $job->hourly_rate,
                 'salary_per_month' => $job->salary,
                 'location' => $job->location,
-                'preferred_worker_types' => is_array($job->preferred_worker_types) 
-                 ? implode(', ', $job->preferred_worker_types) 
+                'preferred_worker_types' => is_array($job->preferred_worker_types)
+                 ? implode(', ', $job->preferred_worker_types)
                 : $job->preferred_worker_types,
                 'job_status' => $job->job_status,
                 'created_at' => $job->created_at->diffForHumans(),
