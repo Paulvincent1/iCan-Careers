@@ -286,7 +286,7 @@ function unshiftLatestChatHead(userId, newChatHead) {
             chatHeads.value[index] = newChatHead;
         }
     } else {
-        chatHeads.value.unshift(newChatHead);
+        chatHeads.value[index] = newChatHead;
     }
 }
 
@@ -306,6 +306,10 @@ let isPayoutInfoModalOpen = ref(false);
 
 const formatCurrency =
     getCurrentInstance().appContext.config.globalProperties.formatCurrency;
+
+onMounted(() => {
+    console.log(chatHeads.value);
+});
 </script>
 <template>
     <Head title="Profile | iCan Careers" />
@@ -319,7 +323,7 @@ const formatCurrency =
                     >
                         <Link
                             :href="route('worker.profile')"
-                            class="group relative mb-3 p-5 flex cursor-pointer flex-col items-center gap-2 font-bold text-gray-500 hover:underline"
+                            class="group relative mb-3 flex cursor-pointer flex-col items-center gap-2 p-5 font-bold text-gray-500 hover:underline"
                         >
                             <!-- Profile Picture -->
                             <div class="h-[84px] w-[84px]">
@@ -425,7 +429,7 @@ const formatCurrency =
                             <div
                                 v-for="(chatHead, index) in chatHeads"
                                 @click="goToChat(chatHead.user.id)"
-                                :key="chatHead.latestMessage.id"
+                                :key="chatHead.latestMessage?.id"
                                 :class="[
                                     'flex cursor-pointer gap-2 p-4',
                                     {
@@ -537,7 +541,7 @@ const formatCurrency =
                                     </li></swiper-slide
                                 >
                             </swiper-container>
-                            <div class="overflow-auto">
+                            <div class="h-[300px] overflow-auto">
                                 <table class="w-full min-w-[500px] table-fixed">
                                     <thead class="text-sm">
                                         <tr>

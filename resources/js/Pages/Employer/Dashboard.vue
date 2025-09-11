@@ -187,6 +187,8 @@ function unshiftLatestChatHead(userId, newChatHead) {
         return Number(ch?.user.id) === Number(userId);
     });
 
+    console.log(index);
+
     if (index) {
         if (index != 0) {
             chatHeads.value.splice(index, 1);
@@ -195,7 +197,7 @@ function unshiftLatestChatHead(userId, newChatHead) {
             chatHeads.value[index] = newChatHead;
         }
     } else {
-        chatHeads.value.unshift(newChatHead);
+        chatHeads.value[index] = newChatHead;
     }
 }
 

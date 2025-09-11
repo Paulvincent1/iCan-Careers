@@ -503,7 +503,7 @@ function unshiftLatestChatHead(userId, newChatHead) {
             chatHeads.value[index] = newChatHead;
         }
     } else {
-        chatHeads.value.unshift(newChatHead);
+        chatHeads.value[index] = newChatHead;
     }
 }
 
@@ -544,6 +544,10 @@ watch(
         );
     }, 500),
 );
+
+onMounted(() => {
+    console.log(chatHeads.value);
+});
 </script>
 <template>
     <Head title="Message | iCan Careers" />
