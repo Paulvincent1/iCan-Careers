@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import dayjs from "dayjs";
 import Layout from "../Layouts/Layout.vue";
@@ -25,12 +25,12 @@ let form = useForm({
     resume: null,
 });
 
-let resumeName = ref(""); // Store uploaded file name
+let resumeName = ref("");
 
 function addResume(e) {
     if (e.target.files[0]) {
         form.resume = e.target.files[0];
-        resumeName.value = e.target.files[0].name; // Display file name
+        resumeName.value = e.target.files[0].name;
     }
 }
 
@@ -45,6 +45,25 @@ const submit = () => {
         },
     });
 };
+
+// ✅ Auto-calculation
+watch(
+    () => [form.work_hour_per_day, form.hour_pay],
+    ([hours, hourly]) => {
+        if (hours && hourly) {
+            form.month_pay = (hours * hourly * 22).toFixed(2); // assume 22 working days
+        }
+    },
+);
+
+watch(
+    () => [form.work_hour_per_day, form.month_pay],
+    ([hours, monthly]) => {
+        if (hours && monthly) {
+            form.hour_pay = (monthly / (hours * 22)).toFixed(2);
+        }
+    },
+);
 </script>
 
 <template>
@@ -157,6 +176,9 @@ const submit = () => {
                                 type="error"
                                 :message="form.errors.work_hour_per_day"
                             />
+                            <small class="mt-1 text-xs text-gray-500">
+                                Maximum of 12 hours per day is allowed.
+                            </small>
                         </div>
 
                         <!-- Hourly Pay -->
@@ -174,6 +196,9 @@ const submit = () => {
                                 type="error"
                                 :message="form.errors.work_hour_per_day"
                             />
+                            <small class="mt-1 text-xs text-gray-500">
+                                Example: ₱100 per hour.
+                            </small>
                         </div>
 
                         <!-- Monthly Pay -->
@@ -183,14 +208,18 @@ const submit = () => {
                                 v-model="form.month_pay"
                                 type="number"
                                 min="0"
-                                class="mt-2 w-full rounded-lg border px-4 py-2 text-lg outline-blue-400"
-                                placeholder="e.g. 20,000"
-                                required
+                                class="mt-2 w-full cursor-not-allowed rounded-lg border bg-gray-100 px-4 py-2 text-lg text-gray-700 outline-none"
+                                placeholder="Automatically calculated"
+                                readonly
                             />
                             <InputFlashMessage
                                 type="error"
                                 :message="form.errors.work_hour_per_day"
                             />
+                            <small class="mt-1 text-xs text-gray-500">
+                                Automatically calculated based on hours × rate ×
+                                22 working days.
+                            </small>
                         </div>
                     </div>
                 </div>

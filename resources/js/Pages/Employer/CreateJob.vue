@@ -35,6 +35,19 @@ let form = useForm({
     preferred_worker_types: props.jobPostProp?.preferred_worker_types ?? null,
 });
 
+// ✅ Auto calculation when hour/day or hourly_rate changes
+watch(
+    () => [form.hour_per_day, form.hourly_rate],
+    ([hours, rate]) => {
+        if (hours && rate) {
+            // Assuming 22 working days per month
+            form.salary = (hours * rate * 22).toFixed(2);
+        } else {
+            form.salary = null;
+        }
+    },
+);
+
 onMounted(() => {
     if (!form.location) {
         form.location = props.locationProps
@@ -171,11 +184,12 @@ const submit = () => {
 
                 <hr class="my-4 border-gray-300" />
                 <h3 class="text-xl font-bold text-gray-900">Job Information</h3>
-                <h3>This information will be displayed publicly so be careful what you share.</h3>
+                <h3>
+                    This information will be displayed publicly so be careful
+                    what you share.
+                </h3>
                 <form @submit.prevent="submit">
-
-                    <div class="space-y-6 mt-4">
-
+                    <div class="mt-4 space-y-6">
                         <!-- Job Title -->
                         <div class="grid grid-cols-2 gap-5">
                             <div class="flex flex-col">
@@ -216,7 +230,9 @@ const submit = () => {
                         </div>
 
                         <hr class="my-4 border-gray-300" />
-                        <h3 class="text-xl font-bold text-gray-900">Work Details</h3>
+                        <h3 class="text-xl font-bold text-gray-900">
+                            Work Details
+                        </h3>
                         <!-- Work Arrangement -->
                         <div class="flex w-full flex-col">
                             <label class="mb-2 font-semibold"
@@ -282,24 +298,26 @@ const submit = () => {
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div
+                            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                        >
                             <!-- Hour Per Day -->
                             <div class="flex flex-col">
                                 <label class="mb-2 font-semibold"
                                     >Hour Per Day</label
                                 >
                                 <input
-                                    v-model="form.hour_per_day"
+                                    v-model.number="form.hour_per_day"
                                     type="number"
                                     min="1"
+                                    max="12"
                                     class="rounded border px-3 py-2 outline-blue-400"
-                                    placeholder="Enter hours per day"
+                                    placeholder="Enter hours per day (max 12)"
                                     required
                                 />
-                                <InputFlashMessage
-                                    type="error"
-                                    :message="form.errors.hour_per_day"
-                                />
+                                <small class="mt-1 text-xs text-gray-500">
+                                    Maximum of 12 hours per day is allowed.
+                                </small>
                             </div>
 
                             <!-- Hourly Rate -->
@@ -308,17 +326,16 @@ const submit = () => {
                                     >Hourly Rate ₱</label
                                 >
                                 <input
-                                    v-model="form.hourly_rate"
+                                    v-model.number="form.hourly_rate"
                                     type="number"
                                     min="1"
                                     class="rounded border px-3 py-2 outline-blue-400"
                                     placeholder="Enter hourly rate"
                                     required
                                 />
-                                <InputFlashMessage
-                                    type="error"
-                                    :message="form.errors.hourly_rate"
-                                />
+                                <small class="mt-1 text-xs text-gray-500">
+                                    Example: ₱100 per hour.
+                                </small>
                             </div>
 
                             <!-- Salary Per Month -->
@@ -329,18 +346,16 @@ const submit = () => {
                                 <input
                                     v-model="form.salary"
                                     type="number"
-                                    min="1"
-                                    class="rounded border px-3 py-2 outline-blue-400"
-                                    placeholder="Enter salary per month"
-                                    required
+                                    class="rounded border bg-gray-100 px-3 py-2 outline-blue-400"
+                                    placeholder="Auto calculated"
+                                    readonly
                                 />
-                                <InputFlashMessage
-                                    type="error"
-                                    :message="form.errors.salary"
-                                />
+                                <small class="mt-1 text-xs text-gray-500">
+                                    Automatically calculated based on hours ×
+                                    rate × 22 working days.
+                                </small>
                             </div>
                         </div>
-
 
                         <!-- Description -->
                         <div class="flex flex-col">
@@ -349,7 +364,7 @@ const submit = () => {
                             >
                             <textarea
                                 v-model="form.description"
-                                class="resize-none h-[250px] rounded border px-3 py-2 outline-blue-400"
+                                class="h-[250px] resize-none rounded border px-3 py-2 outline-blue-400"
                                 placeholder="Enter job description"
                                 required
                             ></textarea>

@@ -39,7 +39,7 @@ const isActive = (url) => computed(() => usePage().url.startsWith(url));
     <!-- Background image (desktop only) -->
     <div
       class="hidden lg:block absolute top-0 right-0 h-full w-2/5 rounded-l-[3rem] bg-cover bg-center "
-      style="background-image: url('/assets/hero.jpg'); -webkit-mask-image: linear-gradient(to left, black 80%, transparent 100%); -webkit-mask-repeat: no-repeat; -webkit-mask-size: cover; mask-image: linear-gradient(to left, black 80%, transparent 100%); mask-repeat: no-repeat; mask-size: cover;"
+      style="background-image: url('/assets/Hero(1).png'); -webkit-mask-image: linear-gradient(to left, black 80%, transparent 100%); -webkit-mask-repeat: no-repeat; -webkit-mask-size: cover; mask-image: linear-gradient(to left, black 80%, transparent 100%); mask-repeat: no-repeat; mask-size: cover;"
     ></div>
 
 
