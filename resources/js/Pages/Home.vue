@@ -201,9 +201,9 @@ const testimonials = [
 
                     <div class="flex flex-col">
                         <label class="mb-2">Looking for Talent?</label>
-                        <Searchbar endpoint="/" name="Talent" class="mb-4" />
+                        <Searchbar endpoint="/register" name="Talent" class="mb-4" />
                         <label class="mb-2">Looking for Work?</label>
-                        <Searchbar endpoint="/" name="Work" />
+                        <Searchbar endpoint="/register" name="Work" />
                         <p class="mt-6 text-center">
                             New to iCan?
                             <Link

@@ -8,6 +8,7 @@ import Footer from "../Components/Admin/Footer.vue";
 import Developers from "../Components/Learning/Developers.vue";
 import Carousel from "../Components/Learning/Carousel.vue";
 import Navlinks from "../Components/Learning/Navlinks.vue";
+import YoutubePromo from "../Components/Learning/YoutubePromo.vue";
 
 // Reference to the UseCourses component
 const useCoursesComponent = ref(null);
@@ -27,8 +28,8 @@ const preview = ref([]);
 
 const tabs = [
     { id: "all", label: "All Courses" },
-    { id: "jobseeking", label: "Jobseeking" },
-    { id: "creative", label: "Creative Arts and Hobbies" },
+    { id: "jobseeking", label: "Website Navigation(English)" },
+    { id: "creative", label: "Website Navigation(Tagalog Version)" },
     { id: "job", label: "Job-Ready Skills" },
     { id: "tech", label: "Technology And IT" },
     { id: "business", label: "Business Marketing" },
@@ -97,8 +98,8 @@ const filteredCourses = computed(() => {
 
 // 🔄 Dynamic title based on the selected tab
 const courseTitle = computed(() => {
-    if (activeTab.value === "jobseeking") return "Jobseeking";
-    if (activeTab.value === "creative") return "Creative Arts and Hobbies";
+    if (activeTab.value === "jobseeking") return "Website Navigation(English)";
+    if (activeTab.value === "creative") return "Website Navigation(Tagalog Version)";
     if (activeTab.value === "job") return "Job-Ready Skills";
     if (activeTab.value === "tech") return "Technology And IT";
     if (activeTab.value === "business") return "Business Marketing";
@@ -192,9 +193,13 @@ const courseTitle = computed(() => {
             </nav>
             <!-- 📚 Course Slider (Changes based on selected tab) -->
             <CourseSlider :courses="filteredCourses" :title="courseTitle" />
+
         </div>
     </div>
-    <Navlinks />
+    <!-- YouTube Promo Section -->
+
+    <Navlinks channelLink="https://www.youtube.com/@ICanCareers-d3l" />
+
     <Developers />
     <Footer />
 
