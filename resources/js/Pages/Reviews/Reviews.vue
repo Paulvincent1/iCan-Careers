@@ -32,6 +32,21 @@ const SORT_KEY = "review_sort";
 const isShowEditModal = ref(false);
 const editStarFeedback = computed(() => (editForm.star ? starLabels[editForm.star] : ""));
 
+const MAX_COMMENT_LENGTH = 250; // adjust to match your backend rule
+
+const commentWarning = computed(() => {
+    return form.comment.length > MAX_COMMENT_LENGTH
+        ? `You have exceeded the ${MAX_COMMENT_LENGTH}-character limit.`
+        : "";
+});
+
+const editCommentWarning = computed(() => {
+    return editForm.comment.length > MAX_COMMENT_LENGTH
+        ? `You have exceeded the ${MAX_COMMENT_LENGTH}-character limit.`
+        : "";
+});
+
+
 
 
 // Label text for stars
@@ -292,9 +307,10 @@ function deleteReview(id) {
                         />
                     </div>
 
-                    <p class="mt-3 text-sm text-gray-700 leading-relaxed">
-                        {{ review.comment }}
-                    </p>
+                    <p class="mt-3 text-sm text-gray-700 leading-relaxed break-words max-h-40 overflow-y-auto">
+    {{ review.comment }}
+</p>
+
 
 
                 </div>
@@ -340,9 +356,18 @@ function deleteReview(id) {
                 <textarea
                     v-model="form.comment"
                     rows="4"
+                    :maxlength="MAX_COMMENT_LENGTH"
                     class="w-full resize-none rounded-md border border-gray-300 p-3 text-sm focus:border-orange-500 focus:ring-orange-500"
-                    placeholder="Share details of your experience..."
+                    placeholder="Share details of your experience... (max 250 characters)"
                 ></textarea>
+                <p class="text-xs text-gray-500 text-right"
+                :class="{ 'text-red-500 font-semibold': form.comment.length > MAX_COMMENT_LENGTH }">
+                    {{ form.comment.length }}/{{ MAX_COMMENT_LENGTH }}
+                </p>
+                <p v-if="commentWarning" class="text-xs text-red-500 mt-1">
+                    {{ commentWarning }}
+                </p>
+
 
                 <!-- Submit -->
                 <div class="flex justify-end">
@@ -378,13 +403,23 @@ function deleteReview(id) {
                 </p>
             </div>
 
+
             <!-- Comment -->
             <textarea
                 v-model="editForm.comment"
                 rows="4"
+                :maxlength="MAX_COMMENT_LENGTH"
                 class="w-full resize-none rounded-md border border-gray-300 p-3 text-sm focus:border-orange-500 focus:ring-orange-500"
-                placeholder="Update your review..."
+                placeholder="Update your review... (max 250 characters)"
             ></textarea>
+            <p class="text-xs text-gray-500 text-right"
+            :class="{ 'text-red-500 font-semibold': editForm.comment.length > MAX_COMMENT_LENGTH }">
+                {{ editForm.comment.length }}/{{ MAX_COMMENT_LENGTH }}
+            </p>
+            <p v-if="editCommentWarning" class="text-xs text-red-500 mt-1">
+                {{ editCommentWarning }}
+            </p>
+
 
             <!-- Buttons -->
             <div class="flex justify-end gap-2">

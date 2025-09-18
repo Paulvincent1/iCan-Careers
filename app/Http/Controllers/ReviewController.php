@@ -115,9 +115,14 @@ class ReviewController extends Controller
     public function store(Request $request, User $id)
     {
         $fields = $request->validate([
-            'comment' => 'nullable|string|max:1000',
+            'comment' => 'nullable|string|max:250',
             'star' => 'required|integer|min:1|max:5'
         ]);
+
+        // Trim comment just in case
+        $fields['comment'] = $fields['comment']
+            ? mb_substr($fields['comment'], 0, 500)
+            : null;
 
         $user = Auth::user();
 
@@ -189,9 +194,13 @@ class ReviewController extends Controller
     public function update(Request $request, Review $review)
     {
         $fields = $request->validate([
-            'comment' => 'nullable|string|max:1000',
+            'comment' => 'nullable|string|max:250',
             'star' => 'required|integer|min:1|max:5',
         ]);
+        // Trim comment just in case
+        $fields['comment'] = $fields['comment']
+            ? mb_substr($fields['comment'], 0, 500)
+            : null;
 
         if ($review->reviewer_id !== Auth::id()) {
             abort(403, 'Unauthorized');

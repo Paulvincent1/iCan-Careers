@@ -8,6 +8,7 @@ import Footer from "../Components/Admin/Footer.vue";
 import Developers from "../Components/Learning/Developers.vue";
 import Carousel from "../Components/Learning/Carousel.vue";
 import Navlinks from "../Components/Learning/Navlinks.vue";
+import YoutubePromo from "../Components/Learning/YoutubePromo.vue";
 
 // Reference to the UseCourses component
 const useCoursesComponent = ref(null);
@@ -27,8 +28,8 @@ const preview = ref([]);
 
 const tabs = [
     { id: "all", label: "All Courses" },
-    { id: "jobseeking", label: "Jobseeking" },
-    { id: "creative", label: "Creative Arts and Hobbies" },
+    { id: "jobseeking", label: "Website Navigation(English)" },
+    { id: "creative", label: "Website Navigation(Tagalog Version)" },
     { id: "job", label: "Job-Ready Skills" },
     { id: "tech", label: "Technology And IT" },
     { id: "business", label: "Business Marketing" },
@@ -97,8 +98,9 @@ const filteredCourses = computed(() => {
 
 // 🔄 Dynamic title based on the selected tab
 const courseTitle = computed(() => {
-    if (activeTab.value === "jobseeking") return "Jobseeking";
-    if (activeTab.value === "creative") return "Creative Arts and Hobbies";
+    if (activeTab.value === "jobseeking") return "Website Navigation(English)";
+    if (activeTab.value === "creative")
+        return "Website Navigation(Tagalog Version)";
     if (activeTab.value === "job") return "Job-Ready Skills";
     if (activeTab.value === "tech") return "Technology And IT";
     if (activeTab.value === "business") return "Business Marketing";
@@ -116,48 +118,47 @@ const courseTitle = computed(() => {
             <div
                 class="container mx-auto flex h-full w-full flex-col items-center justify-center gap-8 sm:flex-row"
             >
-                <div class="text-left 2xl:w-[500px]">
-                    <div class="text-left 2xl:w-[500px]">
-                        <p class="my-2 text-[40px]">
-                            Enhance your skills and unlock new opportunities for
-                            a brighter future.
-                        </p>
-                        <p class="my-1 text-[20px]">
-                            Receive expert guidance to build essential skills in
-                            <Link
-                                :href="route('learning.health')"
-                                class="font-bold hover:text-blue-400"
-                                >jobseeking, </Link
-                            >
-                            <Link
-                                :href="route('learning.creative')"
-                                class="font-bold hover:text-blue-400"
-                                >creative and design,</Link
-                            >
-                            and
-
-                            by a platform that connects you to real
-                            opportunities.
-                        </p>
-                        <div class="flex flex-col">
-                        <p class="mt-6">
+                <!-- Left Content -->
+                <div class="animate-fade-in-up text-left 2xl:w-[500px]">
+                    <p class="my-2 text-[40px] font-bold">
+                        Enhance your skills and unlock new opportunities for a
+                        brighter future.
+                    </p>
+                    <p class="animate-fade-in-delay my-1 text-[20px]">
+                        Receive expert guidance to build essential skills in
+                        <Link
+                            :href="route('learning.health')"
+                            class="font-bold hover:text-blue-400"
+                        >
+                            jobseeking,
+                        </Link>
+                        <Link
+                            :href="route('learning.creative')"
+                            class="font-bold hover:text-blue-400"
+                        >
+                            creative and design,
+                        </Link>
+                        and by a platform that connects you to real
+                        opportunities.
+                    </p>
+                    <div class="flex flex-col">
+                        <p class="animate-bounce-in mt-6">
                             <Link
                                 class="rounded-3xl bg-[#fa8334] px-7 py-2 font-medium text-white hover:bg-gray-600"
                                 :href="route('pricing')"
-                                >Start My Free Trial</Link
                             >
+                                Start My Free Trial
+                            </Link>
                         </p>
                     </div>
-                    </div>
-
-
                 </div>
 
+                <!-- Right Image -->
                 <div
                     class="relative 2xl:left-[-20px] 2xl:top-[-300px] 2xl:w-[500px]"
                 >
                     <img
-                        class="absolute left-0 top-0 h-[700px] w-[1000px] max-w-none"
+                        class="animate-slide-in-right absolute left-0 top-0 h-[700px] w-[1000px] max-w-none"
                         src="/assets/hero4.png"
                         alt="hero-section"
                     />
@@ -194,10 +195,52 @@ const courseTitle = computed(() => {
             <CourseSlider :courses="filteredCourses" :title="courseTitle" />
         </div>
     </div>
-    <Navlinks />
+    <!-- YouTube Promo Section -->
+
+    <Navlinks channelLink="https://www.youtube.com/@ICanCareers-d3l" />
+
     <Developers />
     <Footer />
 
     <!-- Include the UseCourses component -->
     <UseCourses ref="useCoursesComponent" />
 </template>
+<style scoped>
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes bounceIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 1s ease-out forwards;
+}
+.animate-fade-in-delay {
+  animation: fadeInUp 1.2s ease-out forwards;
+}
+.animate-slide-in-right {
+  animation: slideInRight 1.3s ease-out forwards;
+}
+.animate-bounce-in {
+  animation: bounceIn 1.5s ease-out forwards;
+}
+</style>

@@ -222,30 +222,32 @@ onBeforeUnmount(() => {
                     <div
                         class="mb-6 flex flex-col items-center justify-center rounded-lg bg-white p-4"
                     >
-                        <div
-                            class="mb-3 mt-4 h-[84px] min-h-[84px] w-[84px] min-w-[84px]"
-                        >
-                            <img
-                                :src="
-                                    user.profile_photo_path
-                                        ? user.profile_photo_path
-                                        : 'assets/profile_placeholder.jpg'
-                                "
-                                alt="User Profile"
-                                class="h-full w-full rounded-[500px]"
-                            />
-                        </div>
                         <Link
                             :href="route('employer.profile')"
-                            as="button"
-                            class="group relative mb-3 flex cursor-pointer items-center gap-2 rounded-full p-2 font-bold text-gray-500 hover:underline"
+                            class="group relative mb-3 flex cursor-pointer flex-col items-center gap-2 p-5 font-bold text-gray-500 hover:underline"
                         >
-                            <p class="">
-                                {{ $page.props.auth.user.authenticated.name }}
-                            </p>
-                            <i class="bi bi-arrow-right"></i>
+                            <!-- Profile Picture -->
+                            <div class="h-[84px] w-[84px]">
+                                <img
+                                    :src="
+                                        user.profile_photo_path
+                                            ? user.profile_photo_path
+                                            : 'assets/profile_placeholder.jpg'
+                                    "
+                                    alt="User Profile"
+                                    class="h-full w-full rounded-full object-cover"
+                                />
+                            </div>
+
+                            <!-- User Name & Arrow -->
+                            <div class="flex items-center gap-1">
+                                <p>{{ user.name }}</p>
+                                <i class="bi bi-arrow-right"></i>
+                            </div>
+
+                            <!-- Tooltip -->
                             <span
-                                class="absolute left-1/2 top-full z-[9999] mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                class="absolute z-[999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
                             >
                                 View Profile
                                 <!-- Tooltip Arrow -->

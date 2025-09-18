@@ -141,7 +141,7 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::cla
     Route::get('/profile/edit', [EmployerProfileController::class, 'edit'])->name('employer.profile.edit');
     Route::post('/profile/update', [EmployerProfileController::class, 'update'])->name('employer.profile.update');
     Route::post('/business/update', [EmployerProfileController::class, 'updateBusiness'])->name('employer.business.update');
-    
+
     Route::put('/myprofile/updateprofile', [EmployerProfileController::class, 'updateProfile'])->name('update.profile.put');
 
 
@@ -227,7 +227,7 @@ Route::middleware([ForceGetRedirect::class])->group(function () {
     Route::get('/user/{id}/preview', [EmployerDashboardController::class, 'preview'])
     ->name('user.preview')
     ->middleware(['auth']);
-        
+
     Route::get('/job/{id}/preview', [EmployerDashboardController::class, 'previewJob'])
     ->name('job.preview');
 
