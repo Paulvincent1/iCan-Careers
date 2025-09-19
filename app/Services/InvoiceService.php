@@ -55,7 +55,7 @@ class InvoiceService {
             'reminder_time' => 1,
             'items' => $invoicesItems,
         ]);
-        $for_user_id = "67bdcfb25e9bb8a85784b27b";
+        $for_user_id = "679097a12e753bd42605ae99";
         //67bdcfb25e9bb8a85784b27b-nath
         // 679097a12e753bd42605ae99-paul
 
@@ -80,7 +80,7 @@ class InvoiceService {
             DB::beginTransaction();
 
             $invoice_id = $invoice->invoice_id; // string | Invoice ID
-            $for_user_id = "67bdcfb25e9bb8a85784b27b"; // string | Business ID of the sub-account merchant (XP feature)
+            $for_user_id = "679097a12e753bd42605ae99"; // string | Business ID of the sub-account merchant (XP feature)
             //67bdcfb25e9bb8a85784b27b-nath
         // 679097a12e753bd42605ae99-paul
 
@@ -108,12 +108,50 @@ class InvoiceService {
             }
         }
 
+
+        $pendingInvoices = Invoice::where('status','PENDING')->get();
+
+        foreach($pendingInvoices as $invoice) {
+
+            DB::beginTransaction();
+
+            $invoice_id = $invoice->invoice_id; // string | Invoice ID
+            $for_user_id = "679097a12e753bd42605ae99"; // string | Business ID of the sub-account merchant (XP feature)
+            //67bdcfb25e9bb8a85784b27b-nath
+        // 679097a12e753bd42605ae99-paul
+
+            try {
+                $result = $this->apiInstance->getInvoiceById($invoice_id, $for_user_id);
+                $status = $result->getStatus();
+
+                if($status === 'EXPIRED'){
+                    $invoice->update([
+                        'status' =>  $status
+                    ]);
+
+                    // $invoice->worker->balance()->decrement('unsettlement', $invoice->amount);
+                    // $invoice->worker->balance()->increment('balance', $invoice->amount);
+
+                }
+
+                DB::commit();
+
+            } catch (\Xendit\XenditSdkException $e) {
+                echo 'Exception when calling InvoiceApi->getInvoiceById: ', $e->getMessage(), PHP_EOL;
+                echo 'Full Error: ', json_encode($e->getFullError()), PHP_EOL;
+
+                DB::rollBack();
+            }
+
+
+        }
+
     }
 
     public function renewEmployerSubscriptionInvoices(){
         $employerSubscriptionInvoices = EmployerSubscriptionInvoice::all();
 
-        $for_user_id = "67bdcfb25e9bb8a85784b27b";
+        $for_user_id = "679097a12e753bd42605ae99";
         //67bdcfb25e9bb8a85784b27b-nath
         // 679097a12e753bd42605ae99-paul
 
