@@ -5,6 +5,7 @@ import { Link, router } from "@inertiajs/vue3";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import ProfilePage from "../Components/Reviews/ProfilePage.vue";
+import ProfileBusinessCard from "../Components/ProfileBusinessCard.vue";
 
 let props = defineProps({
     user: Object,
@@ -401,7 +402,9 @@ function submitReport(reason) {
                                 "
                                 class="group relative mb-3 text-blue-600 hover:underline"
                             >
-                                {{ businessProps.industry }}
+                                <ProfileBusinessCard
+                                    :business-id="businessProps.id"
+                                >{{ businessProps.industry }}</ProfileBusinessCard>
                                 <span
                                 class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
                             >
@@ -434,53 +437,91 @@ function submitReport(reason) {
                             </div>
                         </div>
                     </div>
-                    <div
-                        class="max-w-2xl rounded-lg bg-white p-8 text-gray-600 shadow"
-                    >
-                        <p class="mb-3 text-[20px] font-bold">Posted Jobs</p>
+                    <div class="col-span-1 rounded-lg bg-white p-4 shadow-sm">
+    <p class="mb-4 text-xl font-bold text-gray-800">
+        Posted Jobs
+    </p>
 
-                        <!-- Business Info Section -->
-                        <div class="mb-4 grid gap-4">
-                            <div v-if="jobsPostedProps.length">
-                                <div
-                                    v-for="job in jobsPostedProps"
-                                    :key="job.id"
-                                    class="mb-4 rounded-lg border bg-white text-[#fa8334]"
-                                >
-                                    <Link
-                                        :href="
-                                            visitor
-                                                ? adminVisit
-                                                    ? route(
-                                                          'admin.show-job-post',
-                                                          job.id,
-                                                      )
-                                                    : route(
-                                                          'jobsearch.show',
-                                                          job.id,
-                                                      )
-                                                : route(
-                                                      'employer.jobpost.show',
-                                                      job.id,
-                                                  )
-                                        "
-                                        class="block h-full w-full p-4"
-                                    >
-                                        <p
-                                            class="text-green- x00 text-xl font-bold hover:underline"
-                                        >
-                                            {{ job.job_title }}
-                                        </p>
-                                        <p class="text-gray-600">
-                                            {{ job.job_type }} -
-                                            {{ job.work_arrangement }}
-                                        </p>
-                                    </Link>
-                                </div>
-                            </div>
-                            <p v-else>No jobs posted yet.</p>
-                        </div>
-                    </div>
+    <!-- No Jobs -->
+    <div v-if="!jobsPostedProps.length" class="text-center text-gray-500">
+        No jobs posted yet.
+    </div>
+
+    <!-- Jobs List -->
+    <ul v-else class="space-y-4">
+        <li
+            v-for="job in jobsPostedProps"
+            :key="job.id"
+            class="flex items-center gap-4 rounded-md border p-4 shadow transition hover:shadow-md"
+        >
+            <!-- Business Logo -->
+            <Link
+                :href="visitor
+                    ? adminVisit
+                        ? route('admin.show-job-post', job.id)
+                        : route('jobsearch.show', job.id)
+                    : route('employer.jobpost.show', job.id)
+                "
+            >
+                <img
+  class="h-16 w-16 flex-shrink-0 rounded border object-cover"
+  :src="
+      job.employer?.business_information?.business_logo
+          ? job.employer.business_information.business_logo
+          : '/assets/logo-placeholder-image.png'
+  "
+  alt="Company Logo"
+/>
+
+            </Link>
+
+            <!-- Job Info -->
+            <div class="flex-1">
+                <Link
+                    :href="visitor
+                        ? adminVisit
+                            ? route('admin.show-job-post', job.id)
+                            : route('jobsearch.show', job.id)
+                        : route('employer.jobpost.show', job.id)
+                    "
+                >
+                    <h3
+                        class="cursor-pointer text-lg font-semibold text-gray-900 hover:underline"
+                    >
+                        {{ job.job_title }}
+                    </h3>
+                </Link>
+                <p class="text-sm text-gray-700">
+                    {{ job.job_type }} • {{ job.work_arrangement }}
+                </p>
+                <p class="text-sm text-gray-500">
+                    Posted on:
+                    {{
+                        job.created_at
+                            ? new Date(job.created_at).toLocaleDateString()
+                            : "N/A"
+                    }}
+                </p>
+            </div>
+
+            <!-- View Button -->
+            <Link
+                :href="visitor
+                    ? adminVisit
+                        ? route('admin.show-job-post', job.id)
+                        : route('jobsearch.show', job.id)
+                    : route('employer.jobpost.show', job.id)
+                "
+                as="button"
+                class="rounded-full bg-blue-100 p-2 text-blue-700 hover:bg-blue-200"
+                aria-label="View Job"
+            >
+                <i class="bi bi-arrow-right text-xl"></i>
+            </Link>
+        </li>
+    </ul>
+</div>
+
 
                     <!-- <div
                         class="mb-8 rounded-lg bg-white p-8 text-gray-600 shadow"

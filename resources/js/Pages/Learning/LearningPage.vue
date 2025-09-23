@@ -29,7 +29,7 @@ const preview = ref([]);
 const tabs = [
     { id: "all", label: "All Courses" },
     { id: "jobseeking", label: "Website Navigation(English)" },
-    { id: "creative", label: "Website Navigation(Tagalog Version)" },
+    { id: "creative", label: "Website Navigation(Filipino)" },
     { id: "job", label: "Job-Ready Skills" },
     { id: "tech", label: "Technology And IT" },
     { id: "business", label: "Business Marketing" },
@@ -100,7 +100,7 @@ const filteredCourses = computed(() => {
 const courseTitle = computed(() => {
     if (activeTab.value === "jobseeking") return "Website Navigation(English)";
     if (activeTab.value === "creative")
-        return "Website Navigation(Tagalog Version)";
+        return "Website Navigation(Filipino)";
     if (activeTab.value === "job") return "Job-Ready Skills";
     if (activeTab.value === "tech") return "Technology And IT";
     if (activeTab.value === "business") return "Business Marketing";

@@ -104,6 +104,21 @@ class User extends Authenticatable
         ->withTimestamps();
     }
 
+    // App\Models\User.php
+
+public function jobPostLimit()
+{
+    return $this->employerSubscription->subscription_type === 'Free' ? 3 : 5;
+}
+
+public function jobPostsThisMonth()
+{
+    return $this->employerJobPosts()
+        ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+        ->count();
+}
+
+
     
 
     public function workerInvoices(){

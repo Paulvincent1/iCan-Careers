@@ -28,131 +28,97 @@ class JobPostController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        if(!Gate::allows('employer-profile-check')) {
-            return redirect()->route('create.profile.employer');
-        }
-        $user = Auth::user();
-        // dd($user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->count());
-        $location = null;
-        if ($user->employerProfile->employer_type === 'business') {
-            $location = $user->employerProfile->businessInformation->business_location;
-        }
-        return inertia('Employer/CreateJob', ['locationProps' => $location]);
+{
+    if (!Gate::allows('employer-profile-check')) {
+        return redirect()->route('create.profile.employer');
     }
+
+    $user = Auth::user();
+
+    $jobCount = $user->jobPostsThisMonth();
+    $maxPosts = $user->jobPostLimit();
+
+    $location = null;
+    if ($user->employerProfile->employer_type === 'business') {
+        $location = $user->employerProfile->businessInformation->business_location;
+    }
+
+    return inertia('Employer/CreateJob', [
+        'locationProps' => $location,
+        'jobPostProp'   => null,
+        'isEdit'        => false,
+        'canPost'       => $jobCount < $maxPosts,
+        'remaining'     => max(0, $maxPosts - $jobCount),
+        'limit'         => $maxPosts,
+    ]);
+}
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+{
+    $user = Auth::user();
 
-        // dd($request);
+    $fields = $request->validate([
+        'job_title' => 'required|max:255',
+        'job_type' => 'required|max:255',
+        'work_arrangement' => 'required|max:255',
+        'location' => 'nullable',
+        'experience' => 'required',
+        'hour_per_day' => 'required|max:255',
+        'hourly_rate' => 'required|max:255',
+        'salary' => 'required|max:255',
+        'description' => 'required|max:255',
+        'preferred_educational_attainment' => 'required|max:255',
+        'skills' => 'required',
+        'preferred_worker_types' => 'required',
+    ]);
 
-        $user = Auth::user();
-        $fields = $request->validate([
-            'job_title' => 'required|max:255',
-            'job_type' => 'required|max:255',
-            'work_arrangement' => 'required|max:255',
-            'location' => 'nullable',
-            'experience' => 'required',
-            'hour_per_day' => 'required|max:255',
-            'hourly_rate' => 'required|max:255',
-            'salary' => 'required|max:255',
-            'description' => 'required|max:255',
-            'preferred_educational_attainment' => 'required|max:255',
-            'skills' => 'required',
-            'preferred_worker_types' => 'required',
-        ]);
-
-
-
-        if ($fields['work_arrangement'] === 'On site' || $fields['work_arrangement'] === 'Hybrid') {
-            $request->validate([
-                'location' => 'required'
-            ]);
-        }
-
-        $skills = [];
-        foreach ($fields['skills'] as $skill) {
-            $skills[] = $skill['name'];
-        }
-        // dd($user->employerSubscription->subscription_type);
-
-        $jobImage = null;
-        if ($request->hasFile('job_image')) {
-            $jobImage = Storage::disk('public')->put('images', $request->job_image);
-        }
-
-
-
-        if ($user->employerSubscription->subscription_type === 'Free') {
-
-            if (
-                $user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
-                ->count() < 3
-            ) {
-                $user->employerJobPosts()->create([
-                    'job_title' =>  $fields['job_title'],
-                    'job_type' =>  $fields['job_type'],
-                    'work_arrangement' =>  $fields['work_arrangement'],
-                    'location' =>  $fields['location'],
-                    'experience' =>  $fields['experience'],
-                    'hour_per_day' =>  $fields['hour_per_day'],
-                    'hourly_rate' =>  $fields['hourly_rate'],
-                    'salary' =>  $fields['salary'],
-                    'description' =>  $fields['description'],
-                    'preferred_educational_attainment' =>  $fields['preferred_educational_attainment'],
-                    'skills' =>  $skills,
-                    'preferred_worker_types' =>  $fields['preferred_worker_types'],
-                    'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open',
-                    // 'job_image' => $
-                ]);
-
-                $admin = User::whereHas('roles', function($query) {
-                    $query->where('name', 'Admin');
-                })->first();
-
-                $admin->notify(new AdminFreeJobPostNotification(admin:$admin,employer:$user));
-                broadcast(new AdminFreeJobPostNotification(admin:$admin,employer:$user));
-
-
-            }else{
-
-                return redirect()->back()->withErrors(['message' => 'You can post up to 3 jobs per month(Free tier)']);
-
-            }
-
-        } else {
-
-            if ($user->employerJobPosts()->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
-                ->count() < 5
-            ) {
-
-                $user->employerJobPosts()->create([
-                    'job_title' =>  $fields['job_title'],
-                    'job_type' =>  $fields['job_type'],
-                    'work_arrangement' =>  $fields['work_arrangement'],
-                    'location' =>  $fields['location'],
-                    'experience' =>  $fields['experience'],
-                    'hour_per_day' =>  $fields['hour_per_day'],
-                    'hourly_rate' =>  $fields['hourly_rate'],
-                    'salary' =>  $fields['salary'],
-                    'description' =>  $fields['description'],
-                    'preferred_educational_attainment' =>  $fields['preferred_educational_attainment'],
-                    'skills' =>  $skills,
-                    'preferred_worker_types' =>  $fields['preferred_worker_types'],
-                    'job_status' =>  $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open',
-                    // 'job_image' => $
-                ]);
-            }else {
-
-                return redirect()->back()->withErrors(['message' => 'You can post up to 5 jobs per month(Pro and Premium tier)']);
-            }
-        }
-
-        return redirect()->route('employer.dashboard');
+    if (in_array($fields['work_arrangement'], ['On site', 'Hybrid'])) {
+        $request->validate(['location' => 'required']);
     }
+
+    $skills = collect($fields['skills'])->pluck('name')->toArray();
+
+    $maxPosts = $user->jobPostLimit();
+    $jobCount = $user->jobPostsThisMonth();
+
+    if ($jobCount >= $maxPosts) {
+        $tierLabel = $user->employerSubscription->subscription_type === 'Free'
+            ? 'Free tier'
+            : 'Pro and Premium tier';
+
+        return redirect()->back()
+            ->withErrors(['message' => "You can post up to {$maxPosts} jobs per month ({$tierLabel})."]);
+    }
+
+    $jobStatus = $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open';
+
+    $user->employerJobPosts()->create([
+        'job_title' => $fields['job_title'],
+        'job_type' => $fields['job_type'],
+        'work_arrangement' => $fields['work_arrangement'],
+        'location' => $fields['location'],
+        'experience' => $fields['experience'],
+        'hour_per_day' => $fields['hour_per_day'],
+        'hourly_rate' => $fields['hourly_rate'],
+        'salary' => $fields['salary'],
+        'description' => $fields['description'],
+        'preferred_educational_attainment' => $fields['preferred_educational_attainment'],
+        'skills' => $skills,
+        'preferred_worker_types' => $fields['preferred_worker_types'],
+        'job_status' => $jobStatus,
+    ]);
+
+    $remaining = max(0, $maxPosts - ($jobCount + 1));
+
+    return redirect()->route('employer.dashboard')
+        ->with('successMessage', "Successfully posted! You can post {$remaining} more this month.");
+}
+
+
 
     /**
      * Display the specified resource.

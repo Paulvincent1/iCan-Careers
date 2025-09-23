@@ -33,9 +33,6 @@ let messageShow = ref(false);
 onMounted(() => {
     if (props.successMessage) {
         messageShow.value = true;
-        setTimeout(() => {
-            messageShow.value = false;
-        }, 2000);
     }
 });
 

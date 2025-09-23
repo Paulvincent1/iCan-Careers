@@ -13,6 +13,7 @@ import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 import ProfileJobHover from "../Components/ProfileJobHover.vue";
 import ProfileBusinessCard from "../Components/ProfileBusinessCard.vue";
+import ProfileHoverCard from "../Components/ProfileHoverCard.vue";
 import dayjs from "dayjs";
 
 const props = defineProps({
@@ -582,7 +583,29 @@ onMounted(() => {
                                                 {{ invoice.external_id }}
                                             </td>
                                             <td class="py-5">
-                                                {{ invoice.employer.email }}
+                                            <Link
+                                                :href="
+                                                    route(
+                                                        'visit.employer.profile',
+                                                        {
+                                                            id: invoice.employer
+                                                                .id,
+                                                        },
+                                                    )
+                                                "
+                                                >
+                                                    <ProfileHoverCard
+                                                        :user-id="
+                                                            invoice.employer.id
+                                                        "
+                                                    >
+                                                        {{
+                                                            invoice.employer
+                                                                .name
+                                                        }}
+                                                    </ProfileHoverCard>
+                                                
+                                            </Link>
                                             </td>
                                             <td class="py-5">
                                                 {{

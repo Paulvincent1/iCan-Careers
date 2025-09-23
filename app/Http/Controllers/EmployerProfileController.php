@@ -73,7 +73,10 @@ class EmployerProfileController extends Controller
 
         $user = Auth::user();
         $employerProfile = $user->employerProfile;
-        $jobsPosted = JobPost::where('employer_id', $user->id)->get();
+        $jobsPosted = JobPost::with('employer.businessInformation')
+        ->where('employer_id', $user->id)
+        ->get();
+
         $business = $user->employerProfile?->businessInformation;
         $subscription = EmployerSubscription::where('employer_id', $user->id)->first();
 
@@ -114,7 +117,10 @@ class EmployerProfileController extends Controller
         }
 
         $employerProfile = $id->employerProfile;
-        $jobsPosted = JobPost::where('employer_id', $id->id)->get();
+        $jobsPosted = JobPost::with('employer.businessInformation')
+    ->where('employer_id', $id->id)
+    ->get();
+;
         $business = $id->employerProfile?->businessInformation;
         $subscription = EmployerSubscription::where('employer_id', $id->id)->first();
 
