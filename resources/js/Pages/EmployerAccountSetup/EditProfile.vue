@@ -1,7 +1,7 @@
 <script setup>
 import { router, useForm } from "@inertiajs/vue3";
 import Layout from "../Layouts/Layout.vue";
-import SetupProfileLayout from "../Layouts/SetupProfileLayout.vue";
+import SetupProfileLayoutEdit from "../Layouts/SetupProfileLayoutEdit.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import dayjs from "dayjs";
@@ -10,7 +10,7 @@ import SubmitImage from "../Components/SubmitImage.vue";
 import Maps from "../Components/Maps.vue";
 import { debounce } from "lodash";
 
-defineOptions({ layout: [Layout, SetupProfileLayout] });
+defineOptions({ layout: [Layout, SetupProfileLayoutEdit] });
 
 const props = defineProps({
     employerProfile: Object,
@@ -143,22 +143,7 @@ const submit = () => {
 
     <div class="mb-4 flex justify-center">
         <div class="mt-5 w-full rounded-lg bg-white p-8">
-            <h2 class="text-[24px] text-gray-900">
-                Edit Your Employer Profile
-            </h2>
-            <p class="mb-6 text-lg text-gray-700">
-                Update your employer profile information.
-            </p>
-
-            <hr class="my-4 border-gray-300" />
-
-            <h3 class="text-[18px] font-bold text-gray-900">
-                Personal Information
-            </h3>
-            <h3 class="text-xs">
-                This information will be displayed publicly so be careful what
-                you share.
-            </h3>
+            
 
             <form @submit.prevent="submit" class="mt-4 space-y-6">
                 <!-- Employer Type -->

@@ -1,5 +1,6 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import { route } from "../../../../vendor/tightenco/ziggy/src/js";
 import EducationalAttainment from "../Components/EducationalAttainment.vue";
@@ -17,6 +18,9 @@ let props = defineProps({
     locationProps: null,
     jobPostProp: null,
     isEdit: null,
+    canPost: Boolean,
+    remaining: Number,
+    limit: Number,
 });
 
 let form = useForm({
@@ -167,39 +171,151 @@ const submit = () => {
 
 <template>
     <Head title="Create Job | iCan Careers" />
-    <div class="flex justify-center bg-[#eff2f6] text-[#171816]">
+    <div
+        class="flex min-h-screen justify-center bg-[#eff2f6] py-8 text-[#171816]"
+    >
         <div
-            class="omd:flex-row mt-8 flex w-full max-w-5xl flex-col rounded-lg bg-white p-8"
+            class="omd:flex-row flex w-full max-w-5xl flex-col rounded-lg bg-white p-8 shadow-lg"
         >
-            <!-- Left Side: Job Post Form -->
-            <div class="w-full pr-6">
-                <h2
-                    class="text-center text-3xl font-bold text-gray-900 md:text-left"
-                >
-                    {{ isEdit ? "Edit a Job" : "Post a Job" }}
-                </h2>
-                <p class="mb-6 text-center text-lg text-gray-700 md:text-left">
-                    Fill out the form below to post a new job opportunity.
-                </p>
+            <!-- 🚫 Show this if posting limit reached -->
+            <div
+                v-if="!canPost"
+                class="mb-8 flex w-full flex-col items-center justify-center rounded-lg border-2 border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-8 shadow-lg"
+            >
+                <div class="flex flex-col items-center space-y-6 text-center">
+                    <!-- Icon Section -->
+                    <div class="flex flex-col items-center space-y-3">
+                        <div class="rounded-full bg-red-100 p-4">
+                            <i
+                                class="bi bi-exclamation-triangle-fill text-4xl text-red-600"
+                            ></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-red-700">
+                            Job Post Limit Reached
+                        </h2>
+                    </div>
 
-                <hr class="my-4 border-gray-300" />
-                <h3 class="text-xl font-bold text-gray-900">Job Information</h3>
-                <h3>
-                    This information will be displayed publicly so be careful
-                    what you share.
-                </h3>
-                <form @submit.prevent="submit">
-                    <div class="mt-4 space-y-6">
-                        <!-- Job Title -->
-                        <div class="grid grid-cols-2 gap-5">
+                    <!-- Message Section -->
+                    <div class="space-y-2">
+                        <p class="text-lg text-gray-800">
+                            You've used all
+                            <span class="font-bold text-red-600">{{ limit }}</span>
+                            available job posts for this month.
+                        </p>
+                        <p class="text-gray-700">
+                            You have
+                            <span class="font-semibold">{{ remaining }}</span>
+                            posts remaining of your
+                            <span class="font-semibold">{{ limit }}</span>
+                            monthly limit.
+                        </p>
+                    </div>
+
+                    <!-- Solution Section -->
+                    <div
+                        class="max-w-md rounded-lg border border-gray-200 bg-white p-4"
+                    >
+                        <p class="mb-3 text-gray-700">
+                            To post more jobs, consider:
+                        </p>
+                        <ul class="space-y-2 text-left text-gray-600">
+                            <li class="flex items-center">
+                                <i
+                                    class="bi bi-arrow-up-circle-fill mr-2 text-green-500"
+                                ></i>
+                                <span>Upgrading your subscription plan</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i
+                                    class="bi bi-calendar-check-fill mr-2 text-blue-500"
+                                ></i>
+                                <span>Waiting until next month's reset</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col gap-4 pt-2 sm:flex-row">
+                        <Link
+                            :href="route('pricing')"
+                            class="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 font-semibold text-white transition-all hover:from-blue-700 hover:to-blue-800 hover:shadow-md"
+                        >
+                            <i class="bi bi-graph-up-arrow"></i>
+                            Upgrade Plan
+                        </Link>
+
+                        <button
+                            @click="$inertia.visit(route('employer.dashboard'))"
+                            class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition-all hover:bg-gray-50 hover:shadow-md"
+                        >
+                            <i class="bi bi-arrow-left"></i>
+                            Return to Dashboard
+                        </button>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="mt-4 text-sm text-gray-500">
+                        <p>
+                            Your posting limit will reset on the first day of
+                            next month.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content - Only show when canPost is true -->
+            <div v-else class="w-full">
+                <!-- Header Section -->
+                <div class="mb-8 text-center md:text-left">
+                    <h2
+                        class="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-3xl font-bold text-transparent"
+                    >
+                        {{
+                            isEdit ? "Edit Job Posting" : "Create New Job Post"
+                        }}
+                    </h2>
+                    <p class="mt-2 text-lg text-gray-600">
+                        {{
+                            isEdit
+                                ? "Update your job opportunity details below."
+                                : "Fill out the form below to post a new job opportunity."
+                        }}
+                    </p>
+
+                    <!-- Progress Indicator -->
+                    <div class="mt-4 flex items-center text-sm text-gray-500">
+                        <span
+                            class="rounded-full bg-green-100 px-3 py-1 font-medium text-green-800"
+                        >
+                            {{ remaining }} of {{ limit }} posts remaining this
+                            month
+                        </span>
+                    </div>
+                </div>
+
+                <hr class="my-6 border-gray-200" />
+
+                <form @submit.prevent="submit" class="space-y-8">
+                    <!-- Job Information Section -->
+                    <div>
+                        <h3 class="mb-3 text-xl font-bold text-gray-900">
+                            Job Information
+                        </h3>
+                        <p class="mb-6 text-gray-600">
+                            This information will be displayed publicly so be
+                            careful what you share.
+                        </p>
+
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <!-- Job Title -->
                             <div class="flex flex-col">
-                                <label class="mb-2 font-semibold"
+                                <label class="mb-2 font-semibold text-gray-700"
                                     >Job Title</label
                                 >
                                 <input
                                     v-model="form.job_title"
                                     type="text"
-                                    class="rounded border px-3 py-2 outline-blue-400"
+                                    class="rounded-lg border border-gray-300 px-4 py-3 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500"
                                     placeholder="Enter job title"
                                     required
                                 />
@@ -211,12 +327,12 @@ const submit = () => {
 
                             <!-- Job Type -->
                             <div class="flex flex-col">
-                                <label class="mb-2 font-semibold"
+                                <label class="mb-2 font-semibold text-gray-700"
                                     >Job Type</label
                                 >
                                 <select
                                     v-model="form.job_type"
-                                    class="rounded border px-3 py-2 outline-blue-400"
+                                    class="rounded-lg border border-gray-300 px-4 py-3 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="Full time">Full time</option>
                                     <option value="Part time">Part time</option>
@@ -228,19 +344,24 @@ const submit = () => {
                                 />
                             </div>
                         </div>
+                    </div>
 
-                        <hr class="my-4 border-gray-300" />
-                        <h3 class="text-xl font-bold text-gray-900">
+                    <hr class="my-6 border-gray-200" />
+
+                    <!-- Work Details Section -->
+                    <div>
+                        <h3 class="mb-3 text-xl font-bold text-gray-900">
                             Work Details
                         </h3>
+
                         <!-- Work Arrangement -->
-                        <div class="flex w-full flex-col">
-                            <label class="mb-2 font-semibold"
+                        <div class="mb-6 flex w-full flex-col">
+                            <label class="mb-2 font-semibold text-gray-700"
                                 >Work Arrangement</label
                             >
                             <select
                                 v-model="form.work_arrangement"
-                                class="rounded border px-3 py-2 outline-blue-400"
+                                class="max-w-md rounded-lg border border-gray-300 px-4 py-3 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="Onsite">Onsite</option>
                                 <option value="Hybrid">Hybrid</option>
@@ -255,18 +376,19 @@ const submit = () => {
                                 :markedCoordinatesProps="form.location"
                                 :centerProps="form.location"
                                 @update:coordinates="setCoordinates"
+                                class="mt-4"
                             />
                         </div>
 
-                        <div class="flex flex-col gap-4">
+                        <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                             <!-- Preferred Experience -->
                             <div class="flex flex-col">
-                                <label class="mb-2 font-semibold"
+                                <label class="mb-2 font-semibold text-gray-700"
                                     >Preferred Experience</label
                                 >
                                 <select
                                     v-model="form.experience"
-                                    class="w-full max-w-[350px] rounded border px-3 py-2 outline-blue-400 md:w-[350px]"
+                                    class="rounded-lg border border-gray-300 px-4 py-3 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="Fresher">Fresher</option>
                                     <option value="0-2 years">0-2 years</option>
@@ -281,7 +403,7 @@ const submit = () => {
 
                             <!-- Preferred Educational Attainment -->
                             <div class="flex flex-col">
-                                <label class="mb-2 font-semibold"
+                                <label class="mb-2 font-semibold text-gray-700"
                                     >Preferred Educational Attainment</label
                                 >
                                 <EducationalAttainment
@@ -293,17 +415,15 @@ const submit = () => {
                                             .preferred_educational_attainment
                                     "
                                     :openToAll="true"
-                                    class="w-full max-w-[350px] md:w-[350px]"
+                                    class="w-full"
                                 />
                             </div>
                         </div>
 
-                        <div
-                            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-                        >
+                        <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
                             <!-- Hour Per Day -->
                             <div class="flex flex-col">
-                                <label class="mb-2 font-semibold"
+                                <label class="mb-2 font-semibold text-gray-700"
                                     >Hour Per Day</label
                                 >
                                 <input
@@ -311,46 +431,46 @@ const submit = () => {
                                     type="number"
                                     min="1"
                                     max="12"
-                                    class="rounded border px-3 py-2 outline-blue-400"
+                                    class="rounded-lg border border-gray-300 px-4 py-3 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500"
                                     placeholder="Enter hours per day (max 12)"
                                     required
                                 />
-                                <small class="mt-1 text-xs text-gray-500">
+                                <small class="mt-2 text-xs text-gray-500">
                                     Maximum of 12 hours per day is allowed.
                                 </small>
                             </div>
 
                             <!-- Hourly Rate -->
                             <div class="flex flex-col">
-                                <label class="mb-2 font-semibold"
+                                <label class="mb-2 font-semibold text-gray-700"
                                     >Hourly Rate ₱</label
                                 >
                                 <input
                                     v-model.number="form.hourly_rate"
                                     type="number"
                                     min="1"
-                                    class="rounded border px-3 py-2 outline-blue-400"
+                                    class="rounded-lg border border-gray-300 px-4 py-3 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500"
                                     placeholder="Enter hourly rate"
                                     required
                                 />
-                                <small class="mt-1 text-xs text-gray-500">
+                                <small class="mt-2 text-xs text-gray-500">
                                     Example: ₱100 per hour.
                                 </small>
                             </div>
 
                             <!-- Salary Per Month -->
                             <div class="flex flex-col">
-                                <label class="mb-2 font-semibold"
+                                <label class="mb-2 font-semibold text-gray-700"
                                     >Salary Per Month ₱</label
                                 >
                                 <input
                                     v-model="form.salary"
                                     type="number"
-                                    class="rounded border bg-gray-100 px-3 py-2 outline-blue-400"
+                                    class="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 outline-none transition-all"
                                     placeholder="Auto calculated"
                                     readonly
                                 />
-                                <small class="mt-1 text-xs text-gray-500">
+                                <small class="mt-2 text-xs text-gray-500">
                                     Automatically calculated based on hours ×
                                     rate × 22 working days.
                                 </small>
@@ -358,13 +478,13 @@ const submit = () => {
                         </div>
 
                         <!-- Description -->
-                        <div class="flex flex-col">
-                            <label class="mb-2 font-semibold"
+                        <div class="mb-6 flex flex-col">
+                            <label class="mb-2 font-semibold text-gray-700"
                                 >Description</label
                             >
                             <textarea
                                 v-model="form.description"
-                                class="h-[250px] resize-none rounded border px-3 py-2 outline-blue-400"
+                                class="h-48 resize-none rounded-lg border border-gray-300 px-4 py-3 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter job description"
                                 required
                             ></textarea>
@@ -375,38 +495,46 @@ const submit = () => {
                         </div>
 
                         <!-- Required Skills -->
-                        <div class="flex flex-col">
-                            <label class="font-semibold">Required Skills</label>
-                            <label class="mb-2 text-xs"
+                        <div class="mb-6 flex flex-col">
+                            <label class="font-semibold text-gray-700"
+                                >Required Skills</label
+                            >
+                            <label class="mb-3 text-sm text-gray-600"
                                 >Add the skills required for this job.</label
                             >
-                            <div class="mb-3">
+                            <div class="mb-3 flex gap-3">
                                 <input
                                     ref="skillInput"
                                     type="text"
-                                    class="mr-3 rounded border px-3 py-2 outline-blue-400"
+                                    class="flex-1 rounded-lg border border-gray-300 px-4 py-2 outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500"
                                     placeholder="Enter skill"
                                 />
-                                <input
+                                <button
                                     @click="addSkill"
-                                    class="cursor-pointer rounded bg-[#fa8334] p-1 text-white"
                                     type="button"
-                                    value="Add"
-                                />
+                                    class="rounded-lg bg-[#fa8334] px-6 py-2 font-semibold text-white transition-all hover:bg-[#e97324] focus:ring-2 focus:ring-orange-500"
+                                >
+                                    Add
+                                </button>
                             </div>
                             <div
-                                class="flex min-h-20 flex-wrap items-start justify-start gap-1 rounded border p-2"
+                                class="flex min-h-20 flex-wrap items-start gap-2 rounded-lg border border-gray-300 p-4"
                             >
                                 <div
                                     v-for="skill in skills"
                                     :key="skill.id"
-                                    class="flex w-fit rounded bg-gray-300 p-1"
+                                    class="flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1"
                                 >
-                                    <p>{{ skill.name }}</p>
-                                    <i
+                                    <span class="text-sm text-blue-800">{{
+                                        skill.name
+                                    }}</span>
+                                    <button
                                         @click="removeSkill(skill)"
-                                        class="bi bi-x ml-1 cursor-pointer"
-                                    ></i>
+                                        type="button"
+                                        class="text-blue-600 transition-colors hover:text-blue-800"
+                                    >
+                                        <i class="bi bi-x text-sm"></i>
+                                    </button>
                                 </div>
                             </div>
                             <InputFlashMessage
@@ -415,157 +543,196 @@ const submit = () => {
                             />
                         </div>
 
-                        <hr class="my-4 border-gray-300" />
                         <!-- Candidate Type Options -->
-                        <div class="flex flex-col">
-                            <label class="font-semibold"
+                        <div class="mb-8 flex flex-col">
+                            <label class="font-semibold text-gray-700"
                                 >Candidate Type Options:</label
                             >
-                            <label class="mb-2 text-xs"
+                            <label class="mb-3 text-sm text-gray-600"
                                 >Select all that apply.</label
                             >
-                            <div class="space-y-2">
-                                <div>
-                                    <label>Seniors</label>
-                                    <input
-                                        @change="addCandidateType"
-                                        value="Seniors Citizens"
-                                        type="checkbox"
-                                        class="ml-2"
-                                    />
-                                </div>
-                                <div>
-                                    <label>PWD</label>
-                                    <input
-                                        @change="
-                                            check();
-                                            addCandidateType($event);
-                                        "
-                                        value="PWD"
-                                        type="checkbox"
-                                        class="ml-2"
-                                    />
-                                </div>
-                                <div v-if="isCheck">
-                                    <div v-if="!isOpenToAllDisability">
-                                        <div>
-                                            <label>Physical Disabilities</label>
-                                            <input
-                                                @change="addCandidateType"
-                                                type="checkbox"
-                                                value="Physical Disabilities"
-                                                class="ml-2"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label>Visual Impairments</label>
-                                            <input
-                                                @change="addCandidateType"
-                                                type="checkbox"
-                                                value="Visual Impairments"
-                                                class="ml-2"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label>Hearing Impairments</label>
-                                            <input
-                                                @change="addCandidateType"
-                                                type="checkbox"
-                                                value="Hearing Impairments"
-                                                class="ml-2"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label
-                                                >Cognitive/Developmental
-                                                Disabilities</label
+
+                            <div class="space-y-4 rounded-lg bg-gray-50 p-4">
+                                <div class="space-y-3">
+                                    <!-- Seniors Citizens -->
+                                    <div class="flex items-center">
+                                        <input
+                                            @change="addCandidateType"
+                                            value="Seniors Citizens"
+                                            type="checkbox"
+                                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <label class="ml-3 text-gray-700"
+                                            >Seniors Citizens</label
+                                        >
+                                    </div>
+
+                                    <!-- PWD -->
+                                    <div class="flex items-center">
+                                        <input
+                                            @change="
+                                                check();
+                                                addCandidateType($event);
+                                            "
+                                            value="PWD"
+                                            type="checkbox"
+                                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <label class="ml-3 text-gray-700"
+                                            >PWD (Persons with
+                                            Disabilities)</label
+                                        >
+                                    </div>
+
+                                    <!-- PWD Disability Types (shown when PWD is checked) -->
+                                    <div
+                                        v-if="isCheck"
+                                        class="ml-6 space-y-2 border-l-2 border-gray-300 pl-4"
+                                    >
+                                        <div
+                                            v-if="!isOpenToAllDisability"
+                                            class="space-y-2"
+                                        >
+                                            <div class="flex items-center">
+                                                <input
+                                                    @change="addCandidateType"
+                                                    type="checkbox"
+                                                    value="Physical Disabilities"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                <label
+                                                    class="ml-3 text-gray-700"
+                                                    >Physical
+                                                    Disabilities</label
+                                                >
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input
+                                                    @change="addCandidateType"
+                                                    type="checkbox"
+                                                    value="Visual Impairments"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                <label
+                                                    class="ml-3 text-gray-700"
+                                                    >Visual Impairments</label
+                                                >
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input
+                                                    @change="addCandidateType"
+                                                    type="checkbox"
+                                                    value="Hearing Impairments"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                <label
+                                                    class="ml-3 text-gray-700"
+                                                    >Hearing Impairments</label
+                                                >
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input
+                                                    @change="addCandidateType"
+                                                    type="checkbox"
+                                                    value="Cognitive/Developmental Disabilities"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                <label
+                                                    class="ml-3 text-gray-700"
+                                                    >Cognitive/Developmental
+                                                    Disabilities</label
+                                                >
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input
+                                                    @change="addCandidateType"
+                                                    type="checkbox"
+                                                    value="Mental Health Disabilities"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                <label
+                                                    class="ml-3 text-gray-700"
+                                                    >Mental Health
+                                                    Disabilities</label
+                                                >
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input
+                                                    @change="
+                                                        otherCheck();
+                                                        addCandidateType(
+                                                            $event,
+                                                        );
+                                                    "
+                                                    type="checkbox"
+                                                    value="Other"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                <label
+                                                    class="ml-3 text-gray-700"
+                                                    >Other</label
+                                                >
+                                            </div>
+                                            <div
+                                                v-if="isOtherCheck"
+                                                class="ml-6 mt-2"
                                             >
-                                            <input
-                                                @change="addCandidateType"
-                                                type="checkbox"
-                                                value="Cognitive/Developmental Disabilities"
-                                                class="ml-2"
-                                            />
+                                                <input
+                                                    ref="otherInput"
+                                                    type="text"
+                                                    placeholder="Please specify disability type"
+                                                    class="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                                    required
+                                                />
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label
-                                                >Mental Health
-                                                Disabilities</label
-                                            >
-                                            <input
-                                                @change="addCandidateType"
-                                                type="checkbox"
-                                                value="Mental Health Disabilities"
-                                                class="ml-2"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label>Other</label>
+
+                                        <!-- Open to All Disabilities -->
+                                        <div
+                                            class="mt-3 flex items-center border-t border-gray-300 pt-3"
+                                        >
                                             <input
                                                 @change="
-                                                    otherCheck();
+                                                    openToAll();
                                                     addCandidateType($event);
                                                 "
                                                 type="checkbox"
-                                                value="Other"
-                                                class="ml-2"
+                                                value="Open to All Disabilities"
+                                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                             />
-                                            <br />
-                                            <input
-                                                v-if="isOtherCheck"
-                                                ref="otherInput"
-                                                type="text"
-                                                placeholder="Please Specify"
-                                                class="mt-2 border-b outline-none"
-                                                required
-                                            />
+                                            <label
+                                                class="ml-3 font-medium text-gray-700"
+                                                >Open to All Disabilities</label
+                                            >
                                         </div>
-                                    </div>
-                                    <div>
-                                        <label>Open to All Disabilities</label>
-                                        <input
-                                            @change="
-                                                openToAll();
-                                                addCandidateType($event);
-                                            "
-                                            type="checkbox"
-                                            value="Open to All Disabilities"
-                                            class="ml-2"
-                                        />
                                     </div>
                                 </div>
                             </div>
+
                             <InputFlashMessage
                                 type="error"
                                 :message="form.errors.preferred_worker_types"
                             />
                         </div>
+                    </div>
 
-                        <div class="mt-4 flex justify-end gap-3">
-                            <!-- Submit Button -->
-                            <div
-                                type="button"
-                                @click="
-                                    $inertia.visit(route('employer.dashboard'))
-                                "
-                                class="mt-4 flex justify-end"
-                            >
-                                <button
-                                    class="cursor-pointer rounded p-2 text-black"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div class="mt-4 flex justify-end">
-                                <button
-                                    class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
-                                >
-                                    Post Job
-                                </button>
-                            </div>
-                        </div>
+                    <!-- Form Actions -->
+                    <div
+                        class="flex justify-end gap-4 border-t border-gray-200 pt-6"
+                    >
+                        <button
+                            type="button"
+                            @click="$inertia.visit(route('employer.dashboard'))"
+                            class="rounded-lg border border-gray-300 px-8 py-3 font-semibold text-gray-700 transition-all hover:bg-gray-50 focus:ring-2 focus:ring-gray-500"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="rounded-lg bg-[#fa8334] px-8 py-3 font-semibold text-white transition-all hover:bg-[#e97324] focus:ring-2 focus:ring-orange-500"
+                        >
+                            {{ isEdit ? "Update Job" : "Post Job" }}
+                        </button>
                     </div>
                 </form>
             </div>

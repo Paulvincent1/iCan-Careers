@@ -304,14 +304,25 @@ class EmployerDashboardController extends Controller
             $user = Auth::user();
 
             $job = JobPost::where('id', $id)
-                 // ensure it belongs to this employer
-                ->withCount('usersWhoApplied') // application count
+                ->withCount('usersWhoApplied')
+                ->with([
+                    'employer.businessInformation',  // one-to-one
+                    'employer.businesses'            // many-to-many alias
+                ])
                 ->first();
 
             if (!$job) {
                 return response()->json(['error' => 'Job not found or not yours'], 404);
             }
+
             $isOwner = $job->employer_id === $user->id;
+
+            // Determine which business info to use (latest if exists)
+            $businessInfo = $job->employer->businesses()
+            ->orderByDesc('created_at')
+            ->first();
+
+
 
             return response()->json([
                 'id' => $job->id,
@@ -324,13 +335,19 @@ class EmployerDashboardController extends Controller
                 'salary_per_month' => $job->salary,
                 'location' => $job->location,
                 'preferred_worker_types' => is_array($job->preferred_worker_types)
-                 ? implode(', ', $job->preferred_worker_types)
-                : $job->preferred_worker_types,
+                    ? implode(', ', $job->preferred_worker_types)
+                    : $job->preferred_worker_types,
                 'job_status' => $job->job_status,
                 'created_at' => $job->created_at->diffForHumans(),
                 'is_owner' => $isOwner,
+                'business' => [
+
+                    'logo' => $businessInfo->business_logo ?? $job->employer->profile_img,
+                ],
             ]);
         }
+
+
 
         public function previewBusiness($id)
         {
