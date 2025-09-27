@@ -601,7 +601,9 @@ onBeforeUnmount(() => {
                                                 ><ProfileJobHover
                                                     :job-id="job.id"
                                                     :business-id="
-                                                        businessProps.id
+                                                        businessProps
+                                                            ? businessProps.id
+                                                            : null
                                                     "
                                                 >
                                                     <span
