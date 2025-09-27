@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google_id',
+        'verification_code',
         'profile_img',
         'verified',
         'ban'
@@ -119,7 +121,7 @@ public function jobPostsThisMonth()
 }
 
 
-    
+
 
     public function workerInvoices(){
         return $this->hasMany(Invoice::class,'worker_id');
