@@ -20,6 +20,7 @@ class EmployerDashboardController extends Controller
     public function index(){
 
         $user = Auth::user();
+        $business = $user->employerProfile?->businessInformation;
         $jobs = JobPost::with(['usersWhoApplied', 'employedWorkers' => function ($query) {
             $query->wherePivot('current' , true);
         }])->where('employer_id',  $user->id)->latest()->get();
@@ -85,7 +86,7 @@ class EmployerDashboardController extends Controller
             'name' => $user->name,
 
             'profile_photo_path' => $user->profile_img ?? null, // Ensure it's included
-        ],'subscriptionProps' => $subscription,'jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices, 'successMessage' => session()->get('successMessage'), 'chatHeadsProps' => $chatHeads]);
+        ],'businessProps' => $business ?? null,'subscriptionProps' => $subscription,'jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices, 'successMessage' => session()->get('successMessage'), 'chatHeadsProps' => $chatHeads]);
     }
 
     public function showJobApplicants(Request $request, JobPost $jobid){
@@ -164,6 +165,7 @@ class EmployerDashboardController extends Controller
         public function prevWorkers()
     {
         $user = Auth::user();
+        $business = $user->employerProfile?->businessInformation;
 
         $previousEmployerWithJobtitle = [];
         $user->employerJobPosts
@@ -189,6 +191,7 @@ class EmployerDashboardController extends Controller
 
         return inertia('Employer/PreviousWorker', [
             'jobsProps' => $previousEmployerWithJobtitle ,
+            'businessProps' => $business ?? null,
         ]);
     }
 
@@ -299,6 +302,22 @@ class EmployerDashboardController extends Controller
             return response()->json($data);
         }
 
+        public function previewBusinessLogo($id)
+        {
+            $business = \App\Models\BusinessInformation::find($id);
+
+            if (!$business) {
+                return response()->json([
+                    'business_logo' => '/assets/logo-placeholder-image.png'
+                ]);
+            }
+
+            return response()->json([
+                'business_logo' => $business->business_logo ?? '/assets/logo-placeholder-image.png',
+            ]);
+        }
+
+
         public function previewJob($id)
         {
             $user = Auth::user();
@@ -317,10 +336,8 @@ class EmployerDashboardController extends Controller
 
             $isOwner = $job->employer_id === $user->id;
 
-            // Determine which business info to use (latest if exists)
-            $businessInfo = $job->employer->businesses()
-            ->orderByDesc('created_at')
-            ->first();
+             $businessInfo = $job->employer->businessInformation;
+            
 
 
 
@@ -341,9 +358,13 @@ class EmployerDashboardController extends Controller
                 'created_at' => $job->created_at->diffForHumans(),
                 'is_owner' => $isOwner,
                 'business' => [
-
-                    'logo' => $businessInfo->business_logo ?? $job->employer->profile_img,
+                    'id'   => $businessInfo->id ?? null,
+                    'business_logo' => $businessInfo->business_logo 
+                                    ?? $job->employer->profile_img 
+                                    ?? '/assets/logo-placeholder-image.png',
+                    'business_name' => $businessInfo->business_name ?? 'N/A',
                 ],
+
             ]);
         }
 

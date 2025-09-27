@@ -179,7 +179,7 @@ const submit = () => {
         >
             <!-- 🚫 Show this if posting limit reached -->
             <div
-                v-if="!canPost"
+                v-if="!canPost && !isEdit"
                 class="mb-8 flex w-full flex-col items-center justify-center rounded-lg border-2 border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-8 shadow-lg"
             >
                 <div class="flex flex-col items-center space-y-6 text-center">
@@ -283,7 +283,7 @@ const submit = () => {
                     </p>
 
                     <!-- Progress Indicator -->
-                    <div class="mt-4 flex items-center text-sm text-gray-500">
+                    <div v-if="!isEdit" class="mt-4 flex items-center text-sm text-gray-500">
                         <span
                             class="rounded-full bg-green-100 px-3 py-1 font-medium text-green-800"
                         >

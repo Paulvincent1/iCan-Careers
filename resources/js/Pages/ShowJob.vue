@@ -13,6 +13,7 @@ import timezone from "dayjs/plugin/timezone";
 
 let props = defineProps({
     jobPostProps: null,
+    businessProps: null,
     workerProfileProps: null,
     interviewDetails: null,
     messageProp: null,
@@ -209,21 +210,36 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     </button>
                 </div>
 
-                <div
-                    class="absolute left-[50%] top-[40px] flex h-36 w-36 translate-x-[-50%] cursor-pointer flex-col items-center"
-                >
-                    <img
-                        class="relative mb-3 h-full w-full"
-                        :src="
+                <Link
+                    v-if="
+                        jobPostProps?.employer?.employer_profile
+                            ?.business_information
+                    "
+                    :href="
+                        route(
+                            'businessinfo.show',
                             jobPostProps.employer.employer_profile
-                                .business_information
-                                ? jobPostProps.employer.employer_profile
-                                      .business_information.business_logo
-                                : '/assets/logo-placeholder-image.png'
-                        "
-                        alt="Company logo"
-                    />
-                </div>
+                                .business_information.id,
+                        )
+                    "
+                    class="absolute left-1/2 top-[70px] -translate-x-1/2 transform"
+                >
+                    <div
+                        class="absolute flex h-36 w-36 translate-x-[-50%] cursor-pointer flex-col items-center"
+                    >
+                        <img
+                            class="relative mb-3 h-full w-full"
+                            :src="
+                                jobPostProps.employer.employer_profile
+                                    .business_information
+                                    ? jobPostProps.employer.employer_profile
+                                          .business_information.business_logo
+                                    : '/assets/logo-placeholder-image.png'
+                            "
+                            alt="Company logo"
+                        />
+                    </div>
+                </Link>
             </div>
         </div>
         <!-- Bookmark Button - Under Company Logo -->

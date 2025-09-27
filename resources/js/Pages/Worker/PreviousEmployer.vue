@@ -6,9 +6,20 @@ import ProfileJobHover from "../Components/ProfileJobHover.vue";
 
 let props = defineProps({
     jobsProps: null,
+    businessProps: {
+        type: Object,
+        default: () => null,
+    },
 });
 
-console.log(props.jobsProps);
+console.log(
+    props.jobsProps.map((job) => ({
+        job_id: job.id,
+        employer_id: job.employer?.id,
+        business_id:
+            job.employer?.employer_profile?.business_information?.id ?? null,
+    })),
+);
 </script>
 <template>
     <Head title="Previous Employers | iCan Careers" />
@@ -85,14 +96,20 @@ console.log(props.jobsProps);
                                         slug: job.slug,
                                     })
                                 "
-                                ><ProfileJobHover :job-id="job.id">
+                                ><ProfileJobHover
+                                    :job-id="job.id"
+                                    :business-id="
+                                        job.employer?.employer_profile
+                                            ?.business_information?.id ?? null
+                                    "
+                                >
                                     <span
-                                        class="cursor-pointer font-bold text-blue-600 hover:underline"
+                                        class="cursor-pointer text-blue-600 hover:underline"
                                     >
                                         {{ job.job_title }}
                                     </span>
-                                </ProfileJobHover></Link
-                            >
+                                </ProfileJobHover>
+                            </Link>
                         </td>
 
                         <td class="p-3">

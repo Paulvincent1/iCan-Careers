@@ -6,6 +6,10 @@ import ProfileJobHover from "../Components/ProfileJobHover.vue";
 
 let props = defineProps({
     jobsProps: null,
+    businessProps: {
+        type: Object,
+        default: () => null,
+    },
 });
 
 console.log(props.jobsProps);
@@ -68,6 +72,9 @@ console.log(props.jobsProps);
                             >
                                 <ProfileJobHover
                                     :job-id="job.job.jobDetails.id"
+                                    :business-id="
+                                        businessProps ? businessProps.id : null
+                                    "
                                 >
                                     <span
                                         class="cursor-pointer font-bold text-blue-600 hover:underline"

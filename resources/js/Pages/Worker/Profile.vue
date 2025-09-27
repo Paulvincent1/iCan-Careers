@@ -684,7 +684,7 @@ function fireWorker(jobPostId) {
                                 class="flex items-center gap-4 rounded-md border p-4 shadow transition hover:shadow-md"
                             >
                                 <!-- Company Logo -->
-                               <ProfileJobHover :job-id="job.id">
+                               
                                  <img
                                     class="h-16 w-16 flex-shrink-0 rounded border object-obtain"
                                     :src="
@@ -695,17 +695,17 @@ function fireWorker(jobPostId) {
                                     "
                                     alt="Company Logo"
                                 />
-                               </ProfileJobHover>
+                               
 
                                 <!-- Job Info -->
                                 <div class="flex-1">
-                                    <ProfileJobHover :job-id="job.id">
+                                    
                                         <h3
-                                            class="cursor-pointer text-lg font-semibold text-gray-900 hover:underline"
+                                            class="cursor-pointer text-lg font-semibold text-gray-900"
                                         >
                                             {{ job.job_title }}
                                         </h3>
-                                    </ProfileJobHover>
+                                    
                                     <p class="text-sm text-gray-700">
                                         Employer:
                                         {{ job.employer?.name || "N/A" }}

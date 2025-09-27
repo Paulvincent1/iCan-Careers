@@ -23,6 +23,10 @@ let props = defineProps({
         type: Object,
         required: false,
     },
+    businessProps: {
+        type: Object,
+        default: () => null,
+    },
     currentWorkerProps: null,
     invoiceProps: null,
     successMessage: null,
@@ -33,6 +37,9 @@ let messageShow = ref(false);
 onMounted(() => {
     if (props.successMessage) {
         messageShow.value = true;
+        setTimeout(() => {
+            messageShow.value = false;
+        }, 3000);
     }
 });
 
@@ -244,7 +251,7 @@ onBeforeUnmount(() => {
 
                             <!-- Tooltip -->
                             <span
-                                class="absolute z-[999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                class="absolute left-1/2 top-full z-[999] mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
                             >
                                 View Profile
                                 <!-- Tooltip Arrow -->
@@ -593,6 +600,9 @@ onBeforeUnmount(() => {
                                                 class=""
                                                 ><ProfileJobHover
                                                     :job-id="job.id"
+                                                    :business-id="
+                                                        businessProps.id
+                                                    "
                                                 >
                                                     <span
                                                         class="cursor-pointer text-blue-600 hover:underline"

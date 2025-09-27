@@ -19,6 +19,23 @@ import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 let props = defineProps({
     jobsProps: null,
     messageProp: null,
+    // Add pagination props
+    currentPage: {
+        type: Number,
+        default: 1
+    },
+    lastPage: {
+        type: Number,
+        default: 1
+    },
+    total: {
+        type: Number,
+        default: 0
+    },
+    perPage: {
+        type: Number,
+        default: 10
+    }
 });
 
 let swiperContainer = useTemplateRef("swiper-container");
@@ -235,6 +252,59 @@ function resetFilter() {
     tagActive.value = false;
 }
 
+// Add pagination functions
+function goToPage(page) {
+    if (page < 1 || page > props.lastPage || page === props.currentPage) return;
+    
+    router.get(
+        route("jobsearch"),
+        {
+            job_type: workingSched.value,
+            work_arrangement: workingModes.value,
+            experience: experiences.value,
+            job_title: search.value,
+            page: page
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                jobs.value = props.jobsProps;
+                // Scroll to top of job listings
+                const jobListings = document.querySelector('.job-listings');
+                if (jobListings) {
+                    jobListings.scrollIntoView({ behavior: 'smooth' });
+                }
+            },
+        },
+    );
+}
+
+function generatePageNumbers() {
+    const current = props.currentPage;
+    const last = props.lastPage;
+    const delta = 2; // Number of pages to show on each side of current page
+    const range = [];
+    
+    for (let i = Math.max(2, current - delta); i <= Math.min(last - 1, current + delta); i++) {
+        range.push(i);
+    }
+    
+    if (current - delta > 2) {
+        range.unshift('...');
+    }
+    if (current + delta < last - 1) {
+        range.push('...');
+    }
+    
+    range.unshift(1);
+    if (last > 1) {
+        range.push(last);
+    }
+    
+    return range;
+}
+
 const submit = () => {
     router.get(
         route("jobsearch"),
@@ -243,6 +313,7 @@ const submit = () => {
             work_arrangement: workingModes.value,
             experience: experiences.value,
             job_title: search.value,
+            page: 1 // Reset to first page when filters change
         },
         {
             preserveState: true,
@@ -500,23 +571,84 @@ watch(search, debounce(submit, 500));
                     </div>
                 </div>
 
-                <TransitionGroup
-                    tag="div"
-                    name="jobcard"
-                    class="grid gap-4 lg:grid-cols-2"
-                >
-                    <Link
-                        v-for="job in jobs"
-                        :key="job.id"
-                        :href="route('jobsearch.show', job.id)"
-                        class="block transition-transform duration-300 hover:scale-[1.02]"
+                <!-- Results info -->
+                <div class="mb-4 flex justify-between items-center">
+                    <p class="text-gray-600">
+                        Showing {{ (currentPage - 1) * perPage + 1 }} to 
+                        {{ Math.min(currentPage * perPage, total) }} of 
+                        {{ total }} results
+                    </p>
+                </div>
+
+                <div class="job-listings">
+                    <TransitionGroup
+                        tag="div"
+                        name="jobcard"
+                        class="grid gap-4 lg:grid-cols-2"
                     >
-                        <JobCard
-                            :job="job"
-                            @saveJob="showMessage"
-                        ></JobCard>
-                    </Link>
-                </TransitionGroup>
+                        <Link
+                            v-for="job in jobs"
+                            :key="job.id"
+                            :href="route('jobsearch.show', job.id)"
+                            class="block transition-transform duration-300 hover:scale-[1.02]"
+                        >
+                            <JobCard
+                                :job="job"
+                                @saveJob="showMessage"
+                            ></JobCard>
+                        </Link>
+                    </TransitionGroup>
+                </div>
+
+                <!-- Pagination -->
+                <div v-if="lastPage > 1" class="mt-8 flex justify-center">
+                    <nav class="flex items-center space-x-2">
+                        <!-- Previous button -->
+                        <button
+                            @click="goToPage(currentPage - 1)"
+                            :disabled="currentPage === 1"
+                            class="rounded px-3 py-2 text-sm font-medium transition-colors"
+                            :class="currentPage === 1 
+                                ? 'text-gray-400 cursor-not-allowed' 
+                                : 'text-gray-700 hover:bg-gray-100'"
+                        >
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </button>
+
+                        <!-- Page numbers -->
+                        <template v-for="(page, index) in generatePageNumbers()" :key="index">
+                            <button
+                                v-if="page === '...'"
+                                class="px-3 py-2 text-gray-500"
+                                disabled
+                            >
+                                ...
+                            </button>
+                            <button
+                                v-else
+                                @click="goToPage(page)"
+                                class="rounded px-3 py-2 text-sm font-medium transition-colors"
+                                :class="page === currentPage
+                                    ? 'bg-orange-500 text-white'
+                                    : 'text-gray-700 hover:bg-gray-100'"
+                            >
+                                {{ page }}
+                            </button>
+                        </template>
+
+                        <!-- Next button -->
+                        <button
+                            @click="goToPage(currentPage + 1)"
+                            :disabled="currentPage === lastPage"
+                            class="rounded px-3 py-2 text-sm font-medium transition-colors"
+                            :class="currentPage === lastPage
+                                ? 'text-gray-400 cursor-not-allowed'
+                                : 'text-gray-700 hover:bg-gray-100'"
+                        >
+                            Next <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </nav>
+                </div>
             </div>
         </div>
         <SuccessfulMessage

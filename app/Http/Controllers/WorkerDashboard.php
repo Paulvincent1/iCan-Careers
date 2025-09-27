@@ -189,12 +189,19 @@ class WorkerDashboard extends Controller
 
     public function prevEmployers()
     {
-        // TODO: fix this
         $user = Auth::user();
 
-        return inertia('Worker/PreviousEmployer',['jobsProps' =>  $user->myJobs->load('employer')]);
+        // Get all previous jobs with employer and their business info
+        $jobs = $user->myJobs()
+            ->with(['employer.employerProfile.businessInformation'])
+            ->latest()
+            ->get();
 
+        return inertia('Worker/PreviousEmployer', [
+            'jobsProps' => $jobs
+        ]);
     }
+
 
     public function sendInvoice(Request $request){
 
