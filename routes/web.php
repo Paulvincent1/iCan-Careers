@@ -234,6 +234,9 @@ Route::middleware([ForceGetRedirect::class])->group(function () {
     Route::get('/business/{id}/preview', [EmployerDashboardController::class, 'previewBusiness'])
     ->name('business.preview');
 
+    Route::get('/business/{id}/logo', [EmployerDashboardController::class, 'previewBusinessLogo'])->name('business.logo');
+
+
 
     //chat routes
     Route::prefix('/messages')->group(function () {

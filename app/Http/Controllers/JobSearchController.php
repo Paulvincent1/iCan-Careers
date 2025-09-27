@@ -15,37 +15,38 @@ class JobSearchController extends Controller
      */
     public function index(Request $request)
     {
-        // $jobType = $request->input('job_type') ?? [];
-        // $workArrangement = $request->input('work_arrangement') ?? [];
-        // $experience = $request->input('experience') ?? [];
-
         $user = Auth::user();
-        $jobs = JobPost::with(['employer.employerProfile','employer.employerProfile.businessInformation','usersWhoSaved' => function ($query) use ($user) {
-            $query->where('user_id',  $user->id)->first();
-        }])->filter(request(['job_type','work_arrangement','experience','job_title']))->where('job_status','Open')->latest()->get();
+        
+        // Build the query with filters
+        $query = JobPost::with([
+            'employer.employerProfile',
+            'employer.employerProfile.businessInformation',
+            'usersWhoSaved' => function ($query) use ($user) {
+                $query->where('user_id', $user->id)->first();
+            }
+        ])->where('job_status', 'Open');
+        
+        // Apply filters
+        $query->filter(request(['job_type','work_arrangement','experience','job_title']));
+        
+        // Get paginated results (10 items per page)
+        $jobs = $query->latest()->paginate(10)->withQueryString();
 
+        // dd($jobs); // You can remove this after testing
 
-        // dd($jobs);
-        // $jobs = JobPost::whereIn('job_type',$jobType)->orWhereIn('work_arrangement', $workArrangement)
-        // ->orWhereIn('experience', $experience)->get();
-
-        // JobPost::whereIn('job_title',$jobType)->orWhere(function ($query) use ($workArrangement) {
-        //     $query->whereIn('work_arrangement', $workArrangement);
-        // })->orWhere(function ($query) use ($experience) {
-        //     $query->whereIn('experience', $experience);
-        // })->get();
-
-        // dd($jobs);
-
-        // dd(session()->get('messageProp'));
-
-
-        return inertia('Worker/FindJobs',['jobsProps' => $jobs, 'messageProp' => session()->get('messageProp')]);
+        return inertia('Worker/FindJobs', [
+            'jobsProps' => $jobs->items(),
+            'currentPage' => $jobs->currentPage(),
+            'lastPage' => $jobs->lastPage(),
+            'total' => $jobs->total(),
+            'perPage' => $jobs->perPage(),
+            'messageProp' => session()->get('messageProp')
+        ]);
     }
 
     public function saveJob(JobPost $id){
         if($id->job_status === 'Pending'){
-            abort(403, "Your'e not allowed to do this action");
+            abort(403, "You're not allowed to do this action");
         }
 
         $user = Auth::user();

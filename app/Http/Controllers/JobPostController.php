@@ -127,6 +127,7 @@ class JobPostController extends Controller
     {
 
         $user = Auth::user();
+        $business = $user->employerProfile?->businessInformation;
 
         $jobid->load('employer.employerProfile.businessInformation');
 
@@ -135,7 +136,7 @@ class JobPostController extends Controller
         }
         // dd($job);
 
-        return inertia('ShowJob', ['jobPostProps' =>  $jobid, 'messageProp' => session()->get('messageProp')]);
+        return inertia('ShowJob', ['businessProps' => $business ?? null,'jobPostProps' =>  $jobid, 'messageProp' => session()->get('messageProp')]);
     }
 
     /**

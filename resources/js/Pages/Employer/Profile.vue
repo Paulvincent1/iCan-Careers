@@ -464,14 +464,14 @@ function submitReport(reason) {
                 "
             >
                 <img
-  class="h-16 w-16 flex-shrink-0 rounded border object-cover"
-  :src="
-      job.employer?.business_information?.business_logo
-          ? job.employer.business_information.business_logo
-          : '/assets/logo-placeholder-image.png'
-  "
-  alt="Company Logo"
-/>
+                class="h-16 w-16 flex-shrink-0 rounded border object-cover"
+                :src="
+                    job.employer?.business_information?.business_logo
+                        ? job.employer.business_information.business_logo
+                        : '/assets/logo-placeholder-image.png'
+                "
+                alt="Company Logo"
+                />
 
             </Link>
 
