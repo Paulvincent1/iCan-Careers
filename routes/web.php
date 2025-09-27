@@ -15,11 +15,13 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportJobPostController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\WorkerBasicInfoController;
 use App\Http\Controllers\WorkerDashboard;
 use App\Http\Controllers\WorkerProfileController;
 use App\Http\Controllers\WorkerSkillsController;
 use App\Http\Controllers\WorkerVerificationController;
+use App\Http\Middleware\ChooseRole;
 use App\Http\Middleware\ForceGetRedirect;
 use App\Http\Middleware\isAdmin;
 use App\Http\Middleware\isBan;
@@ -52,6 +54,9 @@ Route::get('/', function () {
 
 Route::middleware(['guest'])->group(function () {
 
+    // login with google
+    Route::get('/auth/google',[SocialiteController::class, 'googleLogin'])->name('auth.google');
+    Route::get('/auth/google/callback',[SocialiteController::class, 'googleAuthentication']);
 
     Route::get('/register', [AuthController::class, 'registerCreate'])->name('register.create');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
@@ -66,11 +71,13 @@ Route::middleware(['guest'])->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
+Route::get('/choose-role',[SocialiteController::class, 'chooseRole'])->middleware(['auth'])->name('choose.role');
+Route::post('/choose-role',[SocialiteController::class, 'storeRole'])->middleware(['auth'])->name('store.role');
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth'])->name('logout');
 
 
-Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::class, isBan::class])->group(function () {
+Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::class, isBan::class, ChooseRole::class])->group(function () {
 
     Route::prefix('verification')->group(function () {
 
@@ -132,7 +139,7 @@ Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::clas
 });
 
 
-Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::class, isBan::class])->group(function () {
+Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::class, isBan::class, ChooseRole::class])->group(function () {
 
     Route::get('/createprofile', [EmployerProfileController::class, 'createProfile'])->name('create.profile.employer');
     Route::post('/createprofile', [EmployerProfileController::class, 'storeProfile'])->name('create.profile.employer.post');
@@ -173,7 +180,7 @@ Route::prefix('employers')->middleware([ForceGetRedirect::class, isEmployer::cla
 });
 
 // Reviews
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', ChooseRole::class])->group(function () {
     Route::get('myprofile/reviews', [ReviewController::class, 'index'])->name('review.my-profile');
 
     Route::get('/reviews/{id}', [ReviewController::class, 'visitProfile'])->name('review.view-profile');
@@ -221,7 +228,7 @@ Route::prefix('admin')->middleware([isAdmin::class])->group(function () {
 
 
 //shared route for authenticated users
-Route::middleware([ForceGetRedirect::class])->group(function () {
+Route::middleware([ForceGetRedirect::class, ChooseRole::class])->group(function () {
 
 
     Route::get('/user/{id}/preview', [EmployerDashboardController::class, 'preview'])

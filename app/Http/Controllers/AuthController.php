@@ -31,6 +31,15 @@ class AuthController extends Controller
         return inertia('Authentication/Register');
     }
 
+    public function sendCode(Request $request){
+        $fields = $request->validate([
+                'email' => 'required|email|unique:users,email',
+        ]);
+
+        
+
+    }
+
     public function register(Request $request){
         $fields = $request->validate(
             [
