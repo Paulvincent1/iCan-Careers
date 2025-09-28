@@ -46,21 +46,15 @@ const submit = () => {
     });
 };
 
-// ✅ Auto-calculation
+// ✅ Auto-calculation - Fixed to work like Create Job form
 watch(
     () => [form.work_hour_per_day, form.hour_pay],
-    ([hours, hourly]) => {
-        if (hours && hourly) {
-            form.month_pay = (hours * hourly * 22).toFixed(2); // assume 22 working days
-        }
-    },
-);
-
-watch(
-    () => [form.work_hour_per_day, form.month_pay],
-    ([hours, monthly]) => {
-        if (hours && monthly) {
-            form.hour_pay = (monthly / (hours * 22)).toFixed(2);
+    ([hours, rate]) => {
+        if (hours && rate) {
+            // Assuming 22 working days per month (like in Create Job)
+            form.month_pay = (hours * rate * 22).toFixed(2);
+        } else {
+            form.month_pay = null;
         }
     },
 );
@@ -150,7 +144,7 @@ watch(
                         </select>
                         <InputFlashMessage
                             type="error"
-                            :message="form.errors.work_hour_per_day"
+                            :message="form.errors.job_type"
                         />
                     </div>
 
@@ -163,7 +157,7 @@ watch(
                                 >Work Hours per Day</label
                             >
                             <input
-                                v-model="form.work_hour_per_day"
+                                v-model.number="form.work_hour_per_day"
                                 type="number"
                                 min="1"
                                 max="12"
@@ -185,19 +179,20 @@ watch(
                         <div>
                             <label class="text-gray-500">Hourly Pay (₱)</label>
                             <input
-                                v-model="form.hour_pay"
+                                v-model.number="form.hour_pay"
                                 type="number"
-                                min="0"
+                                min="1"
+                                step="1"
                                 class="mt-2 w-full rounded-lg border px-4 py-2 text-lg outline-blue-400"
                                 placeholder="e.g. 150"
                                 required
                             />
                             <InputFlashMessage
                                 type="error"
-                                :message="form.errors.work_hour_per_day"
+                                :message="form.errors.hour_pay"
                             />
                             <small class="mt-1 text-xs text-gray-500">
-                                Example: ₱100 per hour.
+                                Example: ₱100 per hour (whole numbers only).
                             </small>
                         </div>
 
@@ -214,7 +209,7 @@ watch(
                             />
                             <InputFlashMessage
                                 type="error"
-                                :message="form.errors.work_hour_per_day"
+                                :message="form.errors.month_pay"
                             />
                             <small class="mt-1 text-xs text-gray-500">
                                 Automatically calculated based on hours × rate ×
@@ -239,6 +234,16 @@ watch(
                             placeholder="YYYY"
                             required
                         />
+                        <InputFlashMessage
+                            type="error"
+                            :message="form.errors.birth_year"
+                        />
+                        <small class="mt-1 block text-xs text-gray-500">
+                            PWD must be at least 18 years old.
+                        </small>
+                        <small class="mt-1 block text-xs text-gray-500">
+                            Seniors Citizens must be at least 60 years old.
+                        </small>
                     </div>
 
                     <!-- Gender -->
@@ -320,9 +325,10 @@ watch(
                     <!-- Submit Button -->
                     <div class="mt-4 flex justify-end">
                         <button
-                            class="cursor-pointer rounded bg-[#fa8334] p-2 text-white"
+                            :disabled="isDisabled"
+                            class="cursor-pointer rounded bg-[#fa8334] p-2 text-white disabled:opacity-50"
                         >
-                            Save Profile
+                            {{ isDisabled ? "Saving..." : "Save Profile" }}
                         </button>
                     </div>
                 </div>

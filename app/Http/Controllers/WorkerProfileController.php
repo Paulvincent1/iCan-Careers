@@ -29,8 +29,8 @@ class WorkerProfileController extends Controller
         return inertia('WorkerAccountSetup/CreateProfile');
     }
 
-    public function storeProfile(Request $request){
-        // dd($request);
+    public function storeProfile(Request $request)
+    {
         $fields = $request->validate([
             'job_title' =>'required|max:255',
             'profile_description' =>'required',
@@ -39,18 +39,32 @@ class WorkerProfileController extends Controller
             'work_hour_per_day' =>'required|numeric|min:1',
             'hour_pay' =>'required|numeric|min:1',
             'month_pay' =>'required|numeric|min:1',
-            'birth_year' =>'required|numeric|min:1900',
+            'birth_year' =>'required|numeric|min:1900|max:' . now()->year,
             'gender' =>'required',
             'resume' =>'nullable|file|extensions:pdf,docx,doc',
-
         ]);
 
-        if($fields['resume']){
-            $resumepath = Storage::disk('local')->put('resume', $request->resume);
+        $user = $request->user();
 
+        // ✅ Enforce Senior Citizen rule
+        if ($user->roles()->where('name', 'Senior')->exists()) {
+            $age = now()->year - $fields['birth_year'];
+            if ($age < 60) {
+                return back()->withErrors([
+                    'birth_year' => 'Senior citizens must be at least 60 years old.',
+                    'message' => 'Senior Citizens must be at least 60 years old.'
+                ])->withInput();
+            }
         }
 
-        $request->user()->workerProfile()->create([
+        // Handle Resume
+        $resumepath = null;
+        if ($request->hasFile('resume')) {
+            $resumepath = Storage::disk('local')->put('resume', $request->resume);
+        }
+
+        // Save Profile
+        $user->workerProfile()->create([
             'job_title' => $fields['job_title'],
             'profile_description' => $fields['profile_description'],
             'highest_educational_attainment' => $fields['highest_educational_attainment'],
@@ -61,7 +75,7 @@ class WorkerProfileController extends Controller
             'birth_year' => $fields['birth_year'],
             'gender' => $fields['gender'],
             'resume' => $request->resume?->getClientOriginalName() ?? null,
-            'resume_path' => $resumepath  ?? null ,
+            'resume_path' => $resumepath,
         ]);
 
         Inertia::clearHistory();
@@ -112,6 +126,25 @@ class WorkerProfileController extends Controller
 
     public function updateProfile(Request $request){
         $user = Auth::user();
+         // ✅ Check Senior role if updating birth_year
+        if ($request->has('birth_year')) {
+            $request->validate([
+                'birth_year' => 'required|numeric|min:1900|max:' . now()->year,
+            ]);
+
+            if ($user->roles()->where('name', 'Senior')->exists()) {
+                $age = now()->year - $request->birth_year;
+                if ($age < 60) {
+                return back()->withErrors([
+                        'birth_year' => 'Senior Citizens must be at least 60 years old.',
+                    ])->withInput();
+                }
+            }
+
+            $user->workerProfile->update([
+                'birth_year' => $request->birth_year
+            ]);
+        }
         if($request->job_title){
             $request->validate([
                 'job_title' => 'min:1'
@@ -148,6 +181,7 @@ class WorkerProfileController extends Controller
           ]);
         }
 
+        
 
 
         if($request->hasFile('profile_img')){

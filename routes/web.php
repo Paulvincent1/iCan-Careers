@@ -45,8 +45,11 @@ Route::get('/', function () {
         } elseif ($userRole === 'Employer') {
             return redirect()->route('employer.dashboard');
         }
+        if($userRole === 'Admin'){
+            return redirect()->route('admin.dashboard');
+        }
 
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('choose.role');
     }
     return inertia('Home');
 })->name('home');
