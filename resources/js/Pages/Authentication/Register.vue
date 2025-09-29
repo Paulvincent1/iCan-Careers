@@ -1,5 +1,5 @@
 <script setup>
-import { useForm } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 import AuthInput from "../Components/AuthInput.vue";
 import Quotes from "../Components/Quotes.vue";
 import AuthForm from "../Components/AuthForm.vue";
@@ -13,10 +13,34 @@ let form = useForm({
     password: null,
     password_confirmation: null,
     role: null,
+    verification_code: null,
 });
 
+const sendCode = () => {
+    if (!validateInput()) return; // stop if validation fails
+
+    router.post(
+        route("register.send.code"),
+        {
+            email: form.email,
+        },
+        {
+            preserveState: true,
+            onSuccess: () => {
+                openModal();
+            },
+        },
+    );
+};
 const submit = () => {
-    form.post(route("register.post"));
+    form.post(route("register.post"), {
+        onError: (errors) => {
+            closeModal();
+        },
+        onSuccess: (page) => {
+            closeModal();
+        },
+    });
 };
 
 let userRole = ref("Worker");
@@ -46,6 +70,67 @@ function openModal() {
 function closeModal() {
     openSendCodeModal.value = false;
 }
+
+let errors = ref({
+    name: null,
+    email: null,
+    password: null,
+    password_confirmation: null,
+    role: null,
+});
+
+const validateInput = () => {
+    let isValid = true;
+
+    // Name validation
+    if (!form.name) {
+        errors.value.name = "Name is required";
+        isValid = false;
+    } else {
+        errors.value.name = null;
+    }
+
+    // Email validation
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!form.email) {
+        errors.value.email = "Email is required";
+        isValid = false;
+    } else if (!emailRegex.test(form.email)) {
+        errors.value.email = "Email is invalid";
+        isValid = false;
+    } else {
+        errors.value.email = null;
+    }
+
+    // Password validation
+    if (!form.password) {
+        errors.value.password = "Password is required";
+        isValid = false;
+    } else if (form.password.length < 6) {
+        errors.value.password = "Password must be at least 6 characters";
+        isValid = false;
+    } else {
+        errors.value.password = null;
+    }
+
+    // Password confirmation
+    if (form.password !== form.password_confirmation) {
+        errors.value.password_confirmation = "Passwords do not match";
+        isValid = false;
+    } else {
+        errors.value.password_confirmation = null;
+    }
+
+    // Role validation
+    if (!form.role) {
+        errors.value.role = "Role is required";
+        isValid = false;
+    } else {
+        errors.value.role = null;
+    }
+
+    return isValid;
+};
 </script>
 
 <template>
@@ -62,33 +147,36 @@ function closeModal() {
                 </p>
             </div>
             <InputFlashMessage
-                :message="$page.props.errors.message"
+                :message="$page.props.errors.message ?? errors.role"
                 type="error"
             />
             <AuthInput
                 name="NAME"
-                :message="form.errors.name"
+                :message="form.errors.name ?? errors.name"
                 type="text"
                 v-model="form.name"
                 class="mb-3"
             />
             <AuthInput
                 name="EMAIL"
-                :message="form.errors.email"
+                :message="form.errors.email ?? errors.email"
                 type="email"
                 v-model="form.email"
                 class="mb-3"
             />
             <AuthInput
                 name="PASSWORD"
-                :message="form.errors.password"
+                :message="form.errors.password ?? errors.password"
                 type="password"
                 v-model="form.password"
                 class="mb-3"
             />
             <AuthInput
                 name="CONFIRM PASSWORD"
-                :message="form.errors.password_confirmation"
+                :message="
+                    form.errors.password_confirmation ??
+                    errors.password_confirmation
+                "
                 type="password"
                 v-model="form.password_confirmation"
                 class="mb-3"
@@ -130,7 +218,7 @@ function closeModal() {
             <button
                 class="mb-3 rounded bg-[#fa8334] p-3 text-white"
                 :disabled="form.processing"
-                @click="submit"
+                @click="sendCode"
             >
                 Register
             </button>
@@ -156,11 +244,11 @@ function closeModal() {
             <Link :href="route('login')" class="text-center">Log in</Link>
         </AuthForm>
     </div>
-    <ReusableModal v-if="false">
+    <ReusableModal @closeModal="closeModal" v-if="openSendCodeModal">
         <div
             class="w-[350px] overflow-auto rounded bg-white p-4 text-[#171816]"
         >
-            <p class="text-2xl">Send Code</p>
+            <p class="text-2xl">Enter the code</p>
             <p class="text-gray-400">We’ve sent the code to your email.</p>
 
             <input
@@ -168,14 +256,16 @@ function closeModal() {
                 type="text"
                 id="code"
                 name="code"
+                v-model="form.verification_code"
                 placeholder="Enter code here"
             />
             <div>
                 <button
+                    @click="submit"
                     type="button"
                     class="w-full rounded bg-orange-400 p-3 text-white"
                 >
-                    Submit
+                    submit
                 </button>
             </div>
         </div>

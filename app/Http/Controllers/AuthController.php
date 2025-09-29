@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SendCode;
+use App\Models\EmailVerication;
 use App\Models\EmployerSubscriptionInvoice;
 use App\Models\Role;
 use App\Models\User;
@@ -13,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -36,7 +39,29 @@ class AuthController extends Controller
                 'email' => 'required|email|unique:users,email',
         ]);
 
-        
+
+        $code = rand(100000, 999999);
+
+
+        $emailVerification = EmailVerication::where('email', $fields['email'])->first();
+
+        if($emailVerification){
+            $emailVerification->update([
+                'verification_code' => $code
+            ]);
+
+        }else{
+
+            $emailVerification = EmailVerication::create(
+                [
+                    'email'=> $fields['email'],
+                    'verification_code' => $code
+                    ]
+                );
+
+        }
+
+        Mail::to($fields['email'])->send(new SendCode($emailVerification));
 
     }
 
@@ -45,10 +70,21 @@ class AuthController extends Controller
             [
                 'name' => 'required',
                 'email' => 'required|email|unique:users,email',
-                'password' => 'required|confirmed',
-                'role' => 'required'
+                'password' => 'required|confirmed|min:6',
+                'role' => 'required',
+                'verification_code' => 'required',
             ]
             );
+
+            $emailVerification = EmailVerication::where('email', $fields['email'])->first();
+
+            if($fields['verification_code'] != $emailVerification->verification_code) {
+                 return redirect()->back()->withErrors(
+                    [
+                        'message' => 'The verification code you entered is incorrect. Please check your email and try again.'
+                    ]
+                );
+            }
 
 
             if($fields['role'] === 'Employer'){
@@ -234,7 +270,7 @@ class AuthController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $status = Password::reset(

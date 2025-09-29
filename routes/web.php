@@ -62,6 +62,7 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/auth/google/callback',[SocialiteController::class, 'googleAuthentication']);
 
     Route::get('/register', [AuthController::class, 'registerCreate'])->name('register.create');
+    Route::post('/register/confirm-email',[AuthController::class, 'sendCode'])->name('register.send.code');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 
     Route::get('/login', [AuthController::class, 'loginIndex'])->name('login');

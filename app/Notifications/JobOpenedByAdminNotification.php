@@ -31,7 +31,7 @@ class JobOpenedByAdminNotification extends Notification implements ShouldBroadca
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['broadcast','database'];
     }
 
     /**
