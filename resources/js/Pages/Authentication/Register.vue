@@ -20,17 +20,23 @@ const sendCode = () => {
     if (!validateInput()) return; // stop if validation fails
 
     router.post(
-        route("register.send.code"),
-        {
-            email: form.email,
+    route("register.send.code"),
+    {
+        name: form.name,
+        role: form.role,
+        email: form.email,
+    },
+    {
+        preserveState: true,
+        onError: (errors) => {
+            console.error(errors);
         },
-        {
-            preserveState: true,
-            onSuccess: () => {
-                openModal();
-            },
+        onSuccess: () => {
+            openModal();
         },
-    );
+    },
+);
+
 };
 const submit = () => {
     form.post(route("register.post"), {
@@ -159,7 +165,7 @@ const validateInput = () => {
             />
             <AuthInput
                 name="EMAIL"
-                :message="form.errors.email ?? errors.email"
+                :message="$page.props.errors.email ?? form.errors.email ?? errors.email"
                 type="email"
                 v-model="form.email"
                 class="mb-3"
@@ -221,6 +227,7 @@ const validateInput = () => {
                 @click="sendCode"
             >
                 Register
+
             </button>
 
             <a

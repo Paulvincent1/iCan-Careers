@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('email_verications', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable(); // Add this line
             $table->string('email');
+            $table->string('role')->nullable(); // Add this line
             $table->string('verification_code');
             $table->timestamps();
         });

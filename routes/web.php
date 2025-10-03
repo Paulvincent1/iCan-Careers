@@ -74,7 +74,7 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/reset-password/{token}', [AuthController::class, 'resetPasswordIndex'])->name('password.reset');
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
-
+Route::get('/email/verify/{code}', [AuthController::class, 'verifyEmail'])->name('email.verify');
 Route::get('/choose-role',[SocialiteController::class, 'chooseRole'])->middleware(['auth'])->name('choose.role');
 Route::post('/choose-role',[SocialiteController::class, 'storeRole'])->middleware(['auth'])->name('store.role');
 
