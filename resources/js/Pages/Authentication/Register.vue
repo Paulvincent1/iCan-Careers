@@ -6,6 +6,8 @@ import AuthForm from "../Components/AuthForm.vue";
 import { onMounted, ref, useTemplateRef } from "vue";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
 import ReusableModal from "../Components/Modal/ReusableModal.vue";
+import InputCodeModal from "../Components/Modal/InputCodeModal.vue";
+
 
 let form = useForm({
     name: null,
@@ -251,10 +253,8 @@ const validateInput = () => {
             <Link :href="route('login')" class="text-center">Log in</Link>
         </AuthForm>
     </div>
-    <ReusableModal @closeModal="closeModal" v-if="openSendCodeModal">
-        <div
-            class="w-[350px] overflow-auto rounded bg-white p-4 text-[#171816]"
-        >
+    <InputCodeModal @closeModal="closeModal" v-if="openSendCodeModal">
+        <div class="w-[350px] overflow-auto rounded bg-white p-4 text-[#171816]">
             <p class="text-2xl">Enter the code</p>
             <p class="text-gray-400">We’ve sent the code to your email.</p>
 
@@ -276,5 +276,6 @@ const validateInput = () => {
                 </button>
             </div>
         </div>
-    </ReusableModal>
+    </InputCodeModal>
+
 </template>

@@ -187,6 +187,23 @@ function selectReason(report) {
     reasonSelected.value = report.reason;
     descriptions.value = report.descriptions;
 }
+// Add these new reactive variables for expandable jobs
+const showAllJobs = ref(false);
+const initialJobsToShow = 3; // Number of jobs to show initially
+
+// Computed property to determine which jobs to display
+const displayedJobs = computed(() => {
+    if (showAllJobs.value) {
+        return props.jobsPostedProps;
+    } else {
+        return props.jobsPostedProps.slice(0, initialJobsToShow);
+    }
+});
+
+// Computed property to check if there are more jobs to show
+const hasMoreJobs = computed(() => {
+    return props.jobsPostedProps.length > initialJobsToShow;
+});
 
 function submitReport(reason) {
     router.post(
@@ -212,9 +229,9 @@ function submitReport(reason) {
         <div class="relative h-32 bg-[#FAFAFA]">
             <!-- Report Button - Top Right -->
                 <div class="absolute right-9 top-4">
-                    <button 
+                    <button
                         v-if="visitor"
-                        @click="isShowReportModal = true" 
+                        @click="isShowReportModal = true"
                         class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-gray-50"
                     >
                         <i class="bi bi-exclamation-diamond-fill"></i>
@@ -437,90 +454,110 @@ function submitReport(reason) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-span-1 rounded-lg bg-white p-4 shadow-sm">
-    <p class="mb-4 text-xl font-bold text-gray-800">
-        Posted Jobs
-    </p>
+                    <div class="flex flex-col gap-4 text-[16px] text-gray-600">
 
-    <!-- No Jobs -->
-    <div v-if="!jobsPostedProps.length" class="text-center text-gray-500">
-        No jobs posted yet.
-    </div>
+        <!-- Posted Jobs Section - Fixed with proper margin -->
+        <div class="col-span-1 rounded-lg bg-white p-4 shadow-sm mb-6"> <!-- Added mb-6 here -->
+            <p class="mb-4 text-xl font-bold text-gray-800">
+                Posted Jobs
+            </p>
 
-    <!-- Jobs List -->
-    <ul v-else class="space-y-4">
-        <li
-            v-for="job in jobsPostedProps"
-            :key="job.id"
-            class="flex items-center gap-4 rounded-md border p-4 shadow transition hover:shadow-md"
-        >
-            <!-- Business Logo -->
-            <Link
-                :href="visitor
-                    ? adminVisit
-                        ? route('admin.show-job-post', job.id)
-                        : route('jobsearch.show', job.id)
-                    : route('employer.jobpost.show', job.id)
-                "
-            >
-                <img
-                class="h-16 w-16 flex-shrink-0 rounded border object-cover"
-                :src="
-                    job.employer?.business_information?.business_logo
-                        ? job.employer.business_information.business_logo
-                        : '/assets/logo-placeholder-image.png'
-                "
-                alt="Company Logo"
-                />
-
-            </Link>
-
-            <!-- Job Info -->
-            <div class="flex-1">
-                <Link
-                    :href="visitor
-                        ? adminVisit
-                            ? route('admin.show-job-post', job.id)
-                            : route('jobsearch.show', job.id)
-                        : route('employer.jobpost.show', job.id)
-                    "
-                >
-                    <h3
-                        class="cursor-pointer text-lg font-semibold text-gray-900 hover:underline"
-                    >
-                        {{ job.job_title }}
-                    </h3>
-                </Link>
-                <p class="text-sm text-gray-700">
-                    {{ job.job_type }} • {{ job.work_arrangement }}
-                </p>
-                <p class="text-sm text-gray-500">
-                    Posted on:
-                    {{
-                        job.created_at
-                            ? new Date(job.created_at).toLocaleDateString()
-                            : "N/A"
-                    }}
-                </p>
+            <!-- No Jobs -->
+            <div v-if="!jobsPostedProps.length" class="text-center text-gray-500">
+                No jobs posted yet.
             </div>
 
-            <!-- View Button -->
-            <Link
-                :href="visitor
-                    ? adminVisit
-                        ? route('admin.show-job-post', job.id)
-                        : route('jobsearch.show', job.id)
-                    : route('employer.jobpost.show', job.id)
-                "
-                as="button"
-                class="rounded-full bg-blue-100 p-2 text-blue-700 hover:bg-blue-200"
-                aria-label="View Job"
-            >
-                <i class="bi bi-arrow-right text-xl"></i>
-            </Link>
-        </li>
-    </ul>
-</div>
+            <!-- Jobs List -->
+            <ul v-else class="space-y-4">
+                <li
+                    v-for="job in displayedJobs"
+                    :key="job.id"
+                    class="flex items-center gap-4 rounded-md border p-4 shadow transition hover:shadow-md"
+                >
+                    <!-- Business Logo -->
+                    <Link
+                        :href="visitor
+                            ? adminVisit
+                                ? route('admin.show-job-post', job.id)
+                                : route('jobsearch.show', job.id)
+                            : route('employer.jobpost.show', job.id)
+                        "
+                    >
+                        <img
+                        class="h-16 w-16 flex-shrink-0 rounded border object-cover"
+                        :src="
+                            job.employer?.business_information?.business_logo
+                                ? job.employer.business_information.business_logo
+                                : '/assets/logo-placeholder-image.png'
+                        "
+                        alt="Company Logo"
+                        />
+
+                    </Link>
+
+                    <!-- Job Info -->
+                    <div class="flex-1">
+                        <Link
+                            :href="visitor
+                                ? adminVisit
+                                    ? route('admin.show-job-post', job.id)
+                                    : route('jobsearch.show', job.id)
+                                : route('employer.jobpost.show', job.id)
+                            "
+                        >
+                            <h3
+                                class="cursor-pointer text-lg font-semibold text-gray-900 hover:underline"
+                            >
+                                {{ job.job_title }}
+                            </h3>
+                        </Link>
+                        <p class="text-sm text-gray-700">
+                            {{ job.job_type }} • {{ job.work_arrangement }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            Posted on:
+                            {{
+                                job.created_at
+                                    ? new Date(job.created_at).toLocaleDateString()
+                                    : "N/A"
+                            }}
+                        </p>
+                    </div>
+
+                    <!-- View Button -->
+                    <Link
+                        :href="visitor
+                            ? adminVisit
+                                ? route('admin.show-job-post', job.id)
+                                : route('jobsearch.show', job.id)
+                            : route('employer.jobpost.show', job.id)
+                        "
+                        as="button"
+                        class="rounded-full bg-blue-100 p-2 text-blue-700 hover:bg-blue-200"
+                        aria-label="View Job"
+                    >
+                        <i class="bi bi-arrow-right text-xl"></i>
+                    </Link>
+                </li>
+            </ul>
+
+            <!-- Show More/Less Button -->
+            <div v-if="hasMoreJobs" class="mt-4 text-center">
+                <button
+                    @click="showAllJobs = !showAllJobs"
+                    class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
+                >
+                    <span>{{ showAllJobs ? 'Show Less' : `Show More (${jobsPostedProps.length - initialJobsToShow} more)` }}</span>
+                    <i
+                        :class="[
+                            'bi transition-transform duration-200',
+                            showAllJobs ? 'bi-chevron-up' : 'bi-chevron-down'
+                        ]"
+                    ></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
 
                     <!-- <div

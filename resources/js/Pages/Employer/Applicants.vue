@@ -447,13 +447,10 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                 <td class="p-3 text-start">
                                     <div class="h-12 w-12">
                                         <img
-                                            class="h-full w-full rounded-full object-cover"
-                                            :src="
-                                                applicant
-                                                    ? applicant.profile_img
-                                                    : '/assets/profile_placeholder.jpg'
-                                            "
-                                            alt=""
+                                        class="h-full w-full rounded-full object-cover"
+                                        :src="applicant.profile_img || '/assets/profile_placeholder.jpg'"
+                                        @error="event => event.target.src = '/assets/profile_placeholder.jpg'"
+                                        alt="Profile"
                                         />
                                     </div>
                                 </td>

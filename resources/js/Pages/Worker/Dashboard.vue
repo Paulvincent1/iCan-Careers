@@ -299,6 +299,28 @@ function goToChat(userId) {
         user: userId,
     });
 }
+function formatTime(timestamp) {
+    const now = dayjs();
+    const messageTime = dayjs(timestamp);
+
+    // If today, show time only
+    if (messageTime.isSame(now, 'day')) {
+        return messageTime.format('h:mm A');
+    }
+
+    // If yesterday, show "Yesterday"
+    if (messageTime.isSame(now.subtract(1, 'day'), 'day')) {
+        return 'Yesterday';
+    }
+
+    // If within the same week, show day name
+    if (messageTime.isAfter(now.subtract(7, 'day'))) {
+        return messageTime.format('ddd');
+    }
+
+    // Otherwise show date
+    return messageTime.format('MMM D');
+}
 
 onBeforeUnmount(() => {
     channelChatHeads.stopListening(".message.event");
@@ -433,30 +455,66 @@ onMounted(() => {
                                 @click="goToChat(chatHead.user.id)"
                                 :key="chatHead.latestMessage?.id"
                                 :class="[
-                                    'flex cursor-pointer gap-2 p-4',
+                                    'flex cursor-pointer gap-3 p-3 hover:bg-gray-50 transition-colors',
                                     {
-                                        'bg-slate-300':
+                                        'bg-blue-50 border-l-4 border-blue-500':
                                             chatHead.user.id ===
                                             Number(route().params.user),
                                     },
                                 ]"
                             >
-                                <div class="h-12 w-12">
+                                <!-- Avatar with fixed size -->
+                                <div class="flex-shrink-0 h-12 w-12">
                                     <img
                                         :src="
                                             chatHead.user.profile_img ??
                                             '/assets/profile_placeholder.jpg'
                                         "
-                                        alt=""
-                                        class="h-full w-full rounded-full"
+                                        alt="User avatar"
+                                        class="h-full w-full rounded-full object-cover"
                                     />
                                 </div>
-                                <div>
-                                    <p>{{ chatHead.user.email }}</p>
-                                    <p class="text-sm">
+
+                                <!-- Content area that can grow and shrink properly -->
+                                <div class="flex-1 min-w-0">
+                                    <!-- Email with truncation -->
+                                    <p class="font-medium text-gray-900 truncate">
+                                        {{ chatHead.user.email }}
+                                    </p>
+
+                                    <!-- Message preview with proper text handling -->
+                                    <p class="text-sm text-gray-600 mt-1 line-clamp-2">
                                         {{ chatHead.latestMessage?.message }}
                                     </p>
+
+                                    <!-- Optional: Timestamp if available -->
+                                    <p
+                                        v-if="chatHead.latestMessage?.created_at"
+                                        class="text-xs text-gray-400 mt-1"
+                                    >
+                                        {{ formatTime(chatHead.latestMessage.created_at) }}
+                                    </p>
                                 </div>
+
+                                <!-- Optional: Unread message indicator -->
+                                <div
+                                    v-if="chatHead.unread_count > 0"
+                                    class="flex-shrink-0 flex items-center justify-center"
+                                >
+                                    <span class="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                        {{ chatHead.unread_count > 9 ? '9+' : chatHead.unread_count }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Empty state -->
+                            <div
+                                v-if="chatHeads.length === 0"
+                                class="flex flex-col items-center justify-center h-full text-gray-500"
+                            >
+                                <i class="bi bi-chat-dots text-4xl mb-2"></i>
+                                <p class="text-lg">No messages yet</p>
+                                <p class="text-sm">Start a conversation with someone!</p>
                             </div>
                         </div>
                     </div>
@@ -1576,4 +1634,10 @@ onMounted(() => {
 .card-form {
     animation: animation-down 0.2s ease-in;
 } */
+ .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 </style>

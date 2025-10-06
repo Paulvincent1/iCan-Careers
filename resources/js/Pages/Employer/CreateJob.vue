@@ -231,6 +231,12 @@ const submit = () => {
                                 ></i>
                                 <span>Waiting until next month's reset</span>
                             </li>
+                            <li class="flex items-center">
+                                <i
+                                    class="bi bi-pencil mr-2 text-blue-500"
+                                ></i>
+                                <span>Edit Your Ongoing Jobs</span>
+                            </li>
                         </ul>
                     </div>
 
