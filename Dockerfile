@@ -21,7 +21,7 @@ RUN php artisan config:clear && \
     php artisan route:clear && \
     php artisan view:clear
 
-    # Stage 2 - Frontend (Vite)
+# Stage 2 - Frontend (Vite)
 FROM node:18 AS frontend
 
 WORKDIR /app
@@ -37,12 +37,18 @@ RUN npm run build
 
 # Stage 3 - Final
 FROM php:8.2-fpm
+
 WORKDIR /var/www
 
 # Copy Laravel backend
 COPY --from=backend /var/www .
 
-# Copy built frontend assets
+# Copy built frontend
 COPY --from=frontend /app/public/build ./public/build
 
-CMD ["php-fpm"]
+# Expose Render's port
+ENV PORT=10000
+EXPOSE $PORT
+
+# Start Laravel built-in server
+CMD php artisan serve --host=0.0.0.0 --port=$PORT
