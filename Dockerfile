@@ -1,36 +1,21 @@
-# Stage 1 - Build Frontend (Vite)
-FROM node:18 AS frontend
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-# Stage 2 - Backend (Laravel + PHP + Composer)
+# Stage 1 - Backend (Composer first)
 FROM php:8.2-fpm AS backend
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git curl unzip libpq-dev libonig-dev libzip-dev zip \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip
-
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-WORKDIR /var/www
-
-# Copy app files
+WORKDIR /var/www/html
 COPY . .
-
-# Copy built frontend from Stage 1
-COPY --from=frontend /app/public/dist ./public/dist
-
-# Install PHP dependencies
+RUN apt-get update && apt-get install -y git unzip libpq-dev libonig-dev libzip-dev zip \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader
 
-# Laravel setup
-RUN php artisan config:clear && \
-    php artisan route:clear && \
-    php artisan view:clear
+# Stage 2 - Frontend (depends on vendor)
+FROM node:18 AS frontend
+WORKDIR /app
+COPY --from=backend /var/www/html ./
+RUN npm install
+RUN npm run build
 
-CMD ["php-fpm"]
+# Stage 3 - Final
+FROM php:8.2-fpm
+WORKDIR /var/www/html
+COPY --from=backend /var/www/html .
+COPY --from=frontend /app/public/dist ./public/dist
