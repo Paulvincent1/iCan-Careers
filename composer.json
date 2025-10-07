@@ -8,6 +8,12 @@
         "framework"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Paulvincent1/xendit-php"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "inertiajs/inertia-laravel": "^2.0",
@@ -19,7 +25,7 @@
         "spatie/laravel-pdf": "^1.5",
         "stevebauman/location": "^7.6",
         "tightenco/ziggy": "^2.4",
-        "xendit/xendit-php": "^6.1"
+        "xendit/xendit-php": "dev-master"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
