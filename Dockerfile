@@ -28,7 +28,9 @@ FROM php:8.2-fpm
 
 WORKDIR /var/www
 
-RUN apt-get update && apt-get install -y supervisor
+# Install system dependencies + PHP extensions
+RUN apt-get update && apt-get install -y supervisor git unzip libzip-dev zip libonig-dev libpq-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip
 
 # Copy backend and frontend build
 COPY --from=backend /var/www .
@@ -43,3 +45,4 @@ EXPOSE $PORT
 
 # Run migrations then start Supervisor
 CMD php artisan migrate --force && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+
