@@ -48,12 +48,16 @@ let selectedContract = ref("");
 let inputResumeError = ref("");
 let reasonSelected = ref("");
 let descriptions = ref([]);
+let coverPhotoError = ref("");
+let profilePhotoError = ref("");
+let uploadSuccess = ref("");
 
 // Profile Data
 let workerSkills = ref(props.workerSkillsProp);
 let workerProfile = ref(props.workerProfileProp);
 let profilePreview = ref(props.userProp.profile_img);
 let highestEducation = ref(workerProfile.value.highest_educational_attainment);
+let coverPhotoPreview = ref(props.userProp.cover_photo);
 
 // Basic Information - Use props directly for display
 let websiteLink = ref(props.workerBasicInfoProp?.website_link ?? "N/A");
@@ -95,6 +99,49 @@ const ageValidation = computed(() => {
 
     return { valid: true, message: `Age: ${calculatedAge} years old` };
 });
+// Image Validation Functions
+function validateImageFile(file, maxSizeMB = 5) {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const maxSize = maxSizeMB * 1024 * 1024; // Convert to bytes
+
+    // Check file type
+    if (!allowedTypes.includes(file.type)) {
+        return {
+            valid: false,
+            message: 'Please select a valid image file (JPEG, JPG, PNG, or WEBP). GIF and video files are not allowed.'
+        };
+    }
+
+    // Check file size
+    if (file.size > maxSize) {
+        return {
+            valid: false,
+            message: `Image must be less than ${maxSizeMB}MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`
+        };
+    }
+
+    // Additional check for GIF by reading first few bytes
+    if (file.type === 'image/gif' || file.name.toLowerCase().endsWith('.gif')) {
+        return {
+            valid: false,
+            message: 'GIF images are not allowed. Please use JPEG, JPG, PNG, or WEBP format.'
+        };
+    }
+
+    return { valid: true, message: '' };
+}
+
+function showUploadSuccess(message) {
+    uploadSuccess.value = message;
+    setTimeout(() => {
+        uploadSuccess.value = "";
+    }, 3000);
+}
+
+function clearErrors() {
+    coverPhotoError.value = "";
+    profilePhotoError.value = "";
+}
 
 // Watch Effects
 watchEffect(() => {
@@ -119,6 +166,44 @@ onMounted(() => {
         showSuccessMessage();
     }
 });
+
+// Add the cover photo upload function
+function uploadCoverPhoto(e) {
+    clearErrors();
+
+    if (!e.target.files[0]) return;
+
+    const file = e.target.files[0];
+
+    // Validate image file
+    const validation = validateImageFile(file, 5);
+    if (!validation.valid) {
+        coverPhotoError.value = validation.message;
+        e.target.value = ''; // Clear the file input
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('cover_photo', file);
+    formData.append('_method', 'put');
+
+    router.post(
+        "/jobseekers/myprofile/updateprofile",
+        formData,
+        {
+            onSuccess: () => {
+                showUploadSuccess('Cover photo updated successfully!');
+                coverPhotoPreview.value = URL.createObjectURL(file);
+                coverPhotoError.value = "";
+            },
+            onError: (errors) => {
+                coverPhotoError.value = errors.cover_photo || 'Failed to upload cover photo. Please try again.';
+            },
+            preserveScroll: true,
+        },
+    );
+}
+
 
 // Utility Functions
 function showSuccessMessage() {
@@ -188,14 +273,42 @@ function updateDescription() {
 }
 
 function uploadProfileImage(e) {
-    profilePreview.value = URL.createObjectURL(e.target.files[0]);
+    clearErrors();
+
+    if (!e.target.files[0]) return;
+
+    const file = e.target.files[0];
+
+    // Validate image file
+    const validation = validateImageFile(file, 2); // 2MB max for profile photos
+    if (!validation.valid) {
+        profilePhotoError.value = validation.message;
+        e.target.value = ''; // Clear the file input
+        return;
+    }
+
+    // Create preview
+    profilePreview.value = URL.createObjectURL(file);
+
+    const formData = new FormData();
+    formData.append('_method', 'put');
+    formData.append('profile_img', file);
+
     router.post(
         "/jobseekers/myprofile/updateprofile",
+        formData,
         {
-            _method: "put",
-            profile_img: e.target.files[0],
+            onSuccess: () => {
+                showUploadSuccess('Profile photo updated successfully!');
+                profilePhotoError.value = "";
+            },
+            onError: (errors) => {
+                profilePhotoError.value = errors.profile_img || 'Failed to upload profile photo. Please try again.';
+                // Revert preview on error
+                profilePreview.value = props.userProp.profile_img;
+            },
+            preserveScroll: true,
         },
-        { onSuccess: showSuccessMessage, preserveScroll: true },
     );
 }
 
@@ -445,46 +558,93 @@ function formatUrlDisplay(url) {
 <template>
     <Head title="Profile | iCan Careers" />
     <div class="min-h-[calc(100vh-4.625rem)] bg-[#f3f7fa]">
-        <!-- Header Section -->
-        <div class="relative h-32 bg-[#FAFAFA]">
-            <div class="absolute right-9 top-4">
-                <button
-                    v-if="visitor"
-                    @click="isShowReportModal = true"
-                    class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-gray-50"
-                >
-                    <i class="bi bi-exclamation-diamond-fill"></i>
-                    <span>Report</span>
-                </button>
-            </div>
-            <label
-                for="profileimg"
-                :class="[
-                    'absolute left-[50%] top-[40px] flex h-36 w-36 translate-x-[-50%] cursor-pointer flex-col items-center',
-                    { 'pointer-events-none': visitor },
-                ]"
-            >
-                <div class="relative mb-3 h-full w-full">
+        <!-- Updated Header Section with Cover Photo -->
+        <div class="relative">
+            <!-- Cover Photo Section -->
+            <div class="relative h-48 bg-gray-200">
+
+                <!-- Cover Photo Display -->
+                <div v-if="coverPhotoPreview" class="h-full w-full">
                     <img
-                        draggable="false"
-                        :src="profilePreview || '/assets/profile_placeholder.jpg'"
-                        alt="Profile"
-                        class="h-full w-full rounded-full border object-cover"
+                        :src="coverPhotoPreview"
+                        alt="Cover Photo"
+                        class="h-full w-full object-cover"
                     />
-                    <div
-                        v-if="!visitor"
-                        class="absolute bottom-1 right-1 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 shadow-md"
-                    >
-                        <i class="bi bi-camera text-lg text-gray-600"></i>
-                    </div>
                 </div>
-                <input @change="uploadProfileImage" id="profileimg" type="file" class="hidden" />
-            </label>
+                <div v-else class="flex h-full w-full items-center justify-center bg-gradient-to-r from-gray-300 to-gray-400">
+                    <span class="text-gray-500">No cover photo</span>
+                </div>
+
+                <!-- Cover Photo Upload Button (only for owner) -->
+                <label
+                    v-if="!visitor"
+                    for="coverPhoto"
+                    class="absolute right-4 bottom-4 flex cursor-pointer items-center gap-2 rounded-md bg-white/80 px-3 py-2 text-sm font-medium text-gray-700 backdrop-blur-sm transition-all hover:bg-white hover:shadow-md"
+                >
+                    <i class="bi bi-camera"></i>
+                    <span>{{ coverPhotoPreview ? 'Change Cover' : 'Add Cover' }}</span>
+                </label>
+                <input
+                    @change="uploadCoverPhoto"
+                    id="coverPhoto"
+                    type="file"
+                    class="hidden"
+                    accept=".jpg,.jpeg,.png,.webp"
+                />
+
+                <!-- Report Button (for visitors) -->
+                <div v-if="visitor" class="absolute right-4 top-4">
+                    <button
+                        @click="isShowReportModal = true"
+                        class="flex items-center gap-1 rounded-md bg-white/80 px-3 py-2 text-sm font-medium text-red-600 backdrop-blur-sm transition-all hover:bg-white hover:shadow-md"
+                    >
+                        <i class="bi bi-exclamation-diamond-fill"></i>
+                        <span>Report</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Image Section - Positioned over cover photo -->
+            <div class="relative">
+                <div class="absolute -bottom-16 left-1/2 -translate-x-1/2 transform">
+                    <label
+                        for="profileimg"
+                        :class="[
+                            'flex h-32 w-32 cursor-pointer flex-col items-center',
+                            { 'pointer-events-none': visitor },
+                        ]"
+                    >
+                        <div class="relative mb-3 h-full w-full">
+                            <img
+                                draggable="false"
+                                :src="profilePreview || '/assets/profile_placeholder.jpg'"
+                                alt="Profile"
+                                class="h-full w-full rounded-full border-4 border-white object-cover shadow-lg"
+                            />
+                            <div
+                                v-if="!visitor"
+                                class="absolute bottom-1 right-1 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 shadow-md"
+                            >
+                                <i class="bi bi-camera text-lg text-gray-600"></i>
+                            </div>
+                        </div>
+                        <input
+                            @change="uploadProfileImage"
+                            id="profileimg"
+                            type="file"
+                            class="hidden"
+                            accept=".jpg,.jpeg,.png,.webp"
+                        />
+                    </label>
+                </div>
+            </div>
         </div>
 
+
+
         <!-- Profile Info Section -->
-        <div class="bg-white pb-2">
-            <div class="xs container mx-auto flex flex-col items-center justify-center pt-16 xl:max-w-7xl">
+        <div class="bg-white pb-2 pt-16">
+            <div class="xs container mx-auto flex flex-col items-center justify-center xl:max-w-7xl">
                 <div class="mb-2 flex items-end gap-3">
                     <p class="text-lg">{{ userProp.name }}</p>
                     <Link
@@ -495,7 +655,7 @@ function formatUrlDisplay(url) {
                     ></Link>
                 </div>
 
-                <!-- Job Title -->
+                <!-- Job Title and other existing profile info -->
                 <div class="mb-3">
                     <div v-if="!isEditJobTitleActive" class="flex items-center gap-2">
                         <p
@@ -779,155 +939,6 @@ function formatUrlDisplay(url) {
 
                 <!-- Right Column -->
                 <div>
-    <!-- Basic Information -->
-    <div class="mb-5 self-start rounded-lg bg-white p-8 text-gray-600 shadow">
-        <div class="mb-3 flex justify-between items-center">
-            <p class="text-[20px] font-bold">Basic Information</p>
-            <button
-                v-if="!visitor && !isEditBasicInfoActive"
-                @click="isEditBasicInfoActive = true"
-                class="flex items-center gap-1 text-orange-500 hover:text-orange-600"
-            >
-                <i class="bi bi-pencil-square"></i>
-                <span>Edit</span>
-            </button>
-        </div>
-
-        <!-- Display Mode -->
-        <div v-if="!isEditBasicInfoActive" class="space-y-3">
-            <div>
-                <label class="text-sm font-medium text-gray-700">Age</label>
-                <p>{{ age }} (Born in {{ workerProfile.birth_year || "N/A" }})</p>
-            </div>
-            <div>
-                <label class="text-sm font-medium text-gray-700">Gender</label>
-                <p>{{ workerProfile.gender || "N/A" }}</p>
-            </div>
-            <div>
-                <label class="text-sm font-medium text-gray-700">Address</label>
-                <p class="break-words whitespace-normal min-w-0">
-                    {{ address || "N/A" }}
-                </p>
-            </div>
-            <div>
-                <label class="text-sm font-medium text-gray-700">Website / Account</label>
-                <div class="min-w-0">
-                    <a
-                        v-if="websiteLink && isValidUrl(websiteLink)"
-                        :href="formatUrl(websiteLink)"
-                        target="_blank"
-                        class="text-blue-600 hover:text-blue-800 hover:underline break-all whitespace-normal"
-                    >
-                        {{ formatUrlDisplay(websiteLink) }}
-                    </a>
-                    <p v-else-if="websiteLink" class="break-words whitespace-normal">
-                        {{ websiteLink }}
-                    </p>
-                    <p v-else class="text-gray-500">N/A</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Edit Mode -->
-        <form v-else @submit.prevent="updateBasicInfo()" class="space-y-4">
-            <div>
-                <label class="text-sm font-medium text-gray-700">Birth Year</label>
-                <input
-                    v-model.number="basicInfoForm.birthYear"
-                    type="number"
-                    :min="1900"
-                    :max="2007"
-                    placeholder="1900-2007"
-                    class="w-full rounded border px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400"
-                    :class="{ 'border-red-500': !ageValidation.valid && basicInfoForm.birthYear }"
-                    required
-                />
-                <p class="mt-1 text-xs" :class="ageValidation.valid ? 'text-green-600' : 'text-red-600'">
-                    {{ ageValidation.message }}
-                </p>
-            </div>
-
-            <div>
-                <label class="text-sm font-medium text-gray-700">Gender</label>
-                <GenderSelect
-                    v-model="basicInfoForm.gender"
-                    class="w-full rounded border px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400"
-                />
-            </div>
-
-            <div>
-                <label class="text-sm font-medium text-gray-700">Address</label>
-                <textarea
-                    v-model="basicInfoForm.address"
-                    rows="2"
-                    class="w-full rounded border px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400 resize-none"
-                    placeholder="Enter your address"
-                ></textarea>
-            </div>
-
-            <div>
-                <label class="text-sm font-medium text-gray-700">Website / Account</label>
-                <input
-                    v-model="basicInfoForm.websiteLink"
-                    type="text"
-                    class="w-full rounded border px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400"
-                    placeholder="Enter website or social media link"
-                />
-                <p class="mt-1 text-xs text-gray-500">
-                    Example: https://linkedin.com/in/yourprofile or your social media handle
-                </p>
-            </div>
-
-            <div class="flex gap-2 pt-2">
-                <button
-                    type="submit"
-                    :disabled="!ageValidation.valid"
-                    class="rounded bg-orange-500 px-4 py-2 text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-300"
-                >
-                    Save
-                </button>
-                <button
-                    type="button"
-                    @click="cancelEditBasicInfo"
-                    class="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
-                >
-                    Cancel
-                </button>
-            </div>
-        </form>
-
-        <!-- Resume Field (Separate) -->
-        <div class="mt-6 pt-6 border-t">
-            <label class="text-sm font-medium text-gray-700">Resume</label>
-            <div class="flex items-center gap-2 mt-1">
-                <label for="resume" :class="['cursor-pointer', { 'pointer-events-none': adminVisit || visitor }]">
-                    <div class="flex items-center gap-2 min-w-0">
-                        <p class="hover:underline break-all" v-if="!workerProfile.resume">N/A</p>
-                        <div v-else class="flex items-center gap-2 min-w-0">
-                            <p class="hover:underline break-all">{{ workerProfile.resume }}</p>
-                            <a
-                                target="_blank"
-                                :href="'/' + workerProfile.resume_path"
-                                class="pointer-events-auto flex-shrink-0 rounded bg-orange-500 px-2 py-1 text-white"
-                            >
-                                <i class="bi bi-box-arrow-up-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </label>
-                <i
-                    v-if="!adminVisit && !visitor"
-                    class="bi bi-pencil-square cursor-pointer text-sm text-gray-500 flex-shrink-0"
-                    @click="$refs.resumeInput?.click()"
-                ></i>
-            </div>
-            <input ref="resumeInput" @change="updateResume" type="file" id="resume" class="hidden" />
-            <InputFlashMessage class="mt-3 text-sm" :message="inputResumeError" type="error" />
-        </div>
-    </div>
-
-    <ProfilePage :recentReview="recentReview" :visitor="visitor" :averageStar="averageStar" />
-</div><div>
     <!-- Basic Information -->
     <div class="mb-5 self-start rounded-lg bg-white p-8 text-gray-600 shadow">
         <div class="mb-3 flex justify-between items-center">

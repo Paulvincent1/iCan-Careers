@@ -922,7 +922,7 @@ function shouldShowDateSeparator(message, index) {
                                 />
                                 <button
                                     type="submit"
-                                    class="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center gap-2 font-medium shadow-sm hover:shadow-md"
+                                    class="px-6 py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl transition-colors flex items-center gap-2 font-medium shadow-sm hover:shadow-md"
                                     aria-label="Send message"
                                 >
                                     <span class="hidden sm:inline">Send</span>

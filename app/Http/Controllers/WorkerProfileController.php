@@ -220,10 +220,24 @@ class WorkerProfileController extends Controller
             $workerBasicInfo->save();
         }
 
+        // Profile Image Validation - Updated
         if ($request->hasFile('profile_img')) {
             $request->validate([
-                'profile_img' => 'required|image'
+                'profile_img' => [
+                    'required',
+                    'image',
+                    'mimes:jpeg,jpg,png,webp', // Explicitly allow only these formats
+                    'max:2048', // 2MB max for profile photos
+                ]
             ]);
+
+            // Additional validation to block GIFs
+            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            if (!in_array($request->file('profile_img')->getMimeType(), $allowedMimes)) {
+                return back()->withErrors([
+                    'profile_img' => 'Profile photo must be a JPEG, JPG, PNG, or WEBP image. GIF and video files are not allowed.',
+                ])->withInput();
+            }
 
             if ($user->profile_img) {
                 $relativePath = str_replace('/storage/', '', $user->profile_img);
@@ -239,9 +253,10 @@ class WorkerProfileController extends Controller
             ]);
         }
 
+        // Resume Validation
         if ($request->hasFile('resume')) {
             $request->validate([
-                'resume' => 'nullable|file|extensions:pdf,docx,doc',
+                'resume' => 'nullable|file|mimes:pdf,doc,docx|max:5120', // 5MB max
             ]);
 
             $existingResumePath = $user->workerProfile->resume_path;
@@ -257,6 +272,40 @@ class WorkerProfileController extends Controller
             $user->workerProfile->update([
                 'resume' => $request->resume?->getClientOriginalName() ?? null,
                 'resume_path' => $resumePath,
+            ]);
+        }
+
+        // Cover Photo Validation - Updated
+        if ($request->hasFile('cover_photo')) {
+            $request->validate([
+                'cover_photo' => [
+                    'required',
+                    'image',
+                    'mimes:jpeg,jpg,png,webp', // Explicitly allow only these formats
+                    'max:5120', // 5MB max for cover photos
+                ]
+            ]);
+
+            // Additional validation to block GIFs
+            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            if (!in_array($request->file('cover_photo')->getMimeType(), $allowedMimes)) {
+                return back()->withErrors([
+                    'cover_photo' => 'Cover photo must be a JPEG, JPG, PNG, or WEBP image. GIF and video files are not allowed.',
+                ])->withInput();
+            }
+
+            // Delete old cover photo if exists
+            if ($user->cover_photo) {
+                $relativePath = str_replace('/storage/', '', $user->cover_photo);
+                if (Storage::disk('public')->exists($relativePath)) {
+                    Storage::disk('public')->delete($relativePath);
+                }
+            }
+
+            $coverPath = Storage::disk('public')->put('images/cover_photos', $request->cover_photo);
+
+            $user->update([
+                'cover_photo' => '/storage/' . $coverPath
             ]);
         }
 

@@ -948,52 +948,37 @@ onMounted(() => {
                                             class="text-center"
                                         >
                                             <td class="py-2 text-center">
-                                                <Link
-                                                    :href="
-                                                        route(
-                                                            'businessinfo.show',
-                                                            {
-                                                                id: job.employer
-                                                                    ?.employer_profile
-                                                                    ?.business_information,
-                                                            },
-                                                        )
-                                                    "
-                                                    ><ProfileBusinessCard
-                                                        v-if="
-                                                            job.employer
-                                                                ?.employer_profile
-                                                                ?.business_information
-                                                        "
-                                                        :business-id="
-                                                            job.employer
-                                                                .employer_profile
-                                                                .business_information
-                                                                .id
+                                                <template v-if="job.employer?.employer_profile?.business_information?.id">
+                                                    <Link
+                                                        :href="
+                                                            route(
+                                                                'businessinfo.show',
+                                                                {
+                                                                    id: job.employer.employer_profile.business_information.id,
+                                                                },
+                                                            )
                                                         "
                                                     >
-                                                        <img
-                                                            class="mx-auto w-12 object-cover"
-                                                            :src="
-                                                                job.employer
-                                                                    .employer_profile
-                                                                    .business_information
-                                                                    .business_logo ??
-                                                                '/assets/logo-placeholder-image.png'
-                                                            "
-                                                            alt="Business Logo"
-                                                        />
-                                                    </ProfileBusinessCard>
-
-                                                    <!-- Fallback if no business info -->
-                                                    <div v-else>
+                                                        <ProfileBusinessCard
+                                                            :business-id="job.employer.employer_profile.business_information.id"
+                                                        >
+                                                            <img
+                                                                class="mx-auto w-12 object-cover"
+                                                                :src="job.employer.employer_profile.business_information.business_logo ?? '/assets/logo-placeholder-image.png'"
+                                                                alt="Business Logo"
+                                                            />
+                                                        </ProfileBusinessCard>
+                                                    </Link>
+                                                </template>
+                                                <template v-else>
+                                                    <div>
                                                         <img
                                                             class="mx-auto w-12 object-cover"
                                                             src="/assets/logo-placeholder-image.png"
                                                             alt="No Business"
                                                         />
                                                     </div>
-                                                </Link>
+                                                </template>
                                             </td>
 
                                             <td class="py-2 text-center">
@@ -1006,7 +991,8 @@ onMounted(() => {
                                                         )
                                                     "
                                                     class=""
-                                                    ><ProfileJobHover
+                                                >
+                                                    <ProfileJobHover
                                                         :job-id="job.id"
                                                         :business-id="
                                                             job.employer
@@ -1034,9 +1020,7 @@ onMounted(() => {
                                                     as="button"
                                                     class="rounded px-2 py-1 text-lg text-[#171816]"
                                                 >
-                                                    <i
-                                                        class="bi bi-arrow-right"
-                                                    ></i>
+                                                    <i class="bi bi-arrow-right"></i>
                                                 </Link>
                                             </td>
                                         </tr>
@@ -1110,52 +1094,37 @@ onMounted(() => {
                                             class="text-center"
                                         >
                                             <td class="py-2 text-center">
-                                                <Link
-                                                    :href="
-                                                        route(
-                                                            'businessinfo.show',
-                                                            {
-                                                                id: job.employer
-                                                                    ?.employer_profile
-                                                                    ?.business_information,
-                                                            },
-                                                        )
-                                                    "
-                                                    ><ProfileBusinessCard
-                                                        v-if="
-                                                            job.employer
-                                                                ?.employer_profile
-                                                                ?.business_information
-                                                        "
-                                                        :business-id="
-                                                            job.employer
-                                                                .employer_profile
-                                                                .business_information
-                                                                .id
+                                                <template v-if="job.employer?.employer_profile?.business_information?.id">
+                                                    <Link
+                                                        :href="
+                                                            route(
+                                                                'businessinfo.show',
+                                                                {
+                                                                    id: job.employer.employer_profile.business_information.id,
+                                                                },
+                                                            )
                                                         "
                                                     >
-                                                        <img
-                                                            class="mx-auto w-12 object-cover"
-                                                            :src="
-                                                                job.employer
-                                                                    .employer_profile
-                                                                    .business_information
-                                                                    .business_logo ??
-                                                                '/assets/logo-placeholder-image.png'
-                                                            "
-                                                            alt="Business Logo"
-                                                        />
-                                                    </ProfileBusinessCard>
-
-                                                    <!-- Fallback if no business info -->
-                                                    <div v-else>
+                                                        <ProfileBusinessCard
+                                                            :business-id="job.employer.employer_profile.business_information.id"
+                                                        >
+                                                            <img
+                                                                class="mx-auto w-12 object-cover"
+                                                                :src="job.employer.employer_profile.business_information.business_logo ?? '/assets/logo-placeholder-image.png'"
+                                                                alt="Business Logo"
+                                                            />
+                                                        </ProfileBusinessCard>
+                                                    </Link>
+                                                </template>
+                                                <template v-else>
+                                                    <div>
                                                         <img
                                                             class="mx-auto w-12 object-cover"
                                                             src="/assets/logo-placeholder-image.png"
                                                             alt="No Business"
                                                         />
                                                     </div>
-                                                </Link>
+                                                </template>
                                             </td>
 
                                             <td class="py-2 text-center">
@@ -1168,7 +1137,8 @@ onMounted(() => {
                                                         )
                                                     "
                                                     class=""
-                                                    ><ProfileJobHover
+                                                >
+                                                    <ProfileJobHover
                                                         :job-id="job.id"
                                                         :business-id="
                                                             job.employer
@@ -1227,9 +1197,7 @@ onMounted(() => {
                                                     as="button"
                                                     class="rounded px-2 py-1 text-lg text-[#171816]"
                                                 >
-                                                    <i
-                                                        class="bi bi-arrow-right"
-                                                    ></i>
+                                                    <i class="bi bi-arrow-right"></i>
                                                 </Link>
                                             </td>
                                         </tr>

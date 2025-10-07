@@ -5,9 +5,7 @@ import Quotes from "../Components/Quotes.vue";
 import AuthForm from "../Components/AuthForm.vue";
 import { onMounted, ref, useTemplateRef } from "vue";
 import InputFlashMessage from "../Components/InputFlashMessage.vue";
-import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import InputCodeModal from "../Components/Modal/InputCodeModal.vue";
-
 
 let form = useForm({
     name: null,
@@ -19,28 +17,31 @@ let form = useForm({
 });
 
 const sendCode = () => {
-    if (!validateInput()) return; // stop if validation fails
+    if (!validateInput()) return;
 
     router.post(
-    route("register.send.code"),
-    {
-        name: form.name,
-        role: form.role,
-        email: form.email,
-    },
-    {
-        preserveState: true,
-        onError: (errors) => {
-            console.error(errors);
+        route("register.send.code"),
+        {
+            name: form.name,
+            role: form.role,
+            email: form.email,
         },
-        onSuccess: () => {
-            openModal();
+        {
+            preserveState: true,
+            onError: (errors) => {
+                console.error(errors);
+            },
+            onSuccess: () => {
+                openModal();
+            },
         },
-    },
-);
-
+    );
 };
+
 const submit = () => {
+    // Get the code from the modal and add it to the form
+    form.verification_code = codeFromModal.value;
+
     form.post(route("register.post"), {
         onError: (errors) => {
             closeModal();
@@ -51,8 +52,32 @@ const submit = () => {
     });
 };
 
+const resendCode = () => {
+    router.post(
+        route("register.send.code"),
+        {
+            name: form.name,
+            role: form.role,
+            email: form.email,
+        },
+        {
+            preserveState: true,
+            onError: (errors) => {
+                console.error(errors);
+            },
+            onSuccess: () => {
+                // Success message can be shown here if needed
+                console.log('Code resent successfully');
+            },
+        },
+    );
+};
+
 let userRole = ref("Worker");
 let select = useTemplateRef("select");
+let openSendCodeModal = ref(false);
+let codeFromModal = ref('');
+
 function selectRole() {
     if (select.value.value === "Worker") {
         userRole.value = "Worker";
@@ -63,14 +88,8 @@ function selectRole() {
         userRole.value = "Employer";
         form.role = "Employer";
     }
-    console.log(form.role);
 }
 
-onMounted(() => {
-    selectRole();
-});
-
-let openSendCodeModal = ref(false);
 function openModal() {
     openSendCodeModal.value = true;
 }
@@ -89,13 +108,12 @@ let errors = ref({
 
 const validateInput = () => {
     let isValid = true;
+    errors.value = { name: null, email: null, password: null, password_confirmation: null, role: null };
 
     // Name validation
     if (!form.name) {
         errors.value.name = "Name is required";
         isValid = false;
-    } else {
-        errors.value.name = null;
     }
 
     // Email validation
@@ -106,8 +124,6 @@ const validateInput = () => {
     } else if (!emailRegex.test(form.email)) {
         errors.value.email = "Email is invalid";
         isValid = false;
-    } else {
-        errors.value.email = null;
     }
 
     // Password validation
@@ -117,47 +133,44 @@ const validateInput = () => {
     } else if (form.password.length < 6) {
         errors.value.password = "Password must be at least 6 characters";
         isValid = false;
-    } else {
-        errors.value.password = null;
     }
 
     // Password confirmation
     if (form.password !== form.password_confirmation) {
         errors.value.password_confirmation = "Passwords do not match";
         isValid = false;
-    } else {
-        errors.value.password_confirmation = null;
     }
 
     // Role validation
     if (!form.role) {
         errors.value.role = "Role is required";
         isValid = false;
-    } else {
-        errors.value.role = null;
     }
 
     return isValid;
 };
+
+onMounted(() => {
+    selectRole();
+});
 </script>
 
 <template>
     <Head title="Register | iCan Careers" />
-    <div
-        class="container mx-auto grid justify-items-center px-[0.5rem] md:max-w-7xl"
-    >
+    <div class="container mx-auto grid justify-items-center px-[0.5rem] md:max-w-7xl">
         <AuthForm>
             <div class="mb-8">
                 <h1 class="mb-2 text-3xl font-semibold">Sign up</h1>
-
                 <p class="mb-[80px]">
                     <Quotes />
                 </p>
             </div>
+
             <InputFlashMessage
                 :message="$page.props.errors.message ?? errors.role"
                 type="error"
             />
+
             <AuthInput
                 name="NAME"
                 :message="form.errors.name ?? errors.name"
@@ -181,14 +194,12 @@ const validateInput = () => {
             />
             <AuthInput
                 name="CONFIRM PASSWORD"
-                :message="
-                    form.errors.password_confirmation ??
-                    errors.password_confirmation
-                "
+                :message="form.errors.password_confirmation ?? errors.password_confirmation"
                 type="password"
                 v-model="form.password_confirmation"
                 class="mb-3"
             />
+
             <div class="mb-3 flex flex-col text-sm">
                 <div class="flex">
                     <p>I'm a</p>
@@ -229,7 +240,6 @@ const validateInput = () => {
                 @click="sendCode"
             >
                 Register
-
             </button>
 
             <a
@@ -253,29 +263,12 @@ const validateInput = () => {
             <Link :href="route('login')" class="text-center">Log in</Link>
         </AuthForm>
     </div>
-    <InputCodeModal @closeModal="closeModal" v-if="openSendCodeModal">
-        <div class="w-[350px] overflow-auto rounded bg-white p-4 text-[#171816]">
-            <p class="text-2xl">Enter the code</p>
-            <p class="text-gray-400">We’ve sent the code to your email.</p>
 
-            <input
-                class="mb-3 w-full bg-gray-200 p-3 outline-none"
-                type="text"
-                id="code"
-                name="code"
-                v-model="form.verification_code"
-                placeholder="Enter code here"
-            />
-            <div>
-                <button
-                    @click="submit"
-                    type="button"
-                    class="w-full rounded bg-orange-400 p-3 text-white"
-                >
-                    submit
-                </button>
-            </div>
-        </div>
-    </InputCodeModal>
-
+    <InputCodeModal
+        @closeModal="closeModal"
+        @submit="submit"
+        @resendCode="resendCode"
+        @update:code="(code) => codeFromModal = code"
+        v-if="openSendCodeModal"
+    />
 </template>

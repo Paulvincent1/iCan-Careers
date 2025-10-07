@@ -23,9 +23,10 @@ class EmployerProfileController extends Controller
         //
     }
 
-    public function createProfile(){
+    public function createProfile()
+    {
         $user = Auth::user();
-        if($user->employerProfile){
+        if ($user->employerProfile) {
             return redirect()->route('employer.dashboard');
         }
 
@@ -36,7 +37,8 @@ class EmployerProfileController extends Controller
 
 
 
-    public function createCompanyInformation(){
+    public function createCompanyInformation()
+    {
         return inertia('EmployerAccountSetup/CompanyInformation');
     }
 
@@ -56,26 +58,27 @@ class EmployerProfileController extends Controller
 
         $employerProfile = $applicantId->employerProfile;
 
-        return inertia('Employer/Profile',['userProp' => $applicantId,
-         'employerProfileProp' => $employerProfile,
-         'messageProp' => session('message'),
-         'visitor' => true
+        return inertia('Employer/Profile', [
+            'userProp' => $applicantId,
+            'employerProfileProp' => $employerProfile,
+            'messageProp' => session('message'),
+            'visitor' => true
         ]);
     }
 
 
 
-     public function myProfile(Request $request)
+    public function myProfile(Request $request)
     {
-        if(!Gate::allows('employer-profile-check')) {
+        if (!Gate::allows('employer-profile-check')) {
             return redirect()->route('create.profile.employer');
         }
 
         $user = Auth::user();
         $employerProfile = $user->employerProfile;
         $jobsPosted = JobPost::with('employer.businessInformation')
-        ->where('employer_id', $user->id)
-        ->get();
+            ->where('employer_id', $user->id)
+            ->get();
 
         $business = $user->employerProfile?->businessInformation;
         $subscription = EmployerSubscription::where('employer_id', $user->id)->first();
@@ -85,42 +88,41 @@ class EmployerProfileController extends Controller
         $sumStars = 0;
         $reviewCount = $user->receivedReviews()->get()->count();
         $user->receivedReviews()->get()->pluck('star')
-        ->each(
-            function ($e) use(&$sumStars){
-                $sumStars+=$e;
-            }
-        );
+            ->each(
+                function ($e) use (&$sumStars) {
+                    $sumStars += $e;
+                }
+            );
 
-        if($sumStars){
+        if ($sumStars) {
             $average = $sumStars / $reviewCount;
 
-            $roundedAverageStar = round($average,2);
+            $roundedAverageStar = round($average, 2);
         }
 
 
         return inertia('Employer/Profile', [
-        "user" => $user,
-        'employerProfileProp' => $employerProfile,
-        'businessProps' => $business ?? null,
-        'messageProp' => session('message'),
-        'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
-        'subscriptionProps' => $subscription,
-        'recentReview' => $recentReview,
-        'averageStar' => $roundedAverageStar ?? 0.00
+            "user" => $user,
+            'employerProfileProp' => $employerProfile,
+            'businessProps' => $business ?? null,
+            'messageProp' => session('message'),
+            'jobsPostedProps' => $jobsPosted, // Pass multiple jobs
+            'subscriptionProps' => $subscription,
+            'recentReview' => $recentReview,
+            'averageStar' => $roundedAverageStar ?? 0.00
         ]);
     }
 
     public function showEmployerProfile(User $id)
     {
-        if(!$id->employerProfile){
+        if (!$id->employerProfile) {
             return redirect()->back();
         }
 
         $employerProfile = $id->employerProfile;
         $jobsPosted = JobPost::with('employer.businessInformation')
-    ->where('employer_id', $id->id)
-    ->get();
-;
+            ->where('employer_id', $id->id)
+            ->get();;
         $business = $id->employerProfile?->businessInformation;
         $subscription = EmployerSubscription::where('employer_id', $id->id)->first();
 
@@ -130,17 +132,17 @@ class EmployerProfileController extends Controller
         $sumStars = 0;
         $reviewCount = $id->receivedReviews()->get()->count();
         $id->receivedReviews()->get()->pluck('star')
-        ->each(
-            function ($e) use(&$sumStars){
-                $sumStars+=$e;
-            }
-        );
+            ->each(
+                function ($e) use (&$sumStars) {
+                    $sumStars += $e;
+                }
+            );
 
 
-        if($sumStars){
+        if ($sumStars) {
             $average = $sumStars / $reviewCount;
 
-            $roundedAverageStar = round($average,2);
+            $roundedAverageStar = round($average, 2);
         }
 
 
@@ -154,66 +156,107 @@ class EmployerProfileController extends Controller
             'visitor' => true,
             'recentReview' => $recentReview,
             'averageStar' => $roundedAverageStar ?? 0.00
-            ]);
-    }
-
-
-     public function updateProfile(Request $request)
-{
-    $user = Auth::user();
-    $employerProfile = $user->employerProfile; // Fetch the employer profile of the authenticated user
-
-    // Check if employerProfile exists
-    if (!$employerProfile) {
-        return redirect()->back()->with(['message' => 'Employer profile not found.']);
-    }
-
-    // Validate input fields
-    $request->validate([
-        'full_name' => 'nullable|string|min:1',
-        'birth_year' => 'nullable|integer',
-        'gender' => 'nullable|string|in:Male,Female,Other',
-        'phone_number' => 'nullable|string|',
-    ]);
-
-    // Debugging: Check received data
-    // dd($request->all());
-
-    // Update employer profile
-    $employerProfile->update([
-        'full_name' => $request->full_name ?? $employerProfile->full_name,
-        'birth_year' => $request->birth_year ?? $employerProfile->birth_year,
-        'gender' => $request->gender ?? $employerProfile->gender,
-        'phone_number' => $request->phone_number ?? $employerProfile->phone_number,
-    ]);
-
-    // Handle profile image upload
-    if ($request->hasFile('profile_img')) {
-        $request->validate([
-            'profile_img' => 'required|image'
         ]);
+    }
 
-        // Delete old image if exists
-        if ($user->profile_img) {
-            $relativePath = str_replace('/storage/', '', $user->profile_img);
-            if (Storage::disk('public')->exists($relativePath)) {
-                Storage::disk('public')->delete($relativePath);
-            }
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        $employerProfile = $user->employerProfile;
+
+        if (!$employerProfile) {
+            return redirect()->back()->with(['message' => 'Employer profile not found.', 'messageType' => 'error']);
         }
 
-        // Upload new image
-        $path = Storage::disk('public')->put('images', $request->file('profile_img'));
+        // Validate cover photo - REMOVED GIF FROM ALLOWED TYPES
+        if ($request->hasFile('cover_photo')) {
+            $request->validate([
+                'cover_photo' => 'required|image|mimes:jpeg,png,jpg,bmp,webp|max:2048' // Removed gif
+            ]);
 
-        $user->update([
-            'profile_img' => '/storage/'.$path
+            $coverPhoto = $request->file('cover_photo');
+
+            // Check if it's actually an image (additional validation)
+            if (!str_contains($coverPhoto->getMimeType(), 'image/')) {
+                return redirect()->back()->with(['message' => 'Invalid file type. Please upload an image file (JPEG, PNG, JPG, BMP, WEBP).', 'messageType' => 'error']);
+            }
+
+            // Additional check to block GIFs
+            if ($coverPhoto->getMimeType() === 'image/gif') {
+                return redirect()->back()->with(['message' => 'GIF files are not allowed. Please upload JPEG, PNG, JPG, BMP, or WEBP files.', 'messageType' => 'error']);
+            }
+
+            // Delete old cover photo if exists
+            if ($user->cover_photo) {
+                $relativePath = str_replace('/storage/', '', $user->cover_photo);
+                if (Storage::disk('public')->exists($relativePath)) {
+                    Storage::disk('public')->delete($relativePath);
+                }
+            }
+
+            $coverPath = Storage::disk('public')->put('images/cover_photos', $coverPhoto);
+            $user->update([
+                'cover_photo' => '/storage/' . $coverPath
+            ]);
+        }
+
+        // Validate input fields
+        $request->validate([
+            'full_name' => 'nullable|string|min:1',
+            'birth_year' => 'nullable|integer',
+            'gender' => 'nullable|string|in:Male,Female,Other',
+            'phone_number' => 'nullable|string',
         ]);
+
+        // Update employer profile
+        $employerProfile->update([
+            'full_name' => $request->full_name ?? $employerProfile->full_name,
+            'birth_year' => $request->birth_year ?? $employerProfile->birth_year,
+            'gender' => $request->gender ?? $employerProfile->gender,
+            'phone_number' => $request->phone_number ?? $employerProfile->phone_number,
+        ]);
+
+        // Handle profile image upload - REMOVED GIF FROM ALLOWED TYPES
+        if ($request->hasFile('profile_img')) {
+            $request->validate([
+                'profile_img' => 'required|image|mimes:jpeg,png,jpg,bmp,webp|max:2048' // Removed gif
+            ]);
+
+            $profileImg = $request->file('profile_img');
+
+            // Check if it's actually an image (additional validation)
+            if (!str_contains($profileImg->getMimeType(), 'image/')) {
+                return redirect()->back()->with(['message' => 'Invalid file type. Please upload an image file (JPEG, PNG, JPG, BMP, WEBP).', 'messageType' => 'error']);
+            }
+
+            // Additional check to block GIFs
+            if ($profileImg->getMimeType() === 'image/gif') {
+                return redirect()->back()->with(['message' => 'GIF files are not allowed. Please upload JPEG, PNG, JPG, BMP, or WEBP files.', 'messageType' => 'error']);
+            }
+
+            // Delete old image if exists
+            if ($user->profile_img) {
+                $relativePath = str_replace('/storage/', '', $user->profile_img);
+                if (Storage::disk('public')->exists($relativePath)) {
+                    Storage::disk('public')->delete($relativePath);
+                }
+            }
+
+            // Upload new image
+            $path = Storage::disk('public')->put('images', $profileImg);
+
+            $user->update([
+                'profile_img' => '/storage/' . $path
+            ]);
+        }
+
+        return redirect()->back()->with(['message' => 'Profile updated successfully!', 'messageType' => 'success']);
     }
 
-    return redirect()->back()->with(['message' => 'Successfully Updated!']);
-}
 
-
-    public function storeProfile(Request $request){
+    public function storeProfile(Request $request)
+    {
         // dd($request);
         $user = Auth::user();
         $fields = $request->validate([
@@ -225,12 +268,12 @@ class EmployerProfileController extends Controller
         ]);
 
 
-        if($fields['employer_type'] === 'business'){
+        if ($fields['employer_type'] === 'business') {
 
-            if($request->business_id){
+            if ($request->business_id) {
                 $business =  BusinessInformation::where('id', $request->business_id)->first();
 
-                if($business){
+                if ($business) {
                     $business->employers()->syncWithoutDetaching([$user->id]);
 
                     $user->employerProfile()->create([
@@ -253,14 +296,14 @@ class EmployerProfileController extends Controller
                 'business_logo' => 'required|image',
                 'industry' => 'required',
                 'business_description' => 'required',
-                'business_location' =>'required',
+                'business_location' => 'required',
             ]);
             // dd($request);
 
             $logo = Storage::disk('public')->put('images', $request->business_logo);
 
 
-           $businessInformation =  BusinessInformation::create([
+            $businessInformation =  BusinessInformation::create([
                 'user_id' => $user->id,
                 'business_name' => $business['business_name'],
                 'business_logo' => '/storage/' . $logo,
@@ -273,14 +316,14 @@ class EmployerProfileController extends Controller
 
             $businessInformation->employers()->attach($user->id);
 
-           $user->employerProfile()->create([
-            'full_name' => $fields['full_name'],
-            'phone_number' => $fields['phone_number'],
-            'birth_year' => $fields['birth_year'],
-            'gender' => $fields['gender'],
-            'employer_type' => $fields['employer_type'],
-            'business_id' => $businessInformation->id,
-           ]);
+            $user->employerProfile()->create([
+                'full_name' => $fields['full_name'],
+                'phone_number' => $fields['phone_number'],
+                'birth_year' => $fields['birth_year'],
+                'gender' => $fields['gender'],
+                'employer_type' => $fields['employer_type'],
+                'business_id' => $businessInformation->id,
+            ]);
 
 
             return redirect()->route('employer.dashboard');
@@ -296,7 +339,7 @@ class EmployerProfileController extends Controller
      * Display the specified resource.
      */
 
-        public function editProfile()
+    public function editProfile()
     {
         $user = Auth::user();
         $profile = $user->employerProfile()->with('businessInformation')->first();
@@ -308,7 +351,7 @@ class EmployerProfileController extends Controller
         ]);
     }
 
-        public function updateProfileFull(Request $request)
+    public function updateProfileFull(Request $request)
     {
         $user = Auth::user();
         $profile = $user->employerProfile()->with('businessInformation')->first();
@@ -381,18 +424,18 @@ class EmployerProfileController extends Controller
 
 
 
-        public function edit()
+    public function edit()
     {
         $user = Auth::user();
         $employerProfile = $user->employerProfile;
-        
+
         if (!$employerProfile) {
             return redirect()->route('create.profile.employer');
         }
-        
+
         $businesses = BusinessInformation::filter(request(['business_name']))->get();
         $currentBusiness = $employerProfile->businessInformation;
-        
+
         return inertia('EmployerAccountSetup/EditProfile', [
             'employerProfile' => $employerProfile,
             'businesses' => $businesses,
@@ -404,122 +447,122 @@ class EmployerProfileController extends Controller
 
 
     public function update(Request $request)
-{
-    $user = Auth::user();
-    $employerProfile = $user->employerProfile;
-    
-    if (!$employerProfile) {
-        return redirect()->route('create.profile.employer');
-    }
-    
-    $fields = $request->validate([
-        'full_name' => 'required|max:255',
-        'phone_number' => 'required|numeric|min_digits:1',
-        'birth_year' => 'required|numeric|min:1900',
-        'gender' => 'required',
-        'employer_type' => 'required'
-    ]);
-    
-    // Handle business information if employer type is business
-    if ($fields['employer_type'] === 'business') {
-        $request->validate([
-            'business_id' => 'required_without:business_name|nullable|exists:business_information,id',
-            'business_name' => 'required_without:business_id|max:255',
-            'business_logo' => 'required_without:business_id|image|nullable',
-            'industry' => 'required_without:business_id',
-            'business_description' => 'required_without:business_id',
-            'business_location' => 'required_without:business_id'
-        ]);
-        
-        // Handle business creation/selection
-        if ($request->business_id) {
-            $business = BusinessInformation::findOrFail($request->business_id);
-            
-            // Check if the user is already associated with this business
-            if (!$business->employers->contains($user->id)) {
-                $business->employers()->attach($user->id);
-            }
-            
-            $fields['business_id'] = $business->id;
-        } else {
-            $businessFields = $request->validate([
-                'business_name' => 'required|max:255',
-                'business_logo' => 'required|image',
-                'industry' => 'required',
-                'business_description' => 'required',
-                'business_location' => 'required'
-            ]);
-            
-            $logo = Storage::disk('public')->put('images', $request->business_logo);
-            
-            $business = BusinessInformation::create([
-                'user_id' => $user->id,
-                'business_name' => $businessFields['business_name'],
-                'business_logo' => '/storage/' . $logo,
-                'industry' => $businessFields['industry'],
-                'business_description' => $businessFields['business_description'],
-                'business_location' => $businessFields['business_location'],
-            ]);
-            
-            $business->employers()->attach($user->id);
-            $fields['business_id'] = $business->id;
-        }
-    } else {
-        // If switching to individual, remove business association
-        $fields['business_id'] = null;
-    }
-    
-    // Update the employer profile
-    $employerProfile->update($fields);
-    
-    return redirect()->route('employer.profile')->with('message', 'Profile updated successfully!');
-}
+    {
+        $user = Auth::user();
+        $employerProfile = $user->employerProfile;
 
-public function updateBusiness(Request $request)
-{
-    $user = Auth::user();
-    $employerProfile = $user->employerProfile;
-    
-    if (!$employerProfile || $employerProfile->employer_type !== 'business') {
-        return redirect()->back()->withErrors(['message' => 'You are not a business employer']);
-    }
-    
-    $business = $employerProfile->businessInformation;
-    
-    if (!$business) {
-        return redirect()->back()->withErrors(['message' => 'Business information not found']);
-    }
-    
-    $fields = $request->validate([
-        'business_name' => 'required|max:255',
-        'industry' => 'required',
-        'business_description' => 'required',
-        'business_location' => 'required'
-    ]);
-    
-    // Handle logo update if provided
-    if ($request->hasFile('business_logo')) {
-        $request->validate([
-            'business_logo' => 'image'
-        ]);
-        
-        // Delete old logo
-        if ($business->business_logo) {
-            $relativePath = str_replace('/storage/', '', $business->business_logo);
-            if (Storage::disk('public')->exists($relativePath)) {
-                Storage::disk('public')->delete($relativePath);
-            }
+        if (!$employerProfile) {
+            return redirect()->route('create.profile.employer');
         }
-        
-        // Upload new logo
-        $logo = Storage::disk('public')->put('images', $request->business_logo);
-        $fields['business_logo'] = '/storage/' . $logo;
+
+        $fields = $request->validate([
+            'full_name' => 'required|max:255',
+            'phone_number' => 'required|numeric|min_digits:1',
+            'birth_year' => 'required|numeric|min:1900',
+            'gender' => 'required',
+            'employer_type' => 'required'
+        ]);
+
+        // Handle business information if employer type is business
+        if ($fields['employer_type'] === 'business') {
+            $request->validate([
+                'business_id' => 'required_without:business_name|nullable|exists:business_information,id',
+                'business_name' => 'required_without:business_id|max:255',
+                'business_logo' => 'required_without:business_id|image|nullable',
+                'industry' => 'required_without:business_id',
+                'business_description' => 'required_without:business_id',
+                'business_location' => 'required_without:business_id'
+            ]);
+
+            // Handle business creation/selection
+            if ($request->business_id) {
+                $business = BusinessInformation::findOrFail($request->business_id);
+
+                // Check if the user is already associated with this business
+                if (!$business->employers->contains($user->id)) {
+                    $business->employers()->attach($user->id);
+                }
+
+                $fields['business_id'] = $business->id;
+            } else {
+                $businessFields = $request->validate([
+                    'business_name' => 'required|max:255',
+                    'business_logo' => 'required|image',
+                    'industry' => 'required',
+                    'business_description' => 'required',
+                    'business_location' => 'required'
+                ]);
+
+                $logo = Storage::disk('public')->put('images', $request->business_logo);
+
+                $business = BusinessInformation::create([
+                    'user_id' => $user->id,
+                    'business_name' => $businessFields['business_name'],
+                    'business_logo' => '/storage/' . $logo,
+                    'industry' => $businessFields['industry'],
+                    'business_description' => $businessFields['business_description'],
+                    'business_location' => $businessFields['business_location'],
+                ]);
+
+                $business->employers()->attach($user->id);
+                $fields['business_id'] = $business->id;
+            }
+        } else {
+            // If switching to individual, remove business association
+            $fields['business_id'] = null;
+        }
+
+        // Update the employer profile
+        $employerProfile->update($fields);
+
+        return redirect()->route('employer.profile')->with('message', 'Profile updated successfully!');
     }
-    
-    $business->update($fields);
-    
-    return redirect()->back()->with('message', 'Business information updated successfully!');
-}
+
+    public function updateBusiness(Request $request)
+    {
+        $user = Auth::user();
+        $employerProfile = $user->employerProfile;
+
+        if (!$employerProfile || $employerProfile->employer_type !== 'business') {
+            return redirect()->back()->withErrors(['message' => 'You are not a business employer']);
+        }
+
+        $business = $employerProfile->businessInformation;
+
+        if (!$business) {
+            return redirect()->back()->withErrors(['message' => 'Business information not found']);
+        }
+
+        $fields = $request->validate([
+            'business_name' => 'required|max:255',
+            'industry' => 'required',
+            'business_description' => 'required',
+            'business_location' => 'required'
+        ]);
+
+        // Handle logo update if provided
+        if ($request->hasFile('business_logo')) {
+            $request->validate([
+                'business_logo' => 'image'
+            ]);
+
+            // Delete old logo
+            if ($business->business_logo) {
+                $relativePath = str_replace('/storage/', '', $business->business_logo);
+                if (Storage::disk('public')->exists($relativePath)) {
+                    Storage::disk('public')->delete($relativePath);
+                }
+            }
+
+            // Upload new logo
+            $logo = Storage::disk('public')->put('images', $request->business_logo);
+            $fields['business_logo'] = '/storage/' . $logo;
+        }
+
+        $business->update($fields);
+
+        return redirect()->back()->with('message', 'Business information updated successfully!');
+    }
 
     /**
      * Remove the specified resource from storage.
