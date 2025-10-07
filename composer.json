@@ -25,7 +25,7 @@
         "spatie/laravel-pdf": "^1.5",
         "stevebauman/location": "^7.6",
         "tightenco/ziggy": "^2.4",
-        "xendit/xendit-php": "dev-master"
+        "xendit/xendit-php": "dev-master@dev"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
