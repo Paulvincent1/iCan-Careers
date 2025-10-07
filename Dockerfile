@@ -20,6 +20,11 @@ FROM node:18 AS frontend
 
 WORKDIR /app
 COPY --from=backend /var/www .
+
+# Set environment variables for Vite build
+ENV VITE_PUSHER_APP_KEY=0496f1badaa049846379
+ENV VITE_PUSHER_APP_CLUSTER=ap1
+
 RUN npm install
 RUN npm run build
 
