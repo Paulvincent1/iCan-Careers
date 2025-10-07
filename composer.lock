@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0f8179f0dfcd5cc1120e92200752d3cb",
+    "content-hash": "7c7f3f0486664113bcd0d7c38932588e",
     "packages": [
         {
             "name": "brick/math",
@@ -7188,16 +7188,16 @@
         },
         {
             "name": "xendit/xendit-php",
-            "version": "6.4.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/xendit/xendit-php.git",
-                "reference": "1b525c90f88578d05593f7a714363544cd752620"
+                "url": "https://github.com/Paulvincent1/xendit-php.git",
+                "reference": "1e219909f5758009bda7a2542863a629cf305fa5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/xendit/xendit-php/zipball/1b525c90f88578d05593f7a714363544cd752620",
-                "reference": "1b525c90f88578d05593f7a714363544cd752620",
+                "url": "https://api.github.com/repos/Paulvincent1/xendit-php/zipball/1e219909f5758009bda7a2542863a629cf305fa5",
+                "reference": "1e219909f5758009bda7a2542863a629cf305fa5",
                 "shasum": ""
             },
             "require": {
@@ -7213,13 +7213,26 @@
                 "friendsofphp/php-cs-fixer": "^3.5",
                 "phpunit/phpunit": "^8.0 || ^9.0"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
                     "Xendit\\": "lib/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Xendit\\Test\\": "test/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "DEVELOPMENT_API_KEY=$DEVELOPMENT_API_KEY BUSINESS_ID=$BUSINESS_ID phpunit"
+                ],
+                "filtered-test": [
+                    "DEVELOPMENT_API_KEY=$DEVELOPMENT_API_KEY BUSINESS_ID=$BUSINESS_ID phpunit --filter PaymentAPITest"
+                ]
+            },
             "license": [
                 "unlicense"
             ],
@@ -7241,10 +7254,9 @@
                 "sdk"
             ],
             "support": {
-                "issues": "https://github.com/xendit/xendit-php/issues",
-                "source": "https://github.com/xendit/xendit-php/tree/6.4.0"
+                "source": "https://github.com/Paulvincent1/xendit-php/tree/master"
             },
-            "time": "2025-05-16T04:31:28+00:00"
+            "time": "2025-10-07T22:06:28+00:00"
         }
     ],
     "packages-dev": [
@@ -10552,8 +10564,10 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": {},
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "xendit/xendit-php": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
