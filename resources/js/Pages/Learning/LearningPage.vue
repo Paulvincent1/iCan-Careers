@@ -145,7 +145,7 @@ const courseTitle = computed(() => {
                         <p class="animate-bounce-in mt-6">
                             <Link
                                 class="rounded-3xl bg-[#fa8334] px-7 py-2 font-medium text-white hover:bg-gray-600"
-                                :href="route('pricing')"
+                                :href="route('login')"
                             >
                                 Start My Free Trial
                             </Link>

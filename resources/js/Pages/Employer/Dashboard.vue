@@ -12,6 +12,7 @@ import ReusableModal from "../Components/Modal/ReusableModal.vue";
 import SuccessfulMessage from "../Components/Popup/SuccessfulMessage.vue";
 import ProfileHoverCard from "../Components/ProfileHoverCard.vue";
 import ProfileJobHover from "../Components/ProfileJobHover.vue";
+import dayjs from "dayjs";
 
 let props = defineProps({
     user: {
@@ -204,6 +205,28 @@ function unshiftLatestChatHead(userId, newChatHead) {
         chatHeads.value[index] = newChatHead;
     }
 }
+function formatTime(timestamp) {
+    const now = dayjs();
+    const messageTime = dayjs(timestamp);
+
+    // If today, show time only
+    if (messageTime.isSame(now, 'day')) {
+        return messageTime.format('h:mm A');
+    }
+
+    // If yesterday, show "Yesterday"
+    if (messageTime.isSame(now.subtract(1, 'day'), 'day')) {
+        return 'Yesterday';
+    }
+
+    // If within the same week, show day name
+    if (messageTime.isAfter(now.subtract(7, 'day'))) {
+        return messageTime.format('ddd');
+    }
+
+    // Otherwise show date
+    return messageTime.format('MMM D');
+}
 
 function goToChat(userId) {
     console.log("hi");
@@ -216,6 +239,7 @@ function goToChat(userId) {
 onBeforeUnmount(() => {
     channelChatHeads.stopListening(".message.event");
 });
+
 </script>
 <template>
     <Head title="Dashboard | iCan Careers" />
@@ -422,60 +446,94 @@ onBeforeUnmount(() => {
                     </div>
 
                     <div class="mb-6 h-[400px] rounded-lg bg-white p-4">
-                        <div class="flex items-center justify-between">
-                            <p class="text-lg font-bold text-[#171816]">
-                                Inbox
-                            </p>
-                            <Link
-                                :href="route('messages')"
-                                class="group relative flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="text-lg font-bold text-[#171816]">
+                            Inbox
+                        </p>
+                        <Link
+                            :href="route('messages')"
+                            class="group relative flex items-center gap-2 rounded-full p-2 text-sm text-[#171816] underline"
+                        >
+                            <span>See All</span>
+                            <i class="bi bi-caret-right"></i>
+                            <span
+                                class="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
                             >
-                                <span>See All</span>
-                                <i class="bi bi-caret-right"></i>
+                                See all messages
                                 <span
-                                    class="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
-                                >
-                                    See all messages
-                                    <!-- Tooltip Arrow -->
-                                    <span
-                                        class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
-                                    ></span>
-                                </span>
-                            </Link>
-                        </div>
-                        <div class="mt-4 h-[320px] overflow-y-auto">
+                                    class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full border-4 border-transparent border-b-black"
+                                ></span>
+                            </span>
+                        </Link>
+                    </div>
+
+                    <div class="h-[320px] overflow-y-auto">
+                        <div class="space-y-2">
                             <div
                                 v-for="(chatHead, index) in chatHeads"
                                 @click="goToChat(chatHead.user.id)"
-                                :key="chatHead.latestMessage.id"
+                                :key="chatHead.latestMessage?.id"
                                 :class="[
-                                    'flex cursor-pointer gap-2 p-4',
+                                    'grid grid-cols-[auto,1fr,auto] gap-3 p-3 rounded-lg cursor-pointer transition-all hover:shadow-sm',
                                     {
-                                        'bg-slate-300':
-                                            chatHead.user.id ===
-                                            Number(route().params.user),
+                                        'bg-blue-50 ring-2 ring-blue-200':
+                                            chatHead.user.id === Number(route().params.user),
+                                        'bg-gray-50 hover:bg-gray-100':
+                                            chatHead.user.id !== Number(route().params.user),
                                     },
                                 ]"
                             >
-                                <div class="h-12 w-12">
+                                <!-- Avatar -->
+                                <div class="flex-shrink-0 h-10 w-10">
                                     <img
-                                        :src="
-                                            chatHead.user.profile_img ??
-                                            '/assets/profile_placeholder.jpg'
-                                        "
-                                        alt=""
-                                        class="h-full w-full rounded-full"
+                                        :src="chatHead.user.profile_img ?? '/assets/profile_placeholder.jpg'"
+                                        alt="User avatar"
+                                        class="h-full w-full rounded-full object-cover"
                                     />
                                 </div>
-                                <div>
-                                    <p>{{ chatHead.user.email }}</p>
-                                    <p class="text-sm">
-                                        {{ chatHead.latestMessage?.message }}
+
+                                <!-- Content -->
+                                <div class="min-w-0">
+                                    <p class="font-medium text-gray-900 truncate text-sm">
+                                        {{ chatHead.user.email }}
+                                    </p>
+                                    <p class="text-gray-600 text-xs mt-1 truncate">
+                                        {{ chatHead.latestMessage?.message || 'No messages yet' }}
                                     </p>
                                 </div>
+
+                                <!-- Right side indicators -->
+                                <div class="flex flex-col items-end justify-between text-right">
+                                    <!-- Timestamp -->
+                                    <p
+                                        v-if="chatHead.latestMessage?.created_at"
+                                        class="text-xs text-gray-400 whitespace-nowrap"
+                                    >
+                                        {{ formatTime(chatHead.latestMessage.created_at) }}
+                                    </p>
+
+                                    <!-- Unread count -->
+                                    <span
+                                        v-if="chatHead.unread_count > 0"
+                                        class="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center mt-1"
+                                    >
+                                        {{ chatHead.unread_count > 9 ? '9+' : chatHead.unread_count }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Empty state -->
+                            <div
+                                v-if="chatHeads.length === 0"
+                                class="flex flex-col items-center justify-center h-64 text-gray-500"
+                            >
+                                <i class="bi bi-chat-dots text-4xl mb-3 text-gray-300"></i>
+                                <p class="text-lg font-medium text-gray-400">No conversations</p>
+                                <p class="text-sm text-gray-400 mt-1">Your messages will appear here</p>
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
                 <div
                     class="grid grid-cols-1 gap-6 rounded lg:grid-cols-[400px,1fr] xl:grid-cols-[600px,1fr]"
@@ -951,3 +1009,11 @@ onBeforeUnmount(() => {
         :messageProp="successMessage"
     ></SuccessfulMessage>
 </template>
+<style scoped>
+ .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>

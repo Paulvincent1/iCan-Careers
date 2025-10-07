@@ -347,11 +347,14 @@ async function sendMessage() {
     console.log(chatHeads.value);
 
     if (messageInput.value.value) {
+        const now = new Date().toISOString();
         messages.value.push({
             id: nanoid(),
             message: messageInput.value.value,
             sender_id: page.props.auth.user.authenticated.id,
             receiver_id: route().params.user,
+            created_at: now,
+            timestamp: now
         });
         loadMessages();
         const messageToBeSent = messageInput.value.value;
@@ -363,6 +366,8 @@ async function sendMessage() {
                 message: messageToBeSent,
                 receiver_id: route().params.user,
                 sender_id: page.props.auth.user.authenticated.id,
+                created_at: now,
+                timestamp: now
             },
             user: props.userDirectMessageProps,
         };
@@ -548,188 +553,449 @@ watch(
 onMounted(() => {
     console.log(chatHeads.value);
 });
+
+// Helper functions for message timestamps
+function formatMessageTime(timestamp) {
+    if (!timestamp) {
+        return '';
+    }
+
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = (now - date) / (1000 * 60 * 60);
+
+    // If message is from today, show only time
+    if (date.toDateString() === now.toDateString()) {
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+
+    // If message is from yesterday
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+        return 'Yesterday ' + date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+
+    // If message is within this week
+    if (diffInHours < 168) {
+        return date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+
+    // Older messages
+    return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+}
+
+function formatChatHeadTime(timestamp) {
+    if (!timestamp) {
+        return '';
+    }
+
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInMinutes = (now - date) / (1000 * 60);
+    const diffInHours = diffInMinutes / 60;
+    const diffInDays = diffInHours / 24;
+
+    // Less than a minute
+    if (diffInMinutes < 1) {
+        return 'Just now';
+    }
+
+    // Less than an hour
+    if (diffInMinutes < 60) {
+        const mins = Math.floor(diffInMinutes);
+        return `${mins}m`;
+    }
+
+    // Less than a day
+    if (diffInHours < 24) {
+        const hrs = Math.floor(diffInHours);
+        return `${hrs}h`;
+    }
+
+    // Less than a week
+    if (diffInDays < 7) {
+        const days = Math.floor(diffInDays);
+        return `${days}d`;
+    }
+
+    // Less than a month
+    if (diffInDays < 30) {
+        const weeks = Math.floor(diffInDays / 7);
+        return `${weeks}w`;
+    }
+
+    // Show date for older messages
+    if (date.getFullYear() === now.getFullYear()) {
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+    return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: '2-digit'
+    });
+}
+
+function formatDateSeparator(timestamp) {
+    if (!timestamp) {
+        return '';
+    }
+
+    const date = new Date(timestamp);
+    const now = new Date();
+
+    // Today
+    if (date.toDateString() === now.toDateString()) {
+        return 'Today';
+    }
+
+    // Yesterday
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+        return 'Yesterday';
+    }
+
+    // This year
+    if (date.getFullYear() === now.getFullYear()) {
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
+    // Different year
+    return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    });
+}
+
+function shouldShowDateSeparator(message, index) {
+    if (index === 0) return true;
+
+    const currentDate = new Date(message.created_at || message.timestamp || new Date());
+    const previousMessage = messages.value[index - 1];
+    const previousDate = new Date(previousMessage.created_at || previousMessage.timestamp || new Date());
+
+    return currentDate.toDateString() !== previousDate.toDateString();
+}
 </script>
 <template>
     <Head title="Message | iCan Careers" />
-    <div class="bg-[#eff2f6]">
-        <div
-            class="mx-auto min-h-[calc(100vh-4.625rem)] max-w-7xl p-8 px-[0.5rem]"
-        >
-            <div
-                class="grid h-full min-h-[650px] w-full grid-cols-1 rounded-xl bg-white md:grid-cols-[300px,1fr]"
-            >
-                <div class="flex flex-col border-b md:border-none">
-                    <div>
-                        <div class="flex items-center gap-2 border-b p-4">
-                            <div class="h-10 w-10">
+    <div class="bg-[#f8f9fa] min-h-screen">
+        <div class="mx-auto min-h-[calc(100vh-4.625rem)] max-w-7xl p-4 lg:p-8">
+            <!-- Main container with improved spacing and responsiveness -->
+            <div class="grid h-full min-h-[700px] w-full grid-cols-1 rounded-2xl bg-white shadow-lg md:grid-cols-[350px,1fr] overflow-hidden">
+
+                <!-- Left sidebar - Conversation list -->
+                <aside class="flex flex-col border-b md:border-b-0 md:border-r border-gray-200" role="navigation" aria-label="Conversations">
+
+                    <!-- User profile section with better visibility -->
+                    <header class="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+                        <div class="flex items-center gap-3 p-5">
+                            <div class="h-14 w-14 ring-2 ring-white shadow-sm rounded-full overflow-hidden">
                                 <img
-                                    :src="
-                                        user.profile_photo_path
-                                            ? user.profile_photo_path
-                                            : 'assets/profile_placeholder.jpg'
-                                    "
-                                    alt="User Profile"
-                                    class="h-full w-full rounded-full object-cover"
+                                    :src="user.profile_photo_path || '/assets/profile_placeholder.jpg'"
+                                    :alt="`${$page.props.auth.user?.authenticated.name}'s profile`"
+                                    class="h-full w-full object-cover"
                                 />
                             </div>
-                            <div>
-                                <p>
-                                    {{
-                                        $page.props.auth.user?.authenticated
-                                            .name
-                                    }}
-                                </p>
-                                <p class="text-sm text-gray-500">
-                                    Info account
+                            <div class="flex-1">
+                                <h2 class="font-semibold text-lg text-gray-800">
+                                    {{ $page.props.auth.user?.authenticated.name }}
+                                </h2>
+                                <p class="text-sm text-gray-600">
+                                    <i class="bi bi-circle-fill text-green-500 text-xs mr-1"></i>
+                                    Active now
                                 </p>
                             </div>
                         </div>
-                        <div class="mt-5 px-4">
-                            <div class="relative">
-                                <input
-                                    type="text"
-                                    v-model="search"
-                                    class="w-full rounded-full border p-2 px-8"
-                                    placeholder="Search a username"
-                                />
-                                <i
-                                    class="bi bi-search absolute left-3 top-[50%] translate-y-[-50%] text-[14px] text-gray-500"
-                                ></i>
-                            </div>
-                            <p class="my-3 text-gray-500">Messages</p>
+                    </header>
+
+                    <!-- Search section with improved accessibility -->
+                    <div class="p-5 bg-gray-50">
+                        <div class="relative">
+                            <label for="search-conversations" class="sr-only">Search conversations</label>
+                            <input
+                                id="search-conversations"
+                                type="text"
+                                v-model="search"
+                                class="w-full rounded-xl border-2 border-gray-200 p-3 pl-12 text-base focus:border-blue-500 focus:outline-none transition-colors"
+                                placeholder="Search conversations..."
+                                aria-label="Search conversations"
+                            />
+                            <i class="bi bi-search absolute left-4 top-[50%] translate-y-[-50%] text-gray-400 text-lg" aria-hidden="true"></i>
                         </div>
+                        <h3 class="mt-4 mb-2 font-semibold text-gray-700 text-base">
+                            <i class="bi bi-chat-dots mr-2"></i>Messages
+                        </h3>
                     </div>
+
+                    <!-- Conversations list with better touch targets -->
                     <div
                         ref="chathead-container"
-                        class="relative min-h-44 flex-1 basis-1 overflow-auto"
+                        class="relative flex-1 overflow-y-auto bg-white"
+                        role="list"
+                        aria-label="Conversation list"
                     >
-                        <div v-if="!chatHeads.length" class="">
-                            <p class="text-center text-gray-500">
-                                No Messages Available.
-                            </p>
+                        <!-- Empty state -->
+                        <div v-if="!chatHeads.length" class="flex flex-col items-center justify-center p-8">
+                            <i class="bi bi-inbox text-6xl text-gray-300 mb-3"></i>
+                            <p class="text-center text-gray-500 text-lg">No conversations yet</p>
+                            <p class="text-center text-gray-400 text-sm mt-1">Start a new conversation to begin messaging</p>
                         </div>
-                        <div
+
+                        <!-- Conversation items with better visual hierarchy -->
+                        <button
                             v-for="(chatHead, index) in chatHeads"
                             @click="switchChat(chatHead.user.id)"
                             :key="chatHead.latestMessage?.id"
                             :class="[
-                                'flex cursor-pointer gap-2 p-4',
+                                'w-full flex gap-3 p-4 hover:bg-gray-50 transition-all duration-200 border-b border-gray-100',
                                 {
-                                    'bg-orange-400 text-white':
-                                        chatHead.user.id ===
-                                        Number(route().params.user),
+                                    'bg-blue-50 border-l-4 border-l-blue-500 hover:bg-blue-100':
+                                        chatHead.user.id === Number(route().params.user),
                                 },
                             ]"
                             :ref="`chat-head-${chatHead.user.id}`"
+                            role="listitem"
+                            :aria-selected="chatHead.user.id === Number(route().params.user)"
+                            :aria-label="`Conversation with ${chatHead.user.email}`"
                         >
-                            <div class="h-12 w-12">
+                            <div class="h-14 w-14 flex-shrink-0">
                                 <img
-                                    :src="
-                                        chatHead.user.profile_img ??
-                                        '/assets/profile_placeholder.jpg'
-                                    "
-                                    alt=""
-                                    class="h-full w-full rounded-full"
+                                    :src="chatHead.user.profile_img || '/assets/profile_placeholder.jpg'"
+                                    :alt="`${chatHead.user.email}'s profile`"
+                                    class="h-full w-full rounded-full object-cover ring-2 ring-white shadow-sm"
+                                />
+                            </div>
+                            <div class="flex-1 text-left min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <p class="font-semibold text-gray-800 text-base truncate flex-1">
+                                        {{ chatHead.user.email }}
+                                    </p>
+                                    <span v-if="chatHead.latestMessage?.created_at || chatHead.latestMessage?.timestamp" class="text-xs text-gray-500 ml-2">
+                                        {{ formatChatHeadTime(chatHead.latestMessage?.created_at || chatHead.latestMessage?.timestamp) }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1 truncate">
+                                    {{ chatHead.latestMessage?.message || "No messages yet" }}
+                                </p>
+                            </div>
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- Right side - Chat area -->
+                <main class="flex flex-col bg-white" role="main">
+
+                    <!-- Chat header with better user info display -->
+                    <header class="flex items-center justify-between border-b border-gray-200 p-5 bg-gradient-to-r from-blue-50 to-purple-50">
+                        <div v-if="route().params.user" class="flex items-center gap-3">
+                            <div class="h-12 w-12 ring-2 ring-white shadow-sm rounded-full overflow-hidden">
+                                <img
+                                    :src="userDirectMessageProps?.profile_img || '/assets/profile_placeholder.jpg'"
+                                    :alt="`${userDirectMessageProps?.name}'s profile`"
+                                    class="h-full w-full object-cover"
                                 />
                             </div>
                             <div>
-                                <p class="font-bold">
-                                    {{ chatHead.user.email }}
-                                </p>
-                                <p class="text-sm">
-                                    {{
-                                        chatHead.latestMessage?.message ??
-                                        "No Message yet"
-                                    }}
+                                <h1 class="font-semibold text-lg text-gray-800">
+                                    {{ userDirectMessageProps?.name }}
+                                </h1>
+                                <p class="text-sm text-gray-600">
+                                    {{ userDirectMessageProps?.email }}
                                 </p>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="flex flex-col border-l">
-                    <div class="flex flex-1 flex-col">
-                        <div
-                            class="flex h-[77px] items-center justify-between border-b p-4"
+                        <div v-else class="text-center w-full">
+                            <h1 class="text-xl font-semibold text-gray-700">Select a conversation</h1>
+                            <p class="text-gray-500 text-sm mt-1">Choose a conversation from the left to start messaging</p>
+                        </div>
+
+                        <!-- Options menu button -->
+                        <button
+                            v-if="route().params.user"
+                            class="p-2 hover:bg-white/50 rounded-lg transition-colors"
+                            aria-label="More options"
                         >
-                            <div v-if="route().params.user" class="flex gap-2">
-                                <div class="h-10 w-10">
-                                    <img
-                                        class="h-full w-full"
-                                        :src="
-                                            userDirectMessageProps.profile_img ??
-                                            '/assets/profile_placeholder.jpg'
-                                        "
-                                        alt=""
-                                    />
-                                </div>
-                                <div>
-                                    <p>{{ userDirectMessageProps?.name }}</p>
-                                    <p class="text-sm text-gray-500">
-                                        {{ userDirectMessageProps?.email }}
-                                    </p>
-                                </div>
+                            <i class="bi bi-three-dots-vertical text-xl text-gray-600"></i>
+                        </button>
+                    </header>
+
+                    <!-- Messages container with improved readability -->
+                    <div class="flex-1 flex flex-col bg-gradient-to-b from-gray-50 to-white">
+                        <div
+                            ref="chat-container"
+                            class="chat-container overflow-y-auto p-6"
+                            role="log"
+                            aria-label="Message history"
+                            aria-live="polite"
+                        >
+                            <!-- Empty state when no user selected -->
+                            <div v-if="!route().params.user" class="flex flex-col items-center justify-center h-full">
+                                <i class="bi bi-chat-text text-8xl text-gray-300 mb-4"></i>
+                                <h2 class="text-2xl font-semibold text-gray-600 mb-2">Welcome to Messages</h2>
+                                <p class="text-gray-500 text-lg">Select a conversation to start chatting</p>
                             </div>
-                            <div v-if="route().params.user">
-                                <i class="bi bi-three-dots-vertical"></i>
-                            </div>
-                        </div>
-                        <div class="flex flex-1 flex-col">
-                            <div
-                                ref="chat-container"
-                                class="chat-container overflow-auto p-4"
-                            >
-                                <MessageBox
-                                    v-for="message in messages"
-                                    :key="message.id"
-                                    :message="message"
-                                ></MessageBox>
-                                <!-- <div
-                                v-for="message in messages"
-                                :class="[
-                                    'mb-6 flex justify-start',
-                                    {
-                                        'justify-end':
-                                            message.sender_id ===
-                                            $page.props.auth.user.authenticated
-                                                .id,
-                                    },
-                                ]"
-                            >
+
+                            <!-- Messages with time groups -->
+                            <div v-for="(message, index) in messages" :key="message.id">
+                                <!-- Date separator for new days -->
                                 <div
-                                    class="w-fit max-w-lg rounded-lg border px-5 py-3"
+                                    v-if="shouldShowDateSeparator(message, index)"
+                                    class="flex items-center justify-center my-4"
                                 >
-                                    <p>
-                                        {{ message.message }}
-                                    </p>
+                                    <div class="flex-1 border-t border-gray-200"></div>
+                                    <span class="px-4 text-sm text-gray-500 bg-gray-50 rounded-full py-1">
+                                        {{ formatDateSeparator(message.created_at || message.timestamp) }}
+                                    </span>
+                                    <div class="flex-1 border-t border-gray-200"></div>
                                 </div>
-                            </div> -->
+
+                                <!-- Message with timestamp -->
+                                <div :class="[
+                                    'mb-4 flex',
+                                    message.sender_id === $page.props.auth.user.authenticated.id
+                                        ? 'justify-end'
+                                        : 'justify-start'
+                                ]">
+                                    <div class="max-w-[70%] flex flex-col gap-1">
+                                        <MessageBox
+                                            :message="message"
+                                        />
+                                        <!-- Timestamp below message -->
+                                        <span :class="[
+                                            'text-xs text-gray-400 px-2',
+                                            message.sender_id === $page.props.auth.user.authenticated.id
+                                                ? 'text-right'
+                                                : 'text-left'
+                                        ]">
+                                            {{ formatMessageTime(message.created_at || message.timestamp) }}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div v-if="isShowMessageInput" class="p-4">
-                        <div class="relative">
-                            <input
-                                ref="messageInput"
-                                type="text"
-                                placeholder="Type your message..."
-                                class="w-full rounded-full bg-[#f4f4f4] p-4 outline-none"
-                            />
-                            <button
-                                @click="sendMessage"
-                                class="absolute right-5 top-[50%] translate-y-[-50%]"
-                            >
-                                <i class="bi bi-send text-lg text-gray-500"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+
+                    <!-- Message input area with better accessibility -->
+                    <footer v-if="isShowMessageInput" class="p-5 bg-white border-t border-gray-200">
+                        <form @submit.prevent="sendMessage" class="relative">
+                            <label for="message-input" class="sr-only">Type your message</label>
+                            <div class="flex gap-3">
+                                <input
+                                    id="message-input"
+                                    ref="messageInput"
+                                    type="text"
+                                    placeholder="Type your message..."
+                                    class="flex-1 rounded-xl bg-gray-100 px-5 py-4 text-base outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all"
+                                    aria-label="Message input"
+                                />
+                                <button
+                                    type="submit"
+                                    class="px-6 py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl transition-colors flex items-center gap-2 font-medium shadow-sm hover:shadow-md"
+                                    aria-label="Send message"
+                                >
+                                    <span class="hidden sm:inline">Send</span>
+                                    <i class="bi bi-send-fill text-lg"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </footer>
+                </main>
             </div>
         </div>
     </div>
 </template>
+
 <style scoped>
+/* Improved scrollbar styling for better visibility */
 .chat-container {
     flex: 1 1 400px;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.chat-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+    background: #f7fafc;
+    border-radius: 4px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 4px;
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Improve focus visibility for keyboard navigation */
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Larger touch targets for mobile */
+@media (max-width: 768px) {
+    button {
+        min-height: 48px;
+        min-width: 48px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .border-gray-200 {
+        border-color: #4a5568;
+    }
+
+    .text-gray-600 {
+        color: #2d3748;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 </style>

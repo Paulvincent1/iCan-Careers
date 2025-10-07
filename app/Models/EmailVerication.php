@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmailVerication extends Model
 {
-    protected $fillable = [
+      protected $fillable = [
+        'name',
         'email',
+        'role',
         'verification_code'
     ];
 }

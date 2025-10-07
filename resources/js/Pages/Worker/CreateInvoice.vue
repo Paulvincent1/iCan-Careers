@@ -411,7 +411,7 @@ watchEffect(() => {
                                     </p>
                                     <textarea
                                         v-model="form.description"
-                                        class="w-full rounded bg-slate-100 p-5 pb-32"
+                                        class="w-full resize-none rounded bg-slate-100 p-5 pb-32"
                                         name=""
                                         id=""
                                         placeholder="Note or description to recipient"

@@ -51,7 +51,6 @@ function unshiftLatestNotification(notif) {
     notifications.value.unshift(notif);
 }
 
-
 let channelNotif = null;
 watch(
     () => page.props.auth.user.authenticated?.id,
@@ -200,21 +199,25 @@ const profileRoute = computed(() => {
                         >
                             <div class="relative">
                                 <i class="bi bi-chat-dots text-lg"></i>
-                                
-                                <i
-                                    v-if="unreadMessages.length"
-                                    class="bi bi-circle-fill absolute right-0 top-0 text-[8px] text-red-500"
-                                ></i>
+                                <!-- Message Count Badge -->
                                 <span
-                                class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
-                            >
-                                Messages
-                                <!-- Tooltip Arrow -->
+                                    v-if="unreadMessages.length"
+                                    class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white"
+                                    :class="{
+                                        'px-1': unreadMessages.length < 10,
+                                        'px-0.5': unreadMessages.length >= 10,
+                                    }"
+                                >
+                                    {{ unreadMessages.length > 99 ? '99+' : unreadMessages.length }}
                                 </span>
-                                
+                                <span
+                                    class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                >
+                                    Messages
+                                </span>
                             </div>
-                            
                         </div>
+
                         <!-- Notification Icon -->
                         <div
                             ref="dropNotification"
@@ -226,15 +229,21 @@ const profileRoute = computed(() => {
                         >
                             <div class="relative">
                                 <i class="bi bi-bell text-lg"></i>
-                                <i
-                                    v-if="notifications?.length"
-                                    class="bi bi-circle-fill absolute right-0 top-0 text-[8px] text-red-500"
-                                ></i>
+                                <!-- Notification Count Badge -->
                                 <span
-                                class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
-                            >
-                                Notifications
-                                <!-- Tooltip Arrow -->
+                                    v-if="notifications?.length"
+                                    class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white"
+                                    :class="{
+                                        'px-1': notifications.length < 10,
+                                        'px-0.5': notifications.length >= 10,
+                                    }"
+                                >
+                                    {{ notifications.length > 99 ? '99+' : notifications.length }}
+                                </span>
+                                <span
+                                    class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                >
+                                    Notifications
                                 </span>
                             </div>
                             <div
@@ -281,9 +290,10 @@ const profileRoute = computed(() => {
                                             <img
                                                 class="h-full w-full rounded-full object-cover"
                                                 :src="
-                                                    notification.data.image ??
+                                                    notification.data.image ||
                                                     '/assets/SHORTS.svg'
                                                 "
+                                                @error="event => event.target.src = '/assets/SHORTS.svg'"
                                                 alt=""
                                             />
                                         </div>
