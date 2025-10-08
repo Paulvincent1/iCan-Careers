@@ -57,7 +57,7 @@ class AuthController extends Controller
         $mail->to($emailVerification->email)
          ->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'))
          ->subject('Verification Code')
-         ->view('mail.send-code', [
+         ->markdown('mail.send-code', [
              'emailVerification' => $emailVerification,
          ])
          ->send();
