@@ -47,8 +47,8 @@ class InvoiceService {
             'description' => $description,
             'amount' => $totalAmountWithTaxes ?? $totalAmount,
             'invoice_duration' => $duration,
-            'success_redirect_url' => 'http://127.0.0.1:8000/',
-            'failure_redirect_url' => 'http://127.0.0.1:8000/',
+            'success_redirect_url' => 'https://ican-careers.onrender.com/',
+            'failure_redirect_url' => 'https://ican-careers.onrender.com/',
             //http://127.0.0.1:8000/
             //should be https in production
             'currency' => 'PHP',
