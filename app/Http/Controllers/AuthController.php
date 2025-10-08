@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\SendCode;
 use App\Models\EmailVerification;
 use App\Models\EmployerSubscriptionInvoice;
+use Dacastro4\LaravelGmail\Services\Message\Mail;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\InvoiceService;
@@ -15,7 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+// use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -52,7 +53,15 @@ class AuthController extends Controller
             ]
         );
 
-        Mail::to($fields['email'])->send(new SendCode($emailVerification));
+        $mail = new Mail;
+        $mail->to($emailVerification->email)
+            ->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'))
+            ->subject('Verification Code')
+            ->markdown('mail.send-code', [
+                'emailVerification' => $emailVerification,
+            ])
+            ->send();
+
     }
 
     public function verifyEmail($code)
