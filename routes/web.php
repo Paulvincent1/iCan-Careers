@@ -27,9 +27,12 @@ use App\Http\Middleware\isAdmin;
 use App\Http\Middleware\isBan;
 use App\Http\Middleware\isEmployer;
 use App\Http\Middleware\isWorker;
+use App\Mail\SendCode;
 use App\Models\BusinessInformation;
+use App\Models\EmailVerification;
 use App\Models\EmployerProfile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 
@@ -80,6 +83,18 @@ Route::post('/choose-role',[SocialiteController::class, 'storeRole'])->middlewar
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth'])->name('logout');
 
+Route::get('/send', function () {
+    $user = Auth::user();
+    $emailVerification = EmailVerification::create(
+        [
+            'name'=> $user->name,
+            'email'=> $user->email,
+            'role'=> 'Employer',
+            'verification_code' => '31231'
+        ]
+    );
+    Mail::to($user->email)->send(new SendCode($emailVerification));
+})->middleware('auth');
 
 Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::class, isBan::class, ChooseRole::class])->group(function () {
 
