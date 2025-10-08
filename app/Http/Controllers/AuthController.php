@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SendCode;
-use App\Models\EmailVerication;
+use App\Models\EmailVerification;
 use App\Models\EmployerSubscriptionInvoice;
 use App\Models\Role;
 use App\Models\User;
@@ -42,7 +42,7 @@ class AuthController extends Controller
 
         $code = rand(100000, 999999);
 
-        $emailVerification = EmailVerication::updateOrCreate(
+        $emailVerification = EmailVerification::updateOrCreate(
             ['email' => $fields['email']],
             [
                 'name' => $fields['name'],
@@ -57,7 +57,7 @@ class AuthController extends Controller
 
     public function verifyEmail($code)
     {
-        $emailVerification = EmailVerication::where('verification_code', $code)->first();
+        $emailVerification = EmailVerification::where('verification_code', $code)->first();
 
         if (!$emailVerification) {
             return redirect()->route('login')->withErrors([
@@ -221,7 +221,7 @@ class AuthController extends Controller
             ]
         );
 
-        $emailVerification = EmailVerication::where('email', $fields['email'])->first();
+        $emailVerification = EmailVerification::where('email', $fields['email'])->first();
 
         // Check expiry
         if ($emailVerification->created_at->addMinutes(10)->isPast()) {

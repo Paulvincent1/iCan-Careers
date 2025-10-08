@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\EmailVerication;
+use App\Models\EmailVerification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -17,7 +18,7 @@ class SendCode extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public EmailVerication $emailVerification)
+    public function __construct(public EmailVerification $emailVerification)
     {
         //
     }
