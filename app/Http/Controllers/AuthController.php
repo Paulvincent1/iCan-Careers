@@ -39,15 +39,7 @@ class AuthController extends Controller
 
     public function handleGoogleCallbackGmailToken(Request $request) {
 
-        $token = LaravelGmail::makeToken($request->code);
-
-        // dd($token); // you can see access_token & refresh_token
-
-        // Save refresh token in DB
-        GmailToken::updateOrCreate(
-            ['id' => 1],
-            ['refresh_token' => $token['refresh_token']]
-        );
+        $token = LaravelGmail::makeToken();
 
         return 'Token saved!' .  $token['refresh_token'];
 
@@ -74,31 +66,23 @@ class AuthController extends Controller
         );
 
          try {
-            // Get refresh token from DB
-            $refreshToken = GmailToken::where('id', 1)->value('refresh_token');
 
-            // Prepare email HTML
-            // Prepare plain text message
-        $message = "Hello {$fields['name']},\n\n";
-        $message .= "Your verification code is: {$code}\n\n";
-        $message .= "Thanks,\nYour App Team";
+            $token = LaravelGmail::makeToken();
 
-        // Send email using dacastro/laravel-gmail
-        $mail = new Mail();
-        $mail->using($refreshToken)
-             ->to($fields['email'])
-             ->from('sumalinog1124@gmail.com', 'Paul Vincent Sumalinog')
-             ->subject('Verification Code')
-             ->message($message)
-             ->send();
+            $mail = new Mail();
+            $mail->using($token['access_token'])
+            ->to($fields['email'])
+                ->from('icancareers2@gmail.com', 'ican')
+                ->subject('Verification Code')
+                ->view('mail.send-code', ['emailVerification' => $emailVerification])->send();
 
             return back()->with('message', 'Email sent successfully!');
         } catch (\Exception $e) {
-            // Catch and return the actual error
-            return response()->json([
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ], 500);
+
+            return redirect()->back()->with([
+                'message' => $e->getMessage(),
+            ]);
+
         }
 
     }
