@@ -31,6 +31,7 @@ use App\Mail\SendCode;
 use App\Models\BusinessInformation;
 use App\Models\EmailVerification;
 use App\Models\EmployerProfile;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,20 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/auth/google',[SocialiteController::class, 'googleLogin'])->name('auth.google');
     Route::get('/auth/google/callback',[SocialiteController::class, 'googleAuthentication']);
 
+
+    Route::get('/oauth/gmail', function () {
+        // dd(LaravelGmail::redirect());
+        return LaravelGmail::redirect();
+    });
+    Route::get('/oauth/gmail/callback', [AuthController::class, 'handleGoogleCallbackGmailToken']);
+    Route::get('/auth/google/gmail/logout', function () {
+    // Logs out the current user and removes the saved token
+    LaravelGmail::logout();
+
+        return 'Logged out from Gmail API. You can now reauthorize.';
+    });
+
+
     Route::get('/register', [AuthController::class, 'registerCreate'])->name('register.create');
     Route::post('/register/confirm-email',[AuthController::class, 'sendCode'])->name('register.send.code');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
@@ -82,19 +97,6 @@ Route::get('/choose-role',[SocialiteController::class, 'chooseRole'])->middlewar
 Route::post('/choose-role',[SocialiteController::class, 'storeRole'])->middleware(['auth'])->name('store.role');
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth'])->name('logout');
-
-Route::get('/send', function () {
-    $user = Auth::user();
-    $emailVerification = EmailVerification::create(
-        [
-            'name'=> $user->name,
-            'email'=> $user->email,
-            'role'=> 'Employer',
-            'verification_code' => '31231'
-        ]
-    );
-    Mail::to($user->email)->send(new SendCode($emailVerification));
-})->middleware('auth');
 
 Route::prefix('jobseekers')->middleware([ForceGetRedirect::class, isWorker::class, isBan::class, ChooseRole::class])->group(function () {
 

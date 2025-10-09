@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Mail\SendCode;
 use App\Models\EmailVerification;
 use App\Models\EmployerSubscriptionInvoice;
+use App\Models\GmailToken;
 use Dacastro4\LaravelGmail\Services\Message\Mail;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\InvoiceService;
 use Carbon\Carbon;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
 use Exception;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
@@ -18,10 +20,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 // use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 use function Illuminate\Log\log;
+use function Pest\Laravel\json;
 
 class AuthController extends Controller
 {
@@ -31,6 +35,22 @@ class AuthController extends Controller
     public function registerCreate(Request $request)
     {
         return inertia('Authentication/Register');
+    }
+
+    public function handleGoogleCallbackGmailToken(Request $request) {
+
+        $token = LaravelGmail::makeToken($request->code);
+
+        // dd($token); // you can see access_token & refresh_token
+
+        // Save refresh token in DB
+        GmailToken::updateOrCreate(
+            ['id' => 1],
+            ['refresh_token' => $token['refresh_token']]
+        );
+
+        return 'Token saved!' .  $token['refresh_token'];
+
     }
 
     public function sendCode(Request $request)
@@ -53,15 +73,33 @@ class AuthController extends Controller
             ]
         );
 
-        $mail = new Mail;
-        $mail->to($emailVerification->email)
-         ->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'))
-         ->subject('Verification Code')
-         ->markdown('mail.send-code', [
-             'emailVerification' => $emailVerification,
-         ])
-         ->send();
+         try {
+            // Get refresh token from DB
+            $refreshToken = GmailToken::where('id', 1)->value('refresh_token');
 
+            // Prepare email HTML
+            // Prepare plain text message
+        $message = "Hello {$fields['name']},\n\n";
+        $message .= "Your verification code is: {$code}\n\n";
+        $message .= "Thanks,\nYour App Team";
+
+        // Send email using dacastro/laravel-gmail
+        $mail = new Mail();
+        $mail->using($refreshToken)
+             ->to($fields['email'])
+             ->from('sumalinog1124@gmail.com', 'Paul Vincent Sumalinog')
+             ->subject('Verification Code')
+             ->message($message)
+             ->send();
+
+            return back()->with('message', 'Email sent successfully!');
+        } catch (\Exception $e) {
+            // Catch and return the actual error
+            return response()->json([
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
 
     }
 
