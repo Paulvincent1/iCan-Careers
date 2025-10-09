@@ -48,7 +48,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ENV PORT=10000
 EXPOSE $PORT
 
-# Run migrate:fresh (without default seeder), then run RolesSeeder, then start Supervisor
-CMD php artisan migrate:fresh --force && php artisan db:seed --class=RolesSeeder --force && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+# start Supervisor
+CMD /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 
 
