@@ -22,8 +22,10 @@ class User extends Authenticatable
         'email',
         'password',
         'google_id',
-        'profile_img',
-        'cover_photo',
+        'profile_img_public_id',
+        'profile_img_url',
+        'cover_photo_public_id',
+        'cover_photo_url',
         'verified',
         'ban'
     ];

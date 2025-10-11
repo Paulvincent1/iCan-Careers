@@ -55,9 +55,9 @@ let uploadSuccess = ref("");
 // Profile Data
 let workerSkills = ref(props.workerSkillsProp);
 let workerProfile = ref(props.workerProfileProp);
-let profilePreview = ref(props.userProp.profile_img);
+let profilePreview = ref(props.userProp.profile_img_url);
 let highestEducation = ref(workerProfile.value.highest_educational_attainment);
-let coverPhotoPreview = ref(props.userProp.cover_photo);
+let coverPhotoPreview = ref(props.userProp.cover_photo_url);
 
 // Basic Information - Use props directly for display
 let websiteLink = ref(props.workerBasicInfoProp?.website_link ?? "N/A");
@@ -305,7 +305,7 @@ function uploadProfileImage(e) {
             onError: (errors) => {
                 profilePhotoError.value = errors.profile_img || 'Failed to upload profile photo. Please try again.';
                 // Revert preview on error
-                profilePreview.value = props.userProp.profile_img;
+                profilePreview.value = props.userProp.profile_img_url;
             },
             preserveScroll: true,
         },
@@ -1067,7 +1067,7 @@ function formatUrlDisplay(url) {
                             <p class="hover:underline break-all">{{ workerProfile.resume }}</p>
                             <a
                                 target="_blank"
-                                :href="'/' + workerProfile.resume_path"
+                                :href="workerProfile.resume_url"
                                 class="pointer-events-auto flex-shrink-0 rounded bg-orange-500 px-2 py-1 text-white"
                             >
                                 <i class="bi bi-box-arrow-up-right"></i>

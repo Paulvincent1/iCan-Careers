@@ -17,7 +17,8 @@ class WorkerProfile extends Model
         'birth_year',
         'gender',
         'resume',
-        'resume_path',
+        'resume_public_id',
+        'resume_url',
     ];
 
     public function user(){

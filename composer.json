@@ -16,6 +16,7 @@
     ],
     "require": {
         "php": "^8.2",
+        "cloudinary-labs/cloudinary-laravel": "^3.0",
         "dacastro4/laravel-gmail": "^7.0",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^11.31",

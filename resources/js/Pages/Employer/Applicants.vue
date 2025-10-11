@@ -463,7 +463,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                         :href="
                                             route('show.resume', {
                                                 path: applicant.worker_profile
-                                                    .resume_path,
+                                                    .resume_public_id,
                                                 workerId: applicant.id,
                                             })
                                         "

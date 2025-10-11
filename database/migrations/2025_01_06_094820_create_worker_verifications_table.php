@@ -17,8 +17,10 @@ return new class extends Migration
             $table->string('middle_name')->nullable();
             $table->string('last_name');
             $table->string('suffix')->nullable();
-            $table->string('id_image');
-            $table->string('selfie_image');
+            $table->string('id_image_public_id');
+            $table->string('id_image_url');
+            $table->string('selfie_image_public_id');
+            $table->string('selfie_image_url');
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
