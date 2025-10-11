@@ -16,6 +16,7 @@
     ],
     "require": {
         "php": "^8.2",
+        "dacastro4/laravel-gmail": "^7.0",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^11.31",
         "laravel/socialite": "^5.23",

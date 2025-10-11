@@ -3,24 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SendCode;
-use App\Models\EmailVerication;
+use App\Models\EmailVerification;
 use App\Models\EmployerSubscriptionInvoice;
+use App\Models\GmailToken;
+use Dacastro4\LaravelGmail\Services\Message\Mail;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\InvoiceService;
 use Carbon\Carbon;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
 use Exception;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+// use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 use function Illuminate\Log\log;
+use function Pest\Laravel\json;
 
 class AuthController extends Controller
 {
@@ -30,6 +35,14 @@ class AuthController extends Controller
     public function registerCreate(Request $request)
     {
         return inertia('Authentication/Register');
+    }
+
+    public function handleGoogleCallbackGmailToken(Request $request) {
+
+        $token = LaravelGmail::makeToken();
+
+        return 'Token saved!' .  $token['refresh_token'];
+
     }
 
     public function sendCode(Request $request)
@@ -42,7 +55,7 @@ class AuthController extends Controller
 
         $code = rand(100000, 999999);
 
-        $emailVerification = EmailVerication::updateOrCreate(
+        $emailVerification = EmailVerification::updateOrCreate(
             ['email' => $fields['email']],
             [
                 'name' => $fields['name'],
@@ -52,12 +65,31 @@ class AuthController extends Controller
             ]
         );
 
-        Mail::to($fields['email'])->send(new SendCode($emailVerification));
+         try {
+
+            $token = LaravelGmail::makeToken();
+
+            $mail = new Mail();
+            $mail->using($token['access_token'])
+            ->to($fields['email'])
+                ->from('icancareers2@gmail.com', 'ican')
+                ->subject('Verification Code')
+                ->view('mail.send-code', ['emailVerification' => $emailVerification])->send();
+
+            return back()->with('message', 'Email sent successfully!');
+        } catch (\Exception $e) {
+
+            return redirect()->back()->with([
+                'message' => $e->getMessage(),
+            ]);
+
+        }
+
     }
 
     public function verifyEmail($code)
     {
-        $emailVerification = EmailVerication::where('verification_code', $code)->first();
+        $emailVerification = EmailVerification::where('verification_code', $code)->first();
 
         if (!$emailVerification) {
             return redirect()->route('login')->withErrors([
@@ -221,7 +253,7 @@ class AuthController extends Controller
             ]
         );
 
-        $emailVerification = EmailVerication::where('email', $fields['email'])->first();
+        $emailVerification = EmailVerification::where('email', $fields['email'])->first();
 
         // Check expiry
         if ($emailVerification->created_at->addMinutes(10)->isPast()) {

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EmailVerication extends Model
+class EmailVerification extends Model
 {
       protected $fillable = [
         'name',
