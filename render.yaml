@@ -2,4 +2,5 @@ services:
   - type: web
     name: iCan-Careers
     env: docker
-    preDeployCommand: php artisan migrate:fresh --force && php artisan db:seed --class=RolesSeeder
+    deploy:
+      command: php artisan migrate:fresh --force && php artisan db:seed --class=RolesSeeder
