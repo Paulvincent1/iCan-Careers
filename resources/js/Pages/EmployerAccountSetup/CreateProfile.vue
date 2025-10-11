@@ -30,7 +30,7 @@ const form = useForm({
     employer_type: "",
     business_id: null,
     business_name: "",
-    business_logo: null,
+    business_logo_url: null,
     industry: "",
     business_description: "",
     business_location: [120.9842, 14.5995],
@@ -104,7 +104,7 @@ watch(
     },
 );
 
-const imageAdded = (image) => (form.business_logo = image);
+const imageAdded = (image) => (form.business_logo_url = image);
 
 const search = () => {
     router.get(
@@ -326,7 +326,7 @@ const submit = () => {
                                     class="flex cursor-pointer items-center gap-3 rounded-lg p-2 hover:bg-gray-100"
                                 >
                                     <img
-                                        :src="business.business_logo"
+                                        :src="business.business_logo_url"
                                         class="w-12 rounded object-cover"
                                         alt="Company Logo"
                                     />
@@ -342,7 +342,7 @@ const submit = () => {
                             >
                                 <div class="flex items-center gap-3">
                                     <img
-                                        :src="businessSelected.business_logo"
+                                        :src="businessSelected.business_logo_url"
                                         class="w-12 rounded object-cover"
                                         alt="Selected Company Logo"
                                     />
@@ -407,7 +407,7 @@ const submit = () => {
                                 <SubmitImage
                                     @imageAdded="imageAdded"
                                     description="<span class='text-blue-500'><u>Upload</u></span> the business logo here"
-                                    :error="form.errors.business_logo"
+                                    :error="form.errors.business_logo_url"
                                 />
                             </div>
 

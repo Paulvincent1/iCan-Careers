@@ -18,7 +18,7 @@ const props = defineProps({
 
 const form = useForm({
   business_name: props.business.business_name || "",
-  business_logo: props.business.business_logo || null,
+  business_logo: props.business.business_logo_url || null,
   industry: props.business.industry || "",
   business_description: props.business.business_description || "",
   business_location: props.business.business_location || [120.9842, 14.5995],
@@ -37,7 +37,7 @@ watch(
 
 // handle logo upload
 const imageAdded = (image) => {
-  form.business_logo = image;
+  form.business_logo_url = image;
 };
 
 // handle map coordinates update
@@ -54,7 +54,7 @@ const submit = () => {
   form.transform((data) => ({
     ...data,
     // make sure file stays a File (not stringified)
-    business_logo: data.business_logo,
+    business_logo_url: data.business_logo_url,
   }))
   .post(route("employer.business.update", props.business.id), {
     forceFormData: true, // ✅ ensures multipart/form-data
@@ -101,17 +101,17 @@ const submit = () => {
             <SubmitImage
               @imageAdded="imageAdded"
               description="<span class='text-blue-500'><u>Upload</u></span> the business logo here"
-              :error="form.errors.business_logo"
+              :error="form.errors.business_logo_url"
             />
-            <div v-if="form.business_logo" class="mt-3">
+            <div v-if="form.business_logo_url" class="mt-3">
               <img
-                :src="form.business_logo"
+                :src="form.business_logo_url"
                 alt="Current Logo"
                 class="h-16 rounded object-cover"
               />
             </div>
-          </div>
 
+          </div>
           <!-- Industry -->
           <div class="flex w-full flex-col">
             <label class="text-lg font-semibold text-gray-800">

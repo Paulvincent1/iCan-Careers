@@ -35,7 +35,7 @@ const form = useForm({
     employer_type: props.employerProfile.employer_type,
     business_id: props.currentBusiness?.id || null,
     business_name: props.currentBusiness?.business_name || "",
-    business_logo: null,
+    business_logo_url: null,
     industry: props.currentBusiness?.industry || "",
     business_description: props.currentBusiness?.business_description || "",
     business_location: props.currentBusiness?.business_location || [
@@ -122,7 +122,7 @@ watch(
     },
 );
 
-const imageAdded = (image) => (form.business_logo = image);
+const imageAdded = (image) => (form.business_logo_url = image);
 
 const search = () => {
     router.get(
@@ -143,7 +143,7 @@ const submit = () => {
 
     <div class="mb-4 flex justify-center">
         <div class="mt-5 w-full rounded-lg bg-white p-8">
-            
+
 
             <form @submit.prevent="submit" class="mt-4 space-y-6">
                 <!-- Employer Type -->
@@ -253,7 +253,7 @@ const submit = () => {
                                     class="flex cursor-pointer items-center gap-3 rounded-lg p-2 hover:bg-gray-100"
                                 >
                                     <img
-                                        :src="business.business_logo"
+                                        :src="business.business_logo_url"
                                         class="w-12 rounded object-cover"
                                     />
                                     <p class="text-lg">
@@ -268,7 +268,7 @@ const submit = () => {
                             >
                                 <div class="flex items-center gap-3">
                                     <img
-                                        :src="businessSelected.business_logo"
+                                        :src="businessSelected.business_logo_url"
                                         class="w-12 rounded object-cover"
                                     />
                                     <p class="text-lg">
@@ -328,12 +328,13 @@ const submit = () => {
                                 <SubmitImage
                                     @imageAdded="imageAdded"
                                     :initialImage="
-                                        currentBusiness?.business_logo
+                                        currentBusiness?.business_logo_url || null
                                     "
                                     description="<span class='text-blue-500'><u>Upload</u></span> the business logo here"
-                                    :error="form.errors.business_logo"
+                                    :error="form.errors.business_logo_url"
                                 />
                             </div>
+                            <small>Click your current logo(if contain) to edit</small>
 
                             <div class="flex w-full flex-col">
                                 <label
