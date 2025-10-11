@@ -792,7 +792,7 @@ function shouldShowDateSeparator(message, index) {
                         >
                             <div class="h-14 w-14 flex-shrink-0">
                                 <img
-                                    :src="chatHead.user.profile_img || '/assets/profile_placeholder.jpg'"
+                                    :src="chatHead.user.profile_img_url || '/assets/profile_placeholder.jpg'"
                                     :alt="`${chatHead.user.email}'s profile`"
                                     class="h-full w-full rounded-full object-cover ring-2 ring-white shadow-sm"
                                 />
@@ -822,7 +822,7 @@ function shouldShowDateSeparator(message, index) {
                         <div v-if="route().params.user" class="flex items-center gap-3">
                             <div class="h-12 w-12 ring-2 ring-white shadow-sm rounded-full overflow-hidden">
                                 <img
-                                    :src="userDirectMessageProps?.profile_img || '/assets/profile_placeholder.jpg'"
+                                    :src="userDirectMessageProps?.profile_img_url || '/assets/profile_placeholder.jpg'"
                                     :alt="`${userDirectMessageProps?.name}'s profile`"
                                     class="h-full w-full object-cover"
                                 />

@@ -50,11 +50,11 @@ const memberSince = computed(() => {
 
 let messageShow = ref(false);
 let messageType = ref(props.messageType || 'success');
-let profilePreview = ref(props.user.profile_img);
+let profilePreview = ref(props.user.profile_img_url || '/assets/profile_placeholder.jpg');
 let employerProfile = ref({ ...props.employerProfileProp });
 let isEditFullNameActive = ref(false);
 let isEditingBasicInfo = ref(false);
-let coverPhotoPreview = ref(props.user.cover_photo);
+let coverPhotoPreview = ref(props.user.cover_photo_url);
 
 watchEffect(() => {
     showSuccessMessage();

@@ -160,99 +160,108 @@ class EmployerProfileController extends Controller
     }
 
 
+
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
         $employerProfile = $user->employerProfile;
 
         if (!$employerProfile) {
-            return redirect()->back()->with(['message' => 'Employer profile not found.', 'messageType' => 'error']);
-        }
-
-        // Validate cover photo - REMOVED GIF FROM ALLOWED TYPES
-        if ($request->hasFile('cover_photo')) {
-            $request->validate([
-                'cover_photo' => 'required|image|mimes:jpeg,png,jpg,bmp,webp|max:2048' // Removed gif
-            ]);
-
-            $coverPhoto = $request->file('cover_photo');
-
-            // Check if it's actually an image (additional validation)
-            if (!str_contains($coverPhoto->getMimeType(), 'image/')) {
-                return redirect()->back()->with(['message' => 'Invalid file type. Please upload an image file (JPEG, PNG, JPG, BMP, WEBP).', 'messageType' => 'error']);
-            }
-
-            // Additional check to block GIFs
-            if ($coverPhoto->getMimeType() === 'image/gif') {
-                return redirect()->back()->with(['message' => 'GIF files are not allowed. Please upload JPEG, PNG, JPG, BMP, or WEBP files.', 'messageType' => 'error']);
-            }
-
-            // Delete old cover photo if exists
-            if ($user->cover_photo) {
-                $relativePath = str_replace('/storage/', '', $user->cover_photo);
-                if (Storage::disk('public')->exists($relativePath)) {
-                    Storage::disk('public')->delete($relativePath);
-                }
-            }
-
-            $coverPath = Storage::disk('public')->put('images/cover_photos', $coverPhoto);
-            $user->update([
-                'cover_photo' => '/storage/' . $coverPath
+            return redirect()->back()->with([
+                'message' => 'Employer profile not found.',
+                'messageType' => 'error'
             ]);
         }
 
-        // Validate input fields
+        // ========== Scalar field validation & update ==========
         $request->validate([
-            'full_name' => 'nullable|string|min:1',
-            'birth_year' => 'nullable|integer',
-            'gender' => 'nullable|string|in:Male,Female,Other',
+            'full_name'    => 'nullable|string|min:1',
+            'birth_year'   => 'nullable|integer|min:1900|max:' . now()->year,
+            'gender'       => 'nullable|string|in:Male,Female,Other',
             'phone_number' => 'nullable|string',
         ]);
 
-        // Update employer profile
         $employerProfile->update([
-            'full_name' => $request->full_name ?? $employerProfile->full_name,
-            'birth_year' => $request->birth_year ?? $employerProfile->birth_year,
-            'gender' => $request->gender ?? $employerProfile->gender,
+            'full_name'    => $request->full_name ?? $employerProfile->full_name,
+            'birth_year'   => $request->birth_year ?? $employerProfile->birth_year,
+            'gender'       => $request->gender ?? $employerProfile->gender,
             'phone_number' => $request->phone_number ?? $employerProfile->phone_number,
         ]);
 
-        // Handle profile image upload - REMOVED GIF FROM ALLOWED TYPES
+        // ========== Profile Image (Cloudinary) ==========
         if ($request->hasFile('profile_img')) {
             $request->validate([
-                'profile_img' => 'required|image|mimes:jpeg,png,jpg,bmp,webp|max:2048' // Removed gif
+                'profile_img' => [
+                    'required',
+                    'image',
+                    'mimes:jpeg,jpg,png,webp',   // no GIFs
+                    'max:2048',                  // 2MB
+                ]
             ]);
 
-            $profileImg = $request->file('profile_img');
-
-            // Check if it's actually an image (additional validation)
-            if (!str_contains($profileImg->getMimeType(), 'image/')) {
-                return redirect()->back()->with(['message' => 'Invalid file type. Please upload an image file (JPEG, PNG, JPG, BMP, WEBP).', 'messageType' => 'error']);
+            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            $mime = $request->file('profile_img')->getMimeType();
+            if (!in_array($mime, $allowedMimes, true)) {
+                return back()->withErrors([
+                    'profile_img' => 'Profile photo must be JPEG, JPG, PNG, or WEBP. GIF/video files are not allowed.',
+                ])->withInput();
             }
 
-            // Additional check to block GIFs
-            if ($profileImg->getMimeType() === 'image/gif') {
-                return redirect()->back()->with(['message' => 'GIF files are not allowed. Please upload JPEG, PNG, JPG, BMP, or WEBP files.', 'messageType' => 'error']);
+            // delete old from Cloudinary if present
+            if ($user->profile_img_public_id && Storage::disk('cloudinary')->exists($user->profile_img_public_id)) {
+                Storage::disk('cloudinary')->delete($user->profile_img_public_id);
             }
 
-            // Delete old image if exists
-            if ($user->profile_img) {
-                $relativePath = str_replace('/storage/', '', $user->profile_img);
-                if (Storage::disk('public')->exists($relativePath)) {
-                    Storage::disk('public')->delete($relativePath);
-                }
-            }
-
-            // Upload new image
-            $path = Storage::disk('public')->put('images', $profileImg);
+            // upload new
+            $publicId = Storage::disk('cloudinary')->putFile('employers/profile', $request->file('profile_img'));
+            $url      = Storage::disk('cloudinary')->url($publicId);
 
             $user->update([
-                'profile_img' => '/storage/' . $path
+                'profile_img_public_id' => $publicId,
+                'profile_img_url'       => $url,
             ]);
         }
 
-        return redirect()->back()->with(['message' => 'Profile updated successfully!', 'messageType' => 'success']);
+        // ========== Cover Photo (Cloudinary) ==========
+        if ($request->hasFile('cover_photo')) {
+            $request->validate([
+                'cover_photo' => [
+                    'required',
+                    'image',
+                    'mimes:jpeg,jpg,png,webp', // no GIFs
+                    'max:5120',                // 5MB
+                ]
+            ]);
+
+            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            $mime = $request->file('cover_photo')->getMimeType();
+            if (!in_array($mime, $allowedMimes, true)) {
+                return back()->withErrors([
+                    'cover_photo' => 'Cover photo must be JPEG, JPG, PNG, or WEBP. GIF/video files are not allowed.',
+                ])->withInput();
+            }
+
+            // delete old from Cloudinary if present
+            if ($user->cover_photo_public_id && Storage::disk('cloudinary')->exists($user->cover_photo_public_id)) {
+                Storage::disk('cloudinary')->delete($user->cover_photo_public_id);
+            }
+
+            // upload new
+            $publicId = Storage::disk('cloudinary')->putFile('employers/cover', $request->file('cover_photo'));
+            $url      = Storage::disk('cloudinary')->url($publicId);
+
+            $user->update([
+                'cover_photo_public_id' => $publicId,
+                'cover_photo_url'       => $url,
+            ]);
+        }
+
+        return redirect()->back()->with([
+            'message' => 'Profile updated successfully!',
+            'messageType' => 'success'
+        ]);
     }
+
 
 
     public function storeProfile(Request $request)

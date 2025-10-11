@@ -467,7 +467,7 @@ onMounted(() => {
                                 <div class="flex-shrink-0 h-12 w-12">
                                     <img
                                         :src="
-                                            chatHead.user.profile_img ??
+                                            chatHead.user.profile_img_url ??
                                             '/assets/profile_placeholder.jpg'
                                         "
                                         alt="User avatar"

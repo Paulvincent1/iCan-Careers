@@ -486,7 +486,7 @@ onBeforeUnmount(() => {
                                 <!-- Avatar -->
                                 <div class="flex-shrink-0 h-10 w-10">
                                     <img
-                                        :src="chatHead.user.profile_img ?? '/assets/profile_placeholder.jpg'"
+                                        :src="chatHead.user.profile_img_url ?? '/assets/profile_placeholder.jpg'"
                                         alt="User avatar"
                                         class="h-full w-full rounded-full object-cover"
                                     />

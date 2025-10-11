@@ -111,8 +111,8 @@ const deleteWorker = () => {
                         ID Image
                     </h3>
                     <img
-                        v-if="verification.id_image"
-                        :src="verification.id_image"
+                        v-if="verification.id_image_url"
+                        :src="verification.id_image_url"
                         alt="ID Image"
                         class="mx-auto mt-2 h-auto w-full max-w-sm rounded-lg border shadow-md"
                     />
@@ -125,8 +125,8 @@ const deleteWorker = () => {
                         Selfie Image
                     </h3>
                     <img
-                        v-if="verification.selfie_image"
-                        :src="verification.selfie_image"
+                        v-if="verification.selfie_image_url"
+                        :src="verification.selfie_image_url"
                         alt="Selfie Image"
                         class="mx-auto mt-2 h-auto w-full max-w-sm rounded-lg border shadow-md"
                     />

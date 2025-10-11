@@ -107,7 +107,7 @@ class WorkerDashboard extends Controller
         [
             'user' => [
                 'name' => $user->name,
-                'profile_photo_path' => $user->profile_img ?? null, // Ensure it's included
+                'profile_photo_path' => $user->profile_img_url ?? null, // Ensure it's included
             ],
             'isPending' => $isPending,
             'savedJobsProps' => $savedJobs,

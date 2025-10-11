@@ -85,7 +85,7 @@ class EmployerDashboardController extends Controller
         return inertia('Employer/Dashboard',['user' => [
             'name' => $user->name,
 
-            'profile_photo_path' => $user->profile_img ?? null, // Ensure it's included
+            'profile_photo_path' => $user->profile_img_url ?? null, // Ensure it's included
         ],'businessProps' => $business ?? null,'subscriptionProps' => $subscription,'jobsProps' =>  $jobs, 'currentWorkerProps' => $hiredWorkers, 'invoiceProps' =>  $invoices, 'successMessage' => session()->get('successMessage'), 'chatHeadsProps' => $chatHeads]);
     }
 
@@ -261,7 +261,7 @@ class EmployerDashboardController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'profile_img' => $user->profile_img,
+                'profile_img' => $user->profile_img_url,
                 'created_at' => $user->created_at->diffForHumans(),
                 'role' => $role,
                 'average_star' => round($averageStar ?? 0, 2),
@@ -337,7 +337,7 @@ class EmployerDashboardController extends Controller
             $isOwner = $job->employer_id === $user->id;
 
              $businessInfo = $job->employer->businessInformation;
-            
+
 
 
 
@@ -359,8 +359,8 @@ class EmployerDashboardController extends Controller
                 'is_owner' => $isOwner,
                 'business' => [
                     'id'   => $businessInfo->id ?? null,
-                    'business_logo' => $businessInfo->business_logo 
-                                    ?? $job->employer->profile_img 
+                    'business_logo' => $businessInfo->business_logo
+                                    ?? $job->employer->profile_img
                                     ?? '/assets/logo-placeholder-image.png',
                     'business_name' => $businessInfo->business_name ?? 'N/A',
                 ],
