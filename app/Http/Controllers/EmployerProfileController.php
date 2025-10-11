@@ -266,7 +266,6 @@ class EmployerProfileController extends Controller
 
     public function storeProfile(Request $request)
     {
-        // dd($request);
         $user = Auth::user();
         $fields = $request->validate([
             'full_name' => 'required|max:255',
@@ -276,11 +275,9 @@ class EmployerProfileController extends Controller
             'employer_type' => 'required'
         ]);
 
-
         if ($fields['employer_type'] === 'business') {
-
             if ($request->business_id) {
-                $business =  BusinessInformation::where('id', $request->business_id)->first();
+                $business = BusinessInformation::where('id', $request->business_id)->first();
 
                 if ($business) {
                     $business->employers()->syncWithoutDetaching([$user->id]);
@@ -297,31 +294,30 @@ class EmployerProfileController extends Controller
                     return redirect()->route('employer.dashboard');
                 }
 
-                return redirect()->back()->withErrors(['business' => 'business found']);
+                return redirect()->back()->withErrors(['business' => 'Business not found']);
             }
 
             $business = $request->validate([
                 'business_name' => 'required|max:255',
-                'business_logo' => 'required|image',
+                'business_logo' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120',
                 'industry' => 'required',
                 'business_description' => 'required',
                 'business_location' => 'required',
             ]);
-            // dd($request);
 
-            $logo = Storage::disk('public')->put('images', $request->business_logo);
+            // Upload to Cloudinary
+            $publicId = Storage::disk('cloudinary')->putFile('businesses/logo', $request->file('business_logo'));
+            $url = Storage::disk('cloudinary')->url($publicId);
 
-
-            $businessInformation =  BusinessInformation::create([
+            $businessInformation = BusinessInformation::create([
                 'user_id' => $user->id,
                 'business_name' => $business['business_name'],
-                'business_logo' => '/storage/' . $logo,
-                'industry' =>  $business['industry'],
-                'business_description' =>  $business['business_description'],
-                'business_location' =>  $business['business_location'],
-
+                'business_logo_public_id' => $publicId,
+                'business_logo_url' => $url,
+                'industry' => $business['industry'],
+                'business_description' => $business['business_description'],
+                'business_location' => $business['business_location'],
             ]);
-
 
             $businessInformation->employers()->attach($user->id);
 
@@ -334,13 +330,10 @@ class EmployerProfileController extends Controller
                 'business_id' => $businessInformation->id,
             ]);
 
-
             return redirect()->route('employer.dashboard');
         }
 
-
         $user->employerProfile()->create($fields);
-
         return redirect()->route('employer.dashboard');
     }
 
@@ -377,7 +370,7 @@ class EmployerProfileController extends Controller
             'employer_type' => 'required',
             'business_id' => 'nullable|integer|exists:business_information,id',
             'business_name' => 'nullable|max:255',
-            'business_logo' => 'nullable|image',
+            'business_logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
             'industry' => 'nullable|string',
             'business_description' => 'nullable|string',
             'business_location' => 'nullable',
@@ -385,7 +378,6 @@ class EmployerProfileController extends Controller
 
         if ($fields['employer_type'] === 'business') {
             if ($request->business_id) {
-                // attach user to business
                 $business = BusinessInformation::find($request->business_id);
                 $business->employers()->syncWithoutDetaching([$user->id]);
 
@@ -396,16 +388,20 @@ class EmployerProfileController extends Controller
                 return back()->with('message', 'Profile updated with existing business!');
             }
 
-            // Create new business
-            $logo = null;
+            // Create new business with Cloudinary
+            $publicId = null;
+            $url = null;
+
             if ($request->hasFile('business_logo')) {
-                $logo = Storage::disk('public')->put('images', $request->business_logo);
+                $publicId = Storage::disk('cloudinary')->putFile('businesses/logo', $request->file('business_logo'));
+                $url = Storage::disk('cloudinary')->url($publicId);
             }
 
             $businessInformation = BusinessInformation::create([
                 'user_id' => $user->id,
                 'business_name' => $fields['business_name'],
-                'business_logo' => $logo ? '/storage/' . $logo : null,
+                'business_logo_public_id' => $publicId,
+                'business_logo_url' => $url,
                 'industry' => $fields['industry'],
                 'business_description' => $fields['business_description'],
                 'business_location' => $fields['business_location'],
@@ -472,22 +468,19 @@ class EmployerProfileController extends Controller
             'employer_type' => 'required'
         ]);
 
-        // Handle business information if employer type is business
         if ($fields['employer_type'] === 'business') {
             $request->validate([
                 'business_id' => 'required_without:business_name|nullable|exists:business_information,id',
                 'business_name' => 'required_without:business_id|max:255',
-                'business_logo' => 'required_without:business_id|image|nullable',
+                'business_logo' => 'required_without:business_id|image|mimes:jpeg,jpg,png,webp|max:5120|nullable',
                 'industry' => 'required_without:business_id',
                 'business_description' => 'required_without:business_id',
                 'business_location' => 'required_without:business_id'
             ]);
 
-            // Handle business creation/selection
             if ($request->business_id) {
                 $business = BusinessInformation::findOrFail($request->business_id);
 
-                // Check if the user is already associated with this business
                 if (!$business->employers->contains($user->id)) {
                     $business->employers()->attach($user->id);
                 }
@@ -496,18 +489,21 @@ class EmployerProfileController extends Controller
             } else {
                 $businessFields = $request->validate([
                     'business_name' => 'required|max:255',
-                    'business_logo' => 'required|image',
+                    'business_logo' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120',
                     'industry' => 'required',
                     'business_description' => 'required',
                     'business_location' => 'required'
                 ]);
 
-                $logo = Storage::disk('public')->put('images', $request->business_logo);
+                // Upload to Cloudinary
+                $publicId = Storage::disk('cloudinary')->putFile('businesses/logo', $request->file('business_logo'));
+                $url = Storage::disk('cloudinary')->url($publicId);
 
                 $business = BusinessInformation::create([
                     'user_id' => $user->id,
                     'business_name' => $businessFields['business_name'],
-                    'business_logo' => '/storage/' . $logo,
+                    'business_logo_public_id' => $publicId,
+                    'business_logo_url' => $url,
                     'industry' => $businessFields['industry'],
                     'business_description' => $businessFields['business_description'],
                     'business_location' => $businessFields['business_location'],
@@ -517,11 +513,9 @@ class EmployerProfileController extends Controller
                 $fields['business_id'] = $business->id;
             }
         } else {
-            // If switching to individual, remove business association
             $fields['business_id'] = null;
         }
 
-        // Update the employer profile
         $employerProfile->update($fields);
 
         return redirect()->route('employer.profile')->with('message', 'Profile updated successfully!');
@@ -552,20 +546,20 @@ class EmployerProfileController extends Controller
         // Handle logo update if provided
         if ($request->hasFile('business_logo')) {
             $request->validate([
-                'business_logo' => 'image'
+                'business_logo' => 'image|mimes:jpeg,jpg,png,webp|max:5120'
             ]);
 
-            // Delete old logo
-            if ($business->business_logo) {
-                $relativePath = str_replace('/storage/', '', $business->business_logo);
-                if (Storage::disk('public')->exists($relativePath)) {
-                    Storage::disk('public')->delete($relativePath);
-                }
+            // Delete old logo from Cloudinary if exists
+            if ($business->business_logo_public_id && Storage::disk('cloudinary')->exists($business->business_logo_public_id)) {
+                Storage::disk('cloudinary')->delete($business->business_logo_public_id);
             }
 
-            // Upload new logo
-            $logo = Storage::disk('public')->put('images', $request->business_logo);
-            $fields['business_logo'] = '/storage/' . $logo;
+            // Upload new logo to Cloudinary
+            $publicId = Storage::disk('cloudinary')->putFile('businesses/logo', $request->file('business_logo'));
+            $url = Storage::disk('cloudinary')->url($publicId);
+
+            $fields['business_logo_public_id'] = $publicId;
+            $fields['business_logo_url'] = $url;
         }
 
         $business->update($fields);

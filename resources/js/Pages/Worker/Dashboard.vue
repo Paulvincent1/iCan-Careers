@@ -964,7 +964,7 @@ onMounted(() => {
                                                         >
                                                             <img
                                                                 class="mx-auto w-12 object-cover"
-                                                                :src="job.employer.employer_profile.business_information.business_logo ?? '/assets/logo-placeholder-image.png'"
+                                                                :src="job.employer.employer_profile.business_information.business_logo_url ?? '/assets/logo-placeholder-image.png'"
                                                                 alt="Business Logo"
                                                             />
                                                         </ProfileBusinessCard>
@@ -1110,7 +1110,7 @@ onMounted(() => {
                                                         >
                                                             <img
                                                                 class="mx-auto w-12 object-cover"
-                                                                :src="job.employer.employer_profile.business_information.business_logo ?? '/assets/logo-placeholder-image.png'"
+                                                                :src="job.employer.employer_profile.business_information.business_logo_url ?? '/assets/logo-placeholder-image.png'"
                                                                 alt="Business Logo"
                                                             />
                                                         </ProfileBusinessCard>

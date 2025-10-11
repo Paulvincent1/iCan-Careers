@@ -9,7 +9,8 @@ class BusinessInformation extends Model
 {
     protected $fillable = [
         'business_name',
-        'business_logo',
+        'business_logo_public_id',
+        'business_logo_url',
         'industry',
         'business_description',
         'business_location',
@@ -19,6 +20,12 @@ class BusinessInformation extends Model
     protected $casts = [
         'business_location' => 'array'
     ];
+
+     // Add accessor for backward compatibility
+    public function getBusinessLogoAttribute()
+    {
+        return $this->business_logo_url;
+    }
 
     public function scopeFilter(Builder $query, array $filters){
         if($filters['business_name'] ?? false){
