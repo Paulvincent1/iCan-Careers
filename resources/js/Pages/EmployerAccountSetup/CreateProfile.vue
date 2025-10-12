@@ -30,7 +30,7 @@ const form = useForm({
     employer_type: "",
     business_id: null,
     business_name: "",
-    business_logo_url: null,
+    business_logo: null,
     industry: "",
     business_description: "",
     business_location: [120.9842, 14.5995],
@@ -104,7 +104,7 @@ watch(
     },
 );
 
-const imageAdded = (image) => (form.business_logo_url = image);
+const imageAdded = (image) => (form.business_logo = image);
 
 const search = () => {
     router.get(
@@ -116,7 +116,14 @@ const search = () => {
 
 const submit = () => {
     if (form.industry === "Other") form.industry = otherIndustry.value;
-    form.post(route("create.profile.employer.post"));
+
+    form.transform((data) => ({
+        ...data,
+        business_logo: data.business_logo, 
+    }))
+    .post(route("create.profile.employer.post"), {
+        forceFormData: true,
+    });
 };
 </script>
 

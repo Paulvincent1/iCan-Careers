@@ -297,15 +297,16 @@ class EmployerProfileController extends Controller
                 return redirect()->back()->withErrors(['business' => 'Business not found']);
             }
 
+            // ✅ FIXED: Use 'business_logo' for validation (matches Vue form field)
             $business = $request->validate([
                 'business_name' => 'required|max:255',
-                'business_logo' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120',
+                'business_logo' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120', // ✅ Changed from business_logo_url
                 'industry' => 'required',
                 'business_description' => 'required',
                 'business_location' => 'required',
             ]);
 
-            // Upload to Cloudinary
+            // Upload to Cloudinary - ✅ This stays the same
             $publicId = Storage::disk('cloudinary')->putFile('businesses/logo', $request->file('business_logo'));
             $url = Storage::disk('cloudinary')->url($publicId);
 
@@ -313,7 +314,7 @@ class EmployerProfileController extends Controller
                 'user_id' => $user->id,
                 'business_name' => $business['business_name'],
                 'business_logo_public_id' => $publicId,
-                'business_logo_url' => $url,
+                'business_logo_url' => $url, // ✅ Store the URL in database
                 'industry' => $business['industry'],
                 'business_description' => $business['business_description'],
                 'business_location' => $business['business_location'],
