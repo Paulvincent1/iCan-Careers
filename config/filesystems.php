@@ -56,14 +56,18 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
+        
 
         'cloudinary' => [
             'driver' => 'cloudinary',
-            'cloud' => env('CLOUDINARY_CLOUD_NAME'),
             'key' => env('CLOUDINARY_API_KEY'),
             'secret' => env('CLOUDINARY_API_SECRET'),
-            'secure' => env('CLOUDINARY_SECURE', true),
+            'cloud' => env('CLOUDINARY_CLOUD_NAME'),
+            'url' => env('CLOUDINARY_URL'),
+            'secure' => (bool) env('CLOUDINARY_SECURE_URL', true),
+            'prefix' => env('CLOUDINARY_PREFIX'),
         ],
+
 
 
     ],

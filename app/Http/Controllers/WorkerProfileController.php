@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\WorkerProfile;
 use App\Models\WorkerSkills;
+use App\Services\CloudinaryFileUploadService;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -15,6 +17,11 @@ use function Illuminate\Log\log;
 
 class WorkerProfileController extends Controller
 {
+
+     public function __construct(public CloudinaryFileUploadService $cloudinaryFileUpload)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -58,11 +65,10 @@ class WorkerProfileController extends Controller
         }
 
         // Handle Resume
-        $resumePublicId = null;
-        $resumeUrl = null;
+        $resume = null;
         if ($request->hasFile('resume')) {
-            $resumePublicId = Storage::disk('cloudinary')->putFile('resume', $request->resume);
-            $resumeUrl = Storage::disk('cloudinary')->url($resumePublicId);
+            $resume = $this->cloudinaryFileUpload
+            ->uploadFile(request: $request, fileKey: 'resume', folder: 'resumes', uploadPreset: 'resumes');
         }
 
         // Save Profile
@@ -77,8 +83,8 @@ class WorkerProfileController extends Controller
             'birth_year' => $fields['birth_year'],
             'gender' => $fields['gender'],
             'resume' => $request->resume?->getClientOriginalName() ?? null,
-            'resume_public_id' => $resumePublicId,
-            'resume_url' => $resumeUrl,
+            'resume_public_id' => $resume['public_id'],
+            'resume_url' => $resume['url'],
         ]);
 
         Inertia::clearHistory();
@@ -265,20 +271,20 @@ class WorkerProfileController extends Controller
             ]);
 
             $existingResumeUrl = $user->workerProfile->resume_url;
-
             if ($existingResumeUrl) {
                 if (Storage::disk('cloudinary')->exists($user->workerProfile->resume_public_id)) {
                     Storage::disk('cloudinary')->delete($user->workerProfile->resume_public_id);
                 }
             }
 
-            $resumePublicId = Storage::disk('cloudinary')->putFile('resume', $request->resume);
-            $resume_url = Storage::disk('cloudinary')->url($resumePublicId);
+
+            $resume = $this->cloudinaryFileUpload
+            ->uploadFile(request: $request, fileKey: 'resume', folder: 'resumes', uploadPreset: 'resumes');
 
             $user->workerProfile->update([
                 'resume' => $request->resume?->getClientOriginalName() ?? null,
-                'resume_public_id' => $resumePublicId,
-                'resume_url' => $resume_url,
+                'resume_public_id' => $resume['public_id'],
+                'resume_url' => $resume['url'],
             ]);
         }
 
