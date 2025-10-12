@@ -35,7 +35,7 @@ const form = useForm({
     employer_type: props.employerProfile.employer_type,
     business_id: props.currentBusiness?.id || null,
     business_name: props.currentBusiness?.business_name || "",
-    business_logo_url: null,
+    business_logo: null,
     industry: props.currentBusiness?.industry || "",
     business_description: props.currentBusiness?.business_description || "",
     business_location: props.currentBusiness?.business_location || [
@@ -122,7 +122,7 @@ watch(
     },
 );
 
-const imageAdded = (image) => (form.business_logo_url = image);
+const imageAdded = (image) => (form.business_logo = image);
 
 const search = () => {
     router.get(
@@ -134,7 +134,14 @@ const search = () => {
 
 const submit = () => {
     if (form.industry === "Other") form.industry = otherIndustry.value;
-    form.post(route("employer.profile.update"));
+
+    form.transform((data) => ({
+        ...data,
+        business_logo: data.business_logo,
+    }))
+    .post(route("employer.profile.update"), {
+        forceFormData: true, 
+    });
 };
 </script>
 
