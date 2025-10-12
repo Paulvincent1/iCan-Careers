@@ -65,7 +65,7 @@ class AdminWorkerVerificationNotification extends Notification  implements Shoul
     public function broadcastOn()
     {
 
-        return new Channel('notification-' . $this->user->id);
+        return new Channel('notification-' . $this->admin->id);
 
     }
 

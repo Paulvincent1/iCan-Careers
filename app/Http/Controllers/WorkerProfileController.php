@@ -83,8 +83,8 @@ class WorkerProfileController extends Controller
             'birth_year' => $fields['birth_year'],
             'gender' => $fields['gender'],
             'resume' => $request->resume?->getClientOriginalName() ?? null,
-            'resume_public_id' => $resume['public_id'],
-            'resume_url' => $resume['url'],
+            'resume_public_id' => $resume['public_id'] ?? null,
+            'resume_url' => $resume['url'] ?? null,
         ]);
 
         Inertia::clearHistory();
