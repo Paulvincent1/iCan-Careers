@@ -124,7 +124,7 @@ class MessageController extends Controller
 
         return inertia('Messages/Messages', ['user' => [
             'name' => $user->name,
-            'profile_photo_path' => $user->profile_img ?? null, // Ensure it's included
+            'profile_photo_path' => $user->profile_img_url ?? null, // Ensure it's included
         ], 'firstMessageChatHeadProps' => $firstMessageChatHead, 'chatHeadProps' => $chatHeads, 'messageProps' => $messages, 'userDirectMessageProps' => $userDirectMessage]);
     }
 

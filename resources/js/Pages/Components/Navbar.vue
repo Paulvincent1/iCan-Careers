@@ -323,7 +323,7 @@ const profileRoute = computed(() => {
                         >
                             <img
                                 :src="
-                                    $page.props.auth.user?.profile_img ||
+                                    $page.props.auth.user.authenticated?.profile_img_url ||
                                     '/assets/profile_placeholder.jpg'
                                 "
                                 alt="User Profile"

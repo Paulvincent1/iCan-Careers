@@ -11,8 +11,10 @@ class WorkerVerification extends Model
         'middle_name',
         'last_name',
         'suffix',
-        'id_image',
-        'selfie_image',
+        'id_image_public_id',
+        'id_image_url',
+        'selfie_image_public_id',
+        'selfie_image_url',
     ];
 
     public function user(){

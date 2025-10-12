@@ -18,6 +18,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 
 class AdminDashboardController extends Controller
 {
@@ -184,6 +185,16 @@ class AdminDashboardController extends Controller
                 'error' => 'Nothing to delete.'
             ]);
         }
+
+        // delete the images in the
+        if(Storage::disk('cloudinary')->exists($worker->id_image_public_id)){
+            Storage::disk('cloudinary')->delete($worker->id_image_public_id);
+        }
+
+        if(Storage::disk('cloudinary')->exists($worker->selfie_image_public_id)){
+            Storage::disk('cloudinary')->delete($worker->selfie_image_public_id);
+        }
+
         $worker->delete();  // Try deleting the record
 
 

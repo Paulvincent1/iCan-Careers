@@ -20,6 +20,8 @@
         "vite": "^6.0"
     },
     "dependencies": {
+        "@cloudinary/url-gen": "^1.22.0",
+        "@cloudinary/vue": "^1.13.3",
         "@fortawesome/fontawesome-svg-core": "^6.7.2",
         "@fortawesome/free-brands-svg-icons": "^6.7.2",
         "@fortawesome/free-solid-svg-icons": "^6.7.2",

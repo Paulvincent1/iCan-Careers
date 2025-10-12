@@ -55,9 +55,9 @@ let uploadSuccess = ref("");
 // Profile Data
 let workerSkills = ref(props.workerSkillsProp);
 let workerProfile = ref(props.workerProfileProp);
-let profilePreview = ref(props.userProp.profile_img);
+let profilePreview = ref(props.userProp.profile_img_url);
 let highestEducation = ref(workerProfile.value.highest_educational_attainment);
-let coverPhotoPreview = ref(props.userProp.cover_photo);
+let coverPhotoPreview = ref(props.userProp.cover_photo_url);
 
 // Basic Information - Use props directly for display
 let websiteLink = ref(props.workerBasicInfoProp?.website_link ?? "N/A");
@@ -305,7 +305,7 @@ function uploadProfileImage(e) {
             onError: (errors) => {
                 profilePhotoError.value = errors.profile_img || 'Failed to upload profile photo. Please try again.';
                 // Revert preview on error
-                profilePreview.value = props.userProp.profile_img;
+                profilePreview.value = props.userProp.profile_img_url;
             },
             preserveScroll: true,
         },
@@ -559,166 +559,189 @@ function formatUrlDisplay(url) {
     <Head title="Profile | iCan Careers" />
     <div class="min-h-[calc(100vh-4.625rem)] bg-[#f3f7fa]">
         <!-- Updated Header Section with Cover Photo -->
-        <div class="relative">
-            <!-- Cover Photo Section -->
-            <div class="relative h-48 bg-gray-200">
 
-                <!-- Cover Photo Display -->
-                <div v-if="coverPhotoPreview" class="h-full w-full">
-                    <img
+                <div class="relative">
+                <!-- Cover Photo Section - Facebook Proportions -->
+                <div class="relative bg-gray-200 overflow-hidden">
+                    <!-- Facebook cover photo ratio is approximately 2.7:1 (851x315) -->
+                    <div class="w-full aspect-[2.7/1] min-h-[150px] max-h-[400px]">
+                    <!-- Cover Photo Display -->
+                    <div v-if="coverPhotoPreview" class="h-full w-full">
+                        <img
                         :src="coverPhotoPreview"
                         alt="Cover Photo"
                         class="h-full w-full object-cover"
-                    />
-                </div>
-                <div v-else class="flex h-full w-full items-center justify-center bg-gradient-to-r from-gray-300 to-gray-400">
-                    <span class="text-gray-500">No cover photo</span>
-                </div>
+                        />
+                    </div>
+                    <div v-else class="flex h-full w-full items-center justify-center bg-gradient-to-r from-gray-300 to-gray-400">
+                        <span class="text-gray-500 text-sm md:text-base">No cover photo</span>
+                    </div>
+                    </div>
 
-                <!-- Cover Photo Upload Button (only for owner) -->
-                <label
+                    <!-- Cover Photo Upload Button (only for owner) - Facebook Style -->
+                    <label
                     v-if="!visitor"
                     for="coverPhoto"
-                    class="absolute right-4 bottom-4 flex cursor-pointer items-center gap-2 rounded-md bg-white/80 px-3 py-2 text-sm font-medium text-gray-700 backdrop-blur-sm transition-all hover:bg-white hover:shadow-md"
-                >
+                    class="absolute right-4 bottom-4 flex cursor-pointer items-center gap-2 rounded bg-black/60 px-3 py-2 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-black/70"
+                    >
                     <i class="bi bi-camera"></i>
-                    <span>{{ coverPhotoPreview ? 'Change Cover' : 'Add Cover' }}</span>
-                </label>
-                <input
+                    <span class="hidden sm:inline">{{ coverPhotoPreview ? 'Update cover photo' : 'Add cover photo' }}</span>
+                    <span class="sm:hidden">{{ coverPhotoPreview ? 'Update' : 'Add' }}</span>
+                    </label>
+                    <input
                     @change="uploadCoverPhoto"
                     id="coverPhoto"
                     type="file"
                     class="hidden"
                     accept=".jpg,.jpeg,.png,.webp"
-                />
+                    />
 
-                <!-- Report Button (for visitors) -->
-                <div v-if="visitor" class="absolute right-4 top-4">
+                    <!-- Report Button (for visitors) - Facebook Style -->
+                    <div v-if="visitor" class="absolute right-4 top-4">
                     <button
                         @click="isShowReportModal = true"
-                        class="flex items-center gap-1 rounded-md bg-white/80 px-3 py-2 text-sm font-medium text-red-600 backdrop-blur-sm transition-all hover:bg-white hover:shadow-md"
+                        class="flex items-center gap-1 rounded bg-black/60 px-3 py-2 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-black/70"
                     >
-                        <i class="bi bi-exclamation-diamond-fill"></i>
-                        <span>Report</span>
+                        <i class="bi bi-flag"></i>
+                        <span class="hidden sm:inline">Report</span>
                     </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Profile Image Section - Positioned over cover photo -->
-            <div class="relative">
-                <div class="absolute -bottom-16 left-1/2 -translate-x-1/2 transform">
-                    <label
-                        for="profileimg"
-                        :class="[
-                            'flex h-32 w-32 cursor-pointer flex-col items-center',
-                            { 'pointer-events-none': visitor },
-                        ]"
-                    >
-                        <div class="relative mb-3 h-full w-full">
-                            <img
-                                draggable="false"
-                                :src="profilePreview || '/assets/profile_placeholder.jpg'"
-                                alt="Profile"
-                                class="h-full w-full rounded-full border-4 border-white object-cover shadow-lg"
-                            />
-                            <div
-                                v-if="!visitor"
-                                class="absolute bottom-1 right-1 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 shadow-md"
-                            >
-                                <i class="bi bi-camera text-lg text-gray-600"></i>
+                <!-- Profile Image Section - Centered like Facebook -->
+              <div class="relative">
+                    <div class="container mx-auto px-4 max-w-6xl">
+                        <div class="flex justify-center">
+                            <div class="absolute -bottom-16 transform">
+                                <label
+                                    for="profileimg"
+                                    :class="[
+                                        'flex flex-col items-center cursor-pointer',
+                                        { 'pointer-events-none': visitor }
+                                    ]"
+                                >
+                                    <div class="relative">
+                                        <!-- Facebook-style profile picture with white border -->
+                                        <div class="rounded-full bg-white p-1 shadow-lg">
+                                            <img
+                                                draggable="false"
+                                                :src="profilePreview || '/assets/profile_placeholder.jpg'"
+                                                alt="Profile"
+                                                class="h-32 w-32 rounded-full object-cover md:h-36 md:w-36 lg:h-40 lg:w-40"
+                                            />
+                                        </div>
+
+                                        <!-- Camera icon overlay - Positioned at bottom-right edge -->
+                                        <div
+                                            v-if="!visitor"
+                                            class="absolute bottom-2 right-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all hover:bg-blue-700 border-2 border-white"
+                                        >
+                                            <i class="bi bi-camera text-sm"></i>
+                                        </div>
+                                    </div>
+                                    <input
+                                        @change="uploadProfileImage"
+                                        id="profileimg"
+                                        type="file"
+                                        class="hidden"
+                                        accept=".jpg,.jpeg,.png,.webp"
+                                    />
+                                </label>
                             </div>
                         </div>
-                        <input
-                            @change="uploadProfileImage"
-                            id="profileimg"
-                            type="file"
-                            class="hidden"
-                            accept=".jpg,.jpeg,.png,.webp"
-                        />
-                    </label>
+                    </div>
                 </div>
-            </div>
-        </div>
+                </div>
 
-
-
-        <!-- Profile Info Section -->
-        <div class="bg-white pb-2 pt-16">
-            <div class="xs container mx-auto flex flex-col items-center justify-center xl:max-w-7xl">
-                <div class="mb-2 flex items-end gap-3">
-                    <p class="text-lg">{{ userProp.name }}</p>
-                    <Link
+                <!-- Profile Info Section - Adjusted for Facebook layout -->
+                <div class="bg-white pb-6 pt-20 md:pt-24 lg:pt-28">
+                <div class="container mx-auto max-w-6xl px-4">
+                    <div class="flex flex-col items-center text-center">
+                    <!-- Name and Chat -->
+                    <div class="mb-2 flex items-end gap-3">
+                        <p class="text-2xl font-bold text-gray-900">{{ userProp.name }}</p>
+                        <Link
                         v-if="visitor"
                         :href="route('messages')"
                         :data="{ user: userProp.id }"
-                        class="bi bi-chat-dots text-[30px] text-blue-500 hover:cursor-pointer"
-                    ></Link>
-                </div>
+                        class="bi bi-chat-dots-fill text-[28px] text-blue-500 hover:cursor-pointer hover:text-blue-600 transition-colors"
+                        ></Link>
+                    </div>
 
-                <!-- Job Title and other existing profile info -->
-                <div class="mb-3">
-                    <div v-if="!isEditJobTitleActive" class="flex items-center gap-2">
+                    <!-- Job Title -->
+                    <div class="mb-4 max-w-2xl">
+                        <div v-if="!isEditJobTitleActive" class="flex items-center justify-center gap-2">
                         <p
                             @click="isEditJobTitleActive = !visitor"
                             :class="[
-                                'max-w-[600px] break-words text-center text-[24px] font-bold',
-                                { 'cursor-pointer hover:underline': !visitor }
+                            'text-lg text-gray-600 break-words text-center',
+                            { 'cursor-pointer hover:text-gray-800': !visitor }
                             ]"
                         >
                             {{ workerProfile.job_title }}
                         </p>
                         <i
                             v-if="!visitor"
-                            class="bi bi-pencil-square cursor-pointer text-sm text-gray-500"
+                            class="bi bi-pencil-square cursor-pointer text-gray-400 hover:text-gray-600 transition-colors"
                             @click="isEditJobTitleActive = true"
                         ></i>
-                    </div>
-                    <form v-if="isEditJobTitleActive" @submit.prevent="updateJobTitle(); isEditJobTitleActive = false;">
+                        </div>
+                        <form
+                        v-if="isEditJobTitleActive"
+                        @submit.prevent="updateJobTitle(); isEditJobTitleActive = false;"
+                        class="flex items-center justify-center gap-2"
+                        >
                         <input
                             type="text"
                             v-model="workerProfile.job_title"
-                            class="mr-2 rounded border p-1 outline-none ring-orange-300 transition-all hover:ring-1 focus:ring-1"
+                            class="rounded-lg border border-gray-300 px-3 py-1 text-center outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            placeholder="Enter your job title"
                             required
                         />
-                        <button class="rounded bg-orange-500 p-1 text-white">Save</button>
-                    </form>
-                </div>
+                        <button class="rounded-lg bg-blue-600 px-3 py-1 text-white hover:bg-blue-700 transition-colors">
+                            Save
+                        </button>
+                        </form>
+                    </div>
 
-                <!-- Verification Status -->
-                <div v-if="!$page.props.auth.worker_verified && !visitor" class="flex flex-col items-center">
-                    <p class="mb-3 text-center text-orange-600">
+                    <!-- Verification Status -->
+                    <div v-if="!$page.props.auth.worker_verified && !visitor" class="mb-4 flex flex-col items-center">
+                        <p class="mb-2 text-center text-amber-600 text-sm">
+                        <i class="bi bi-exclamation-triangle-fill mr-1"></i>
                         Please verify your account to apply for jobs!
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                    </p>
-                    <Link
+                        </p>
+                        <Link
                         :href="route('account.verify')"
                         as="button"
-                        class="w-fit rounded-lg border bg-orange-500 px-3 py-2 font-bold text-white"
-                    >
-                        Verify Now!
-                    </Link>
-                </div>
+                        class="rounded-lg bg-amber-500 px-4 py-2 font-semibold text-white hover:bg-amber-600 transition-colors"
+                        >
+                        Verify Now
+                        </Link>
+                    </div>
 
-                <div v-if="$page.props.auth.user.authenticated.verified" class="flex items-center gap-1">
-                    <p class="text-sm font-bold text-gray-600">Verified</p>
-                    <i class="bi bi-patch-check-fill text-green-400"></i>
-                </div>
+                    <!-- Verified Badge -->
+                    <div v-if="$page.props.auth.user.authenticated.verified" class="mb-4 flex items-center gap-1 text-green-600">
+                        <i class="bi bi-patch-check-fill text-lg"></i>
+                        <p class="text-sm font-semibold">Verified</p>
+                    </div>
 
-                <div v-if="isPending">
-                    <p class="text-yellow-400">{{ isPending }}</p>
-                </div>
+                    <!-- Pending Status -->
+                    <div v-if="isPending" class="mb-4">
+                        <p class="text-amber-500 text-sm">{{ isPending }}</p>
+                    </div>
 
-                <!-- Manage Contracts Button -->
-                <div v-if="currentlyEmployedByMeProp?.length > 0" class="my-4 flex justify-center">
-                    <button
+                    <!-- Manage Contracts Button -->
+                    <div v-if="currentlyEmployedByMeProp?.length > 0" class="my-4">
+                        <button
                         @click="isShowContractModal = true"
-                        class="rounded-md bg-red-500 px-4 py-2 font-bold text-white shadow hover:bg-red-600"
-                    >
+                        class="rounded-lg bg-red-500 px-6 py-2 font-semibold text-white shadow hover:bg-red-600 transition-colors"
+                        >
                         Manage Contracts
-                    </button>
+                        </button>
+                    </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+                </div>
 
         <!-- Main Content -->
         <div class="xs container mx-auto px-[0.5rem] md:px-[3rem] lg:px-[9rem] xl:max-w-7xl">
@@ -875,8 +898,8 @@ function formatUrlDisplay(url) {
                         <ul v-else class="space-y-4">
                             <li v-for="job in displayedJobs" :key="job.id" class="flex items-center gap-4 rounded-md border p-4 shadow transition hover:shadow-md">
                                 <img
-                                    class="object-obtain h-16 w-16 flex-shrink-0 rounded border"
-                                    :src="job.employer?.employer_profile?.business_information?.business_logo || '/assets/logo-placeholder-image.png'"
+                                    class="object-contain h-16 w-16 flex-shrink-0 rounded border"
+                                    :src="job.employer?.employer_profile?.business_information?.business_logo_url || '/assets/logo-placeholder-image.png'"
                                     alt="Company Logo"
                                 />
                                 <div class="flex-1">
@@ -1067,7 +1090,7 @@ function formatUrlDisplay(url) {
                             <p class="hover:underline break-all">{{ workerProfile.resume }}</p>
                             <a
                                 target="_blank"
-                                :href="'/' + workerProfile.resume_path"
+                                :href="workerProfile.resume_url"
                                 class="pointer-events-auto flex-shrink-0 rounded bg-orange-500 px-2 py-1 text-white"
                             >
                                 <i class="bi bi-box-arrow-up-right"></i>

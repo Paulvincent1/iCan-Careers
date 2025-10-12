@@ -37,7 +37,7 @@ class HandleInertiaRequests extends Middleware
     {
         return array_merge(parent::share($request), [
             'auth.user.authenticated' => fn () => $request->user()
-            ? $request->user()->only('id', 'name', 'email', 'profile_img','verified')
+            ? $request->user()->only('id', 'name', 'email', 'profile_img_url','verified')
             : null,
             'auth.worker_profile' => function () use($request) {
                 if($request->user()){
@@ -58,7 +58,7 @@ class HandleInertiaRequests extends Middleware
             'auth.employer_profile' => function () use($request) {
                 if($request->user()){
                     if($request->user()->roles()->where('name','Employer')->exists()){
-                        if(!$request->user()->employerProfile) {          
+                        if(!$request->user()->employerProfile) {
                             return ['message' => 'Complete your profile now to post jobs.', 'route' => 'create.profile.employer'];
                         }
                     }

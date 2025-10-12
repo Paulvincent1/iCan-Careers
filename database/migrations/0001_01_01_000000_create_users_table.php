@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('profile_img')->nullable();
-            $table->string('cover_photo')->nullable();
+            $table->string('profile_img_public_id')->nullable();
+            $table->string('profile_img_url')->nullable();
+            $table->string('cover_photo_public_id')->nullable();
+            $table->string('cover_photo_url')->nullable();
             $table->boolean('verified')->nullable();
             $table->boolean('ban')->nullable();
             $table->timestamp('email_verified_at')->nullable();

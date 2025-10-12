@@ -36,7 +36,7 @@ const showAllEmployers = ref(false);
                     <div class="h-36 w-36 rounded-md bg-white p-1 shadow-lg">
                         <img
                             :src="
-                                business.business_logo ||
+                                business.business_logo_url ||
                                 '/assets/profile_placeholder.jpg'
                             "
                             alt="Business Logo"
@@ -182,7 +182,7 @@ const showAllEmployers = ref(false);
                                 >
                                     <img
                                         :src="
-                                            emp.profile_img ||
+                                            emp.profile_img_url ||
                                             '/assets/profile_placeholder.jpg'
                                         "
                                         :alt="emp.name"

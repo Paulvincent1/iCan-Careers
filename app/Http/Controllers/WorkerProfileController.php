@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\WorkerProfile;
 use App\Models\WorkerSkills;
+use App\Services\CloudinaryFileUploadService;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -15,6 +17,11 @@ use function Illuminate\Log\log;
 
 class WorkerProfileController extends Controller
 {
+
+     public function __construct(public CloudinaryFileUploadService $cloudinaryFileUpload)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -58,9 +65,10 @@ class WorkerProfileController extends Controller
         }
 
         // Handle Resume
-        $resumepath = null;
+        $resume = null;
         if ($request->hasFile('resume')) {
-            $resumepath = Storage::disk('local')->put('resume', $request->resume);
+            $resume = $this->cloudinaryFileUpload
+            ->uploadFile(request: $request, fileKey: 'resume', folder: 'resumes', uploadPreset: 'resumes');
         }
 
         // Save Profile
@@ -75,7 +83,8 @@ class WorkerProfileController extends Controller
             'birth_year' => $fields['birth_year'],
             'gender' => $fields['gender'],
             'resume' => $request->resume?->getClientOriginalName() ?? null,
-            'resume_path' => $resumepath,
+            'resume_public_id' => $resume['public_id'],
+            'resume_url' => $resume['url'],
         ]);
 
         Inertia::clearHistory();
@@ -221,7 +230,7 @@ class WorkerProfileController extends Controller
         }
 
         // Profile Image Validation - Updated
-        if ($request->hasFile('profile_img')) {
+        if ($request->hasFile('profile_img')) { // TODO: make it cloud
             $request->validate([
                 'profile_img' => [
                     'required',
@@ -239,17 +248,19 @@ class WorkerProfileController extends Controller
                 ])->withInput();
             }
 
-            if ($user->profile_img) {
-                $relativePath = str_replace('/storage/', '', $user->profile_img);
-                if (Storage::disk('public')->exists($relativePath)) {
-                    Storage::disk('public')->delete($relativePath);
+            if ($user->profile_img_url) {
+                // $relativePath = str_replace('/storage/', '', $user->profile_img);
+                if (Storage::disk('cloudinary')->exists($user->profile_img_public_id)) {
+                    Storage::disk('cloudinary')->delete($user->profile_img_public_id);
                 }
             }
 
-            $path = Storage::disk('public')->put('images', $request->profile_img);
+            $profileImgPublicId = Storage::disk('cloudinary')->putFile('profile', $request->profile_img);
+            $profileImgUrl = Storage::disk('cloudinary')->url($profileImgPublicId);
 
             $user->update([
-                'profile_img' => '/storage/' . $path
+                'profile_img_public_id' =>  $profileImgPublicId,
+                'profile_img_url' => $profileImgUrl
             ]);
         }
 
@@ -259,19 +270,21 @@ class WorkerProfileController extends Controller
                 'resume' => 'nullable|file|mimes:pdf,doc,docx|max:5120', // 5MB max
             ]);
 
-            $existingResumePath = $user->workerProfile->resume_path;
-
-            if ($existingResumePath) {
-                if (Storage::disk('local')->exists($existingResumePath)) {
-                    Storage::disk('local')->delete($existingResumePath);
+            $existingResumeUrl = $user->workerProfile->resume_url;
+            if ($existingResumeUrl) {
+                if (Storage::disk('cloudinary')->exists($user->workerProfile->resume_public_id)) {
+                    Storage::disk('cloudinary')->delete($user->workerProfile->resume_public_id);
                 }
             }
 
-            $resumePath = Storage::disk('local')->put('resume', $request->resume);
+
+            $resume = $this->cloudinaryFileUpload
+            ->uploadFile(request: $request, fileKey: 'resume', folder: 'resumes', uploadPreset: 'resumes');
 
             $user->workerProfile->update([
                 'resume' => $request->resume?->getClientOriginalName() ?? null,
-                'resume_path' => $resumePath,
+                'resume_public_id' => $resume['public_id'],
+                'resume_url' => $resume['url'],
             ]);
         }
 
@@ -295,17 +308,19 @@ class WorkerProfileController extends Controller
             }
 
             // Delete old cover photo if exists
-            if ($user->cover_photo) {
-                $relativePath = str_replace('/storage/', '', $user->cover_photo);
-                if (Storage::disk('public')->exists($relativePath)) {
-                    Storage::disk('public')->delete($relativePath);
+            if ($user->cover_photo_url) {
+                // $relativePath = str_replace('/storage/', '', $user->cover_photo);
+                if (Storage::disk('cloudinary')->exists($user->cover_photo_public_id)) {
+                    Storage::disk('cloudinary')->delete($user->cover_photo_public_id);
                 }
             }
 
-            $coverPath = Storage::disk('public')->put('images/cover_photos', $request->cover_photo);
+            $coverPhotoPublicId = Storage::disk('cloudinary')->putFile('profile', $request->cover_photo);
+            $coverPhotoUrl = Storage::disk('cloudinary')->url($coverPhotoPublicId);
 
             $user->update([
-                'cover_photo' => '/storage/' . $coverPath
+                'cover_photo_public_id' => $coverPhotoPublicId,
+                'cover_photo_url' => $coverPhotoUrl,
             ]);
         }
 
@@ -455,10 +470,10 @@ class WorkerProfileController extends Controller
         //    dd($user->workerProfile->resume_path === $path);
         // dd($workerId);
 
-        if ($user->workerProfile?->resume_path === $path || $user->employerJobPosts()->whereHas('usersWhoApplied', function ($query) use ($workerId) {
+        if ($user->workerProfile?->resume_public_id === $path || $user->employerJobPosts()->whereHas('usersWhoApplied', function ($query) use ($workerId) {
             $query->where('worker_id', $workerId->id);
         })->first() || $user->roles()->first()->name === 'Admin') {
-            return Storage::disk('local')->response($path);
+            return Storage::disk('cloudinary')->response($path);
         }
 
         abort(403, "You're not authorize to view this");

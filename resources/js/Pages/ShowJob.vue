@@ -222,18 +222,22 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     class="absolute left-1/2 top-[70px] -translate-x-1/2 transform"
                 >
                     <div
-                        class="absolute flex h-36 w-36 translate-x-[-50%] cursor-pointer flex-col items-center"
-                    >
+                        class="absolute flex h-36 w-36 translate-x-[-50%] cursor-pointer items-center justify-center
+                                rounded-2xl bg-white p-2 shadow-md ring-1 ring-gray-200 ring-offset-2 ring-offset-[#FAFAFA]"
+                        >
                         <img
-                            class="relative mb-3 h-full w-full"
+                            class="h-full w-full rounded-xl object-contain"
                             :src="
-                                jobPostProps?.employer?.employer_profile?.business_information?.business_logo
-                                    ? jobPostProps.employer.employer_profile.business_information.business_logo
-                                    : '/assets/logo-placeholder-image.png'
+                            jobPostProps?.employer?.employer_profile?.business_information?.business_logo_url
+                                ? jobPostProps.employer.employer_profile.business_information.business_logo_url
+                                : '/assets/logo-placeholder-image.png'
                             "
                             alt="Company logo"
+                            loading="lazy"
+                            decoding="async"
                         />
-                    </div>
+                        </div>
+
                 </Link>
             </div>
         </div>
@@ -417,7 +421,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
         </div>
 
         <div class="flex-1 bg-[#f3f7fa]">
-            <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">
+            <div class="xs container mx-auto mb-5 px-[0.5rem] xl:max-w-7xl">
                 <div class="grid gap-5 pt-5 lg:grid-cols-[1fr,300px]">
                     <div
                         class="self-start rounded-lg bg-white px-8 py-5 shadow-sm"

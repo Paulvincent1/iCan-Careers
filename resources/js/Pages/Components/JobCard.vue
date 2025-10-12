@@ -79,7 +79,7 @@ const truncatedDescription = computed(() => {
                 <img
                     :src="
                         job.employer.employer_profile.business_information
-                            ? job.employer.employer_profile.business_information.business_logo
+                            ? job.employer.employer_profile.business_information.business_logo_url
                             : '/assets/logo-placeholder-image.png'
                     "
                     :alt="companyName + ' logo'"
@@ -98,15 +98,15 @@ const truncatedDescription = computed(() => {
 
         <!-- Special badges for Senior/PWD -->
         <div class="mb-3 flex flex-wrap gap-2">
-            <span 
-                v-if="isForSeniors" 
+            <span
+                v-if="isForSeniors"
                 class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full flex items-center gap-1"
             >
                 <i class="bi bi-person-check-fill"></i>
                 Senior-Friendly
             </span>
-            <span 
-                v-if="isForPWD" 
+            <span
+                v-if="isForPWD"
                 class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full flex items-center gap-1"
             >
                 <i class="bi bi-wheelchair"></i>
@@ -150,15 +150,15 @@ const truncatedDescription = computed(() => {
             >
                 {{ skill }}
             </span>
-            <span 
-                v-if="job.skills.length > 3" 
+            <span
+                v-if="job.skills.length > 3"
                 class="px-2 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded"
             >
                 +{{ job.skills.length - 3 }} more
             </span>
         </div>
 
-       
+
     </div>
 </template>
 

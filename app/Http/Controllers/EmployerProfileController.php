@@ -160,104 +160,112 @@ class EmployerProfileController extends Controller
     }
 
 
+
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
         $employerProfile = $user->employerProfile;
 
         if (!$employerProfile) {
-            return redirect()->back()->with(['message' => 'Employer profile not found.', 'messageType' => 'error']);
-        }
-
-        // Validate cover photo - REMOVED GIF FROM ALLOWED TYPES
-        if ($request->hasFile('cover_photo')) {
-            $request->validate([
-                'cover_photo' => 'required|image|mimes:jpeg,png,jpg,bmp,webp|max:2048' // Removed gif
-            ]);
-
-            $coverPhoto = $request->file('cover_photo');
-
-            // Check if it's actually an image (additional validation)
-            if (!str_contains($coverPhoto->getMimeType(), 'image/')) {
-                return redirect()->back()->with(['message' => 'Invalid file type. Please upload an image file (JPEG, PNG, JPG, BMP, WEBP).', 'messageType' => 'error']);
-            }
-
-            // Additional check to block GIFs
-            if ($coverPhoto->getMimeType() === 'image/gif') {
-                return redirect()->back()->with(['message' => 'GIF files are not allowed. Please upload JPEG, PNG, JPG, BMP, or WEBP files.', 'messageType' => 'error']);
-            }
-
-            // Delete old cover photo if exists
-            if ($user->cover_photo) {
-                $relativePath = str_replace('/storage/', '', $user->cover_photo);
-                if (Storage::disk('public')->exists($relativePath)) {
-                    Storage::disk('public')->delete($relativePath);
-                }
-            }
-
-            $coverPath = Storage::disk('public')->put('images/cover_photos', $coverPhoto);
-            $user->update([
-                'cover_photo' => '/storage/' . $coverPath
+            return redirect()->back()->with([
+                'message' => 'Employer profile not found.',
+                'messageType' => 'error'
             ]);
         }
 
-        // Validate input fields
+        // ========== Scalar field validation & update ==========
         $request->validate([
-            'full_name' => 'nullable|string|min:1',
-            'birth_year' => 'nullable|integer',
-            'gender' => 'nullable|string|in:Male,Female,Other',
+            'full_name'    => 'nullable|string|min:1',
+            'birth_year'   => 'nullable|integer|min:1900|max:' . now()->year,
+            'gender'       => 'nullable|string|in:Male,Female,Other',
             'phone_number' => 'nullable|string',
         ]);
 
-        // Update employer profile
         $employerProfile->update([
-            'full_name' => $request->full_name ?? $employerProfile->full_name,
-            'birth_year' => $request->birth_year ?? $employerProfile->birth_year,
-            'gender' => $request->gender ?? $employerProfile->gender,
+            'full_name'    => $request->full_name ?? $employerProfile->full_name,
+            'birth_year'   => $request->birth_year ?? $employerProfile->birth_year,
+            'gender'       => $request->gender ?? $employerProfile->gender,
             'phone_number' => $request->phone_number ?? $employerProfile->phone_number,
         ]);
 
-        // Handle profile image upload - REMOVED GIF FROM ALLOWED TYPES
+        // ========== Profile Image (Cloudinary) ==========
         if ($request->hasFile('profile_img')) {
             $request->validate([
-                'profile_img' => 'required|image|mimes:jpeg,png,jpg,bmp,webp|max:2048' // Removed gif
+                'profile_img' => [
+                    'required',
+                    'image',
+                    'mimes:jpeg,jpg,png,webp',   // no GIFs
+                    'max:2048',                  // 2MB
+                ]
             ]);
 
-            $profileImg = $request->file('profile_img');
-
-            // Check if it's actually an image (additional validation)
-            if (!str_contains($profileImg->getMimeType(), 'image/')) {
-                return redirect()->back()->with(['message' => 'Invalid file type. Please upload an image file (JPEG, PNG, JPG, BMP, WEBP).', 'messageType' => 'error']);
+            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            $mime = $request->file('profile_img')->getMimeType();
+            if (!in_array($mime, $allowedMimes, true)) {
+                return back()->withErrors([
+                    'profile_img' => 'Profile photo must be JPEG, JPG, PNG, or WEBP. GIF/video files are not allowed.',
+                ])->withInput();
             }
 
-            // Additional check to block GIFs
-            if ($profileImg->getMimeType() === 'image/gif') {
-                return redirect()->back()->with(['message' => 'GIF files are not allowed. Please upload JPEG, PNG, JPG, BMP, or WEBP files.', 'messageType' => 'error']);
+            // delete old from Cloudinary if present
+            if ($user->profile_img_public_id && Storage::disk('cloudinary')->exists($user->profile_img_public_id)) {
+                Storage::disk('cloudinary')->delete($user->profile_img_public_id);
             }
 
-            // Delete old image if exists
-            if ($user->profile_img) {
-                $relativePath = str_replace('/storage/', '', $user->profile_img);
-                if (Storage::disk('public')->exists($relativePath)) {
-                    Storage::disk('public')->delete($relativePath);
-                }
-            }
-
-            // Upload new image
-            $path = Storage::disk('public')->put('images', $profileImg);
+            // upload new
+            $publicId = Storage::disk('cloudinary')->putFile('employers/profile', $request->file('profile_img'));
+            $url      = Storage::disk('cloudinary')->url($publicId);
 
             $user->update([
-                'profile_img' => '/storage/' . $path
+                'profile_img_public_id' => $publicId,
+                'profile_img_url'       => $url,
             ]);
         }
 
-        return redirect()->back()->with(['message' => 'Profile updated successfully!', 'messageType' => 'success']);
+        // ========== Cover Photo (Cloudinary) ==========
+        if ($request->hasFile('cover_photo')) {
+            $request->validate([
+                'cover_photo' => [
+                    'required',
+                    'image',
+                    'mimes:jpeg,jpg,png,webp', // no GIFs
+                    'max:5120',                // 5MB
+                ]
+            ]);
+
+            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            $mime = $request->file('cover_photo')->getMimeType();
+            if (!in_array($mime, $allowedMimes, true)) {
+                return back()->withErrors([
+                    'cover_photo' => 'Cover photo must be JPEG, JPG, PNG, or WEBP. GIF/video files are not allowed.',
+                ])->withInput();
+            }
+
+            // delete old from Cloudinary if present
+            if ($user->cover_photo_public_id && Storage::disk('cloudinary')->exists($user->cover_photo_public_id)) {
+                Storage::disk('cloudinary')->delete($user->cover_photo_public_id);
+            }
+
+            // upload new
+            $publicId = Storage::disk('cloudinary')->putFile('employers/cover', $request->file('cover_photo'));
+            $url      = Storage::disk('cloudinary')->url($publicId);
+
+            $user->update([
+                'cover_photo_public_id' => $publicId,
+                'cover_photo_url'       => $url,
+            ]);
+        }
+
+        return redirect()->back()->with([
+            'message' => 'Profile updated successfully!',
+            'messageType' => 'success'
+        ]);
     }
+
 
 
     public function storeProfile(Request $request)
     {
-        // dd($request);
         $user = Auth::user();
         $fields = $request->validate([
             'full_name' => 'required|max:255',
@@ -267,11 +275,9 @@ class EmployerProfileController extends Controller
             'employer_type' => 'required'
         ]);
 
-
         if ($fields['employer_type'] === 'business') {
-
             if ($request->business_id) {
-                $business =  BusinessInformation::where('id', $request->business_id)->first();
+                $business = BusinessInformation::where('id', $request->business_id)->first();
 
                 if ($business) {
                     $business->employers()->syncWithoutDetaching([$user->id]);
@@ -288,31 +294,30 @@ class EmployerProfileController extends Controller
                     return redirect()->route('employer.dashboard');
                 }
 
-                return redirect()->back()->withErrors(['business' => 'business found']);
+                return redirect()->back()->withErrors(['business' => 'Business not found']);
             }
 
             $business = $request->validate([
                 'business_name' => 'required|max:255',
-                'business_logo' => 'required|image',
+                'business_logo' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120',
                 'industry' => 'required',
                 'business_description' => 'required',
                 'business_location' => 'required',
             ]);
-            // dd($request);
 
-            $logo = Storage::disk('public')->put('images', $request->business_logo);
+            // Upload to Cloudinary
+            $publicId = Storage::disk('cloudinary')->putFile('businesses/logo', $request->file('business_logo'));
+            $url = Storage::disk('cloudinary')->url($publicId);
 
-
-            $businessInformation =  BusinessInformation::create([
+            $businessInformation = BusinessInformation::create([
                 'user_id' => $user->id,
                 'business_name' => $business['business_name'],
-                'business_logo' => '/storage/' . $logo,
-                'industry' =>  $business['industry'],
-                'business_description' =>  $business['business_description'],
-                'business_location' =>  $business['business_location'],
-
+                'business_logo_public_id' => $publicId,
+                'business_logo_url' => $url,
+                'industry' => $business['industry'],
+                'business_description' => $business['business_description'],
+                'business_location' => $business['business_location'],
             ]);
-
 
             $businessInformation->employers()->attach($user->id);
 
@@ -325,13 +330,10 @@ class EmployerProfileController extends Controller
                 'business_id' => $businessInformation->id,
             ]);
 
-
             return redirect()->route('employer.dashboard');
         }
 
-
         $user->employerProfile()->create($fields);
-
         return redirect()->route('employer.dashboard');
     }
 
@@ -368,7 +370,7 @@ class EmployerProfileController extends Controller
             'employer_type' => 'required',
             'business_id' => 'nullable|integer|exists:business_information,id',
             'business_name' => 'nullable|max:255',
-            'business_logo' => 'nullable|image',
+            'business_logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
             'industry' => 'nullable|string',
             'business_description' => 'nullable|string',
             'business_location' => 'nullable',
@@ -376,7 +378,6 @@ class EmployerProfileController extends Controller
 
         if ($fields['employer_type'] === 'business') {
             if ($request->business_id) {
-                // attach user to business
                 $business = BusinessInformation::find($request->business_id);
                 $business->employers()->syncWithoutDetaching([$user->id]);
 
@@ -387,16 +388,20 @@ class EmployerProfileController extends Controller
                 return back()->with('message', 'Profile updated with existing business!');
             }
 
-            // Create new business
-            $logo = null;
+            // Create new business with Cloudinary
+            $publicId = null;
+            $url = null;
+
             if ($request->hasFile('business_logo')) {
-                $logo = Storage::disk('public')->put('images', $request->business_logo);
+                $publicId = Storage::disk('cloudinary')->putFile('businesses/logo', $request->file('business_logo'));
+                $url = Storage::disk('cloudinary')->url($publicId);
             }
 
             $businessInformation = BusinessInformation::create([
                 'user_id' => $user->id,
                 'business_name' => $fields['business_name'],
-                'business_logo' => $logo ? '/storage/' . $logo : null,
+                'business_logo_public_id' => $publicId,
+                'business_logo_url' => $url,
                 'industry' => $fields['industry'],
                 'business_description' => $fields['business_description'],
                 'business_location' => $fields['business_location'],
@@ -463,22 +468,19 @@ class EmployerProfileController extends Controller
             'employer_type' => 'required'
         ]);
 
-        // Handle business information if employer type is business
         if ($fields['employer_type'] === 'business') {
             $request->validate([
                 'business_id' => 'required_without:business_name|nullable|exists:business_information,id',
                 'business_name' => 'required_without:business_id|max:255',
-                'business_logo' => 'required_without:business_id|image|nullable',
+                'business_logo' => 'required_without:business_id|image|mimes:jpeg,jpg,png,webp|max:5120|nullable',
                 'industry' => 'required_without:business_id',
                 'business_description' => 'required_without:business_id',
                 'business_location' => 'required_without:business_id'
             ]);
 
-            // Handle business creation/selection
             if ($request->business_id) {
                 $business = BusinessInformation::findOrFail($request->business_id);
 
-                // Check if the user is already associated with this business
                 if (!$business->employers->contains($user->id)) {
                     $business->employers()->attach($user->id);
                 }
@@ -487,18 +489,21 @@ class EmployerProfileController extends Controller
             } else {
                 $businessFields = $request->validate([
                     'business_name' => 'required|max:255',
-                    'business_logo' => 'required|image',
+                    'business_logo' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120',
                     'industry' => 'required',
                     'business_description' => 'required',
                     'business_location' => 'required'
                 ]);
 
-                $logo = Storage::disk('public')->put('images', $request->business_logo);
+                // Upload to Cloudinary
+                $publicId = Storage::disk('cloudinary')->putFile('businesses/logo', $request->file('business_logo'));
+                $url = Storage::disk('cloudinary')->url($publicId);
 
                 $business = BusinessInformation::create([
                     'user_id' => $user->id,
                     'business_name' => $businessFields['business_name'],
-                    'business_logo' => '/storage/' . $logo,
+                    'business_logo_public_id' => $publicId,
+                    'business_logo_url' => $url,
                     'industry' => $businessFields['industry'],
                     'business_description' => $businessFields['business_description'],
                     'business_location' => $businessFields['business_location'],
@@ -508,11 +513,9 @@ class EmployerProfileController extends Controller
                 $fields['business_id'] = $business->id;
             }
         } else {
-            // If switching to individual, remove business association
             $fields['business_id'] = null;
         }
 
-        // Update the employer profile
         $employerProfile->update($fields);
 
         return redirect()->route('employer.profile')->with('message', 'Profile updated successfully!');
@@ -543,20 +546,20 @@ class EmployerProfileController extends Controller
         // Handle logo update if provided
         if ($request->hasFile('business_logo')) {
             $request->validate([
-                'business_logo' => 'image'
+                'business_logo' => 'image|mimes:jpeg,jpg,png,webp|max:5120'
             ]);
 
-            // Delete old logo
-            if ($business->business_logo) {
-                $relativePath = str_replace('/storage/', '', $business->business_logo);
-                if (Storage::disk('public')->exists($relativePath)) {
-                    Storage::disk('public')->delete($relativePath);
-                }
+            // Delete old logo from Cloudinary if exists
+            if ($business->business_logo_public_id && Storage::disk('cloudinary')->exists($business->business_logo_public_id)) {
+                Storage::disk('cloudinary')->delete($business->business_logo_public_id);
             }
 
-            // Upload new logo
-            $logo = Storage::disk('public')->put('images', $request->business_logo);
-            $fields['business_logo'] = '/storage/' . $logo;
+            // Upload new logo to Cloudinary
+            $publicId = Storage::disk('cloudinary')->putFile('businesses/logo', $request->file('business_logo'));
+            $url = Storage::disk('cloudinary')->url($publicId);
+
+            $fields['business_logo_public_id'] = $publicId;
+            $fields['business_logo_url'] = $url;
         }
 
         $business->update($fields);

@@ -42,7 +42,7 @@ class WorkerVerificationController extends Controller
     public function store(Request $request)
     {
 
-       
+
         $fields = $request->validate([
             'first_name' => 'required|max:255',
             'middle_name' => 'max:255',
@@ -53,8 +53,18 @@ class WorkerVerificationController extends Controller
         ]);
         // dd($fields['id_image']);
 
-        $idImage = Storage::disk('public')->put('images',$fields['id_image']);
-        $selfieImage = Storage::disk('public')->put('images',$fields['selfie_image']);
+        // FOR FILE STORAGE
+        // $idImage = Storage::disk('public')->put('images',$fields['id_image']);
+        // $selfieImage = Storage::disk('public')->put('images',$fields['selfie_image']);
+
+
+        // FOR CLOUDINARY
+        $idImagePublicId = $request->file('id_image')->store('worker_verification', 'cloudinary');
+        $idImageUrl = Storage::disk('cloudinary')->url($idImagePublicId);
+
+        $selfieImagePublicId = $request->file('selfie_image')->store('worker_verification', 'cloudinary');
+        $selfieImageUrl = Storage::disk('cloudinary')->url($idImagePublicId);
+
 
         // dd('/storage/'.$idImage);
         $user = Auth::user();
@@ -63,8 +73,10 @@ class WorkerVerificationController extends Controller
             'middle_name' => $fields['middle_name'],
             'last_name' => $fields['last_name'],
             'suffix' =>  $fields['suffix'] ?? null,
-            'id_image' =>  '/storage/'.$idImage,
-            'selfie_image' => '/storage/'.$selfieImage,
+            'id_image_public_id' => $idImagePublicId,
+            'id_image_url' => $idImageUrl,
+            'selfie_image_public_id' => $selfieImagePublicId,
+            'selfie_image_url' => $selfieImageUrl,
         ]);
 
         $admin = User::whereHas('roles', function($query) {
@@ -73,9 +85,9 @@ class WorkerVerificationController extends Controller
 
         $admin->notify(new AdminWorkerVerificationNotification(admin:$admin,user:$user));
         broadcast(new AdminWorkerVerificationNotification(admin:$admin,user:$user));
-        
 
-        
+
+
         Inertia::clearHistory();
         return redirect()->route('worker.dashboard');
     }
