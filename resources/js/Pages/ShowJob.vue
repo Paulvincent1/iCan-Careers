@@ -76,7 +76,7 @@ function closeModal() {
 let isApplied = ref(props.jobPostProps.users_who_applied?.length ?? 0);
 let inputErrorResume = ref(null);
 function submitResume() {
-    if (!props.workerProfileProps.resume_path) {
+    if (!props.workerProfileProps.resume_url) {
         inputErrorResume.value = "Please add resume first.";
         return;
     }
@@ -532,17 +532,17 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     </div>
                     <p class="mb-3">This action cannot be undone!</p>
                     <div class="flex gap-2 border p-2">
-                        <p v-if="workerProfileProps?.resume_path">
+                        <p v-if="workerProfileProps?.resume_url">
                             Your active resume:
                         </p>
                         <p v-else>No active resume</p>
                         <a
-                            v-if="workerProfileProps?.resume_path"
+                            v-if="workerProfileProps?.resume_url"
                             class="text-blue-500"
                             :href="
                                 route(
                                     'show.resume',
-                                    workerProfileProps?.resume_path,
+                                    workerProfileProps?.resume_url,
                                 )
                             "
                             target="_blank"
