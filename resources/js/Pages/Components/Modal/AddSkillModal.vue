@@ -99,7 +99,7 @@ const card = useTemplateRef("card");
 const backdrop = useTemplateRef("backdrop");
 const closeBtn = useTemplateRef("closeBtn");
 const saveBtn = useTemplateRef("saveBtn");
-const skill = useTemplateRef("skill");
+// const skill = useTemplateRef("skill");
 onMounted(() => {
     backdrop.value.addEventListener("click", (e) => {
         if (saveBtn.value.contains(e.target) || deleteBtnClicked.value) {
@@ -137,7 +137,6 @@ onMounted(() => {
 
             <div class="mb-3 max-h-[300px] overflow-y-auto">
                 <Skill
-                    ref="skill"
                     class="mb-2"
                     v-for="skill in form.skills"
                     :key="skill.id"
@@ -147,6 +146,7 @@ onMounted(() => {
                     @updateSkillName="updateSkillName"
                     @updateExperience="updateExperience"
                 />
+                <!-- <p v-for="item in form.skills">{{ item.name }}</p> -->
                 <!-- owner="true" -->
                 <!-- starValue="1" -->
             </div>
