@@ -461,6 +461,7 @@ class WorkerProfileController extends Controller
 
     public function showResume(string $path, User $workerId)
     {
+        //TODO: MAKE IT PRIVATE FOR OTHER USER RIGHT NOW ITS NOT.
         $user = Auth::user();
 
         //    dd($user->employerJobPosts()->whereHas('usersWhoApplied', function ($query) use ($workerId){

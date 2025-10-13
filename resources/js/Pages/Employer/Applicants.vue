@@ -447,10 +447,17 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                 <td class="p-3 text-start">
                                     <div class="h-12 w-12">
                                         <img
-                                        class="h-full w-full rounded-full object-cover"
-                                        :src="applicant.profile_img || '/assets/profile_placeholder.jpg'"
-                                        @error="event => event.target.src = '/assets/profile_placeholder.jpg'"
-                                        alt="Profile"
+                                            class="h-full w-full rounded-full object-cover"
+                                            :src="
+                                                applicant.profile_img ||
+                                                '/assets/profile_placeholder.jpg'
+                                            "
+                                            @error="
+                                                (event) =>
+                                                    (event.target.src =
+                                                        '/assets/profile_placeholder.jpg')
+                                            "
+                                            alt="Profile"
                                         />
                                     </div>
                                 </td>
@@ -461,11 +468,12 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                     <a
                                         class="text-blue-500 underline"
                                         :href="
-                                            route('show.resume', {
-                                                path: applicant.worker_profile
-                                                    .resume_public_id,
-                                                workerId: applicant.id,
-                                            })
+                                            applicant.worker_profile.resume_url
+                                            // route('show.resume', {
+                                            //     path: applicant.worker_profile
+                                            //         .resume_url,
+                                            //     workerId: applicant.id,
+                                            // })
                                         "
                                         target="_blank"
                                         >{{

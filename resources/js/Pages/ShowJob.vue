@@ -76,7 +76,7 @@ function closeModal() {
 let isApplied = ref(props.jobPostProps.users_who_applied?.length ?? 0);
 let inputErrorResume = ref(null);
 function submitResume() {
-    if (!props.workerProfileProps.resume_path) {
+    if (!props.workerProfileProps.resume_url) {
         inputErrorResume.value = "Please add resume first.";
         return;
     }
@@ -212,32 +212,35 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
                 <Link
                     :href="
-                        jobPostProps?.employer?.employer_profile?.business_information?.id
+                        jobPostProps?.employer?.employer_profile
+                            ?.business_information?.id
                             ? route(
-                                'businessinfo.show',
-                                jobPostProps.employer.employer_profile.business_information.id,
-                            )
-                            : '#'  // Fallback href if no business info
+                                  'businessinfo.show',
+                                  jobPostProps.employer.employer_profile
+                                      .business_information.id,
+                              )
+                            : '#' // Fallback href if no business info
                     "
                     class="absolute left-1/2 top-[70px] -translate-x-1/2 transform"
                 >
                     <div
-                        class="absolute flex h-36 w-36 translate-x-[-50%] cursor-pointer items-center justify-center
-                                rounded-2xl bg-white p-2 shadow-md ring-1 ring-gray-200 ring-offset-2 ring-offset-[#FAFAFA]"
-                        >
+                        class="absolute flex h-36 w-36 translate-x-[-50%] cursor-pointer items-center justify-center rounded-2xl bg-white p-2 shadow-md ring-1 ring-gray-200 ring-offset-2 ring-offset-[#FAFAFA]"
+                    >
                         <img
                             class="h-full w-full rounded-xl object-contain"
                             :src="
-                            jobPostProps?.employer?.employer_profile?.business_information?.business_logo_url
-                                ? jobPostProps.employer.employer_profile.business_information.business_logo_url
-                                : '/assets/logo-placeholder-image.png'
+                                jobPostProps?.employer?.employer_profile
+                                    ?.business_information?.business_logo_url
+                                    ? jobPostProps.employer.employer_profile
+                                          .business_information
+                                          .business_logo_url
+                                    : '/assets/logo-placeholder-image.png'
                             "
                             alt="Company logo"
                             loading="lazy"
                             decoding="async"
                         />
-                        </div>
-
+                    </div>
                 </Link>
             </div>
         </div>
@@ -532,19 +535,14 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     </div>
                     <p class="mb-3">This action cannot be undone!</p>
                     <div class="flex gap-2 border p-2">
-                        <p v-if="workerProfileProps?.resume_path">
+                        <p v-if="workerProfileProps?.resume_url">
                             Your active resume:
                         </p>
                         <p v-else>No active resume</p>
                         <a
-                            v-if="workerProfileProps?.resume_path"
+                            v-if="workerProfileProps?.resume_url"
                             class="text-blue-500"
-                            :href="
-                                route(
-                                    'show.resume',
-                                    workerProfileProps?.resume_path,
-                                )
-                            "
+                            :href="workerProfileProps?.resume_url"
                             target="_blank"
                             >{{ workerProfileProps?.resume }}</a
                         >
