@@ -29,12 +29,13 @@ RUN npm install
 RUN npm run build
 
 # Stage 3 - Final
-FROM thecodingmachine/php:8.2-v4-fpm-node20
+FROM php:8.2-fpm
 
 WORKDIR /var/www
 
-# Install system dependencies + PHP extensions
-RUN apt-get update && apt-get install -y supervisor git unzip libzip-dev zip libonig-dev libpq-dev \
+# Install Node manually (curl + apt)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs chromium supervisor git unzip libzip-dev zip libonig-dev libpq-dev \
     && docker-php-ext-install pdo pdo_mysql mbstring zip
 
 # Copy backend and frontend build
