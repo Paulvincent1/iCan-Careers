@@ -833,7 +833,7 @@ onMounted(() => {
                                             <img
                                                 :src="
                                                     transaction.employer
-                                                        .profile_img ??
+                                                        .profile_img_url ??
                                                     '/assets/profile_placeholder.jpg'
                                                 "
                                                 alt=""

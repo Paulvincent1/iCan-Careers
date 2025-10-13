@@ -262,7 +262,7 @@ function deleteReview(id) {
                     <div class="flex items-center gap-3">
                         <ProfileHoverCard :user-id="review.reviewer.id">
                             <img
-                                :src="review.reviewer.profile_img ?? '/assets/profile_placeholder.jpg'"
+                                :src="review.reviewer.profile_img_url ?? '/assets/profile_placeholder.jpg'"
                                 alt="Reviewer"
                                 class="h-10 w-10 rounded-full object-cover border-2 border-gray-200 shadow-sm cursor-pointer"
                             />

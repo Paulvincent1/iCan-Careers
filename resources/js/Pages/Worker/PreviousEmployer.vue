@@ -61,7 +61,7 @@ console.log(
                                         <img
                                             class="h-full w-full rounded-full"
                                             :src="
-                                                job.employer.profile_img ??
+                                                job.employer.profile_img_url ??
                                                 '/assets/profile_placeholder.jpg'
                                             "
                                             alt=""
