@@ -51,8 +51,8 @@ console.log(props.jobsProps);
                                     >
                                         <img
                                             :src="
-                                                job.job.worker.profile_img
-                                                    ? job.job.worker.profile_img
+                                                job.job.worker.profile_img_url
+                                                    ? job.job.worker.profile_img_url
                                                     : '/assets/profile_placeholder.jpg'
                                             "
                                             class="h-14 w-14 rounded-full object-cover"

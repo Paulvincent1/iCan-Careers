@@ -9,7 +9,7 @@ const props = defineProps({
     features: Array,
     borderColor: String,
     priceColor: String,
-    tag: null,
+    tag: String,
     isPro: Boolean,
     isPremium: Boolean,
 });
@@ -19,6 +19,11 @@ const emit = defineEmits(['buyNow']);
 // Hover state for card animation
 const isHovered = ref(false);
 
+const billingSuffix = computed(() => {
+  if (props.tag === 'Pro') return '/month';
+  if (props.tag === 'Premium') return '/year';
+  return ''; // Free or anything else
+});
 // Determine card styling based on tier
 const cardGradient = computed(() => {
     if (props.tag === 'Free') {
@@ -26,7 +31,7 @@ const cardGradient = computed(() => {
     } else if (props.tag === 'Pro') {
         return 'from-blue-50 to-indigo-50';
     } else if (props.tag === 'Premium') {
-        return 'from-purple-50 to-pink-50';
+        return 'from-red-50 to-orange-50';
     }
     return 'from-gray-50 to-white';
 });
@@ -42,7 +47,7 @@ const buttonClasses = computed(() => {
     if (props.tag === 'Pro') {
         return 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-blue-500/25';
     } else if (props.tag === 'Premium') {
-        return 'bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-purple-500/25';
+        return 'bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white shadow-purple-500/25';
     }
     return 'bg-gray-600 hover:bg-gray-700 text-white';
 });
@@ -68,7 +73,7 @@ const iconColor = computed(() => {
             v-if="tag === 'Premium'"
             class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10"
         >
-            <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg animate-pulse">
+            <span class="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg animate-pulse">
                 MOST POPULAR
             </span>
         </div>
@@ -84,7 +89,7 @@ const iconColor = computed(() => {
         >
             <!-- Gradient Header -->
             <div
-                class="relative h-48 bg-gradient-to-br p-8 text-white overflow-hidden"
+                class="relative h-64 bg-gradient-to-br p-8 text-white overflow-hidden"
                 :class="{
                     'from-emerald-400 to-green-500': tag === 'Free',
                     'from-blue-500 to-indigo-600': tag === 'Pro',
@@ -101,8 +106,9 @@ const iconColor = computed(() => {
                     <p v-if="subtitle" class="text-sm opacity-90 mb-4">{{ subtitle }}</p>
                     <div class="flex items-baseline">
                         <span class="text-4xl font-bold">{{ price }}</span>
-                        <span v-if="price !== 'Free'" class="ml-2 text-sm opacity-75">/month</span>
+                        <span v-if="billingSuffix" class="ml-2 text-sm opacity-75">{{ billingSuffix }}</span>
                     </div>
+
                 </div>
 
                 <!-- Wave decoration -->
@@ -112,7 +118,7 @@ const iconColor = computed(() => {
             </div>
 
             <!-- Features List -->
-            <div class="p-8 pb-24">
+            <div class="p-8 pb-24 h-[420px]">
                 <ul class="space-y-4">
                     <li
                         v-for="(feature, index) in features"
@@ -194,7 +200,7 @@ const iconColor = computed(() => {
             :class="[
                 tag === 'Free' ? 'from-emerald-200 to-green-200' : '',
                 tag === 'Pro' ? 'from-blue-200 to-indigo-200' : '',
-                tag === 'Premium' ? 'from-purple-200 to-pink-200' : '',
+                tag === 'Premium' ? 'from-yellow-200 to-orange-200' : '',
                 isHovered ? 'opacity-40' : 'opacity-0'
             ]"
         ></div>

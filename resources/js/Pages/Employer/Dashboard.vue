@@ -747,8 +747,8 @@ onBeforeUnmount(() => {
                                         ]"
                                     >
                                         Pending
-                                    </li></swiper-slide
-                                >
+                                    </li>
+                                </swiper-slide>
                                 <swiper-slide class="w-fit">
                                     <li
                                         @click="switchInvoiceTag('HISTORY')"
@@ -761,8 +761,8 @@ onBeforeUnmount(() => {
                                         ]"
                                     >
                                         History
-                                    </li></swiper-slide
-                                >
+                                    </li>
+                                </swiper-slide>
                             </swiper-container>
                         </div>
 
@@ -772,22 +772,22 @@ onBeforeUnmount(() => {
                                 :key="invoice.id"
                                 class="mx-2 mb-2 flex items-center gap-2 border-b p-3"
                             >
-                                <div class="h-11 w-11">
+                                <div class="h-11 w-11 flex-shrink-0">
                                     <img
                                         :src="
-                                            invoice.worker.profile_img ??
+                                            invoice.worker.profile_img_url ??
                                             '/assets/profile_placeholder.jpg'
                                         "
                                         alt=""
-                                        class="h-full w-full rounded-full"
+                                        class="h-full w-full rounded-full object-cover"
                                     />
                                 </div>
-                                <div>
-                                    <p class="text-sm font-bold">
+                                <div class="min-w-0 flex-1">
+                                    <p class="truncate text-sm font-bold">
                                         {{ invoice.worker.name }}
                                     </p>
-                                    <div class="flex gap-1">
-                                        <p class="text-[12px]">
+                                    <div class="flex flex-wrap gap-1">
+                                        <p class="truncate text-[12px]">
                                             {{ invoice.worker.email }}
                                         </p>
                                         <div
@@ -934,8 +934,8 @@ onBeforeUnmount(() => {
                                                     <img
                                                         class="mx-auto h-12 w-12 rounded-full"
                                                         :src="
-                                                            worker.profile_img
-                                                                ? worker.profile_img
+                                                            worker.profile_img_url
+                                                                ? worker.profile_img_url
                                                                 : '/assets/profile_placeholder.jpg'
                                                         "
                                                         alt=""

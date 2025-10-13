@@ -449,7 +449,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                         <img
                                             class="h-full w-full rounded-full object-cover"
                                             :src="
-                                                applicant.profile_img ||
+                                                applicant.profile_img_url ||
                                                 '/assets/profile_placeholder.jpg'
                                             "
                                             @error="
