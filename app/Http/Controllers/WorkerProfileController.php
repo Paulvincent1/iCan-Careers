@@ -69,6 +69,7 @@ class WorkerProfileController extends Controller
         if ($request->hasFile('resume')) {
             $resume = $this->cloudinaryFileUpload
             ->uploadFile(request: $request, fileKey: 'resume', folder: 'resumes', uploadPreset: 'resumes');
+            $resume['url'] = str_replace('http','https',$resume['url']);
         }
 
         // Save Profile
@@ -280,6 +281,7 @@ class WorkerProfileController extends Controller
 
             $resume = $this->cloudinaryFileUpload
             ->uploadFile(request: $request, fileKey: 'resume', folder: 'resumes', uploadPreset: 'resumes');
+            $resume['url'] = str_replace('http','https',$resume['url']);
 
             $user->workerProfile->update([
                 'resume' => $request->resume?->getClientOriginalName() ?? null,

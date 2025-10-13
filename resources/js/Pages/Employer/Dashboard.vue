@@ -722,7 +722,7 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
                     <div
-                        class="col-span-2 flex h-[424px] flex-col overflow-hidden rounded-lg bg-white p-3 md:col-span-1"
+                        class="col-span-2 flex h-[424px] flex-col overflow-hidden rounded-lg bg-white p-3 lg:col-span-1"
                     >
                         <div>
                             <p class="mb-2 text-lg font-bold text-[#171816]">
