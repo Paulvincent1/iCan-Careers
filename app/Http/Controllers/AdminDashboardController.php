@@ -162,7 +162,7 @@ class AdminDashboardController extends Controller
         if(!$worker->verified){
 
             $worker->notify(new WorkerVerificationNotification(worker:$worker,verified:true));
-            broadcast(new WorkerVerificationNotification(worker:$worker,verified:true));
+            // broadcast(new WorkerVerificationNotification(worker:$worker,verified:true));
 
         }
         $worker->verified = !$worker->verified; // Toggle between true/false
