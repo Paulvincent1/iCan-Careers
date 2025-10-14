@@ -3,8 +3,12 @@
 namespace App\Jobs;
 
 use App\Models\User;
+use App\Services\CloudinaryFileUploadService;
+use CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelPdf\Facades\Pdf;
 
 class ProcessInvoicePdf implements ShouldQueue
@@ -23,7 +27,7 @@ class ProcessInvoicePdf implements ShouldQueue
         public float $xenditTransactionFee,
         public float $vatTransactionFee,
         public int $totalAmount,
-        public string $invoiceUrl, 
+        public string $invoiceUrl,
         )
     {
         //
@@ -34,7 +38,7 @@ class ProcessInvoicePdf implements ShouldQueue
      */
     public function handle(): void
     {
-        
+
         Pdf::view('pdf.invoice',[
             'invoiceId' => $this->externalId,
             'dueDate' => $this->dueDate,
@@ -46,5 +50,14 @@ class ProcessInvoicePdf implements ShouldQueue
             'totalAmount' => $this->totalAmount + $this->xenditTransactionFee + $this->vatTransactionFee,
             'invoiceUrl' => $this->invoiceUrl
         ])->disk('public')->save('/invoices/' . $this->externalId . '.pdf');
+
+        $tempPath = Storage::disk('public')->path('/invoices/' . $this->externalId . '.pdf');
+
+        $cloudinary = app(CloudinaryFileUploadService::class);
+
+        $cloudinary->uploadFile(path: $tempPath, folder: 'invoices', uploadPreset: 'invoices');
+
+
+
     }
 }

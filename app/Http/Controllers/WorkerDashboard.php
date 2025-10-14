@@ -258,6 +258,7 @@ class WorkerDashboard extends Controller
                 totalAmountWithTaxes: $totalAmount
             );
 
+            // put it in the ProcessInvoicePdf.php
             $user->workerInvoices()
             ->create(
                 [

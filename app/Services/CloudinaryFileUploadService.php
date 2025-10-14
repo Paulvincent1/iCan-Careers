@@ -11,13 +11,17 @@ class CloudinaryFileUploadService{
     {
     }
 
-    public function uploadFile(Request $request, string $fileKey ,string $folder, string $uploadPreset){
+    public function uploadFile(Request $request = null,
+    string $fileKey = null,
+    string $path = null,
+    string $folder = null,
+    string $uploadPreset = null){
            $response = $this->client->post('https://api.cloudinary.com/v1_1/dyhmwzlpe/raw/upload', [
                 'multipart' => [
                     [
                         'name' => 'file',
-                        'contents' => fopen($request->file($fileKey)->getRealPath(), 'r'),
-                        'filename' => $request->file('resume')->getClientOriginalName(),
+                        'contents' => !$path ? fopen($request->file($fileKey)->getRealPath(), 'r') : fopen($path, 'r') ,
+                        'filename' =>  !$path ? $request->file('resume')->getClientOriginalName() : basename($path),
                     ],
                     [
                         'name' => 'resource_type',

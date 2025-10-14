@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Models\EmployerProfile;
 use App\Models\JobPost;
 use App\Models\User;
+use App\Services\CloudinaryFileUploadService;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
@@ -30,6 +32,10 @@ class AppServiceProvider extends ServiceProvider
         //else register your services you require for production
             $this->app['request']->server->set('HTTPS', true);
         }
+
+        $this->app->singleton(CloudinaryFileUploadService::class, function ($app) {
+         return new CloudinaryFileUploadService(new Client());
+        });
     }
 
     /**
