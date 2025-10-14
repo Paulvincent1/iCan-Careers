@@ -81,6 +81,7 @@ onMounted(() => {
                 data: {
                     status: notif.status,
                     message: notif.message,
+                    image: notif.image,
                 },
             });
         });
@@ -298,7 +299,9 @@ const profileRoute = computed(() => {
                                             <img
                                                 class="h-full w-full rounded-full object-cover"
                                                 :src="
-                                                    notification.data.image ||
+                                                    '/' +
+                                                        notification.data
+                                                            .image ||
                                                     '/assets/SHORTS.svg'
                                                 "
                                                 @error="
