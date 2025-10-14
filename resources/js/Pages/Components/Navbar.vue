@@ -52,23 +52,23 @@ function unshiftLatestNotification(notif) {
 }
 
 let channelNotif = null;
-watch(
-    () => page.props.auth.user.authenticated?.id,
-    () => {
-        channelNotif = window.Echo.channel(
-            "notification-" + page.props.auth.user.authenticated?.id,
-        ).listen(".notification.event", (notif) => {
-            console.log(notif);
-            unshiftLatestNotification({
-                id: nanoid(),
-                data: {
-                    status: notif.status,
-                    message: notif.message,
-                },
-            });
-        });
-    },
-);
+// watch(
+//     () => page.props.auth.user.authenticated?.id,
+//     () => {
+//         channelNotif = window.Echo.channel(
+//             "notification-" + page.props.auth.user.authenticated?.id,
+//         ).listen(".notification.event", (notif) => {
+//             console.log(notif);
+//             unshiftLatestNotification({
+//                 id: nanoid(),
+//                 data: {
+//                     status: notif.status,
+//                     message: notif.message,
+//                 },
+//             });
+//         });
+//     },
+// );
 
 onMounted(() => {
     if (page.props.auth.user.authenticated?.id) {
@@ -208,10 +208,14 @@ const profileRoute = computed(() => {
                                         'px-0.5': unreadMessages.length >= 10,
                                     }"
                                 >
-                                    {{ unreadMessages.length > 99 ? '99+' : unreadMessages.length }}
+                                    {{
+                                        unreadMessages.length > 99
+                                            ? "99+"
+                                            : unreadMessages.length
+                                    }}
                                 </span>
                                 <span
-                                    class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                    class="absolute left-1/2 top-full z-[9999] mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
                                 >
                                     Messages
                                 </span>
@@ -238,10 +242,14 @@ const profileRoute = computed(() => {
                                         'px-0.5': notifications.length >= 10,
                                     }"
                                 >
-                                    {{ notifications.length > 99 ? '99+' : notifications.length }}
+                                    {{
+                                        notifications.length > 99
+                                            ? "99+"
+                                            : notifications.length
+                                    }}
                                 </span>
                                 <span
-                                    class="absolute z-[9999] left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                                    class="absolute left-1/2 top-full z-[9999] mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100"
                                 >
                                     Notifications
                                 </span>
@@ -293,7 +301,11 @@ const profileRoute = computed(() => {
                                                     notification.data.image ||
                                                     '/assets/SHORTS.svg'
                                                 "
-                                                @error="event => event.target.src = '/assets/SHORTS.svg'"
+                                                @error="
+                                                    (event) =>
+                                                        (event.target.src =
+                                                            '/assets/SHORTS.svg')
+                                                "
                                                 alt=""
                                             />
                                         </div>
@@ -323,7 +335,8 @@ const profileRoute = computed(() => {
                         >
                             <img
                                 :src="
-                                    $page.props.auth.user.authenticated?.profile_img_url ||
+                                    $page.props.auth.user.authenticated
+                                        ?.profile_img_url ||
                                     '/assets/profile_placeholder.jpg'
                                 "
                                 alt="User Profile"
