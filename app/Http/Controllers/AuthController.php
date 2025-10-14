@@ -435,13 +435,39 @@ class AuthController extends Controller
     {
         $request->validate(['email' => 'required|email']);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        // $status = Password::sendResetLink(
+        //     $request->only('email')
+        // );
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with(['status' => __($status)])
-            : back()->withErrors(['email' => __($status)]);
+        // return $status === Password::RESET_LINK_SENT
+        //     ? back()->with(['status' => __($status)])
+        //     : back()->withErrors(['email' => __($status)]);
+
+
+        // Generate the reset token manually
+        $tokenUser = app('auth.password.broker')->createToken(User::where('email', $request->email)->first());
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return back()->withErrors(['email' => 'No user found with this email']);
+        }
+
+
+        try {
+            $token = LaravelGmail::makeToken();
+
+            $mail = new Mail();
+            $mail->using($token['access_token'])
+                ->to($user->email, $user->name)
+                ->from('icancareers2@gmail.com', 'ican')
+                ->subject('Reset your password')
+                ->view('mail.reset-password', ['user' => $user, 'token' => $tokenUser])
+                ->send();
+
+            return back()->with(['status' => 'Password reset email sent!']);
+        } catch (\Exception $e) {
+            return back()->withErrors(['email' => $e->getMessage()]);
+        }
     }
 
     public function resetPasswordIndex(Request $request)

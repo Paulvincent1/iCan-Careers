@@ -796,7 +796,7 @@ onBeforeUnmount(() => {
                                         >
                                             <a
                                                 :href="
-                                                    '/storage/invoices/' +
+                                                    'https://res.cloudinary.com/dyhmwzlpe/raw/upload/v1760405690/invoices/' +
                                                     invoice.external_id +
                                                     '.pdf'
                                                 "
