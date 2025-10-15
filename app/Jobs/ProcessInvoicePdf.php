@@ -40,7 +40,9 @@ class ProcessInvoicePdf implements ShouldQueue
     public function handle(): void
     {
         try {
-            Pdf::view('pdf.invoice', [
+            Log::info("Step 1: Starting PDF generation for {$this->externalId}");
+
+            Pdf::view('pdf.invoice',  [
                 'invoiceId' => $this->externalId,
                 'dueDate' => $this->dueDate,
                 'description' => $this->description,
@@ -50,30 +52,34 @@ class ProcessInvoicePdf implements ShouldQueue
                 'vatTransactionFee' => $this->vatTransactionFee,
                 'totalAmount' => $this->totalAmount + $this->xenditTransactionFee + $this->vatTransactionFee,
                 'invoiceUrl' => $this->invoiceUrl
-            ])->disk('public')->save('/invoices/' . $this->externalId . '.pdf');
+            ])
+                ->disk('public')
+                ->save("/invoices/{$this->externalId}.pdf");
 
-            $tempPath = Storage::disk('public')->path('/invoices/' . $this->externalId . '.pdf');
+            Log::info("Step 2: PDF saved for {$this->externalId}");
 
-            $cloudinary = app(CloudinaryFileUploadService::class);
+            $tempPath = Storage::disk('public')->path("/invoices/{$this->externalId}.pdf");
 
-            $cloudinary->uploadFile(
+            Log::info("Step 3: Uploading to Cloudinary for {$this->externalId}");
+
+            app(CloudinaryFileUploadService::class)->uploadFile(
                 path: $tempPath,
                 folder: 'invoices',
                 uploadPreset: 'invoices'
             );
 
-            Log::info("✅ Invoice job completed successfully for ID: {$this->externalId}");
+            Log::info("✅ Job complete: {$this->externalId}");
 
         } catch (\Throwable $e) {
-            Log::error("❌ Invoice job failed for ID: {$this->externalId}", [
+            Log::error("❌ Job failed for {$this->externalId}", [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            // Important: Rethrow the exception so Laravel marks the job as failed
             throw $e;
         }
     }
+
 }
