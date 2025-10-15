@@ -15,7 +15,7 @@ use Illuminate\Notifications\Notification;
 
 class HiringProcessNotification extends Notification implements ShouldBroadcastNow
 {
-    use Queueable;
+    // use Queueable;
 
     public string $status;
     public string $message;

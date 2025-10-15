@@ -14,7 +14,7 @@ use Illuminate\Notifications\Notification;
 
 class JobOpenedByAdminNotification extends Notification implements ShouldBroadcastNow
 {
-    use Queueable;
+    // use Queueable;
 
     /**
      * Create a new notification instance.
