@@ -45,7 +45,7 @@ class ReportController extends Controller
         })->first();
 
         $admin->notify(new AdminReportUserNotification(admin:$admin,user:$user));
-        broadcast(new AdminReportUserNotification(admin:$admin,user:$user));
+        // broadcast(new AdminReportUserNotification(admin:$admin,user:$user));
 
 
         return redirect()->back()->with('message','Thank you for reporting this user! We will review the behaviour of this user.');

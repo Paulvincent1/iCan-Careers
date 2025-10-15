@@ -200,7 +200,7 @@ class AdminDashboardController extends Controller
 
 
         $userWorker->notify(new WorkerVerificationNotification(worker:$userWorker,verified:false));
-        broadcast(new WorkerVerificationNotification(worker:$userWorker,verified:false));
+        // broadcast(new WorkerVerificationNotification(worker:$userWorker,verified:false));
 
 
         return redirect()->back()->with(['message' => 'Successfuly updated!']);

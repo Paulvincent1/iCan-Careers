@@ -48,7 +48,7 @@ class ReportJobPostController extends Controller
         })->first();
 
         $admin->notify(new AdminReportJobPostNotification(admin:$admin,user:$user));
-        broadcast(new AdminReportJobPostNotification(admin:$admin,user:$user));
+        // broadcast(new AdminReportJobPostNotification(admin:$admin,user:$user));
 
 
 

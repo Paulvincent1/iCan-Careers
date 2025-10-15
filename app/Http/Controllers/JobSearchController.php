@@ -16,7 +16,7 @@ class JobSearchController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        
+
         // Build the query with filters
         $query = JobPost::with([
             'employer.employerProfile',
@@ -25,10 +25,10 @@ class JobSearchController extends Controller
                 $query->where('user_id', $user->id)->first();
             }
         ])->where('job_status', 'Open');
-        
+
         // Apply filters
         $query->filter(request(['job_type','work_arrangement','experience','job_title']));
-        
+
         // Get paginated results (10 items per page)
         $jobs = $query->latest()->paginate(10)->withQueryString();
 
@@ -109,7 +109,7 @@ class JobSearchController extends Controller
             $user->appliedJobs()->attach($id->id);
 
             $id->employer->notify(new WokerAppliesToJobPostNotification(applicant:$user,employer:$id->employer,jobPost:$id));
-            broadcast(new WokerAppliesToJobPostNotification(applicant:$user,employer:$id->employer,jobPost:$id));
+            // broadcast(new WokerAppliesToJobPostNotification(applicant:$user,employer:$id->employer,jobPost:$id));
 
             return redirect()->back()->with(['messageProp' => 'Successfuly applied!']);
         }

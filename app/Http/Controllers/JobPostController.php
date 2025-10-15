@@ -221,7 +221,7 @@ class JobPostController extends Controller
         })->first();
 
         $employer->notify(new JobOpenedByAdminNotification(employer:$employer,jobPost:$jobPost));
-        broadcast(new JobOpenedByAdminNotification(employer:$employer,jobPost:$jobPost));
+        // broadcast(new JobOpenedByAdminNotification(employer:$employer,jobPost:$jobPost));
 
         return redirect()->route('admin.job.approvals')->with('success', 'Job status updated successfully.');
     }
@@ -277,7 +277,7 @@ class JobPostController extends Controller
             $workerId->myJobs()->updateExistingPivot($currentJob->id, ['current' => false]);
 
             $workerId->notify(new FireWorkerNotification(employer:$employer,worker:$workerId));
-            broadcast(new FireWorkerNotification(employer:$employer,worker:$workerId));
+            // broadcast(new FireWorkerNotification(employer:$employer,worker:$workerId));
         }
 
         return redirect()->back()->with('message','Successfully ended the contract.');
