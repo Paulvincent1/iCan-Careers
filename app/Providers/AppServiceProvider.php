@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
 
        // set this for production when you need https.
-       $this->app['request']->server->set('HTTPS', true);
+    //    $this->app['request']->server->set('HTTPS', true);
         //check that app is local
         if ($this->app->isLocal()) {
         //if local register your services you require for development
@@ -43,6 +43,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        config([
+            'pdf.browsershot.options' => [
+                'chromePath' => '/usr/bin/chromium',
+                'args' => ['--no-sandbox'],
+            ],
+        ]);
+
         Gate::define('view-applicants', function (User $user, JobPost $jobPost){
             return $user->id === $jobPost->employer_id;
         });
