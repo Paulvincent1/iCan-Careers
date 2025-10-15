@@ -12,7 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class JobOpenedByAdminNotification extends Notification implements ShouldBroadcast
+class JobOpenedByAdminNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 

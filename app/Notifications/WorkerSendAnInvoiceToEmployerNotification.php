@@ -11,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WorkerSendAnInvoiceToEmployerNotification extends Notification implements ShouldBroadcast
+class WorkerSendAnInvoiceToEmployerNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 

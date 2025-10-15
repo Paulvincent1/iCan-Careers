@@ -13,7 +13,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WokerAppliesToJobPostNotification extends Notification implements ShouldBroadcast
+class WokerAppliesToJobPostNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 

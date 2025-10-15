@@ -13,7 +13,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class HiringProcessNotification extends Notification implements ShouldBroadcast
+class HiringProcessNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 
