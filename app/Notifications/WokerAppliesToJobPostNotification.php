@@ -13,9 +13,9 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WokerAppliesToJobPostNotification extends Notification implements ShouldBroadcastNow
+class WokerAppliesToJobPostNotification extends Notification implements ShouldBroadcast
 {
-    // use Queueable;
+    use Queueable;
 
     /**
      * Create a new notification instance.

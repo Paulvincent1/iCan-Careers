@@ -12,9 +12,9 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WorkerVerificationNotification extends Notification implements ShouldBroadcastNow
+class WorkerVerificationNotification extends Notification implements ShouldBroadcast
 {
-    // use Queueable;
+    use Queueable;
 
     /**
      * Create a new notification instance.
