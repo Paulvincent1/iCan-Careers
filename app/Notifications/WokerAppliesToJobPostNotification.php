@@ -15,7 +15,7 @@ use Illuminate\Notifications\Notification;
 
 class WokerAppliesToJobPostNotification extends Notification implements ShouldBroadcastNow
 {
-    use Queueable;
+    // use Queueable;
 
     /**
      * Create a new notification instance.

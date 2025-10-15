@@ -14,7 +14,7 @@ use Illuminate\Notifications\Notification;
 
 class WorkerVerificationNotification extends Notification implements ShouldBroadcastNow
 {
-    use Queueable;
+    // use Queueable;
 
     /**
      * Create a new notification instance.

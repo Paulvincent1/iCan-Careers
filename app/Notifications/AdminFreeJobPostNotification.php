@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notification;
 
 class AdminFreeJobPostNotification extends Notification implements ShouldBroadcastNow
 {
-    use Queueable;
+    // use Queueable;
 
     /**
      * Create a new notification instance.

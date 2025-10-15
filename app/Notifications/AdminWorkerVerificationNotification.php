@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notification;
 
 class AdminWorkerVerificationNotification extends Notification  implements ShouldBroadcastNow
 {
-    use Queueable;
+    // use Queueable;
 
     /**
      * Create a new notification instance.
