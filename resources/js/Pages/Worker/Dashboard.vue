@@ -699,7 +699,8 @@ onMounted(() => {
                                             <td class="py-5">
                                                 <a
                                                     class="text-lg text-[#171816]"
-                                                    :href="`/storage/invoices/${invoice.external_id}.pdf`"
+                                                    :href=" 'https://res.cloudinary.com/dyhmwzlpe/raw/upload/v1760405690/invoices/' +
+                                                    invoice.external_id + '.pdf'"
                                                     target="_blank"
                                                 >
                                                     <i

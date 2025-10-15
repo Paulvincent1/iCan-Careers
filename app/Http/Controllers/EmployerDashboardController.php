@@ -156,7 +156,7 @@ class EmployerDashboardController extends Controller
 
         // for notif
         $worker->notify(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
-        broadcast(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
+        // broadcast(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
 
 
         return redirect()->back()->with('message','Successfully updated.');
@@ -233,7 +233,7 @@ class EmployerDashboardController extends Controller
 
          // for notif
          $worker->notify(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
-         broadcast(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
+        //  broadcast(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
 
 
 //   dd( Carbon::parse("$request->date $request->time"));

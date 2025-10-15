@@ -84,7 +84,7 @@ class WorkerVerificationController extends Controller
         })->first();
 
         $admin->notify(new AdminWorkerVerificationNotification(admin:$admin,user:$user));
-        broadcast(new AdminWorkerVerificationNotification(admin:$admin,user:$user));
+        // broadcast(new AdminWorkerVerificationNotification(admin:$admin,user:$user));
 
 
 
