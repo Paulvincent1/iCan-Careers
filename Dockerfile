@@ -33,9 +33,10 @@ FROM php:8.2-fpm
 
 WORKDIR /var/www
 
-# Install Node manually (curl + apt)
+# Install Node, Chromium, and Puppeteer
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs chromium supervisor git unzip libzip-dev zip libonig-dev libpq-dev \
+    && npm install -g puppeteer \
     && docker-php-ext-install pdo pdo_mysql mbstring zip
 
 # Copy backend and frontend build
