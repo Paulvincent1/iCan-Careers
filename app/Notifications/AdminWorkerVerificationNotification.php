@@ -11,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AdminWorkerVerificationNotification extends Notification  implements ShouldBroadcast
+class AdminWorkerVerificationNotification extends Notification  implements ShouldBroadcastNow
 {
     use Queueable;
 

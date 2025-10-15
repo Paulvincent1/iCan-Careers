@@ -12,7 +12,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class FireWorkerNotification extends Notification implements ShouldBroadcast
+class FireWorkerNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
 
