@@ -275,6 +275,8 @@ class WorkerDashboard extends Controller
                 ]
             );
 
+            $employer->notify(new WorkerSendAnInvoiceToEmployerNotification(worker:$user,employer:$employer));
+
             dispatch(new ProcessInvoicePdf(
              employer: $employer,
              externalId:  $externalId,
@@ -287,11 +289,7 @@ class WorkerDashboard extends Controller
              invoiceUrl: $resultInvoice->getInvoiceUrl()
             ));
 
-
-
             DB::commit();
-
-            $employer->notify(new WorkerSendAnInvoiceToEmployerNotification(worker:$user,employer:$employer));
 
             return redirect()->route('worker.dashboard');
 
