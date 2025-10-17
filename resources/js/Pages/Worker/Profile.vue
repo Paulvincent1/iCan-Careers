@@ -51,6 +51,7 @@ let descriptions = ref([]);
 let coverPhotoError = ref("");
 let profilePhotoError = ref("");
 let uploadSuccess = ref("");
+let backendErrors = ref({});
 
 // Profile Data
 let workerSkills = ref(props.workerSkillsProp);
@@ -352,6 +353,7 @@ function updateBasicInfo() {
             onSuccess: () => {
                 showSuccessMessage();
                 isEditBasicInfoActive.value = false;
+                backendErrors.value = {}; // Clear backend errors
 
                 // Update local state
                 workerProfile.value.birth_year = basicInfoForm.value.birthYear;
@@ -361,10 +363,22 @@ function updateBasicInfo() {
                 address.value = basicInfoForm.value.address || "N/A";
                 websiteLink.value = basicInfoForm.value.websiteLink || "N/A";
             },
+            onError: (errors) => {
+                // Handle backend validation errors
+                backendErrors.value = errors;
+
+                // If there's a birth_year error from backend, show it
+                if (errors.birth_year) {
+                    // You can either show an alert or display it in the form
+                    alert(errors.birth_year);
+                    // Or set it to display below the input field
+                }
+            },
             preserveScroll: true,
         },
     );
 }
+
 
 function cancelEditBasicInfo() {
     // Reset form to current values
@@ -1013,22 +1027,42 @@ function formatUrlDisplay(url) {
 
         <!-- Edit Mode -->
         <form v-else @submit.prevent="updateBasicInfo()" class="space-y-4">
-            <div>
-                <label class="text-sm font-medium text-gray-700">Birth Year</label>
-                <input
-                    v-model.number="basicInfoForm.birthYear"
-                    type="number"
-                    :min="1900"
-                    :max="2007"
-                    placeholder="1900-2007"
-                    class="w-full rounded border px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400"
-                    :class="{ 'border-red-500': !ageValidation.valid && basicInfoForm.birthYear }"
-                    required
-                />
-                <p class="mt-1 text-xs" :class="ageValidation.valid ? 'text-green-600' : 'text-red-600'">
-                    {{ ageValidation.message }}
-                </p>
+        <div>
+            <label class="text-sm font-medium text-gray-700">Birth Year</label>
+            <input
+                v-model.number="basicInfoForm.birthYear"
+                type="number"
+                :min="props.userProp.senior_citizen_registered ? 1900 : 1900"
+                :max="props.userProp.senior_citizen_registered ? dayjs().format('YYYY') - 60 : 2007"
+                :placeholder="props.userProp.senior_citizen_registered ? 'Must be 60+ years' : '1900-2007'"
+                class="w-full rounded border px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400"
+                :class="{
+                    'border-red-500': (!ageValidation.valid && basicInfoForm.birthYear) || backendErrors.birth_year
+                }"
+                required
+            />
+
+            <!-- Frontend Validation Message -->
+            <p v-if="!ageValidation.valid && basicInfoForm.birthYear" class="mt-1 text-xs text-red-600">
+                {{ ageValidation.message }}
+            </p>
+
+            <!-- Backend Validation Message -->
+            <p v-if="backendErrors.birth_year" class="mt-1 text-xs text-red-600">
+                {{ backendErrors.birth_year }}
+            </p>
+
+            <!-- Success/Info Message -->
+            <p v-if="ageValidation.valid && !backendErrors.birth_year" class="mt-1 text-xs text-green-600">
+                {{ ageValidation.message }}
+            </p>
+
+            <!-- Senior Citizen Badge -->
+            <div v-if="props.userProp.senior_citizen_registered" class="mt-2 flex items-center gap-1 text-purple-600">
+                <i class="bi bi-person-check-fill"></i>
+                <p class="text-xs font-semibold">Registered Senior Citizen</p>
             </div>
+        </div>
 
             <div>
                 <label class="text-sm font-medium text-gray-700">Gender</label>

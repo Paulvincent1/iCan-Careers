@@ -63,7 +63,7 @@ class WorkerVerificationController extends Controller
         $idImageUrl = Storage::disk('cloudinary')->url($idImagePublicId);
 
         $selfieImagePublicId = $request->file('selfie_image')->store('worker_verification', 'cloudinary');
-        $selfieImageUrl = Storage::disk('cloudinary')->url($idImagePublicId);
+        $selfieImageUrl = Storage::disk('cloudinary')->url($selfieImagePublicId);
 
 
         // dd('/storage/'.$idImage);
