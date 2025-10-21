@@ -11,7 +11,8 @@ class CloudinaryFileUploadService{
     {
     }
 
-    public function uploadFile(Request $request = null,
+    public function uploadFile(
+    Request $request = null,
     string $fileKey = null,
     string $path = null,
     string $folder = null,

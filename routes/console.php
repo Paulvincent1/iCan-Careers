@@ -19,6 +19,12 @@ Artisan::command('update:subscription-type-employer', function () {
         $expiredSubscription->update([
             'subscription_type' => 'Free'
         ]);
+
+        foreach($expiredSubscription->employer->employerJobPosts()->latest()->skip(3)->get() as $jobPost){
+            $jobPost->update([
+                'job_status' => 'Locked'
+            ]);
+        }
     }
 })->purpose('update employer subscription type if expired')->daily();
 

@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Salary;
 use App\Notifications\EmployerPaysTheWorkerInvoiceNotification;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
+use Dacastro4\LaravelGmail\Services\Message\Mail;
 
 use function Illuminate\Log\log;
 
@@ -262,6 +264,26 @@ class InvoiceController extends Controller
 
             $worker->notify(new EmployerPaysTheWorkerInvoiceNotification(employer:$invoice->employer,worker:$invoice->worker));
 
+            // 2️⃣ Send email via Gmail API
+            try {
+                $token = LaravelGmail::makeToken(); // Make sure token is generated first
+
+                $mail = new Mail();
+                $mail->using($token['access_token'])
+                    ->to($worker->email, $worker->name)
+                    ->from('icancareers2@gmail.com', 'iCan Careers')
+                    ->subject('Invoice Paid Notification')
+                    ->view('mail.invoice-paid', [
+                        'employer' => $invoice->employer,
+                        'worker' => $invoice->worker,
+                        'invoice' => $invoice,
+                    ])
+                    ->send();
+
+            } catch (\Exception $e) {
+                // Optionally log error or return back with error
+                return back()->withErrors(['email' => $e->getMessage()]);
+            }
         }
 
 

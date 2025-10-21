@@ -8,6 +8,8 @@ use App\Models\Message;
 use App\Models\User;
 use App\Notifications\HiringProcessNotification;
 use Carbon\Carbon;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
+use Dacastro4\LaravelGmail\Services\Message\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -158,6 +160,24 @@ class EmployerDashboardController extends Controller
         $worker->notify(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
         // broadcast(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
 
+            // --- Send Gmail Email ---
+            try {
+                $token = LaravelGmail::makeToken(); // only needed if token not stored
+
+                $mail = new Mail();
+                $mail->using($token['access_token'])
+                    ->to($worker->email, $worker->name)
+                    ->from('icancareers2@gmail.com', 'iCan Careers')
+                    ->subject('Interview Scheduled')
+                    ->view('mail.hiring-process', [
+                        'worker' => $worker,
+                        'jobPost' => $jobPost,
+                    ])
+                    ->send();
+
+            } catch (\Exception $e) {
+                return back()->withErrors(['email' => $e->getMessage()]);
+            }
 
         return redirect()->back()->with('message','Successfully updated.');
     }
@@ -234,6 +254,26 @@ class EmployerDashboardController extends Controller
          // for notif
          $worker->notify(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
         //  broadcast(new HiringProcessNotification(jobPost:$jobPost, applicant:$worker));
+
+         // --- Send Gmail Email ---
+            try {
+                $token = LaravelGmail::makeToken(); // only needed if token not stored
+
+                $mail = new Mail();
+                $mail->using($token['access_token'])
+                    ->to($worker->email, $worker->name)
+                    ->from('icancareers2@gmail.com', 'iCan Careers')
+                    ->subject('Interview Scheduled')
+                    ->view('mail.hiring-process', [
+                        'worker' => $worker,
+                        'jobPost' => $jobPost,
+                    ])
+                    ->send();
+
+            } catch (\Exception $e) {
+                return back()->withErrors(['email' => $e->getMessage()]);
+            }
+
 
 
 //   dd( Carbon::parse("$request->date $request->time"));

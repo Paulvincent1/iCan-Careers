@@ -17,6 +17,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
+use Dacastro4\LaravelGmail\Services\Message\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 
@@ -168,6 +170,22 @@ class AdminDashboardController extends Controller
         $worker->verified = !$worker->verified; // Toggle between true/false
         $worker->save();
 
+           try {
+                $token = LaravelGmail::makeToken();
+
+                $mail = new Mail();
+                $mail->using($token['access_token'])
+                    ->to($worker->email, $worker->name)
+                    ->from('icancareers2@gmail.com', 'iCan Careers')
+                    ->subject($worker->verified ? 'Your Account is Verified!' : 'Verification Not Approved')
+                    ->view('mail.worker-verification', ['user' => $worker, 'verified' => $worker->verified])
+                    ->send();
+
+
+            } catch (\Exception $e) {
+                return back()->withErrors(['email' => $e->getMessage()]);
+            }
+
         return back()->with('success', 'Worker verification status updated.');
     }
 
@@ -201,6 +219,22 @@ class AdminDashboardController extends Controller
 
         $userWorker->notify(new WorkerVerificationNotification(worker:$userWorker,verified:false));
         // broadcast(new WorkerVerificationNotification(worker:$userWorker,verified:false));
+
+        try {
+                $token = LaravelGmail::makeToken();
+
+                $mail = new Mail();
+                $mail->using($token['access_token'])
+                    ->to($userWorker->email, $userWorker->name)
+                    ->from('icancareers2@gmail.com', 'iCan Careers')
+                    ->subject(false ? 'Your Account is Verified!' : 'Verification Not Approved')
+                    ->view('mail.worker-verification', ['user' => $userWorker, 'verified' => false])
+                    ->send();
+
+
+            } catch (\Exception $e) {
+                return back()->withErrors(['email' => $e->getMessage()]);
+            }
 
 
         return redirect()->back()->with(['message' => 'Successfuly updated!']);
