@@ -612,7 +612,7 @@ onBeforeUnmount(() => {
                                     v-if="
                                         page.props.auth.user.employer
                                             .subscription.subscription_type ===
-                                        'Locked'
+                                        'Free'
                                     "
                                     class="w-fit"
                                 >
