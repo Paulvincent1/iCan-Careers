@@ -26,7 +26,7 @@ Artisan::command('update:subscription-type-employer', function () {
             ]);
         }
     }
-})->purpose('update employer subscription type if expired')->daily();
+})->purpose('update employer subscription type if expired')->everyMinute();
 
 
 Schedule::command(InvoiceUpdateStatus::class)->everyMinute();

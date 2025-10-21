@@ -608,6 +608,29 @@ onBeforeUnmount(() => {
                                         Open Jobs
                                     </li></swiper-slide
                                 >
+                                 <swiper-slide
+                                    v-if="
+                                        page.props.auth.user.employer
+                                            .subscription.subscription_type ===
+                                        'Locked'
+                                    "
+                                    class="w-fit"
+                                >
+                                    <li
+                                        @click="switchJobTag('Locked')"
+                                        :class="[
+                                            'cursor-pointer rounded-full border border-[#F1F1F1] px-2 py-1 text-center',
+                                            {
+                                                'bg-[#171816] text-white':
+                                                    jobTag === 'Locked',
+                                                'text-[#9f9f9f]':
+                                                    jobTag != 'Locked',
+                                            },
+                                        ]"
+                                    >
+                                        Locked Jobs
+                                    </li></swiper-slide
+                                >
                                 <swiper-slide class="w-fit">
                                     <li
                                         @click="switchJobTag('Closed')"
