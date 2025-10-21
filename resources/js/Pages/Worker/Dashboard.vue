@@ -162,88 +162,59 @@ let errorMessage = ref({
     gcashCardNumber: null,
 });
 function validatePayoutInput(channelCode) {
+    // Convert input to numbers first
+    let amount = 0;
+    let accountNumber = "";
+
     if (channelCode === "PH_BPI") {
+        amount = Number(bpiAmount.value);
+        accountNumber = bpiCardNumber.value;
         errorMessage.value.bpiAmount = null;
         errorMessage.value.bpiCardNumber = null;
-
-        if (
-            String(bpiAmount.value).toLowerCase().includes("e") ||
-            isNaN(bpiAmount.value)
-        ) {
-            errorMessage.value.bpiAmount = "BPI Amount must be a number.";
-            return false;
-        }
-
-        if (bpiAmount.value > balance.value.balance) {
-            errorMessage.value.bpiAmount =
-                "You do not have enough balance to payout this amount.";
-            return false;
-        }
-
-        if (bpiAmount.value < 100) {
-            errorMessage.value.bpiAmount =
-                "Payout amount must be at least ₱100. Please enter a valid amount.";
-            return false;
-        }
-        if (bpiAmount.value > 50000) {
-            errorMessage.value.bpiAmount =
-                "Payout amount cannot exceed ₱50,000. Please enter a valid amount.";
-            return false;
-        }
-
-        if (
-            String(bpiCardNumber.value).toLowerCase().includes("e") ||
-            isNaN(bpiCardNumber.value) ||
-            String(bpiCardNumber.value) === ""
-        ) {
-            errorMessage.value.bpiCardNumber =
-                "BPI Card Number must be a number.";
-            return false;
-        }
-    }
-
-    if (channelCode === "PH_GCASH") {
+    } else if (channelCode === "PH_GCASH") {
+        amount = Number(gcashAmount.value);
+        accountNumber = gcashCardNumber.value;
         errorMessage.value.gcashAmount = null;
         errorMessage.value.gcashCardNumber = null;
+    } else {
+        return false; // Unknown channel
+    }
 
-        if (
-            String(gcashAmount.value).toLowerCase().includes("e") ||
-            isNaN(gcashAmount.value)
-        ) {
-            errorMessage.value.gcashAmount = "Gcash Amount must be a number.";
-            return false;
-        }
+    // Validate amount
+    if (isNaN(amount)) {
+        if (channelCode === "PH_BPI") errorMessage.value.bpiAmount = "BPI Amount must be a number.";
+        if (channelCode === "PH_GCASH") errorMessage.value.gcashAmount = "GCash Amount must be a number.";
+        return false;
+    }
 
-        if (gcashAmount.value > balance.value.balance) {
-            errorMessage.value.gcashAmount =
-                "You do not have enough balance to payout this amount.";
-            return false;
-        }
+    if (amount < 100) {
+        if (channelCode === "PH_BPI") errorMessage.value.bpiAmount = "Payout amount must be at least ₱100.";
+        if (channelCode === "PH_GCASH") errorMessage.value.gcashAmount = "Payout amount must be at least ₱100.";
+        return false;
+    }
 
-        if (gcashAmount.value < 100) {
-            errorMessage.value.gcashAmount =
-                "Payout amount must be at least ₱100. Please enter a valid amount.";
-            return false;
-        }
-        if (gcashAmount.value > 50000) {
-            errorMessage.value.gcashAmount =
-                "Payout amount cannot exceed ₱50,000. Please enter a valid amount.";
-            return false;
-        }
+    if (amount > 50000) {
+        if (channelCode === "PH_BPI") errorMessage.value.bpiAmount = "Payout amount cannot exceed ₱50,000.";
+        if (channelCode === "PH_GCASH") errorMessage.value.gcashAmount = "Payout amount cannot exceed ₱50,000.";
+        return false;
+    }
 
-        if (
-            String(gcashCardNumber.value).toLowerCase().includes("e") ||
-            isNaN(gcashCardNumber.value) ||
-            String(gcashCardNumber.value) === ""
-        ) {
-            errorMessage.value.gcashCardNumber =
-                "Gcash Number must be a number.";
-            return false;
-        }
+    if (amount > balance.value.balance) {
+        if (channelCode === "PH_BPI") errorMessage.value.bpiAmount = "You do not have enough balance to payout this amount.";
+        if (channelCode === "PH_GCASH") errorMessage.value.gcashAmount = "You do not have enough balance to payout this amount.";
+        return false;
+    }
+
+    // Validate account number
+    if (!accountNumber || isNaN(Number(accountNumber))) {
+        if (channelCode === "PH_BPI") errorMessage.value.bpiCardNumber = "BPI Card Number must be a number.";
+        if (channelCode === "PH_GCASH") errorMessage.value.gcashCardNumber = "GCash Number must be a number.";
+        return false;
     }
 
     return true;
 }
+
 
 let page = usePage();
 
