@@ -703,7 +703,7 @@ onBeforeUnmount(() => {
                                                 'py-5 text-center underline',
                                                 {
                                                     'pointer-events-none text-black no-underline':
-                                                        jobTag === 'Pending',
+                                                        jobTag === 'Pending' || 'Locked',
                                                     'text-blue-500':
                                                         jobTag != 'Pending',
                                                 },

@@ -20,7 +20,7 @@ Artisan::command('update:subscription-type-employer', function () {
             'subscription_type' => 'Free'
         ]);
 
-        foreach($expiredSubscription->employer->employerJobPosts()->latest()->skip(3)->get() as $jobPost){
+        foreach($expiredSubscription->employer->employerJobPosts()->where('job_status', 'Open')->latest()->skip(3)->get() as $jobPost){
             $jobPost->update([
                 'job_status' => 'Locked'
             ]);
