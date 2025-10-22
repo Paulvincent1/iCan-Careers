@@ -21,7 +21,7 @@ const isHovered = ref(false);
 
 const billingSuffix = computed(() => {
   if (props.tag === 'Pro') return '/month';
-  if (props.tag === 'Premium') return '/year';
+  if (props.tag === 'Premium') return '/month';
   return ''; // Free or anything else
 });
 // Determine card styling based on tier
@@ -70,7 +70,7 @@ const iconColor = computed(() => {
     >
         <!-- Popular badge for Premium -->
         <div
-            v-if="tag === 'Premium'"
+            v-if="tag === 'Pro'"
             class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10"
         >
             <span class="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg animate-pulse">

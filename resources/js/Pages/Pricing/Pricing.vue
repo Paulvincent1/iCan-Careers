@@ -44,14 +44,15 @@ const pricingPlans = [
     {
         title: "Premium Tier",
         tag: "Premium",
-        subtitle: "Anually",
+        subtitle: "Monthly",
         price: "₱5699",
         features: [
             { text: "Communicate with Workers" },
             { text: "Hire Workers" },
-            { text: "Create up to 5 jobs per month" },
+            { text: "Create up to 10 jobs per month" },
             { text: "Instant Job Approval" },
             { text: "View Job Applications" },
+            { text: "Enable Curated E-Learning Integration" },
         ],
         borderColor: "border-red-500 border-t-8 rounded",
         priceColor: "text-red-500"
