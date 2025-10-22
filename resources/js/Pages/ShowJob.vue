@@ -273,7 +273,10 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
             </Link>
             <Link
                 v-else
-                v-if="!isClosed || !isLocked"
+                v-if="
+                    jobPostProps.job_status === 'Open' ||
+                    jobPostProps.job_status === 'PEnding'
+                "
                 as="button"
                 method="get"
                 preserve-scroll

@@ -519,7 +519,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                     </p>
                                 </td>
                                 <td class="p-3 text-start font-normal">
-                                    <select
+                                    <!-- <select
                                         :disabled="
                                             page.props.auth.user.employer
                                                 .subscription
@@ -574,7 +574,8 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                         </option>
                                     </select>
 
-                                    <p v-else>{{ applicant.pivot.status }}</p>
+                                    <p v-else>{{ applicant.pivot.status }}</p> -->
+                                    <i class="bi bi-gear-fill"></i>
                                 </td>
                             </tr>
                         </TransitionGroup>
@@ -653,6 +654,130 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
             <div class="flex justify-end"></div>
         </div>
     </ReusableModal>
+    <ReusableModal v-if="true" @closeModal="closeModal">
+        <div
+            class="h-fit max-h-[400px] w-[350px] max-w-[400px] overflow-auto overflow-y-auto rounded bg-white p-4 text-[#171816] sm:w-[400px]"
+        >
+            <div class="mb-3 flex items-center justify-between">
+                <h2 class="text-xl">Update Applicant Status</h2>
+                <button @click="closeModal" class="cursor-pointer">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div>
+                <p>
+                    Paul Vincent Sumalinog
+                    <Link class="text-slate-500"
+                        ><i class="bi bi-arrow-right"></i
+                    ></Link>
+                </p>
+                <a href="" class="text-blue-500">resume_link</a>
+            </div>
+
+            <div class="mb-5">
+                <p>Pending</p>
+
+                <button class="bg-green-500 p-1 text-white">
+                    Under Review
+                </button>
+                <button class="bg-red-500 p-1 text-white">Reject</button>
+            </div>
+            <div class="mb-5">
+                <p>Under Review</p>
+
+                <!-- <div>
+                    <button class="bg-green-500 p-1 text-white">
+                        Interview
+                    </button>
+                    <button class="bg-red-500 p-1 text-white">Reject</button>
+                </div> -->
+                <!-- <div class="bg-orange-500 p-2"></div> -->
+                <div class="bg-green-500 p-2"></div>
+            </div>
+            <div class="mb-5">
+                <p>Interview Scheduled</p>
+                <p>Feb 14 2026</p>
+
+                <!-- <form @submit.prevent="schedInterview">
+                    <div class="mb-3 flex justify-start gap-3">
+                        <div class="flex flex-1 flex-col">
+                            <label for="" class="text-gray-500">Date</label>
+                            <input
+                                type="date"
+                                :min="
+                                    dayjs()
+                                        .tz(userTz)
+                                        .add(12, 'hour')
+                                        .format('YYYY-MM-DD')
+                                "
+                                class="rounded border p-2"
+                                v-model="date"
+                            />
+                        </div>
+                        <div class="flex flex-1 flex-col">
+                            <label for="" class="text-gray-500">Time</label>
+                            <input
+                                type="time"
+                                class="rounded border p-2"
+                                v-model="time"
+                            />
+                        </div>
+                    </div>
+                    <InputFlashMessage
+                        class="mb-5"
+                        type="error"
+                        :message="errorMessage"
+                    ></InputFlashMessage>
+                    <div class="flex flex-col">
+                        <label for="" class="text-gray-500"
+                            >Interview Mode</label
+                        >
+                        <select
+                            v-model="interviewMode"
+                            name=""
+                            id=""
+                            class="mb-3 rounded border p-2"
+                        >
+                            <option value="remote">Remote</option>
+                            <option value="onsite">On site</option>
+                        </select>
+                    </div>
+                    <div v-if="interviewMode === 'onsite'" class="mb-3">
+                        <Maps
+                            @update:coordinates="setCoordinates"
+                            :centerProps="jobProps.location"
+                            :markedCoordinatesProps="jobProps.location"
+                        ></Maps>
+                    </div>
+                    <div class="flex justify-end">
+                        <button
+                            class="inline-block rounded bg-[#171816] p-2 text-white"
+                        >
+                            Update status
+                        </button>
+                    </div>
+                </form> -->
+                <button class="bg-green-500 p-1 text-white">Hire</button>
+                <button class="bg-red-500 p-1 text-white">Reject</button>
+                <div class="bg-orange-500 p-2"></div>
+                <!-- <div class="bg-green-500 p-2"></div> -->
+            </div>
+            <div class="mb-5">
+                <p>Accepted</p>
+
+                <!-- <div>
+                    <button class="bg-green-500 p-1 text-white">
+                        Interview
+                    </button>
+                    <button class="bg-red-500 p-1 text-white">Reject</button>
+                </div> -->
+                <div class="bg-orange-500 p-2"></div>
+                <!-- <div class="bg-green-500 p-2"></div> -->
+            </div>
+            <div class="flex justify-end"></div>
+        </div>
+    </ReusableModal>
+
     <SuccessfulMessage
         :type="page.props.errors?.message ? 'Error' : 'Success'"
         :messageShow="showMessage"
