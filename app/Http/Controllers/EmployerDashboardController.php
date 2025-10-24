@@ -225,12 +225,12 @@ class EmployerDashboardController extends Controller
                 'interview_schedule' => 'nullable',
                 'interview_mode' => 'nullable',
                 'coordinates' => 'nullable|array',
+                'timezone' => 'required'
             ]
         );
-        $location = Location::get($request->ip());
-        $timezone = $location ? $location->timezone : config('app.timezone', 'UTC');
 
-        $interviewTime = Carbon::parse("$request->date $request->time", $timezone)->setTimezone('UTC');
+
+        $interviewTime = Carbon::parse("$request->date $request->time", $fields['timezone'])->setTimezone('UTC');
 
         if ($interviewTime->lt(now()->addHours(12))) {
             return redirect()->back()->withErrors(['message' => 'Please select a time at least 12 hours from now.']);

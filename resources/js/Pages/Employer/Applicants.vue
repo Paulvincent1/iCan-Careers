@@ -133,11 +133,13 @@ function updateCount(indexOfApplicant, statusAddCount) {
     }
 }
 let applicationPivotId = ref(null);
+let setInterview = ref(false);
 function updateStatus(applicationId, e) {
     if (e.target.value === "Interview Scheduled") {
-        openModal(e);
+        // openModal(e);
 
         applicationPivotId.value = applicationId;
+        setInterview.value = true;
         return;
     }
 
@@ -169,16 +171,20 @@ function updateStatus(applicationId, e) {
 
                         showSpecificStatus();
                         // applicants.value[indexOfApplicant].name = e.target.value;
+                        closeModal();
                     },
                     onError: (e) => {
                         showMessageProp();
+                        console.log(e);
                     },
                     preserveState: true,
                     preserveScroll: true,
                 },
             );
         } else {
+            console.log("232");
             e.target.value = "";
+            closeModal();
         }
     }
 }
@@ -249,6 +255,7 @@ function schedInterview(e) {
             time: time.value,
             interview_mode: interviewMode.value,
             coordinates: coordinates.value,
+            timezone: userTz
         },
         {
             onSuccess: () => {
@@ -267,12 +274,14 @@ function schedInterview(e) {
                 showSpecificStatus();
                 applicationPivotId.value = null;
                 closeModal();
+                setInterview.value = false;
             },
             onError: () => {
                 applicationPivotId.value = null;
                 showMessageProp();
                 event.target.value = "";
                 closeModal();
+                setInterview.value = false;
             },
             preserveState: true,
             preserveScroll: true,
@@ -290,12 +299,15 @@ function closeModal(e) {
         event.target.value = "";
     }
     showModal.value = false;
+    setInterview.value = false;
 }
 let event;
 function openModal(e) {
     event = e;
     showModal.value = true;
 }
+
+let applicantData = ref(null);
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -575,7 +587,35 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                     </select>
 
                                     <p v-else>{{ applicant.pivot.status }}</p> -->
-                                    <i class="bi bi-gear-fill"></i>
+                                    <button
+                                        @click="
+                                            applicantData = applicant;
+                                            showModal = true;
+                                        "
+                                        :disabled="
+                                            page.props.auth.user.employer
+                                                .subscription
+                                                .subscription_type === 'Free'
+                                        "
+                                        :class="[
+                                            {
+                                                'pointer-events-none text-black':
+                                                    page.props.auth.user
+                                                        .employer.subscription
+                                                        .subscription_type ===
+                                                    'Free',
+                                                'text-blue-500':
+                                                    page.props.auth.user
+                                                        .employer.subscription
+                                                        .subscription_type !=
+                                                    'Free',
+                                            },
+                                        ]"
+                                    >
+                                        <i
+                                            class="bi bi-gear-fill cursor-pointer"
+                                        ></i>
+                                    </button>
                                 </td>
                             </tr>
                         </TransitionGroup>
@@ -654,7 +694,7 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
             <div class="flex justify-end"></div>
         </div>
     </ReusableModal>
-    <ReusableModal v-if="true" @closeModal="closeModal">
+    <ReusableModal v-if="showModal" @closeModal="closeModal">
         <div
             class="h-fit max-h-[400px] w-[350px] max-w-[400px] overflow-auto overflow-y-auto rounded bg-white p-4 text-[#171816] sm:w-[400px]"
         >
@@ -666,39 +706,73 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
             </div>
             <div>
                 <p>
-                    Paul Vincent Sumalinog
+                    {{ applicantData.name }}
                     <Link class="text-slate-500"
                         ><i class="bi bi-arrow-right"></i
                     ></Link>
                 </p>
-                <a href="" class="text-blue-500">resume_link</a>
+                <a
+                    class="text-blue-500 underline"
+                    :href="
+                        applicantData.worker_profile.resume_url
+                        // route('show.resume', {
+                        //     path: applicant.worker_profile
+                        //         .resume_url,
+                        //     workerId: applicant.id,
+                        // })
+                    "
+                    target="_blank"
+                    >{{ applicantData.worker_profile.resume }}</a
+                >
             </div>
 
             <div class="mb-5">
                 <p>Pending</p>
 
-                <button class="bg-green-500 p-1 text-white">
-                    Under Review
-                </button>
-                <button class="bg-red-500 p-1 text-white">Reject</button>
+                <div v-if="applicantData.pivot.status === 'Pending'">
+                    <button
+                        @click="updateStatus(applicantData.pivot.id, $event)"
+                        class="bg-green-500 p-1 text-white"
+                        value="Under Review"
+                    >
+                        Under Review
+                    </button>
+                    <button
+                        @click="updateStatus(applicantData.pivot.id, $event)"
+                        class="bg-red-500 p-1 text-white"
+                        value="Rejected"
+                    >
+                        Rejected
+                    </button>
+                </div>
+                <div v-else class="bg-green-500 p-2"></div>
             </div>
             <div class="mb-5">
                 <p>Under Review</p>
 
-                <!-- <div>
-                    <button class="bg-green-500 p-1 text-white">
-                        Interview
+                <div v-if="applicantData.pivot.status === 'Under Review'">
+                    <button
+                        @click="updateStatus(applicantData.pivot.id, $event)"
+                        class="bg-green-500 p-1 text-white"
+                        value="Interview Scheduled"
+                    >
+                        Set Interview
                     </button>
-                    <button class="bg-red-500 p-1 text-white">Reject</button>
-                </div> -->
-                <!-- <div class="bg-orange-500 p-2"></div> -->
-                <div class="bg-green-500 p-2"></div>
-            </div>
-            <div class="mb-5">
-                <p>Interview Scheduled</p>
-                <p>Feb 14 2026</p>
-
-                <!-- <form @submit.prevent="schedInterview">
+                    <button
+                        @click="updateStatus(applicantData.pivot.id, $event)"
+                        class="bg-red-500 p-1 text-white"
+                        value="Rejected"
+                    >
+                        Rejected
+                    </button>
+                </div>
+                <form
+                    @submit.prevent="schedInterview"
+                    v-if="
+                        setInterview &&
+                        applicantData.pivot.status === 'Under Review'
+                    "
+                >
                     <div class="mb-3 flex justify-start gap-3">
                         <div class="flex flex-1 flex-col">
                             <label for="" class="text-gray-500">Date</label>
@@ -756,11 +830,142 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                             Update status
                         </button>
                     </div>
-                </form> -->
-                <button class="bg-green-500 p-1 text-white">Hire</button>
-                <button class="bg-red-500 p-1 text-white">Reject</button>
-                <div class="bg-orange-500 p-2"></div>
-                <!-- <div class="bg-green-500 p-2"></div> -->
+                </form>
+                <div
+                    v-if="applicantData.pivot.status === 'Pending'"
+                    class="bg-orange-500 p-2"
+                ></div>
+                <div
+                    v-if="
+                        applicantData.pivot.status === 'Accepted' ||
+                        applicantData.pivot.status === 'Interview Scheduled'
+                    "
+                    class="bg-green-500 p-2"
+                ></div>
+            </div>
+            <div class="mb-5">
+                <p>Interview Scheduled</p>
+
+                <div
+                    v-if="applicantData.pivot.status === 'Interview Scheduled'"
+                >
+                    <p>
+                        {{
+                            dayjs(
+                                applicantData.pivot.interview_schedule,
+                            ).format("MMMM D YYYY — h:mm A")
+                        }}
+                    </p>
+                    <p>
+                        {{ applicantData.pivot.interview_mode }}
+                    </p>
+                </div>
+
+                <div
+                    v-if="applicantData.pivot.status === 'Interview Scheduled'"
+                >
+                    <button
+                        @click="setInterview = true"
+                        class="bg-green-500 p-1 text-white"
+                    >
+                        Reschedule
+                    </button>
+                    <button
+                        @click="updateStatus(applicantData.pivot.id, $event)"
+                        class="bg-green-500 p-1 text-white"
+                        value="Accepted"
+                    >
+                        Accepted
+                    </button>
+                    <button
+                        @click="updateStatus(applicantData.pivot.id, $event)"
+                        class="bg-red-500 p-1 text-white"
+                        value="Rejected"
+                    >
+                        Rejected
+                    </button>
+                </div>
+
+                <form
+                    @submit.prevent="
+                        applicationPivotId = applicantData.pivot.id;
+                        schedInterview;
+                    "
+                    v-if="
+                        setInterview &&
+                        applicantData.pivot.status === 'Interview Scheduled'
+                    "
+                >
+                    <div class="mb-3 flex justify-start gap-3">
+                        <div class="flex flex-1 flex-col">
+                            <label for="" class="text-gray-500">Date</label>
+                            <input
+                                type="date"
+                                :min="
+                                    dayjs()
+                                        .tz(userTz)
+                                        .add(12, 'hour')
+                                        .format('YYYY-MM-DD')
+                                "
+                                class="rounded border p-2"
+                                v-model="date"
+                            />
+                        </div>
+                        <div class="flex flex-1 flex-col">
+                            <label for="" class="text-gray-500">Time</label>
+                            <input
+                                type="time"
+                                class="rounded border p-2"
+                                v-model="time"
+                            />
+                        </div>
+                    </div>
+                    <InputFlashMessage
+                        class="mb-5"
+                        type="error"
+                        :message="errorMessage"
+                    ></InputFlashMessage>
+                    <div class="flex flex-col">
+                        <label for="" class="text-gray-500"
+                            >Interview Mode</label
+                        >
+                        <select
+                            v-model="interviewMode"
+                            name=""
+                            id=""
+                            class="mb-3 rounded border p-2"
+                        >
+                            <option value="remote">Remote</option>
+                            <option value="onsite">On site</option>
+                        </select>
+                    </div>
+                    <div v-if="interviewMode === 'onsite'" class="mb-3">
+                        <Maps
+                            @update:coordinates="setCoordinates"
+                            :centerProps="jobProps.location"
+                            :markedCoordinatesProps="jobProps.location"
+                        ></Maps>
+                    </div>
+                    <div class="flex justify-end">
+                        <button
+                            class="inline-block rounded bg-[#171816] p-2 text-white"
+                        >
+                            Update status
+                        </button>
+                    </div>
+                </form>
+
+                <div
+                    v-if="
+                        applicantData.pivot.status === 'Pending' ||
+                        applicantData.pivot.status === 'Under Review'
+                    "
+                    class="bg-orange-500 p-2"
+                ></div>
+                <div
+                    v-if="applicantData.pivot.status === 'Accepted'"
+                    class="bg-green-500 p-2"
+                ></div>
             </div>
             <div class="mb-5">
                 <p>Accepted</p>
@@ -771,10 +976,16 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     </button>
                     <button class="bg-red-500 p-1 text-white">Reject</button>
                 </div> -->
-                <div class="bg-orange-500 p-2"></div>
-                <!-- <div class="bg-green-500 p-2"></div> -->
+                <div
+                    v-if="applicantData.pivot.status != 'Accepted'"
+                    class="bg-orange-500 p-2"
+                ></div>
+                <div class="bg-green-500 p-2"></div>
             </div>
-            <div class="flex justify-end"></div>
+            <div
+                v-if="applicantData.pivot.status === 'Accepted'"
+                class="flex justify-end"
+            ></div>
         </div>
     </ReusableModal>
 
