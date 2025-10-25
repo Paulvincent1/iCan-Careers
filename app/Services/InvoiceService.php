@@ -47,8 +47,8 @@ class InvoiceService {
             'description' => $description,
             'amount' => $totalAmountWithTaxes ?? $totalAmount,
             'invoice_duration' => $duration,
-            'success_redirect_url' => 'http://127.0.0.1:8000/',
-            'failure_redirect_url' => 'http://127.0.0.1:8000/',
+            'success_redirect_url' => 'https://ican-careers.onrender.com/',
+            'failure_redirect_url' => 'https://ican-careers.onrender.com/',
             //http://127.0.0.1:8000/
             //should be https in production
             //https://ican-careers.onrender.com/
@@ -81,7 +81,7 @@ class InvoiceService {
             DB::beginTransaction();
 
             $invoice_id = $invoice->invoice_id; // string | Invoice ID
-            $for_user_id = "679097a12e753bd42605ae99"; // string | Business ID of the sub-account merchant (XP feature)
+            $for_user_id = "679097a12e753bd42605ae99"; // string | Businzzzzzzzzzzzzzzzzzess ID of the sub-account merchant (XP feature)
             //67bdcfb25e9bb8a85784b27b-nath
         // 679097a12e753bd42605ae99-paul
 
