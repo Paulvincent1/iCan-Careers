@@ -238,7 +238,7 @@ function schedInterview(e) {
             time: time.value,
             interview_mode: interviewMode.value,
             coordinates: coordinates.value,
-            timezone: userTz
+            timezone: userTz,
         },
         {
             onSuccess: () => {
@@ -297,6 +297,7 @@ dayjs.extend(timezone);
 
 // get the timezone of the user
 const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+console.log(userTz);
 </script>
 
 <template>
@@ -305,16 +306,26 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
         <div class="container mx-auto max-w-7xl px-4">
             <!-- Header Section -->
             <div class="mb-6">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div
+                    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+                >
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">{{ jobProps.job_title }}</h1>
-                        <div class="flex items-center gap-4 mt-2">
+                        <h1 class="text-2xl font-bold text-gray-900">
+                            {{ jobProps.job_title }}
+                        </h1>
+                        <div class="mt-2 flex items-center gap-4">
                             <p class="text-gray-600">
-                                <span class="font-medium">{{ applicantsCount }}</span> applicants
+                                <span class="font-medium">{{
+                                    applicantsCount
+                                }}</span>
+                                applicants
                             </p>
                             <p
-                                v-if="page.props.auth.user.employer.subscription.subscription_type === 'Free'"
-                                class="flex items-center gap-1 text-amber-600 text-sm font-medium"
+                                v-if="
+                                    page.props.auth.user.employer.subscription
+                                        .subscription_type === 'Free'
+                                "
+                                class="flex items-center gap-1 text-sm font-medium text-amber-600"
                             >
                                 <i class="bi bi-exclamation-triangle-fill"></i>
                                 You cannot hire applicants in free tier.
@@ -330,19 +341,39 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 <div class="flex flex-wrap gap-2">
                     <button
                         v-for="status in [
-                            { label: 'Pending', count: pendingCount, value: 'Pending' },
-                            { label: 'Under Review', count: underReviewCount, value: 'Under Review' },
-                            { label: 'Interview', count: interviewCount, value: 'Interview Scheduled' },
-                            { label: 'Accepted', count: acceptedCount, value: 'Accepted' },
-                            { label: 'Rejected', count: rejectedCount, value: 'Rejected' }
+                            {
+                                label: 'Pending',
+                                count: pendingCount,
+                                value: 'Pending',
+                            },
+                            {
+                                label: 'Under Review',
+                                count: underReviewCount,
+                                value: 'Under Review',
+                            },
+                            {
+                                label: 'Interview',
+                                count: interviewCount,
+                                value: 'Interview Scheduled',
+                            },
+                            {
+                                label: 'Accepted',
+                                count: acceptedCount,
+                                value: 'Accepted',
+                            },
+                            {
+                                label: 'Rejected',
+                                count: rejectedCount,
+                                value: 'Rejected',
+                            },
                         ]"
                         :key="status.value"
                         @click="showSpecificStatus(status.value, $event)"
                         :class="[
-                            'px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border',
+                            'rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200',
                             lastTagValueClicked === status.value
-                                ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
-                                : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 hover:shadow-sm'
+                                ? 'border-gray-900 bg-gray-900 text-white shadow-sm'
+                                : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:shadow-sm',
                         ]"
                     >
                         {{ status.label }} ({{ status.count }})
@@ -352,11 +383,13 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 <!-- Search -->
                 <div class="flex justify-end">
                     <div class="relative w-full sm:w-64">
-                        <i class="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <i
+                            class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400"
+                        ></i>
                         <input
                             v-model="search"
                             type="text"
-                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            class="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             placeholder="Search applicant..."
                         />
                     </div>
@@ -364,16 +397,22 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
             </div>
 
             <!-- Applicants Table -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div
+                class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+            >
                 <div class="overflow-x-auto">
                     <table class="w-full">
-                        <thead class="bg-gray-50 border-b border-gray-200">
-                            <tr class="text-left text-sm font-medium text-gray-700">
-                                <th class="py-4 px-6 font-semibold">Applicant</th>
-                                <th class="py-4 px-6 font-semibold">Resume</th>
-                                <th class="py-4 px-6 font-semibold">Profile</th>
-                                <th class="py-4 px-6 font-semibold">Status</th>
-                                <th class="py-4 px-6 font-semibold">Actions</th>
+                        <thead class="border-b border-gray-200 bg-gray-50">
+                            <tr
+                                class="text-left text-sm font-medium text-gray-700"
+                            >
+                                <th class="px-6 py-4 font-semibold">
+                                    Applicant
+                                </th>
+                                <th class="px-6 py-4 font-semibold">Resume</th>
+                                <th class="px-6 py-4 font-semibold">Profile</th>
+                                <th class="px-6 py-4 font-semibold">Status</th>
+                                <th class="px-6 py-4 font-semibold">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -381,60 +420,100 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                 <tr
                                     v-for="applicant in applicants"
                                     :key="applicant.id"
-                                    class="hover:bg-gray-50 transition-colors"
+                                    class="transition-colors hover:bg-gray-50"
                                 >
                                     <!-- Applicant Info -->
-                                    <td class="py-4 px-6">
+                                    <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="h-10 w-10 flex-shrink-0">
+                                            <div
+                                                class="h-10 w-10 flex-shrink-0"
+                                            >
                                                 <img
-                                                    class="h-10 w-10 rounded-full object-cover border border-gray-200"
-                                                    :src="applicant.profile_img_url || '/assets/profile_placeholder.jpg'"
-                                                    @error="(event) => event.target.src = '/assets/profile_placeholder.jpg'"
+                                                    class="h-10 w-10 rounded-full border border-gray-200 object-cover"
+                                                    :src="
+                                                        applicant.profile_img_url ||
+                                                        '/assets/profile_placeholder.jpg'
+                                                    "
+                                                    @error="
+                                                        (event) =>
+                                                            (event.target.src =
+                                                                '/assets/profile_placeholder.jpg')
+                                                    "
                                                     alt="Profile"
                                                 />
                                             </div>
                                             <div>
-                                                <p class="font-medium text-gray-900">{{ applicant.name }}</p>
+                                                <p
+                                                    class="font-medium text-gray-900"
+                                                >
+                                                    {{ applicant.name }}
+                                                </p>
                                             </div>
                                         </div>
                                     </td>
 
                                     <!-- Resume -->
-                                    <td class="py-4 px-6">
+                                    <td class="px-6 py-4">
                                         <a
-                                            :href="applicant.worker_profile.resume_url"
+                                            :href="
+                                                applicant.worker_profile
+                                                    .resume_url
+                                            "
                                             target="_blank"
-                                            class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
+                                            class="inline-flex items-center gap-1 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700"
                                         >
-                                            <i class="bi bi-file-earmark-text"></i>
+                                            <i
+                                                class="bi bi-file-earmark-text"
+                                            ></i>
                                             View Resume
                                         </a>
                                     </td>
 
                                     <!-- Profile -->
-                                    <td class="py-4 px-6">
+                                    <td class="px-6 py-4">
                                         <Link
-                                            :href="route('worker.show.profile', applicant.id)"
-                                            class="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 transition-colors"
+                                            :href="
+                                                route(
+                                                    'worker.show.profile',
+                                                    applicant.id,
+                                                )
+                                            "
+                                            class="inline-flex items-center gap-1 text-gray-600 transition-colors hover:text-gray-800"
                                         >
-                                            <i class="bi bi-box-arrow-up-right text-sm"></i>
+                                            <i
+                                                class="bi bi-box-arrow-up-right text-sm"
+                                            ></i>
                                             View Profile
                                         </Link>
                                     </td>
 
                                     <!-- Status -->
-                                    <td class="py-4 px-6">
+                                    <td class="px-6 py-4">
                                         <span
                                             :class="[
-                                                'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium',
+                                                'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium',
                                                 {
-                                                    'bg-amber-100 text-amber-800': applicant.pivot.status === 'Pending',
-                                                    'bg-blue-100 text-blue-800': applicant.pivot.status === 'Under Review',
-                                                    'bg-purple-100 text-purple-800': applicant.pivot.status === 'Interview Scheduled',
-                                                    'bg-green-100 text-green-800': applicant.pivot.status === 'Accepted',
-                                                    'bg-red-100 text-red-800': applicant.pivot.status === 'Rejected'
-                                                }
+                                                    'bg-amber-100 text-amber-800':
+                                                        applicant.pivot
+                                                            .status ===
+                                                        'Pending',
+                                                    'bg-blue-100 text-blue-800':
+                                                        applicant.pivot
+                                                            .status ===
+                                                        'Under Review',
+                                                    'bg-purple-100 text-purple-800':
+                                                        applicant.pivot
+                                                            .status ===
+                                                        'Interview Scheduled',
+                                                    'bg-green-100 text-green-800':
+                                                        applicant.pivot
+                                                            .status ===
+                                                        'Accepted',
+                                                    'bg-red-100 text-red-800':
+                                                        applicant.pivot
+                                                            .status ===
+                                                        'Rejected',
+                                                },
                                             ]"
                                         >
                                             {{ applicant.pivot.status }}
@@ -442,18 +521,31 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                                     </td>
 
                                     <!-- Actions -->
-                                    <td class="py-4 px-6">
+                                    <td class="px-6 py-4">
                                         <button
-                                            @click="applicantData = applicant; showModal = true"
-                                            :disabled="page.props.auth.user.employer.subscription.subscription_type === 'Free'"
+                                            @click="
+                                                applicantData = applicant;
+                                                showModal = true;
+                                            "
+                                            :disabled="
+                                                page.props.auth.user.employer
+                                                    .subscription
+                                                    .subscription_type ===
+                                                'Free'
+                                            "
                                             :class="[
-                                                'p-2 rounded-lg transition-all duration-200',
-                                                page.props.auth.user.employer.subscription.subscription_type === 'Free'
-                                                    ? 'text-gray-400 cursor-not-allowed'
-                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                                'rounded-lg p-2 transition-all duration-200',
+                                                page.props.auth.user.employer
+                                                    .subscription
+                                                    .subscription_type ===
+                                                'Free'
+                                                    ? 'cursor-not-allowed text-gray-400'
+                                                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
                                             ]"
                                         >
-                                            <i class="bi bi-gear-fill text-lg"></i>
+                                            <i
+                                                class="bi bi-gear-fill text-lg"
+                                            ></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -467,95 +559,147 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     <!-- Status Update Modal -->
     <ReusableModal v-if="showModal" @closeModal="closeModal">
-        <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl">
+        <div class="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
             <!-- Header -->
-            <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-900">Manage Applicant</h2>
+            <div
+                class="flex items-center justify-between border-b border-gray-200 p-6"
+            >
+                <h2 class="text-xl font-semibold text-gray-900">
+                    Manage Applicant
+                </h2>
                 <button
                     @click="closeModal"
-                    class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    class="rounded-lg p-2 transition-colors hover:bg-gray-100"
                 >
                     <i class="bi bi-x-lg text-gray-500"></i>
                 </button>
             </div>
 
             <!-- Applicant Info -->
-            <div class="p-6 border-b border-gray-200">
+            <div class="border-b border-gray-200 p-6">
                 <div class="flex items-center gap-4">
                     <div class="h-16 w-16">
                         <img
-                            class="h-16 w-16 rounded-full object-cover border border-gray-200"
-                            :src="applicantData?.profile_img_url || '/assets/profile_placeholder.jpg'"
-                            @error="(event) => event.target.src = '/assets/profile_placeholder.jpg'"
+                            class="h-16 w-16 rounded-full border border-gray-200 object-cover"
+                            :src="
+                                applicantData?.profile_img_url ||
+                                '/assets/profile_placeholder.jpg'
+                            "
+                            @error="
+                                (event) =>
+                                    (event.target.src =
+                                        '/assets/profile_placeholder.jpg')
+                            "
                             alt="Profile"
                         />
                     </div>
                     <div class="flex-1">
-                        <h3 class="text-lg font-semibold text-gray-900">{{ applicantData?.name }}</h3>
-                        <div class="flex items-center gap-4 mt-1">
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            {{ applicantData?.name }}
+                        </h3>
+                        <div class="mt-1 flex items-center gap-4">
                             <a
-                                :href="applicantData?.worker_profile?.resume_url"
+                                :href="
+                                    applicantData?.worker_profile?.resume_url
+                                "
                                 target="_blank"
-                                class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium text-sm"
+                                class="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700"
                             >
                                 <i class="bi bi-file-earmark-text"></i>
                                 Resume
                             </a>
                             <Link
-                                :href="route('worker.show.profile', applicantData?.id)"
-                                class="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 font-medium text-sm"
+                                :href="
+                                    route(
+                                        'worker.show.profile',
+                                        applicantData?.id,
+                                    )
+                                "
+                                class="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-800"
                             >
                                 <i class="bi bi-box-arrow-up-right"></i>
                                 Profile
                             </Link>
                         </div>
                     </div>
-                    <div :class="[
-                        'px-3 py-1 rounded-full text-sm font-medium',
-                        {
-                            'bg-amber-100 text-amber-800': applicantData?.pivot?.status === 'Pending',
-                            'bg-blue-100 text-blue-800': applicantData?.pivot?.status === 'Under Review',
-                            'bg-purple-100 text-purple-800': applicantData?.pivot?.status === 'Interview Scheduled',
-                            'bg-green-100 text-green-800': applicantData?.pivot?.status === 'Accepted',
-                            'bg-red-100 text-red-800': applicantData?.pivot?.status === 'Rejected'
-                        }
-                    ]">
+                    <div
+                        :class="[
+                            'rounded-full px-3 py-1 text-sm font-medium',
+                            {
+                                'bg-amber-100 text-amber-800':
+                                    applicantData?.pivot?.status === 'Pending',
+                                'bg-blue-100 text-blue-800':
+                                    applicantData?.pivot?.status ===
+                                    'Under Review',
+                                'bg-purple-100 text-purple-800':
+                                    applicantData?.pivot?.status ===
+                                    'Interview Scheduled',
+                                'bg-green-100 text-green-800':
+                                    applicantData?.pivot?.status === 'Accepted',
+                                'bg-red-100 text-red-800':
+                                    applicantData?.pivot?.status === 'Rejected',
+                            },
+                        ]"
+                    >
                         {{ applicantData?.pivot?.status }}
                     </div>
                 </div>
             </div>
 
             <!-- Status Management -->
-            <div class="p-6 space-y-6 max-h-96 overflow-y-auto">
+            <div class="max-h-96 space-y-6 overflow-y-auto p-6">
                 <!-- Pending State -->
-                <div v-if="applicantData?.pivot?.status === 'Pending'" class="space-y-4">
+                <div
+                    v-if="applicantData?.pivot?.status === 'Pending'"
+                    class="space-y-4"
+                >
                     <h4 class="font-medium text-gray-900">Update Status</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <button
-                            @click="updateStatus(applicantData.pivot.id, { target: { value: 'Under Review' } })"
-                            class="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors text-left group"
+                            @click="
+                                updateStatus(applicantData.pivot.id, {
+                                    target: { value: 'Under Review' },
+                                })
+                            "
+                            class="group rounded-lg border border-blue-200 bg-blue-50 p-3 text-left transition-colors hover:bg-blue-100"
                         >
                             <div class="flex items-center gap-3">
-                                <div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 transition-colors group-hover:bg-blue-200"
+                                >
                                     <i class="bi bi-eye text-blue-600"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-blue-900">Under Review</p>
-                                    <p class="text-sm text-blue-600">Move to next stage</p>
+                                    <p class="font-medium text-blue-900">
+                                        Under Review
+                                    </p>
+                                    <p class="text-sm text-blue-600">
+                                        Move to next stage
+                                    </p>
                                 </div>
                             </div>
                         </button>
                         <button
-                            @click="updateStatus(applicantData.pivot.id, { target: { value: 'Rejected' } })"
-                            class="p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-left group"
+                            @click="
+                                updateStatus(applicantData.pivot.id, {
+                                    target: { value: 'Rejected' },
+                                })
+                            "
+                            class="group rounded-lg border border-red-200 bg-red-50 p-3 text-left transition-colors hover:bg-red-100"
                         >
                             <div class="flex items-center gap-3">
-                                <div class="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 transition-colors group-hover:bg-red-200"
+                                >
                                     <i class="bi bi-x-lg text-red-600"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-red-900">Reject</p>
-                                    <p class="text-sm text-red-600">Decline application</p>
+                                    <p class="font-medium text-red-900">
+                                        Reject
+                                    </p>
+                                    <p class="text-sm text-red-600">
+                                        Decline application
+                                    </p>
                                 </div>
                             </div>
                         </button>
@@ -563,34 +707,58 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 </div>
 
                 <!-- Under Review State -->
-                <div v-if="applicantData?.pivot?.status === 'Under Review'" class="space-y-4">
+                <div
+                    v-if="applicantData?.pivot?.status === 'Under Review'"
+                    class="space-y-4"
+                >
                     <h4 class="font-medium text-gray-900">Next Steps</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <button
-                            @click="applicationPivotId = applicantData.pivot.id; setInterview = true"
-                            class="p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors text-left group"
+                            @click="
+                                applicationPivotId = applicantData.pivot.id;
+                                setInterview = true;
+                            "
+                            class="group rounded-lg border border-green-200 bg-green-50 p-3 text-left transition-colors hover:bg-green-100"
                         >
                             <div class="flex items-center gap-3">
-                                <div class="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                                    <i class="bi bi-calendar-check text-green-600"></i>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 transition-colors group-hover:bg-green-200"
+                                >
+                                    <i
+                                        class="bi bi-calendar-check text-green-600"
+                                    ></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-green-900">Schedule Interview</p>
-                                    <p class="text-sm text-green-600">Set up meeting</p>
+                                    <p class="font-medium text-green-900">
+                                        Schedule Interview
+                                    </p>
+                                    <p class="text-sm text-green-600">
+                                        Set up meeting
+                                    </p>
                                 </div>
                             </div>
                         </button>
                         <button
-                            @click="updateStatus(applicantData.pivot.id, { target: { value: 'Rejected' } })"
-                            class="p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-left group"
+                            @click="
+                                updateStatus(applicantData.pivot.id, {
+                                    target: { value: 'Rejected' },
+                                })
+                            "
+                            class="group rounded-lg border border-red-200 bg-red-50 p-3 text-left transition-colors hover:bg-red-100"
                         >
                             <div class="flex items-center gap-3">
-                                <div class="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 transition-colors group-hover:bg-red-200"
+                                >
                                     <i class="bi bi-x-lg text-red-600"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-red-900">Reject</p>
-                                    <p class="text-sm text-red-600">Decline application</p>
+                                    <p class="font-medium text-red-900">
+                                        Reject
+                                    </p>
+                                    <p class="text-sm text-red-600">
+                                        Decline application
+                                    </p>
                                 </div>
                             </div>
                         </button>
@@ -598,67 +766,120 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 </div>
 
                 <!-- Interview Scheduled State -->
-                <div v-if="applicantData?.pivot?.status === 'Interview Scheduled'" class="space-y-4">
+                <div
+                    v-if="
+                        applicantData?.pivot?.status === 'Interview Scheduled'
+                    "
+                    class="space-y-4"
+                >
                     <!-- Interview Details -->
-                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <h4 class="font-medium text-purple-900 mb-2">Scheduled Interview</h4>
+                    <div
+                        class="rounded-lg border border-purple-200 bg-purple-50 p-4"
+                    >
+                        <h4 class="mb-2 font-medium text-purple-900">
+                            Scheduled Interview
+                        </h4>
                         <div class="space-y-1 text-sm text-purple-800">
                             <p class="flex items-center gap-2">
                                 <i class="bi bi-calendar"></i>
-                                {{ dayjs(applicantData.pivot.interview_schedule).format("MMMM D, YYYY") }}
+                                {{
+                                    dayjs.utc(applicantData.pivot.interview_schedule).tz(userTz)
+                                        .format("MMMM D, YYYY")
+                                }}
                             </p>
                             <p class="flex items-center gap-2">
                                 <i class="bi bi-clock"></i>
-                                {{ dayjs(applicantData.pivot.interview_schedule).format("h:mm A") }}
+                                {{
+                                     dayjs.utc(applicantData.pivot.interview_schedule).tz(userTz).format("h:mm A")
+                                }}
                             </p>
+
                             <p class="flex items-center gap-2">
                                 <i class="bi bi-geo-alt"></i>
-                                {{ applicantData.pivot.interview_mode === 'remote' ? 'Remote Meeting' : 'On-site' }}
+                                {{
+                                    applicantData.pivot.interview_mode ===
+                                    "remote"
+                                        ? "Remote Meeting"
+                                        : "On-site"
+                                }}
                             </p>
                         </div>
                     </div>
 
                     <h4 class="font-medium text-gray-900">Update Status</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <button
-                            @click="applicationPivotId = applicantData.pivot.id; setInterview = true"
-                            class="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors text-left group"
+                            @click="
+                                applicationPivotId = applicantData.pivot.id;
+                                setInterview = true;
+                            "
+                            class="group rounded-lg border border-blue-200 bg-blue-50 p-3 text-left transition-colors hover:bg-blue-100"
                         >
                             <div class="flex items-center gap-3">
-                                <div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                                    <i class="bi bi-arrow-repeat text-blue-600"></i>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 transition-colors group-hover:bg-blue-200"
+                                >
+                                    <i
+                                        class="bi bi-arrow-repeat text-blue-600"
+                                    ></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-blue-900">Reschedule</p>
-                                    <p class="text-sm text-blue-600">Change time/date</p>
+                                    <p class="font-medium text-blue-900">
+                                        Reschedule
+                                    </p>
+                                    <p class="text-sm text-blue-600">
+                                        Change time/date
+                                    </p>
                                 </div>
                             </div>
                         </button>
                         <button
-                            @click="updateStatus(applicantData.pivot.id, { target: { value: 'Accepted' } })"
-                            class="p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors text-left group"
+                            @click="
+                                updateStatus(applicantData.pivot.id, {
+                                    target: { value: 'Accepted' },
+                                })
+                            "
+                            class="group rounded-lg border border-green-200 bg-green-50 p-3 text-left transition-colors hover:bg-green-100"
                         >
                             <div class="flex items-center gap-3">
-                                <div class="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                                    <i class="bi bi-check-lg text-green-600"></i>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 transition-colors group-hover:bg-green-200"
+                                >
+                                    <i
+                                        class="bi bi-check-lg text-green-600"
+                                    ></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-green-900">Accept</p>
-                                    <p class="text-sm text-green-600">Hire applicant</p>
+                                    <p class="font-medium text-green-900">
+                                        Accept
+                                    </p>
+                                    <p class="text-sm text-green-600">
+                                        Hire applicant
+                                    </p>
                                 </div>
                             </div>
                         </button>
                         <button
-                            @click="updateStatus(applicantData.pivot.id, { target: { value: 'Rejected' } })"
-                            class="p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-left group"
+                            @click="
+                                updateStatus(applicantData.pivot.id, {
+                                    target: { value: 'Rejected' },
+                                })
+                            "
+                            class="group rounded-lg border border-red-200 bg-red-50 p-3 text-left transition-colors hover:bg-red-100"
                         >
                             <div class="flex items-center gap-3">
-                                <div class="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 transition-colors group-hover:bg-red-200"
+                                >
                                     <i class="bi bi-x-lg text-red-600"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-red-900">Reject</p>
-                                    <p class="text-sm text-red-600">Decline application</p>
+                                    <p class="font-medium text-red-900">
+                                        Reject
+                                    </p>
+                                    <p class="text-sm text-red-600">
+                                        Decline application
+                                    </p>
                                 </div>
                             </div>
                         </button>
@@ -666,58 +887,90 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 </div>
 
                 <!-- Final States -->
-                <div v-if="['Accepted', 'Rejected'].includes(applicantData?.pivot?.status)" class="text-center py-8">
-                    <div :class="[
-                        'inline-flex flex-col items-center p-6 rounded-2xl',
-                        applicantData?.pivot?.status === 'Accepted'
-                            ? 'bg-green-50 border border-green-200'
-                            : 'bg-red-50 border border-red-200'
-                    ]">
+                <div
+                    v-if="
+                        ['Accepted', 'Rejected'].includes(
+                            applicantData?.pivot?.status,
+                        )
+                    "
+                    class="py-8 text-center"
+                >
+                    <div
+                        :class="[
+                            'inline-flex flex-col items-center rounded-2xl p-6',
+                            applicantData?.pivot?.status === 'Accepted'
+                                ? 'border border-green-200 bg-green-50'
+                                : 'border border-red-200 bg-red-50',
+                        ]"
+                    >
                         <i
                             :class="[
-                                'text-4xl mb-3',
+                                'mb-3 text-4xl',
                                 applicantData?.pivot?.status === 'Accepted'
                                     ? 'bi bi-check-circle-fill text-green-500'
-                                    : 'bi bi-x-circle-fill text-red-500'
+                                    : 'bi bi-x-circle-fill text-red-500',
                             ]"
                         ></i>
-                        <h4 class="font-semibold text-gray-900 mb-1">
-                            {{ applicantData?.pivot?.status === 'Accepted' ? 'Application Accepted' : 'Application Rejected' }}
+                        <h4 class="mb-1 font-semibold text-gray-900">
+                            {{
+                                applicantData?.pivot?.status === "Accepted"
+                                    ? "Application Accepted"
+                                    : "Application Rejected"
+                            }}
                         </h4>
-                        <p :class="[
-                            'text-sm',
-                            applicantData?.pivot?.status === 'Accepted'
-                                ? 'text-green-700'
-                                : 'text-red-700'
-                        ]">
-                            {{ applicantData?.pivot?.status === 'Accepted'
-                                ? 'This applicant has been successfully hired.'
-                                : 'This application has been declined.'
+                        <p
+                            :class="[
+                                'text-sm',
+                                applicantData?.pivot?.status === 'Accepted'
+                                    ? 'text-green-700'
+                                    : 'text-red-700',
+                            ]"
+                        >
+                            {{
+                                applicantData?.pivot?.status === "Accepted"
+                                    ? "This applicant has been successfully hired."
+                                    : "This application has been declined."
                             }}
                         </p>
                     </div>
                 </div>
 
                 <!-- Interview Scheduling Form -->
-                <div v-if="setInterview" class="space-y-4 pt-4 border-t border-gray-200">
-                    <h4 class="font-medium text-gray-900">Schedule Interview</h4>
+                <div
+                    v-if="setInterview"
+                    class="space-y-4 border-t border-gray-200 pt-4"
+                >
+                    <h4 class="font-medium text-gray-900">
+                        Schedule Interview
+                    </h4>
                     <form @submit.prevent="schedInterview" class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                                <label
+                                    class="mb-1 block text-sm font-medium text-gray-700"
+                                    >Date</label
+                                >
                                 <input
                                     type="date"
-                                    :min="dayjs().tz(userTz).add(12, 'hour').format('YYYY-MM-DD')"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    :min="
+                                        dayjs()
+                                            .tz(userTz)
+                                            .add(12, 'hour')
+                                            .format('YYYY-MM-DD')
+                                    "
+                                    class="w-full rounded-lg border border-gray-300 px-3 py-2 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                                     v-model="date"
                                     required
                                 />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                                <label
+                                    class="mb-1 block text-sm font-medium text-gray-700"
+                                    >Time</label
+                                >
                                 <input
                                     type="time"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    class="w-full rounded-lg border border-gray-300 px-3 py-2 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                                     v-model="time"
                                     required
                                 />
@@ -731,10 +984,13 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                         />
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Interview Mode</label>
+                            <label
+                                class="mb-1 block text-sm font-medium text-gray-700"
+                                >Interview Mode</label
+                            >
                             <select
                                 v-model="interviewMode"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="remote">Remote</option>
                                 <option value="onsite">On Site</option>
@@ -742,7 +998,10 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                         </div>
 
                         <div v-if="interviewMode === 'onsite'" class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                            <label
+                                class="mb-2 block text-sm font-medium text-gray-700"
+                                >Location</label
+                            >
                             <Maps
                                 @update:coordinates="setCoordinates"
                                 :centerProps="jobProps.location"
@@ -754,13 +1013,13 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                             <button
                                 type="button"
                                 @click="setInterview = false"
-                                class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                                class="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-50"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700"
                             >
                                 Schedule Interview
                             </button>
