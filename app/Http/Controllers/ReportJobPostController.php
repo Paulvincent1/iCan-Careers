@@ -6,6 +6,8 @@ use App\Models\JobPost;
 use App\Models\ReportJobPost;
 use App\Models\User;
 use App\Notifications\AdminReportJobPostNotification;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
+use Dacastro4\LaravelGmail\Services\Message\Mail;
 use Illuminate\Http\Request;
 
 class ReportJobPostController extends Controller
@@ -50,6 +52,26 @@ class ReportJobPostController extends Controller
         $admin->notify(new AdminReportJobPostNotification(admin:$admin,user:$user));
         // broadcast(new AdminReportJobPostNotification(admin:$admin,user:$user));
 
+        // ✅ Send Gmail notification
+        try {
+            $token = LaravelGmail::makeToken(); // Generate Gmail token
+
+            $mail = new Mail();
+            $mail->using($token['access_token'])
+                ->to($admin->email, $admin->name)
+                ->from('icancareers2@gmail.com', 'iCan Careers')
+                ->subject('A Job Post Has Been Reported')
+                ->view('mail.report-job', [
+                    'admin' => $admin,
+                    'user' => $user,
+                    'jobPost' => $jobpostId,
+                    'reason' => $request->reason,
+                ])
+                ->send();
+
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['email' => 'Email sending failed: ' . $e->getMessage()]);
+        }
 
 
         return redirect()->back()->with('messageProp','Thank you for reporting this user! We will review the behaviour of this user.');

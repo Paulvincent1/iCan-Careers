@@ -11,6 +11,8 @@ use App\Notifications\WorkerSendAnInvoiceToEmployerNotification;
 use App\Services\InvoiceService;
 use App\Services\PayoutService;
 use Carbon\Carbon;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
+use Dacastro4\LaravelGmail\Services\Message\Mail;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -276,6 +278,31 @@ class WorkerDashboard extends Controller
             );
 
             $employer->notify(new WorkerSendAnInvoiceToEmployerNotification(worker:$user,employer:$employer));
+
+            // ✅ Send Gmail email to employer
+            try {
+                $token = LaravelGmail::makeToken();
+
+                $mail = new Mail();
+                $mail->using($token['access_token'])
+                    ->to($employer->email, $employer->name)
+                    ->from('icancareers2@gmail.com', 'iCan Careers')
+                    ->subject('New Invoice from ' . $user->name)
+                    ->view('mail.worker-send-invoice', [
+                        'employer' => $employer,
+                        'worker' => $user,
+                        'invoiceUrl' => $resultInvoice->getInvoiceUrl(),
+                        'dueDate' => $fields['dueDate'],
+                        'description' => $fields['description'],
+                        'items' => $items,
+                        'totalAmount' => $fields['totalAmount'],
+                    ])
+                    ->send();
+
+            } catch (\Exception $e) {
+                return redirect()->back()->withErrors(['email' => 'Email sending failed: ' . $e->getMessage()]);
+            }
+
 
             dispatch(new ProcessInvoicePdf(
              employer: $employer,

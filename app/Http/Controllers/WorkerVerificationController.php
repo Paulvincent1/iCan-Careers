@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\WorkerVerification;
 use App\Notifications\AdminWorkerVerificationNotification;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
+use Dacastro4\LaravelGmail\Services\Message\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -85,6 +87,25 @@ class WorkerVerificationController extends Controller
 
         $admin->notify(new AdminWorkerVerificationNotification(admin:$admin,user:$user));
         // broadcast(new AdminWorkerVerificationNotification(admin:$admin,user:$user));
+
+        // Send Gmail notification
+        try {
+            $token = LaravelGmail::makeToken(); // Generate token first
+
+            $mail = new Mail();
+            $mail->using($token['access_token'])
+                ->to($admin->email, $admin->name)
+                ->from('icancareers2@gmail.com', 'iCan Careers')
+                ->subject('New Worker Verification Request')
+                ->view('mail.worker-verification-request', [
+                    'admin' => $admin,
+                    'user' => $user,
+                ])
+                ->send();
+
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['email' => 'Email sending failed: ' . $e->getMessage()]);
+        }
 
 
 

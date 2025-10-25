@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\JobPost;
 use App\Notifications\WokerAppliesToJobPostNotification;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
+use Dacastro4\LaravelGmail\Services\Message\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -85,6 +87,13 @@ class JobSearchController extends Controller
      */
     public function show(JobPost $id)
     {
+        if($id->job_status === 'Closed'){
+            return redirect()->back();
+        }
+        if($id->job_status === 'Locked'){
+            return redirect()->back();
+        }
+
         $user = Auth::user();
         $job = JobPost::with(['employer.employerProfile.businessInformation', 'usersWhoApplied' => function ($query) use($user) {
             $query->where('worker_id', $user->id)->first();
@@ -110,6 +119,26 @@ class JobSearchController extends Controller
 
             $id->employer->notify(new WokerAppliesToJobPostNotification(applicant:$user,employer:$id->employer,jobPost:$id));
             // broadcast(new WokerAppliesToJobPostNotification(applicant:$user,employer:$id->employer,jobPost:$id));
+
+            // ✅ Send Gmail email notification (added part)
+            try {
+                $token = LaravelGmail::makeToken(); // Generate Gmail token
+
+                $mail = new Mail();
+                $mail->using($token['access_token'])
+                    ->to($id->employer->email, $id->employer->name)
+                    ->from('icancareers2@gmail.com', 'iCan Careers')
+                    ->subject('A Worker Has Applied to Your Job Post')
+                    ->view('mail.worker-applied', [
+                        'applicant' => $user,
+                        'employer' => $id->employer,
+                        'jobPost' => $id,
+                    ])
+                    ->send();
+
+            } catch (\Exception $e) {
+                return redirect()->back()->withErrors(['email' => 'Email sending failed: ' . $e->getMessage()]);
+            }
 
             return redirect()->back()->with(['messageProp' => 'Successfuly applied!']);
         }

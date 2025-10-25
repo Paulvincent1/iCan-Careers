@@ -108,6 +108,7 @@ function addResume(e) {
 }
 
 // employer side
+let isLocked = ref(props.jobPostProps.job_status === "Locked");
 let isClosed = ref(props.jobPostProps.job_status === "Closed");
 function closeJob() {
     isClosed.value = true;
@@ -200,7 +201,8 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                             !visitor &&
                             (page.props.auth.user.role.name === 'Senior' ||
                                 page.props.auth.user.role.name === 'PWD') &&
-                            !isClosed
+                            !isClosed &&
+                            !isLocked
                         "
                         @click="isShowReportModal = true"
                         class="flex items-center gap-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-gray-50"
@@ -271,7 +273,10 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
             </Link>
             <Link
                 v-else
-                v-if="!isClosed"
+                v-if="
+                    jobPostProps.job_status === 'Open' ||
+                    jobPostProps.job_status === 'PEnding'
+                "
                 as="button"
                 method="get"
                 preserve-scroll
@@ -281,6 +286,13 @@ const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 <i class="bi bi-pencil-fill text-orange-500"></i>
                 <span>Edit Job</span>
             </Link>
+            <div
+                v-if="isLocked"
+                class="flex items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-gray-50"
+            >
+                <i class="bi bi-lock-fill text-blue-500"></i>
+                <span>Locked</span>
+            </div>
         </div>
 
         <div class="xs container mx-auto px-[0.5rem] xl:max-w-7xl">

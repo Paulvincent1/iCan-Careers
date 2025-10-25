@@ -50,21 +50,9 @@ let rejectedCount = ref(props.statusCountProps.Rejected ?? 0);
 
 let jobId = ref(null);
 onMounted(() => {
-    // props.applicantsProps.forEach((job) => {
-    //     job;
-    // });
-
     jobId.value = route().params.jobid;
     search.value = route().params.q;
 });
-
-// let updateStatus = ref(null);
-
-// watch(updateStatus, (value) => {
-//     if (value === "under review" || value === "rejected") {
-//         console.log("hi");
-//     }
-// });
 
 let lastTagValueClicked = ref(null);
 
@@ -133,11 +121,11 @@ function updateCount(indexOfApplicant, statusAddCount) {
     }
 }
 let applicationPivotId = ref(null);
+let setInterview = ref(false);
 function updateStatus(applicationId, e) {
     if (e.target.value === "Interview Scheduled") {
-        openModal(e);
-
         applicationPivotId.value = applicationId;
+        setInterview.value = true;
         return;
     }
 
@@ -168,17 +156,20 @@ function updateStatus(applicationId, e) {
                             e.target.value;
 
                         showSpecificStatus();
-                        // applicants.value[indexOfApplicant].name = e.target.value;
+                        closeModal();
                     },
                     onError: (e) => {
                         showMessageProp();
+                        console.log(e);
                     },
                     preserveState: true,
                     preserveScroll: true,
                 },
             );
         } else {
+            console.log("232");
             e.target.value = "";
+            closeModal();
         }
     }
 }
@@ -193,9 +184,7 @@ function submit() {
         {
             preserveState: true,
             onSuccess: () => {
-                // showSpecificStatus(lastTagValueClicked.value);
                 showSpecificStatus();
-                // applicants.value = props.applicantsProps;
             },
         },
     );
@@ -249,6 +238,7 @@ function schedInterview(e) {
             time: time.value,
             interview_mode: interviewMode.value,
             coordinates: coordinates.value,
+            timezone: userTz
         },
         {
             onSuccess: () => {
@@ -267,12 +257,14 @@ function schedInterview(e) {
                 showSpecificStatus();
                 applicationPivotId.value = null;
                 closeModal();
+                setInterview.value = false;
             },
             onError: () => {
                 applicationPivotId.value = null;
                 showMessageProp();
                 event.target.value = "";
                 closeModal();
+                setInterview.value = false;
             },
             preserveState: true,
             preserveScroll: true,
@@ -290,6 +282,7 @@ function closeModal(e) {
         event.target.value = "";
     }
     showModal.value = false;
+    setInterview.value = false;
 }
 let event;
 function openModal(e) {
@@ -297,381 +290,507 @@ function openModal(e) {
     showModal.value = true;
 }
 
+let applicantData = ref(null);
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 // get the timezone of the user
 const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-// console.log(userTz);
-
-// console.log(dayjs().tz(userTz).format("YYYY-MM-DD"));
 </script>
+
 <template>
     <Head title="Applicants| iCan Careers" />
-    <div class="h-[calc(100vh-4.625rem)] bg-[#eff2f6] pt-5 text-[#171816]">
-        <div
-            class="container mx-auto flex h-[90%] flex-col rounded bg-white p-5 xl:max-w-7xl"
-        >
-            <div class="mb-2">
-                <h2 class="text-[26px]">{{ jobProps.job_title }}</h2>
-                <div class="flex items-center gap-2">
-                    <p class="text-[#171816]">
-                        Applicants: {{ applicantsCount }}
-                    </p>
-                    <p
-                        v-if="
-                            page.props.auth.user.employer.subscription
-                                .subscription_type === 'Free'
-                        "
-                        class="font-bold text-orange-500"
+    <div class="min-h-[calc(100vh-4.625rem)] bg-gray-50 py-6">
+        <div class="container mx-auto max-w-7xl px-4">
+            <!-- Header Section -->
+            <div class="mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ jobProps.job_title }}</h1>
+                        <div class="flex items-center gap-4 mt-2">
+                            <p class="text-gray-600">
+                                <span class="font-medium">{{ applicantsCount }}</span> applicants
+                            </p>
+                            <p
+                                v-if="page.props.auth.user.employer.subscription.subscription_type === 'Free'"
+                                class="flex items-center gap-1 text-amber-600 text-sm font-medium"
+                            >
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                You cannot hire applicants in free tier.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Search Section -->
+            <div class="mb-6 space-y-4">
+                <!-- Status Filters -->
+                <div class="flex flex-wrap gap-2">
+                    <button
+                        v-for="status in [
+                            { label: 'Pending', count: pendingCount, value: 'Pending' },
+                            { label: 'Under Review', count: underReviewCount, value: 'Under Review' },
+                            { label: 'Interview', count: interviewCount, value: 'Interview Scheduled' },
+                            { label: 'Accepted', count: acceptedCount, value: 'Accepted' },
+                            { label: 'Rejected', count: rejectedCount, value: 'Rejected' }
+                        ]"
+                        :key="status.value"
+                        @click="showSpecificStatus(status.value, $event)"
+                        :class="[
+                            'px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border',
+                            lastTagValueClicked === status.value
+                                ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
+                                : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 hover:shadow-sm'
+                        ]"
                     >
-                        <i class="bi bi-exclamation-triangle-fill"></i> You
-                        cannot hire applicants in free tier.
-                    </p>
-                </div>
-            </div>
-            <div class="mb-3 flex flex-col justify-between gap-3 lg:flex-row">
-                <div>
-                    <swiper-container slides-per-view="auto" :space-between="5">
-                        <swiper-slide class="w-fit">
-                            <li
-                                @click="showSpecificStatus('Pending', $event)"
-                                :class="[
-                                    'cursor-pointer rounded border border-[#F1F1F1] p-1 text-sm',
-                                    {
-                                        'bg-[#171816] text-white':
-                                            lastTagValueClicked === 'Pending',
-                                        'text-gray-500':
-                                            lastTagValueClicked != 'Pending',
-                                    },
-                                ]"
-                            >
-                                Pending ({{ pendingCount ?? 0 }})
-                            </li></swiper-slide
-                        >
-                        <swiper-slide class="w-fit">
-                            <li
-                                @click="
-                                    showSpecificStatus('Under Review', $event)
-                                "
-                                :class="[
-                                    'cursor-pointer rounded border border-[#F1F1F1] p-1 text-sm text-gray-500',
-                                    {
-                                        'bg-[#171816] text-white':
-                                            lastTagValueClicked ===
-                                            'Under Review',
-                                    },
-                                ]"
-                            >
-                                Under Review ({{ underReviewCount ?? 0 }})
-                            </li></swiper-slide
-                        >
-                        <swiper-slide class="w-fit">
-                            <li
-                                @click="
-                                    showSpecificStatus(
-                                        'Interview Scheduled',
-                                        $event,
-                                    )
-                                "
-                                :class="[
-                                    'cursor-pointer rounded border border-[#F1F1F1] p-1 text-sm text-gray-500',
-                                    {
-                                        'bg-[#171816] text-white':
-                                            lastTagValueClicked ===
-                                            'Interview Scheduled',
-                                    },
-                                ]"
-                            >
-                                Interview Scheduled ({{ interviewCount ?? 0 }})
-                            </li></swiper-slide
-                        >
-                        <swiper-slide class="w-fit">
-                            <li
-                                @click="showSpecificStatus('Accepted', $event)"
-                                :class="[
-                                    'cursor-pointer rounded border border-[#F1F1F1] p-1 text-sm text-gray-500',
-                                    {
-                                        'bg-[#171816] text-white':
-                                            lastTagValueClicked === 'Accepted',
-                                    },
-                                ]"
-                            >
-                                Accepted ({{ acceptedCount ?? 0 }})
-                            </li></swiper-slide
-                        >
-                        <swiper-slide class="w-fit">
-                            <li
-                                @click="showSpecificStatus('Rejected', $event)"
-                                :class="[
-                                    'cursor-pointer rounded border border-[#F1F1F1] p-1 text-sm text-gray-500',
-                                    {
-                                        'bg-[#171816] text-white':
-                                            lastTagValueClicked === 'Rejected',
-                                    },
-                                ]"
-                            >
-                                Rejected ({{ rejectedCount ?? 0 }})
-                            </li></swiper-slide
-                        >
-                    </swiper-container>
+                        {{ status.label }} ({{ status.count }})
+                    </button>
                 </div>
 
-                <input
-                    v-model="search"
-                    type="text"
-                    class="max-w-96 rounded border px-2 text-sm"
-                    placeholder="Search Applicant Name"
-                />
+                <!-- Search -->
+                <div class="flex justify-end">
+                    <div class="relative w-full sm:w-64">
+                        <i class="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input
+                            v-model="search"
+                            type="text"
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            placeholder="Search applicant..."
+                        />
+                    </div>
+                </div>
             </div>
 
-            <div class="flex-1 basis-1 overflow-x-auto">
-                <table class="relative min-w-[800px] table-fixed md:w-full">
-                    <thead class="">
-                        <tr class="text-sm text-slate-500">
-                            <th class="p-3 text-start font-normal">Image</th>
-                            <th class="p-3 text-start font-normal">Name</th>
-                            <th class="p-3 text-start font-normal">Resume</th>
-                            <th class="p-3 text-start font-normal">Profile</th>
-                            <th class="p-3 text-start font-normal">Status</th>
-                            <th class="p-3 text-start font-normal">Update</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <TransitionGroup name="applicant">
-                            <tr
-                                class="text-sm"
-                                v-for="(applicant, index) in applicants"
-                                :key="applicant.id"
-                            >
-                                <td class="p-3 text-start">
-                                    <div class="h-12 w-12">
-                                        <img
-                                            class="h-full w-full rounded-full object-cover"
-                                            :src="
-                                                applicant.profile_img_url ||
-                                                '/assets/profile_placeholder.jpg'
-                                            "
-                                            @error="
-                                                (event) =>
-                                                    (event.target.src =
-                                                        '/assets/profile_placeholder.jpg')
-                                            "
-                                            alt="Profile"
-                                        />
-                                    </div>
-                                </td>
-                                <td class="p-3 text-start font-normal">
-                                    {{ applicant.name }}
-                                </td>
-                                <td class="p-3 text-start font-normal">
-                                    <a
-                                        class="text-blue-500 underline"
-                                        :href="
-                                            applicant.worker_profile.resume_url
-                                            // route('show.resume', {
-                                            //     path: applicant.worker_profile
-                                            //         .resume_url,
-                                            //     workerId: applicant.id,
-                                            // })
-                                        "
-                                        target="_blank"
-                                        >{{
-                                            applicant.worker_profile.resume
-                                        }}</a
-                                    >
-                                </td>
-                                <td class="p-3 text-start font-normal">
-                                    <Link
-                                        class="text-slate-500"
-                                        :href="
-                                            route(
-                                                'worker.show.profile',
-                                                applicant.id,
-                                            )
-                                        "
-                                        ><i class="bi bi-arrow-right"></i
-                                    ></Link>
-                                </td>
-                                <td class="p-3 text-start font-normal">
-                                    <p
-                                        :class="[
-                                            'w-fit rounded-full px-2 text-start text-white xl:text-start',
-                                            {
-                                                'bg-yellow-600':
-                                                    applicant.pivot.status ===
-                                                    'Pending',
-                                                'bg-slate-600':
-                                                    applicant.pivot.status ===
-                                                        'Interview Scheduled' ||
-                                                    applicant.pivot.status ===
-                                                        'Under Review',
-                                                'bg-green-600':
-                                                    applicant.pivot.status ===
-                                                    'Accepted',
-                                                'bg-red-600':
-                                                    applicant.pivot.status ===
-                                                    'Rejected',
-                                            },
-                                        ]"
-                                    >
-                                        {{ applicant.pivot.status }}
-                                    </p>
-                                </td>
-                                <td class="p-3 text-start font-normal">
-                                    <select
-                                        :disabled="
-                                            page.props.auth.user.employer
-                                                .subscription
-                                                .subscription_type === 'Free'
-                                        "
-                                        v-if="
-                                            applicant.pivot.status !=
-                                                'Rejected' &&
-                                            applicant.pivot.status != 'Accepted'
-                                        "
-                                        name=""
-                                        id=""
-                                        @change="
-                                            updateStatus(
-                                                applicant.pivot.id,
-                                                $event,
-                                            )
-                                        "
-                                    >
-                                        <option value="">
-                                            {{ applicant.pivot.status }}
-                                        </option>
-                                        <option
-                                            v-if="
-                                                applicant.pivot.status ===
-                                                'Pending'
-                                            "
-                                            value="Under Review"
-                                        >
-                                            Under Review
-                                        </option>
-                                        <option
-                                            v-if="
-                                                applicant.pivot.status ===
-                                                'Under Review'
-                                            "
-                                            value="Interview Scheduled"
-                                        >
-                                            Interview Scheduled
-                                        </option>
-                                        <option
-                                            v-if="
-                                                applicant.pivot.status ===
-                                                'Interview Scheduled'
-                                            "
-                                            value="Accepted"
-                                        >
-                                            Accepted
-                                        </option>
-                                        <option value="Rejected">
-                                            Rejected
-                                        </option>
-                                    </select>
-
-                                    <p v-else>{{ applicant.pivot.status }}</p>
-                                </td>
+            <!-- Applicants Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr class="text-left text-sm font-medium text-gray-700">
+                                <th class="py-4 px-6 font-semibold">Applicant</th>
+                                <th class="py-4 px-6 font-semibold">Resume</th>
+                                <th class="py-4 px-6 font-semibold">Profile</th>
+                                <th class="py-4 px-6 font-semibold">Status</th>
+                                <th class="py-4 px-6 font-semibold">Actions</th>
                             </tr>
-                        </TransitionGroup>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <TransitionGroup name="applicant">
+                                <tr
+                                    v-for="applicant in applicants"
+                                    :key="applicant.id"
+                                    class="hover:bg-gray-50 transition-colors"
+                                >
+                                    <!-- Applicant Info -->
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-10 w-10 flex-shrink-0">
+                                                <img
+                                                    class="h-10 w-10 rounded-full object-cover border border-gray-200"
+                                                    :src="applicant.profile_img_url || '/assets/profile_placeholder.jpg'"
+                                                    @error="(event) => event.target.src = '/assets/profile_placeholder.jpg'"
+                                                    alt="Profile"
+                                                />
+                                            </div>
+                                            <div>
+                                                <p class="font-medium text-gray-900">{{ applicant.name }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Resume -->
+                                    <td class="py-4 px-6">
+                                        <a
+                                            :href="applicant.worker_profile.resume_url"
+                                            target="_blank"
+                                            class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
+                                        >
+                                            <i class="bi bi-file-earmark-text"></i>
+                                            View Resume
+                                        </a>
+                                    </td>
+
+                                    <!-- Profile -->
+                                    <td class="py-4 px-6">
+                                        <Link
+                                            :href="route('worker.show.profile', applicant.id)"
+                                            class="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 transition-colors"
+                                        >
+                                            <i class="bi bi-box-arrow-up-right text-sm"></i>
+                                            View Profile
+                                        </Link>
+                                    </td>
+
+                                    <!-- Status -->
+                                    <td class="py-4 px-6">
+                                        <span
+                                            :class="[
+                                                'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium',
+                                                {
+                                                    'bg-amber-100 text-amber-800': applicant.pivot.status === 'Pending',
+                                                    'bg-blue-100 text-blue-800': applicant.pivot.status === 'Under Review',
+                                                    'bg-purple-100 text-purple-800': applicant.pivot.status === 'Interview Scheduled',
+                                                    'bg-green-100 text-green-800': applicant.pivot.status === 'Accepted',
+                                                    'bg-red-100 text-red-800': applicant.pivot.status === 'Rejected'
+                                                }
+                                            ]"
+                                        >
+                                            {{ applicant.pivot.status }}
+                                        </span>
+                                    </td>
+
+                                    <!-- Actions -->
+                                    <td class="py-4 px-6">
+                                        <button
+                                            @click="applicantData = applicant; showModal = true"
+                                            :disabled="page.props.auth.user.employer.subscription.subscription_type === 'Free'"
+                                            :class="[
+                                                'p-2 rounded-lg transition-all duration-200',
+                                                page.props.auth.user.employer.subscription.subscription_type === 'Free'
+                                                    ? 'text-gray-400 cursor-not-allowed'
+                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                            ]"
+                                        >
+                                            <i class="bi bi-gear-fill text-lg"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </TransitionGroup>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Status Update Modal -->
     <ReusableModal v-if="showModal" @closeModal="closeModal">
-        <div
-            class="h-fit max-h-[400px] w-[350px] max-w-[400px] overflow-auto overflow-y-auto rounded bg-white p-4 text-[#171816] sm:w-[400px]"
-        >
-            <div class="mb-3 flex items-center justify-between">
-                <h2 class="text-xl">Set an interview date</h2>
-                <button @click="closeModal" class="cursor-pointer">
-                    <i class="bi bi-x-lg"></i>
+        <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">Manage Applicant</h2>
+                <button
+                    @click="closeModal"
+                    class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                    <i class="bi bi-x-lg text-gray-500"></i>
                 </button>
             </div>
-            <form @submit.prevent="schedInterview">
-                <div class="mb-3 flex justify-start gap-3">
-                    <div class="flex flex-1 flex-col">
-                        <label for="" class="text-gray-500">Date</label>
-                        <input
-                            type="date"
-                            :min="
-                                dayjs()
-                                    .tz(userTz)
-                                    .add(12, 'hour')
-                                    .format('YYYY-MM-DD')
-                            "
-                            class="rounded border p-2"
-                            v-model="date"
+
+            <!-- Applicant Info -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center gap-4">
+                    <div class="h-16 w-16">
+                        <img
+                            class="h-16 w-16 rounded-full object-cover border border-gray-200"
+                            :src="applicantData?.profile_img_url || '/assets/profile_placeholder.jpg'"
+                            @error="(event) => event.target.src = '/assets/profile_placeholder.jpg'"
+                            alt="Profile"
                         />
                     </div>
-                    <div class="flex flex-1 flex-col">
-                        <label for="" class="text-gray-500">Time</label>
-                        <input
-                            type="time"
-                            class="rounded border p-2"
-                            v-model="time"
-                        />
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ applicantData?.name }}</h3>
+                        <div class="flex items-center gap-4 mt-1">
+                            <a
+                                :href="applicantData?.worker_profile?.resume_url"
+                                target="_blank"
+                                class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium text-sm"
+                            >
+                                <i class="bi bi-file-earmark-text"></i>
+                                Resume
+                            </a>
+                            <Link
+                                :href="route('worker.show.profile', applicantData?.id)"
+                                class="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 font-medium text-sm"
+                            >
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                Profile
+                            </Link>
+                        </div>
+                    </div>
+                    <div :class="[
+                        'px-3 py-1 rounded-full text-sm font-medium',
+                        {
+                            'bg-amber-100 text-amber-800': applicantData?.pivot?.status === 'Pending',
+                            'bg-blue-100 text-blue-800': applicantData?.pivot?.status === 'Under Review',
+                            'bg-purple-100 text-purple-800': applicantData?.pivot?.status === 'Interview Scheduled',
+                            'bg-green-100 text-green-800': applicantData?.pivot?.status === 'Accepted',
+                            'bg-red-100 text-red-800': applicantData?.pivot?.status === 'Rejected'
+                        }
+                    ]">
+                        {{ applicantData?.pivot?.status }}
                     </div>
                 </div>
-                <InputFlashMessage
-                    class="mb-5"
-                    type="error"
-                    :message="errorMessage"
-                ></InputFlashMessage>
-                <div class="flex flex-col">
-                    <label for="" class="text-gray-500">Interview Mode</label>
-                    <select
-                        v-model="interviewMode"
-                        name=""
-                        id=""
-                        class="mb-3 rounded border p-2"
-                    >
-                        <option value="remote">Remote</option>
-                        <option value="onsite">On site</option>
-                    </select>
+            </div>
+
+            <!-- Status Management -->
+            <div class="p-6 space-y-6 max-h-96 overflow-y-auto">
+                <!-- Pending State -->
+                <div v-if="applicantData?.pivot?.status === 'Pending'" class="space-y-4">
+                    <h4 class="font-medium text-gray-900">Update Status</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button
+                            @click="updateStatus(applicantData.pivot.id, { target: { value: 'Under Review' } })"
+                            class="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors text-left group"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                                    <i class="bi bi-eye text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-blue-900">Under Review</p>
+                                    <p class="text-sm text-blue-600">Move to next stage</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button
+                            @click="updateStatus(applicantData.pivot.id, { target: { value: 'Rejected' } })"
+                            class="p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-left group"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                    <i class="bi bi-x-lg text-red-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-red-900">Reject</p>
+                                    <p class="text-sm text-red-600">Decline application</p>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
                 </div>
-                <div v-if="interviewMode === 'onsite'" class="mb-3">
-                    <Maps
-                        @update:coordinates="setCoordinates"
-                        :centerProps="jobProps.location"
-                        :markedCoordinatesProps="jobProps.location"
-                    ></Maps>
+
+                <!-- Under Review State -->
+                <div v-if="applicantData?.pivot?.status === 'Under Review'" class="space-y-4">
+                    <h4 class="font-medium text-gray-900">Next Steps</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button
+                            @click="applicationPivotId = applicantData.pivot.id; setInterview = true"
+                            class="p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors text-left group"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                                    <i class="bi bi-calendar-check text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-green-900">Schedule Interview</p>
+                                    <p class="text-sm text-green-600">Set up meeting</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button
+                            @click="updateStatus(applicantData.pivot.id, { target: { value: 'Rejected' } })"
+                            class="p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-left group"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                    <i class="bi bi-x-lg text-red-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-red-900">Reject</p>
+                                    <p class="text-sm text-red-600">Decline application</p>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex justify-end">
-                    <button
-                        class="inline-block rounded bg-[#171816] p-2 text-white"
-                    >
-                        Update status
-                    </button>
+
+                <!-- Interview Scheduled State -->
+                <div v-if="applicantData?.pivot?.status === 'Interview Scheduled'" class="space-y-4">
+                    <!-- Interview Details -->
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h4 class="font-medium text-purple-900 mb-2">Scheduled Interview</h4>
+                        <div class="space-y-1 text-sm text-purple-800">
+                            <p class="flex items-center gap-2">
+                                <i class="bi bi-calendar"></i>
+                                {{ dayjs(applicantData.pivot.interview_schedule).format("MMMM D, YYYY") }}
+                            </p>
+                            <p class="flex items-center gap-2">
+                                <i class="bi bi-clock"></i>
+                                {{ dayjs(applicantData.pivot.interview_schedule).format("h:mm A") }}
+                            </p>
+                            <p class="flex items-center gap-2">
+                                <i class="bi bi-geo-alt"></i>
+                                {{ applicantData.pivot.interview_mode === 'remote' ? 'Remote Meeting' : 'On-site' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <h4 class="font-medium text-gray-900">Update Status</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button
+                            @click="applicationPivotId = applicantData.pivot.id; setInterview = true"
+                            class="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors text-left group"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                                    <i class="bi bi-arrow-repeat text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-blue-900">Reschedule</p>
+                                    <p class="text-sm text-blue-600">Change time/date</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button
+                            @click="updateStatus(applicantData.pivot.id, { target: { value: 'Accepted' } })"
+                            class="p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors text-left group"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                                    <i class="bi bi-check-lg text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-green-900">Accept</p>
+                                    <p class="text-sm text-green-600">Hire applicant</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button
+                            @click="updateStatus(applicantData.pivot.id, { target: { value: 'Rejected' } })"
+                            class="p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-left group"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div class="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                    <i class="bi bi-x-lg text-red-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-red-900">Reject</p>
+                                    <p class="text-sm text-red-600">Decline application</p>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
                 </div>
-            </form>
-            <div class="flex justify-end"></div>
+
+                <!-- Final States -->
+                <div v-if="['Accepted', 'Rejected'].includes(applicantData?.pivot?.status)" class="text-center py-8">
+                    <div :class="[
+                        'inline-flex flex-col items-center p-6 rounded-2xl',
+                        applicantData?.pivot?.status === 'Accepted'
+                            ? 'bg-green-50 border border-green-200'
+                            : 'bg-red-50 border border-red-200'
+                    ]">
+                        <i
+                            :class="[
+                                'text-4xl mb-3',
+                                applicantData?.pivot?.status === 'Accepted'
+                                    ? 'bi bi-check-circle-fill text-green-500'
+                                    : 'bi bi-x-circle-fill text-red-500'
+                            ]"
+                        ></i>
+                        <h4 class="font-semibold text-gray-900 mb-1">
+                            {{ applicantData?.pivot?.status === 'Accepted' ? 'Application Accepted' : 'Application Rejected' }}
+                        </h4>
+                        <p :class="[
+                            'text-sm',
+                            applicantData?.pivot?.status === 'Accepted'
+                                ? 'text-green-700'
+                                : 'text-red-700'
+                        ]">
+                            {{ applicantData?.pivot?.status === 'Accepted'
+                                ? 'This applicant has been successfully hired.'
+                                : 'This application has been declined.'
+                            }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Interview Scheduling Form -->
+                <div v-if="setInterview" class="space-y-4 pt-4 border-t border-gray-200">
+                    <h4 class="font-medium text-gray-900">Schedule Interview</h4>
+                    <form @submit.prevent="schedInterview" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                                <input
+                                    type="date"
+                                    :min="dayjs().tz(userTz).add(12, 'hour').format('YYYY-MM-DD')"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    v-model="date"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                                <input
+                                    type="time"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    v-model="time"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <InputFlashMessage
+                            v-if="errorMessage"
+                            type="error"
+                            :message="errorMessage"
+                        />
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Interview Mode</label>
+                            <select
+                                v-model="interviewMode"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            >
+                                <option value="remote">Remote</option>
+                                <option value="onsite">On Site</option>
+                            </select>
+                        </div>
+
+                        <div v-if="interviewMode === 'onsite'" class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                            <Maps
+                                @update:coordinates="setCoordinates"
+                                :centerProps="jobProps.location"
+                                :markedCoordinatesProps="jobProps.location"
+                            ></Maps>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button
+                                type="button"
+                                @click="setInterview = false"
+                                class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                            >
+                                Schedule Interview
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </ReusableModal>
+
     <SuccessfulMessage
         :type="page.props.errors?.message ? 'Error' : 'Success'"
         :messageShow="showMessage"
         :messageProp="page.props.errors?.message ?? messageProp"
     ></SuccessfulMessage>
 </template>
+
 <style scoped>
 .applicant-move,
 .applicant-enter-active {
-    transition: all 0.5s ease-in;
+    transition: all 0.3s ease-in-out;
 }
 
 .applicant-enter-from,
 .applicant-leave-to {
     opacity: 0;
+    transform: translateY(10px);
 }
 
 .applicant-leave-active {
-    @apply invisible;
     position: absolute;
 }
 </style>

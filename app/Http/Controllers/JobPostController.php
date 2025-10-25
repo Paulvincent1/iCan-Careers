@@ -8,6 +8,8 @@ use App\Notifications\AdminFreeJobPostNotification;
 use App\Notifications\FireWorkerNotification;
 use App\Notifications\JobOpenedByAdminNotification;
 use Carbon\Carbon;
+use Dacastro4\LaravelGmail\Facade\LaravelGmail;
+use Dacastro4\LaravelGmail\Services\Message\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -85,13 +87,21 @@ class JobPostController extends Controller
     $maxPosts = $user->jobPostLimit();
     $jobCount = $user->jobPostsThisMonth();
 
+    $allJobCount = $user->employerJobPosts()->count();
+
+
+    if($user->employerSubscription->subscription_type === 'Free'){
+         if ($allJobCount >= $maxPosts) {
+            return redirect()->back()
+                ->withErrors(['message' => "You can post up to {$maxPosts} jobs for Free tier."]);
+        }
+    }
+
+
     if ($jobCount >= $maxPosts) {
-        $tierLabel = $user->employerSubscription->subscription_type === 'Free'
-            ? 'Free tier'
-            : 'Pro and Premium tier';
 
         return redirect()->back()
-            ->withErrors(['message' => "You can post up to {$maxPosts} jobs per month ({$tierLabel})."]);
+            ->withErrors(['message' => "You can post up to {$maxPosts} jobs per month Pro and Premium tier."]);
     }
 
     $jobStatus = $user->employerSubscription->subscription_type === 'Free' ? 'Pending' : 'Open';
@@ -148,6 +158,9 @@ class JobPostController extends Controller
         if($jobid->job_status === 'Closed'){
             return redirect()->back();
         }
+        if($jobid->job_status === 'Locked'){
+            return redirect()->back();
+        }
         return inertia('Employer/CreateJob', ['jobPostProp' => $jobid, 'isEdit' => true]);
     }
 
@@ -156,6 +169,12 @@ class JobPostController extends Controller
      */
     public function update(Request $request, JobPost $jobid)
     {
+        if($jobid->job_status === 'Closed'){
+            return redirect()->back();
+        }
+        if($jobid->job_status === 'Locked'){
+            return redirect()->back();
+        }
 
         // dd($request);
 
@@ -223,6 +242,26 @@ class JobPostController extends Controller
         $employer->notify(new JobOpenedByAdminNotification(employer:$employer,jobPost:$jobPost));
         // broadcast(new JobOpenedByAdminNotification(employer:$employer,jobPost:$jobPost));
 
+         // Send Gmail notification
+        try {
+            $token = LaravelGmail::makeToken(); // Generate token first
+
+            $mail = new Mail();
+            $mail->using($token['access_token'])
+                ->to($employer->email, $employer->name)
+                ->from('icancareers2@gmail.com', 'iCan Careers')
+                ->subject('Your Job Post Has Been Approved')
+                ->view('mail.job-opened', [
+                    'employer' => $employer,
+                    'jobPost' => $jobPost,
+                ])
+                ->send();
+
+        } catch (\Exception $e) {
+
+            return redirect()->back()->withErrors(['email' => 'Email sending failed: ' . $e->getMessage()]);
+        }
+
         return redirect()->route('admin.job.approvals')->with('success', 'Job status updated successfully.');
     }
 
@@ -272,12 +311,32 @@ class JobPostController extends Controller
             $query->where('id', $employer->id);
         })->first();
 
-        if($currentJob){
-            // expects the related model(myJobs) id not the pivot table id.
-            $workerId->myJobs()->updateExistingPivot($currentJob->id, ['current' => false]);
+            if($currentJob){
+                // expects the related model(myJobs) id not the pivot table id.
+                $workerId->myJobs()->updateExistingPivot($currentJob->id, ['current' => false]);
 
-            $workerId->notify(new FireWorkerNotification(employer:$employer,worker:$workerId));
-            // broadcast(new FireWorkerNotification(employer:$employer,worker:$workerId));
+                $workerId->notify(new FireWorkerNotification(employer:$employer,worker:$workerId));
+                // broadcast(new FireWorkerNotification(employer:$employer,worker:$workerId));
+
+                // ✅ Send Gmail email notification
+            try {
+                $token = LaravelGmail::makeToken(); // Generate Gmail token
+
+                $mail = new Mail();
+                $mail->using($token['access_token'])
+                    ->to($workerId->email, $workerId->name)
+                    ->from('icancareers2@gmail.com', 'iCan Careers')
+                    ->subject('Contract Ended Notification')
+                    ->view('mail.fire-worker', [
+                        'employer' => $employer,
+                        'worker' => $workerId,
+                        'jobPost' => $jobPostId,
+                    ])
+                    ->send();
+
+            } catch (\Exception $e) {
+                return redirect()->back()->withErrors(['email' => 'Email sending failed: ' . $e->getMessage()]);
+            }
         }
 
         return redirect()->back()->with('message','Successfully ended the contract.');
