@@ -783,23 +783,17 @@ console.log(userTz);
                             <p class="flex items-center gap-2">
                                 <i class="bi bi-calendar"></i>
                                 {{
-                                    dayjs(
-                                        applicantData.pivot.interview_schedule,
-                                    )
-                                        .utc(userTz)
+                                    dayjs.utc(applicantData.pivot.interview_schedule).tz(userTz)
                                         .format("MMMM D, YYYY")
                                 }}
                             </p>
                             <p class="flex items-center gap-2">
                                 <i class="bi bi-clock"></i>
                                 {{
-                                    dayjs(
-                                        applicantData.pivot.interview_schedule,
-                                    )
-                                        .utc(userTz)
-                                        .format("h:mm A")
+                                     dayjs.utc(applicantData.pivot.interview_schedule).tz(userTz).format("h:mm A")
                                 }}
                             </p>
+
                             <p class="flex items-center gap-2">
                                 <i class="bi bi-geo-alt"></i>
                                 {{
